@@ -1,6 +1,9 @@
 # Copyright 2022 VMware, Inc. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
+# Ensure Make is run with bash shell as some syntax below is bash-specific
+SHELL := /usr/bin/env bash
+
 ROOT_DIR := $(shell git rev-parse --show-toplevel)
 
 # Golang specific variables
@@ -20,10 +23,14 @@ GO := go
 # Directories
 TOOLS_DIR := $(abspath $(ROOT_DIR)/hack/tools)
 TOOLS_BIN_DIR := $(TOOLS_DIR)/bin
+GO_MODULES=$(shell find . -path "*/go.mod" | grep -v "^./pinniped/" | xargs -I _ dirname _)
 
 # Add tooling binaries here and in hack/tools/Makefile
-GOIMPORTS        := $(TOOLS_BIN_DIR)/goimports
-TOOLING_BINARIES := $(GOIMPORTS)
+GOIMPORTS          := $(TOOLS_BIN_DIR)/goimports
+GOLANGCI_LINT      := $(TOOLS_BIN_DIR)/golangci-lint
+VALE               := $(TOOLS_BIN_DIR)/vale
+MISSPELL           := $(TOOLS_BIN_DIR)/misspell
+TOOLING_BINARIES   := $(GOIMPORTS) $(GOLANGCI_LINT) $(VALE) $(MISSPELL)
 
 ## --------------------------------------
 ## Help
@@ -44,16 +51,48 @@ all: test ## Tests the library
 ## --------------------------------------
 
 .PHONY: test
-test: fmt vet ## Run Tests
+test: fmt ## Run Tests
 	${GO} test ./... -timeout 60m -race -coverprofile coverage.txt -v
-
-.PHONY: vet
-vet: ## Vet codebase
-	${GO} vet ./...
 
 .PHONY: fmt
 fmt: $(GOIMPORTS) ## Run goimports
 	$(GOIMPORTS) -w -local github.com/vmware-tanzu ./
+
+lint: tools go-lint doc-lint misspell yamllint ## Run linting and misspell checks
+	# Check licenses in shell scripts and Makefiles
+	hack/check/check-license.sh
+
+misspell: $(MISSPELL)
+	hack/check/misspell.sh
+
+yamllint:
+	hack/check/check-yaml.sh
+
+go-lint: $(GOLANGCI_LINT)  ## Run linting of go source
+	@for i in $(GO_MODULES); do \
+		echo "-- Linting $$i --"; \
+		pushd $${i}; \
+		$(GOLANGCI_LINT) run -v --timeout=10m; \
+		popd; \
+	done
+
+
+	# Prevent use of deprecated ioutils module
+	@CHECK=$$(grep -r --include="*.go"  --exclude="zz_generated*" ioutil .); \
+	if [ -n "$${CHECK}" ]; then \
+		echo "ioutil is deprecated, use io or os replacements"; \
+		echo "https://go.dev/doc/go1.16#ioutil"; \
+		echo "$${CHECK}"; \
+		exit 1; \
+	fi
+
+doc-lint: $(VALE) ## Run linting checks for docs
+	$(VALE) --config=.vale/config.ini --glob='*.md' ./
+	# mdlint rules with possible errors and fixes can be found here:
+	# https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md
+	# Additional configuration can be found in the .markdownlintrc file.
+	hack/check/check-mdlint.sh
+
 
 ## --------------------------------------
 ## Tooling Binaries

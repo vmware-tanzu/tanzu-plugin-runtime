@@ -23,7 +23,7 @@ GO := go
 # Directories
 TOOLS_DIR := $(abspath $(ROOT_DIR)/hack/tools)
 TOOLS_BIN_DIR := $(TOOLS_DIR)/bin
-GO_MODULES=$(shell find . -path "*/go.mod" | grep -v "^./pinniped/" | xargs -I _ dirname _)
+GO_MODULES=$(shell find . -path "*/go.mod" | xargs -I _ dirname _)
 
 # Add tooling binaries here and in hack/tools/Makefile
 GOIMPORTS          := $(TOOLS_BIN_DIR)/goimports
@@ -52,6 +52,7 @@ all: test ## Tests the library
 
 .PHONY: test
 test: fmt ## Run Tests
+	make -C test/plugins all
 	${GO} test ./... -timeout 60m -race -coverprofile coverage.txt -v
 
 .PHONY: fmt
@@ -72,7 +73,7 @@ go-lint: $(GOLANGCI_LINT)  ## Run linting of go source
 	@for i in $(GO_MODULES); do \
 		echo "-- Linting $$i --"; \
 		pushd $${i}; \
-		$(GOLANGCI_LINT) run -v --timeout=10m; \
+		$(GOLANGCI_LINT) run -v --timeout=10m || exit 1; \
 		popd; \
 	done
 
@@ -93,6 +94,14 @@ doc-lint: $(VALE) ## Run linting checks for docs
 	# Additional configuration can be found in the .markdownlintrc file.
 	hack/check/check-mdlint.sh
 
+.PHONY: modules
+modules: ## Runs go mod to ensure modules are up to date.
+	@for i in $(GO_MODULES); do \
+		echo "-- Tidying $$i --"; \
+		pushd $${i}; \
+		$(GO) mod tidy || exit 1; \
+		popd; \
+	done
 
 ## --------------------------------------
 ## Tooling Binaries
@@ -102,3 +111,7 @@ tools: $(TOOLING_BINARIES) ## Build tooling binaries
 .PHONY: $(TOOLING_BINARIES)
 $(TOOLING_BINARIES):
 	make -C $(TOOLS_DIR) $(@F)
+
+.PHONY: clean
+clean: ## Remove all generated binaries
+	make -C test/plugins clean

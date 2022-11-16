@@ -13,9 +13,8 @@ func newRootCmd(descriptor *PluginDescriptor) *cobra.Command {
 		Short:   descriptor.Description,
 		Aliases: descriptor.Aliases,
 	}
-	// TODO(prkalle): To be uncommented when CmdTemplate/TemplateFunc(usage.go) are added along with the component package dependency
-	// cobra.AddTemplateFuncs(TemplateFuncs)
-	// cmd.SetUsageTemplate(CmdTemplate)
+	cobra.AddTemplateFuncs(TemplateFuncs)
+	cmd.SetUsageTemplate(CmdTemplate)
 
 	cmd.AddCommand(
 		newDescribeCmd(descriptor.Description),

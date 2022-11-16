@@ -26,8 +26,7 @@ func NewPlugin(descriptor *PluginDescriptor) (*Plugin, error) {
 	p := &Plugin{
 		Cmd: newRootCmd(descriptor),
 	}
-	// TODO(prkalle): To be uncommented when lint command is added along with the component package dependency
-	// p.Cmd.AddCommand(lintCmd)
+	p.Cmd.AddCommand(lintCmd)
 	p.Cmd.AddCommand(genDocsCmd)
 	p.Cmd.AddCommand(newPostInstallCmd(descriptor))
 	return p, nil

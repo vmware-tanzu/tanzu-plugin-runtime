@@ -57,8 +57,7 @@ func TestAddCommands(t *testing.T) {
 	cmd.AddCommands(subCmd)
 
 	// Plugin gets 6 commands by default (describe, info, version, lint, post-install, generate-docs), ours should make 7.
-	// TODO(prkalle): Should revert back to 7 when lint command is added back
-	assert.Equal(6, len(cmd.Cmd.Commands()))
+	assert.Equal(7, len(cmd.Cmd.Commands()))
 }
 
 func TestExecute(t *testing.T) {

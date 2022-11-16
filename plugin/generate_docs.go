@@ -26,7 +26,6 @@ func init() {
 	genDocsCmd.Flags().StringVarP(&docsDir, "docs-dir", "d", DefaultDocsDir, "destination for docs output")
 }
 
-// TODO(prkalle): Add unit tests for this command
 var genDocsCmd = &cobra.Command{
 	Use:    "generate-docs",
 	Short:  "Generate Cobra CLI docs for all subcommands",

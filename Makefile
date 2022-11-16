@@ -30,7 +30,8 @@ GOIMPORTS          := $(TOOLS_BIN_DIR)/goimports
 GOLANGCI_LINT      := $(TOOLS_BIN_DIR)/golangci-lint
 VALE               := $(TOOLS_BIN_DIR)/vale
 MISSPELL           := $(TOOLS_BIN_DIR)/misspell
-TOOLING_BINARIES   := $(GOIMPORTS) $(GOLANGCI_LINT) $(VALE) $(MISSPELL)
+CONTROLLER_GEN     := $(TOOLS_BIN_DIR)/controller-gen
+TOOLING_BINARIES   := $(GOIMPORTS) $(GOLANGCI_LINT) $(VALE) $(MISSPELL) $(CONTROLLER_GEN)
 
 ## --------------------------------------
 ## Help
@@ -44,7 +45,7 @@ help: ## Display this help (default)
 ## --------------------------------------
 
 .PHONY: all
-all: test ## Tests the library
+all: modules test lint ## ## Run all major targets (lint, test, modules)
 
 ## --------------------------------------
 ## Testing
@@ -115,3 +116,16 @@ $(TOOLING_BINARIES):
 .PHONY: clean
 clean: ## Remove all generated binaries
 	make -C test/plugins clean
+
+
+## --------------------------------------
+## Generators
+## --------------------------------------
+
+CONTROLLER_GEN_SRC ?= "./..."
+
+generate-controller-code: $(CONTROLLER_GEN)  ## Generate code via controller-gen
+	$(CONTROLLER_GEN) $(GENERATOR) object:headerFile="$(ROOT_DIR)/hack/boilerplate.go.txt",year=$(shell date +%Y) paths="$(CONTROLLER_GEN_SRC)" $(OPTIONS)
+	$(MAKE) fmt
+
+generate: generate-controller-code

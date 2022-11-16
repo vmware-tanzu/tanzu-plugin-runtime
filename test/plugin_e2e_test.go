@@ -16,7 +16,7 @@ import (
 	executil "github.com/vmware-tanzu/tanzu-plugin-runtime/test/exec"
 )
 
-func Test(t *testing.T) {
+func TestPlugin(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Plugin test suite")
 }

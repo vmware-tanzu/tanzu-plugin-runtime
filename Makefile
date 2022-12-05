@@ -158,7 +158,7 @@ manifests: ## Generate manifests e.g. CRD, RBAC etc.
 	$(MAKE) -C apis/run generate-manifests
 	$(MAKE) -C cli/runtime generate-manifests
 
-generate-go: $(COUNTERFEITER) ## Generate code via go generate.
+generate-go: tools $(COUNTERFEITER) ## Generate code via go generate.
 	@for i in $(GO_MODULES); do \
 		echo "-- Running go generate ./... $$i --"; \
 		pushd $${i}; \
@@ -486,73 +486,73 @@ test: generate manifests build-cli-mocks ## Run tests
 	## Skip running TKG integration tests
 	$(MAKE) ytt -C $(TOOLS_DIR)
 
-	echo "Verifying cluster-api packages and providers are in sync..."
-	make -C hack/providers-sync-tools validate
-	echo "... cluster-api packages are in sync"
+#	echo "Verifying cluster-api packages and providers are in sync..."
+#	make -C hack/providers-sync-tools validate
+#	echo "... cluster-api packages are in sync"
 
 	## Test the YTT cluster templates
-	echo "Changing into the provider test directory to verify ytt cluster templates..."
-	cd ./providers/tests/unit && PATH=$(abspath hack/tools/bin):"$(PATH)" $(GO) test -coverprofile coverage1.txt -v -timeout 120s ./
-	echo "... ytt cluster template verification complete!"
+#	echo "Changing into the provider test directory to verify ytt cluster templates..."
+#	cd ./providers/tests/unit && PATH=$(abspath hack/tools/bin):"$(PATH)" $(GO) test -coverprofile coverage1.txt -v -timeout 120s ./
+#	echo "... ytt cluster template verification complete!"
+#
+#	echo "Verifying package tests..."
+#	find ./packages/ -name "test" -type d | \
+#		xargs -n1  -I {} bash -c 'cd {} && PATH=$(abspath hack/tools/bin):"$(PATH)" $(GO) test -coverprofile coverage2.txt -v -timeout 120s ./...' \;
+#	echo "... package tests complete!"
 
-	echo "Verifying package tests..."
-	find ./packages/ -name "test" -type d | \
-		xargs -n1  -I {} bash -c 'cd {} && PATH=$(abspath hack/tools/bin):"$(PATH)" $(GO) test -coverprofile coverage2.txt -v -timeout 120s ./...' \;
-	echo "... package tests complete!"
+	PATH=$(abspath hack/tools/bin):"$(PATH)" $(GO) test -coverprofile coverage3.txt -v `go list ./... | grep -Ev '(github.com/vmware-tanzu/tanzu-framework/tkg/test|github.com/vmware-tanzu/tanzu-framework/cmd/cli/plugin/package/test) | grep plugin'`
 
-	PATH=$(abspath hack/tools/bin):"$(PATH)" $(GO) test -coverprofile coverage3.txt -v `go list ./... | grep -Ev '(github.com/vmware-tanzu/tanzu-framework/tkg/test|github.com/vmware-tanzu/tanzu-framework/cmd/cli/plugin/package/test)'`
-
-	$(MAKE) kubebuilder -C $(TOOLS_DIR)
-	KUBEBUILDER_ASSETS=$(ROOT_DIR)/$(KUBEBUILDER)/bin $(MAKE) test -C addons
+#	$(MAKE) kubebuilder -C $(TOOLS_DIR)
+#	KUBEBUILDER_ASSETS=$(ROOT_DIR)/$(KUBEBUILDER)/bin $(MAKE) test -C addons
 
 	# pinniped post-deploy
-	$(MAKE) test -C pinniped-components/post-deploy
+#	$(MAKE) test -C pinniped-components/post-deploy
 	# pinniped tanzu-auth-controller-manager
-	pinniped-components/tanzu-auth-controller-manager/hack/test.sh
+#	pinniped-components/tanzu-auth-controller-manager/hack/test.sh
 
 	#Test core cli runtime library
 	$(MAKE) test -C cli/runtime
 
 	# Test core cli
-	$(MAKE) test -C cli/core
+#	$(MAKE) test -C cli/core
 
 	# Test tkg module
-	$(MAKE) test -C tkg
+#	$(MAKE) test -C tkg
 
 	# Test feature gates
-	$(MAKE) test -C featuregates
+#	$(MAKE) test -C featuregates
 
 	# Test capabilities
-	$(MAKE) test -C capabilities
+#	$(MAKE) test -C capabilities
 
 	# Test other modules.
 	# TODO: This should be a call to a "test" target in that module's Makefile
-	cd apis/config && $(GO) test ./... -coverprofile cover.out
-	cd apis/run && $(GO) test ./... -coverprofile cover.out
-	cd packageclients && $(GO) test ./... -coverprofile cover.out
-	cd apis/addonconfigs && $(GO) test ./... -coverprofile cover.out
-	cd apis/cli && $(GO) test ./... -coverprofile cover.out
-	cd apis/core && $(GO) test ./... -coverprofile cover.out
-
-	# Test admin plugins
-	cd cmd/cli/plugin-admin/builder && $(GO) test ./... -coverprofile cover.out
-	cd cmd/cli/plugin-admin/codegen && $(GO) test ./... -coverprofile cover.out
-	cd cmd/cli/plugin-admin/test && $(GO) test ./... -coverprofile cover.out
-
-	# Test plugins
-	cd cmd/cli/plugin/feature && $(GO) test ./... -coverprofile cover.out
-	cd cmd/cli/plugin/login && $(GO) test ./... -coverprofile cover.out
-	cd cmd/cli/plugin/pinniped-auth && $(GO) test ./... -coverprofile cover.out
-	cd cmd/cli/plugin/secret && $(GO) test ./... -coverprofile cover.out
-
-	# Test package plugin but skip package/test which are e2e tests run separately in CI
-	cd cmd/cli/plugin/package && $(GO) test -coverprofile cover.out -v `go list ./... | grep -v github.com/vmware-tanzu/tanzu-framework/cmd/cli/plugin/package/test`
-
-	# Cluster plugin tests
-	$(MAKE) test -C cmd/cli/plugin/cluster
+#	cd apis/config && $(GO) test ./... -coverprofile cover.out
+#	cd apis/run && $(GO) test ./... -coverprofile cover.out
+#	cd packageclients && $(GO) test ./... -coverprofile cover.out
+#	cd apis/addonconfigs && $(GO) test ./... -coverprofile cover.out
+#	cd apis/cli && $(GO) test ./... -coverprofile cover.out
+#	cd apis/core && $(GO) test ./... -coverprofile cover.out
+#
+#	# Test admin plugins
+#	cd cmd/cli/plugin-admin/builder && $(GO) test ./... -coverprofile cover.out
+#	cd cmd/cli/plugin-admin/codegen && $(GO) test ./... -coverprofile cover.out
+#	cd cmd/cli/plugin-admin/test && $(GO) test ./... -coverprofile cover.out
+#
+#	# Test plugins
+#	cd cmd/cli/plugin/feature && $(GO) test ./... -coverprofile cover.out
+#	cd cmd/cli/plugin/login && $(GO) test ./... -coverprofile cover.out
+#	cd cmd/cli/plugin/pinniped-auth && $(GO) test ./... -coverprofile cover.out
+#	cd cmd/cli/plugin/secret && $(GO) test ./... -coverprofile cover.out
+#
+#	# Test package plugin but skip package/test which are e2e tests run separately in CI
+#	cd cmd/cli/plugin/package && $(GO) test -coverprofile cover.out -v `go list ./... | grep -v github.com/vmware-tanzu/tanzu-framework/cmd/cli/plugin/package/test`
 
 	# Cluster plugin tests
-	$(MAKE) test -C cmd/cli/plugin/managementcluster
+#	$(MAKE) test -C cmd/cli/plugin/cluster
+
+	# Cluster plugin tests
+#	$(MAKE) test -C cmd/cli/plugin/managementcluster
 
 .PHONY: test-cli
 test-cli: build-cli-mocks ## Run tests

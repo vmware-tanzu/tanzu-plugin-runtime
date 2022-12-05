@@ -35,11 +35,6 @@ jobs:
     - name: Get dependencies
       run: go mod download
 
-    - name: Build
-      run: |
-        env | sort
-        make all ENVS=linux-amd64
-
     - name: Verify
       run: |
         make verify
@@ -50,7 +45,7 @@ jobs:
     - name: Upload coverage reports to Codecov with GitHub Action
       uses: codecov/codecov-action@v3
       with:
-        files: ./coverage1.txt,./coverage2.txt,./coverage3.txt,./cli/core/coverage.txt,./cli/runtime/coverage.txt,./cmd/cli/plugin-admin/builder/cover.out,./cmd/cli/plugin-admin/codegen/cover.out,./cmd/cli/plugin-admin/test/cover.out,./cmd/cli/plugin/login/cover.out
+        files: ./coverage3.txt,./cli/runtime/coverage.txt
   check:
     name: Lint
     runs-on: ubuntu-latest

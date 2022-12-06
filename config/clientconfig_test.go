@@ -1,4 +1,4 @@
-// Copyright 2022 VMware, Inc. All Rights Reserved.
+// Copyright 2021 VMware, Inc. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
 package config
@@ -15,6 +15,7 @@ import (
 	"github.com/tj/assert"
 	"golang.org/x/sync/errgroup"
 
+	cliv1alpha1 "github.com/vmware-tanzu/tanzu-framework/apis/cli/v1alpha1"
 	configapi "github.com/vmware-tanzu/tanzu-plugin-runtime/apis/config/v1alpha1"
 )
 
@@ -28,7 +29,13 @@ func randString() string {
 }
 
 func TestClientConfig(t *testing.T) {
-	LocalDirName = fmt.Sprintf(".tanzu-test-%s", randString())
+	// Setup config test data
+	_, cleanUp := setupTestConfig(t, &CfgTestData{})
+
+	defer func() {
+		cleanUp()
+	}()
+
 	server0 := &configapi.Server{
 		Name: "test",
 		Type: configapi.ManagementClusterServerType,
@@ -46,21 +53,14 @@ func TestClientConfig(t *testing.T) {
 	err := StoreClientConfig(testCtx)
 	require.NoError(t, err)
 	ReleaseTanzuConfigLock()
-
-	defer cleanupDir(LocalDirName)
-
 	_, err = GetClientConfig()
 	require.NoError(t, err)
-
 	s, err := GetServer("test")
 	require.NoError(t, err)
-
 	require.Equal(t, s, server0)
-
 	e, err := ServerExists("test")
 	require.NoError(t, err)
 	require.True(t, e)
-
 	server1 := &configapi.Server{
 		Name: "test1",
 		Type: configapi.ManagementClusterServerType,
@@ -68,53 +68,45 @@ func TestClientConfig(t *testing.T) {
 			Path: "test1",
 		},
 	}
-
-	err = AddServer(server1, true)
+	err = SetServer(server1, true)
 	require.NoError(t, err)
-
 	c, err := GetClientConfig()
 	require.NoError(t, err)
 	require.Len(t, c.KnownServers, 2)
 	require.Equal(t, c.CurrentServer, "test1")
-
 	err = SetCurrentServer("test")
 	require.NoError(t, err)
-
 	c, err = GetClientConfig()
 	require.NoError(t, err)
 	require.Len(t, c.KnownServers, 2)
 	require.Equal(t, "test", c.CurrentServer)
-
 	err = RemoveServer("test")
 	require.NoError(t, err)
-
 	c, err = GetClientConfig()
 	require.NoError(t, err)
 	require.Len(t, c.KnownServers, 1)
 	require.Equal(t, "", c.CurrentServer)
-
-	err = PutServer(server1, true)
+	err = SetServer(server1, true)
 	require.NoError(t, err)
-
 	c, err = GetClientConfig()
 	require.NoError(t, err)
 	require.Len(t, c.KnownServers, 1)
-
 	err = RemoveServer("test1")
 	require.NoError(t, err)
-
 	c, err = GetClientConfig()
 	require.NoError(t, err)
 	require.Len(t, c.KnownServers, 0)
 	require.Equal(t, c.CurrentServer, "")
-
-	err = DeleteClientConfig()
-	require.NoError(t, err)
 }
 
-func TestConfigLegacyDir(t *testing.T) {
+func TestConfigLegacyDirWithEnvConfigKey(t *testing.T) {
 	r := randString()
-	LocalDirName = fmt.Sprintf(".tanzu-test-%s", r)
+	// Setup config test data
+	_, cleanUp := setupTestConfig(t, &CfgTestData{})
+
+	defer func() {
+		cleanUp()
+	}()
 
 	// Setup legacy config dir.
 	legacyLocalDirName = fmt.Sprintf(".tanzu-test-legacy-%s", r)
@@ -124,33 +116,30 @@ func TestConfigLegacyDir(t *testing.T) {
 	require.NoError(t, err)
 	legacyCfgPath, err := legacyConfigPath()
 	require.NoError(t, err)
+	defer cleanupDir(legacyLocalDirName)
 
-	server0 := &configapi.Server{
-		Name: "test",
-		Type: configapi.ManagementClusterServerType,
-		ManagementClusterOpts: &configapi.ManagementClusterServer{
-			Path: "test",
-		},
-	}
-	testCtx := &configapi.ClientConfig{
+	//Setup data
+	testCfg := &configapi.ClientConfig{
 		KnownServers: []*configapi.Server{
-			server0,
+			{
+				Name: "test",
+				Type: configapi.ManagementClusterServerType,
+				ManagementClusterOpts: &configapi.ManagementClusterServer{
+					Path: "test",
+				},
+			},
 		},
 		CurrentServer: "test",
 	}
 
 	AcquireTanzuConfigLock()
-	err = StoreClientConfig(testCtx)
+	err = StoreClientConfig(testCfg)
 	ReleaseTanzuConfigLock()
 	require.NoError(t, err)
 	require.FileExists(t, legacyCfgPath)
 
-	defer cleanupDir(LocalDirName)
-	defer cleanupDir(legacyLocalDirName)
-
 	_, err = GetClientConfig()
 	require.NoError(t, err)
-
 	server1 := &configapi.Server{
 		Name: "test1",
 		Type: configapi.ManagementClusterServerType,
@@ -159,7 +148,7 @@ func TestConfigLegacyDir(t *testing.T) {
 		},
 	}
 
-	err = AddServer(server1, true)
+	err = SetServer(server1, true)
 	require.NoError(t, err)
 
 	c, err := GetClientConfig()
@@ -182,79 +171,96 @@ func TestConfigLegacyDir(t *testing.T) {
 		t.Errorf("ClientConfig object mismatch between legacy and new config location (-want +got): \n%s", diff)
 	}
 	LocalDirName = tmp
-
-	err = DeleteClientConfig()
-	require.NoError(t, err)
 }
 
-func TestGetDiscoverySources(t *testing.T) {
-	assert := assert.New(t)
+func TestConfigLegacyDirWithoutEnvConfigKey(t *testing.T) {
+	r := randString()
 
-	tanzuConfigBytes := `apiVersion: config.tanzu.vmware.com/v1alpha1
-clientOptions:
-  cli:
-    useContextAwareDiscovery: true
-current: mgmt
-kind: ClientConfig
-metadata:
-  creationTimestamp: null
-servers:
-- managementClusterOpts:
-    context: mgmt-admin@mgmt
-    path: config
-  name: mgmt
-  type: managementcluster
-`
-	f, err := os.CreateTemp("", "tanzu_config")
-	assert.Nil(err)
-	err = os.WriteFile(f.Name(), []byte(tanzuConfigBytes), 0644)
-	assert.Nil(err)
-	defer os.Remove(f.Name())
-	os.Setenv("TANZU_CONFIG", f.Name())
+	// Setup config test data
+	_, cleanUp := setupTestConfig(t, &CfgTestData{})
 
-	pds := GetDiscoverySources("mgmt")
-	assert.Equal(1, len(pds))
-	assert.Equal(pds[0].Kubernetes.Name, "default-mgmt")
-	assert.Equal(pds[0].Kubernetes.Path, "config")
-	assert.Equal(pds[0].Kubernetes.Context, "mgmt-admin@mgmt")
+	defer func() {
+		cleanUp()
+	}()
 
-	// Test tmc global server
-	tanzuConfigBytes = `apiVersion: config.tanzu.vmware.com/v1alpha1
-clientOptions:
-  cli:
-    useContextAwareDiscovery: true
-current: tmc-test
-kind: ClientConfig
-metadata:
-  creationTimestamp: null
-servers:
-- globalOpts:
-    endpoint: test.cloud.vmware.com:443
-  name: tmc-test
-  type: global
-`
-	tf, err := os.CreateTemp("", "tanzu_tmc_config")
-	assert.Nil(err)
-	err = os.WriteFile(tf.Name(), []byte(tanzuConfigBytes), 0644)
-	assert.Nil(err)
-	defer os.Remove(tf.Name())
-	os.Setenv("TANZU_CONFIG", tf.Name())
+	func() {
+		LocalDirName = TestLocalDirName
+	}()
+	defer func() {
+		cleanupDir(LocalDirName)
+	}()
 
-	pds = GetDiscoverySources("tmc-test")
-	assert.Equal(1, len(pds))
-	assert.Equal(pds[0].REST.Endpoint, "https://test.cloud.vmware.com")
-	assert.Equal(pds[0].REST.BasePath, "v1alpha1/system/binaries/plugins")
-	assert.Equal(pds[0].REST.Name, "default-tmc-test")
+	// Setup legacy config dir.
+	legacyLocalDirName = fmt.Sprintf(".tanzu-test-legacy-%s", r)
+	legacyLocalDir, err := legacyLocalDir()
+	require.NoError(t, err)
+	err = os.MkdirAll(legacyLocalDir, 0755)
+	require.NoError(t, err)
+	legacyCfgPath, err := legacyConfigPath()
+	require.NoError(t, err)
+	defer cleanupDir(legacyLocalDirName)
+
+	//Setup data
+	testCfg := &configapi.ClientConfig{
+		KnownServers: []*configapi.Server{
+			{
+				Name: "test",
+				Type: configapi.ManagementClusterServerType,
+				ManagementClusterOpts: &configapi.ManagementClusterServer{
+					Path: "test",
+				},
+			},
+		},
+		CurrentServer: "test",
+	}
+
+	AcquireTanzuConfigLock()
+	err = StoreClientConfig(testCfg)
+	ReleaseTanzuConfigLock()
+	require.NoError(t, err)
+	require.FileExists(t, legacyCfgPath)
+
+	_, err = GetClientConfig()
+	require.NoError(t, err)
+	server1 := &configapi.Server{
+		Name: "test1",
+		Type: configapi.ManagementClusterServerType,
+		ManagementClusterOpts: &configapi.ManagementClusterServer{
+			Path: "test1",
+		},
+	}
+
+	err = SetServer(server1, true)
+	require.NoError(t, err)
+
+	c, err := GetClientConfig()
+	require.NoError(t, err)
+	require.Len(t, c.KnownServers, 2)
+	require.Equal(t, c.CurrentServer, "test1")
+
+	err = RemoveServer("test")
+	require.NoError(t, err)
+
+	c, err = GetClientConfig()
+	require.NoError(t, err)
+	require.Len(t, c.KnownServers, 1)
+
+	tmp := LocalDirName
+	LocalDirName = legacyLocalDirName
+	configCopy, err := GetClientConfig()
+	require.NoError(t, err)
+	if diff := cmp.Diff(c, configCopy); diff != "" {
+		t.Errorf("ClientConfig object mismatch between legacy and new config location (-want +got): \n%s", diff)
+	}
+	LocalDirName = tmp
 }
 
 func TestClientConfigUpdateInParallel(t *testing.T) {
-	assert := assert.New(t)
 	addServer := func(mcName string) error {
 		_, err := GetClientConfig()
 		if err != nil {
 			return err
 		}
-
 		s := &configapi.Server{
 			Name: mcName,
 			Type: configapi.ManagementClusterServerType,
@@ -263,21 +269,21 @@ func TestClientConfigUpdateInParallel(t *testing.T) {
 				Path:    "fake-path",
 			},
 		}
-		err = AddServer(s, true)
+		err = SetServer(s, true)
 		if err != nil {
 			return err
 		}
-
 		_, err = GetClientConfig()
 		return err
 	}
-
 	// Creates temp configuration file and runs addServer in parallel
 	runTestInParallel := func() {
-		// Get the temp tanzu config file
-		f, err := os.CreateTemp("", "tanzu_config*")
-		assert.Nil(err)
-		os.Setenv("TANZU_CONFIG", f.Name())
+		// Setup config test data
+		cfgTestFiles, cleanUp := setupTestConfig(t, &CfgTestData{})
+
+		defer func() {
+			cleanUp()
+		}()
 
 		// run addServer in parallel
 		parallelExecutionCounter := 100
@@ -288,19 +294,16 @@ func TestClientConfigUpdateInParallel(t *testing.T) {
 				return addServer(fmt.Sprintf("mc-%v", id))
 			})
 		}
-		err = group.Wait()
-		rawContents, readErr := os.ReadFile(f.Name())
-		assert.Nil(readErr, "Error reading config: %s", readErr)
-		assert.Nil(err, "Config file contents: \n%s", rawContents)
-
+		err := group.Wait()
+		rawContents, readErr := os.ReadFile(cfgTestFiles[0].Name())
+		assert.Nil(t, readErr, "Error reading config: %s", readErr)
+		assert.Nil(t, err, "Config file contents: \n%s", rawContents)
 		// Make sure that the configuration file is not corrupted
 		clientconfig, err := GetClientConfig()
-		assert.Nil(err)
-
+		assert.Nil(t, err)
 		// Make sure all expected servers are added to the knownServers list
-		assert.Equal(parallelExecutionCounter, len(clientconfig.KnownServers))
+		assert.Equal(t, parallelExecutionCounter, len(clientconfig.KnownServers))
 	}
-
 	// Run the parallel tests of reading and updating the configuration file
 	// multiple times to make sure all the attempts are successful
 	for testCounter := 1; testCounter <= 5; testCounter++ {
@@ -318,8 +321,8 @@ func TestEndpointFromContext(t *testing.T) {
 		{
 			name: "success k8s",
 			ctx: &configapi.Context{
-				Name: "test-mc",
-				Type: configapi.CtxTypeK8s,
+				Name:   "test-mc",
+				Target: cliv1alpha1.TargetK8s,
 				ClusterOpts: &configapi.ClusterServer{
 					Endpoint:            "test-endpoint",
 					Path:                "test-path",
@@ -331,8 +334,8 @@ func TestEndpointFromContext(t *testing.T) {
 		{
 			name: "success tmc current",
 			ctx: &configapi.Context{
-				Name: "test-tmc",
-				Type: configapi.CtxTypeTMC,
+				Name:   "test-tmc",
+				Target: cliv1alpha1.TargetTMC,
 				GlobalOpts: &configapi.GlobalServer{
 					Endpoint: "test-endpoint",
 				},
@@ -341,8 +344,8 @@ func TestEndpointFromContext(t *testing.T) {
 		{
 			name: "failure",
 			ctx: &configapi.Context{
-				Name: "test-dummy",
-				Type: "dummy",
+				Name:   "test-dummy",
+				Target: "dummy",
 				ClusterOpts: &configapi.ClusterServer{
 					Endpoint:            "test-endpoint",
 					Path:                "test-path",

@@ -5,7 +5,10 @@ package config
 
 import (
 	"github.com/aunum/log"
+	"github.com/pkg/errors"
+	"gopkg.in/yaml.v3"
 
+	cliapi "github.com/vmware-tanzu/tanzu-framework/apis/cli/v1alpha1"
 	configapi "github.com/vmware-tanzu/tanzu-plugin-runtime/apis/config/v1alpha1"
 )
 
@@ -34,18 +37,10 @@ func PopulateContexts(cfg *configapi.ClientConfig) bool {
 		cfg.KnownContexts = append(cfg.KnownContexts, c)
 
 		if s.Name == cfg.CurrentServer {
-			err := cfg.SetCurrentContext(c.Type, c.Name)
+			err := cfg.SetCurrentContext(c.Target, c.Name)
 			if err != nil {
 				log.Warningf(err.Error())
 			}
-		}
-	}
-
-	if cfg.ClientOptions != nil && cfg.ClientOptions.CLI != nil {
-		sources := cfg.ClientOptions.CLI.DiscoverySources
-		for i := range cfg.ClientOptions.CLI.DiscoverySources {
-			// This is a new field. So, using the K8s context since it is the only one available publicly.
-			sources[i].ContextType = configapi.CtxTypeK8s
 		}
 	}
 
@@ -59,22 +54,22 @@ func convertServerToContext(s *configapi.Server) *configapi.Context {
 
 	return &configapi.Context{
 		Name:             s.Name,
-		Type:             convertServerTypeToContextType(s.Type),
+		Target:           convertServerTypeToTarget(s.Type),
 		GlobalOpts:       s.GlobalOpts,
 		ClusterOpts:      convertMgmtClusterOptsToClusterOpts(s.ManagementClusterOpts),
 		DiscoverySources: s.DiscoverySources,
 	}
 }
 
-func convertServerTypeToContextType(t configapi.ServerType) configapi.ContextType {
+func convertServerTypeToTarget(t configapi.ServerType) cliapi.Target {
 	switch t {
 	case configapi.ManagementClusterServerType:
-		return configapi.CtxTypeK8s
+		return cliapi.TargetK8s
 	case configapi.GlobalServerType:
-		return configapi.CtxTypeTMC
+		return cliapi.TargetTMC
 	}
 	// no other server type is supported in v0
-	return configapi.ContextType(t)
+	return cliapi.Target(t)
 }
 
 func convertMgmtClusterOptsToClusterOpts(s *configapi.ManagementClusterServer) *configapi.ClusterServer {
@@ -111,11 +106,11 @@ func populateServers(cfg *configapi.ClientConfig) {
 		s := convertContextToServer(c)
 		cfg.KnownServers = append(cfg.KnownServers, s)
 
-		if cfg.CurrentServer == "" && (c.IsManagementCluster() || c.Type == configapi.CtxTypeTMC) && c.Name == cfg.CurrentContext[c.Type] {
+		if cfg.CurrentServer == "" && (c.IsManagementCluster() || c.Target == cliapi.TargetTMC) && c.Name == cfg.CurrentContext[c.Target] {
 			// This is lossy because only one server can be active at a time in the older CLI.
 			// Using the K8s context for a management cluster or TMC, since these are the two
 			// available publicly at the time of deprecation.
-			cfg.CurrentServer = cfg.CurrentContext[configapi.CtxTypeK8s]
+			cfg.CurrentServer = cfg.CurrentContext[cliapi.TargetK8s]
 		}
 	}
 }
@@ -127,19 +122,19 @@ func convertContextToServer(c *configapi.Context) *configapi.Server {
 
 	return &configapi.Server{
 		Name:                  c.Name,
-		Type:                  convertContextTypeToServerType(c.Type),
+		Type:                  convertTargetToServerType(c.Target),
 		GlobalOpts:            c.GlobalOpts,
 		ManagementClusterOpts: convertClusterOptsToMgmtClusterOpts(c.ClusterOpts),
 		DiscoverySources:      c.DiscoverySources,
 	}
 }
 
-func convertContextTypeToServerType(t configapi.ContextType) configapi.ServerType {
+func convertTargetToServerType(t cliapi.Target) configapi.ServerType {
 	switch t {
-	case configapi.CtxTypeK8s:
+	case cliapi.TargetK8s:
 		// This is lossy because only management cluster servers are supported by the older CLI.
 		return configapi.ManagementClusterServerType
-	case configapi.CtxTypeTMC:
+	case cliapi.TargetTMC:
 		return configapi.GlobalServerType
 	}
 	// no other context type is supported in v1 yet
@@ -156,4 +151,109 @@ func convertClusterOptsToMgmtClusterOpts(o *configapi.ClusterServer) *configapi.
 		Path:     o.Path,
 		Context:  o.Context,
 	}
+}
+
+// convertNodeToClientConfig converts yaml node to client config type
+func convertNodeToClientConfig(node *yaml.Node) (obj *configapi.ClientConfig, err error) {
+	err = node.Decode(&obj)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to convert node to ClientConfig")
+	}
+	if obj == nil {
+		return &configapi.ClientConfig{}, err
+	}
+	return obj, err
+}
+
+// convertNodeToMetadata converts yaml node to client config type
+func convertNodeToMetadata(node *yaml.Node) (obj *configapi.Metadata, err error) {
+	err = node.Decode(&obj)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to convert node to Metadata")
+	}
+	return obj, err
+}
+
+// convertClientConfigToNode converts client config type to yaml node
+func convertClientConfigToNode(obj *configapi.ClientConfig) (*yaml.Node, error) {
+	bytes, err := yaml.Marshal(obj)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to convert obj to node")
+	}
+	var node yaml.Node
+	err = yaml.Unmarshal(bytes, &node)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to unmarshal bytes to node")
+	}
+	return &node, nil
+}
+
+// convertMetadataToNode converts client config type to yaml node
+func convertMetadataToNode(metadata *configapi.Metadata) (*yaml.Node, error) {
+	bytes, err := yaml.Marshal(metadata)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to convert metadata obj to node")
+	}
+	var node yaml.Node
+	err = yaml.Unmarshal(bytes, &node)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to unmarshal bytes to node")
+	}
+	return &node, nil
+}
+
+// convertServerToNode converts server to yaml node
+func convertServerToNode(obj *configapi.Server) (*yaml.Node, error) {
+	bytes, err := yaml.Marshal(obj)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to convert obj to node")
+	}
+	var node yaml.Node
+	err = yaml.Unmarshal(bytes, &node)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to unmarshal bytes to node")
+	}
+	return &node, nil
+}
+
+// convertPluginRepositoryToNode converts PluginRepository to yaml node
+func convertPluginRepositoryToNode(obj *configapi.PluginRepository) (*yaml.Node, error) {
+	bytes, err := yaml.Marshal(obj)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to convert obj to node")
+	}
+	var node yaml.Node
+	err = yaml.Unmarshal(bytes, &node)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to unmarshal bytes to node")
+	}
+	return &node, nil
+}
+
+// convertContextToNode converts context to yaml node
+func convertContextToNode(obj *configapi.Context) (*yaml.Node, error) {
+	bytes, err := yaml.Marshal(obj)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to convert obj to node")
+	}
+	var node yaml.Node
+	err = yaml.Unmarshal(bytes, &node)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to unmarshal bytes to node")
+	}
+	return &node, nil
+}
+
+// convertPluginDiscoveryToNode converts PluginDiscovery to yaml node
+func convertPluginDiscoveryToNode(obj *configapi.PluginDiscovery) (*yaml.Node, error) {
+	bytes, err := yaml.Marshal(obj)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to convert obj to node")
+	}
+	var node yaml.Node
+	err = yaml.Unmarshal(bytes, &node)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to unmarshal bytes to node")
+	}
+	return &node, nil
 }

@@ -15,3 +15,12 @@ Developers can use the `Builder` admin plugin to bootstrap a new plugin which ca
 Tanzu Plugin Runtime provides various config api methods to perform CRUD operations on Contexts, Servers, DiscoverySources, Features, Envs etc.
 
 For more details about the design and apis go to [Config API](docs/config.md)
+
+## Backward Compatibility Testing
+
+### Overview
+
+This testing ensures that plugins developed with different Runtime versions work as expected as long as those runtime versions are supported.
+Current testing verifies that plugin developed with new Tanzu Plugin Runtime (Ex :- v1.0.0) works along with the plugin developed with old Tanzu Plugin Runtime versions like v0.28.0, v0.25.0, v0.11.0.
+
+For more details go to [Backward Compatibility](BACKWARD_COMPATIBILITY.md)

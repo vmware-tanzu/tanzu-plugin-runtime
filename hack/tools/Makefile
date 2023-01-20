@@ -23,7 +23,6 @@ GOIMPORTS_VERSION=0.1.12
 VALE_VERSION=2.20.1
 GOLANGCI_LINT_VERSION=1.46.0
 MISSPELL_VERSION=0.3.4
-CONTROLLER_TOOLS_VERSION=0.9.2
 
 # Host information.
 HOST_OS=$(shell go env GOOS)
@@ -34,7 +33,6 @@ GOIMPORTS      	   := $(BIN_DIR)/goimports
 VALE               := $(BIN_DIR)/vale
 GOLANGCI_LINT      := $(BIN_DIR)/golangci-lint
 MISSPELL           := $(BIN_DIR)/misspell
-CONTROLLER_GEN     := $(BIN_DIR)/controller-gen
 ## --------------------------------------
 ## Help
 ## --------------------------------------
@@ -71,11 +69,6 @@ $(MISSPELL):
 	mkdir -p $(BIN_DIR)
 	GOBIN=$(ROOT_DIR)/hack/tools/$(BIN_DIR) go install  github.com/client9/misspell/cmd/misspell@v$(MISSPELL_VERSION)
 
-controller-gen: $(CONTROLLER_GEN) ## Build controller-gen
-$(CONTROLLER_GEN):
-	mkdir -p $(BIN_DIR)
-	#go build -tags=tools -o $@ sigs.k8s.io/controller-tools/cmd/controller-gen
-	GOBIN=$(ROOT_DIR)/hack/tools/$(BIN_DIR) go install sigs.k8s.io/controller-tools/cmd/controller-gen@v$(CONTROLLER_TOOLS_VERSION)
 ## --------------------------------------
 ## Cleanup
 ## --------------------------------------

@@ -12,7 +12,7 @@ import (
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v3"
 
-	configapi "github.com/vmware-tanzu/tanzu-plugin-runtime/apis/config/v1alpha1"
+	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
 
 // getMetadataNode retrieves the config from the local directory with lock
@@ -50,7 +50,7 @@ func getMetadataNodeNoLock() (*yaml.Node, error) {
 }
 
 func newMetadataNode() (*yaml.Node, error) {
-	c := &configapi.Metadata{}
+	c := &configtypes.Metadata{}
 	node, err := convertMetadataToNode(c)
 	node.Content[0].Style = 0
 	if err != nil {

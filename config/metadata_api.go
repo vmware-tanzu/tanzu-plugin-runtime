@@ -9,12 +9,12 @@ import (
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v3"
 
-	configapi "github.com/vmware-tanzu/tanzu-plugin-runtime/apis/config/v1alpha1"
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/config/nodeutils"
+	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
 
 // GetMetadata retrieves Metadata
-func GetMetadata() (*configapi.Metadata, error) {
+func GetMetadata() (*configtypes.Metadata, error) {
 	// Retrieve config metadata node
 	node, err := getMetadataNode()
 	if err != nil {
@@ -24,7 +24,7 @@ func GetMetadata() (*configapi.Metadata, error) {
 }
 
 // GetConfigMetadata retrieves configMetadata
-func GetConfigMetadata() (*configapi.ConfigMetadata, error) {
+func GetConfigMetadata() (*configtypes.ConfigMetadata, error) {
 	// Retrieve config metadata node
 	node, err := getMetadataNode()
 	if err != nil {
@@ -81,7 +81,7 @@ func SetConfigMetadataPatchStrategies(patchStrategies map[string]string) error {
 	return persistConfigMetadata(node)
 }
 
-func getConfigMetadata(node *yaml.Node) (*configapi.ConfigMetadata, error) {
+func getConfigMetadata(node *yaml.Node) (*configtypes.ConfigMetadata, error) {
 	metadata, err := convertNodeToMetadata(node)
 	if err != nil {
 		return nil, err
@@ -94,7 +94,7 @@ func getConfigMetadata(node *yaml.Node) (*configapi.ConfigMetadata, error) {
 	return nil, errors.New("config metadata not found")
 }
 
-func getMetadata(node *yaml.Node) (*configapi.Metadata, error) {
+func getMetadata(node *yaml.Node) (*configtypes.Metadata, error) {
 	metadata, err := convertNodeToMetadata(node)
 	if err != nil {
 		return nil, err

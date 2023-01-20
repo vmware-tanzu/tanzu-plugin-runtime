@@ -8,13 +8,13 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	cliapi "github.com/vmware-tanzu/tanzu-framework/apis/cli/v1alpha1"
-	configapi "github.com/vmware-tanzu/tanzu-plugin-runtime/apis/config/v1alpha1"
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/config/nodeutils"
+
+	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
 
 // GetContext retrieves the context by name
-func GetContext(name string) (*configapi.Context, error) {
+func GetContext(name string) (*configtypes.Context, error) {
 	// Retrieve client config node
 	node, err := getClientConfigNode()
 	if err != nil {
@@ -24,14 +24,14 @@ func GetContext(name string) (*configapi.Context, error) {
 }
 
 // AddContext add or update context and currentContext
-func AddContext(c *configapi.Context, setCurrent bool) error {
+func AddContext(c *configtypes.Context, setCurrent bool) error {
 	return SetContext(c, setCurrent)
 }
 
 // SetContext add or update context and currentContext
 //
 //nolint:gocyclo
-func SetContext(c *configapi.Context, setCurrent bool) error {
+func SetContext(c *configtypes.Context, setCurrent bool) error {
 	// Retrieve client config node
 	AcquireTanzuConfigLock()
 	defer ReleaseTanzuConfigLock()
@@ -80,7 +80,7 @@ func SetContext(c *configapi.Context, setCurrent bool) error {
 	}
 
 	// Set current server
-	if setCurrent && s.Type == configapi.ManagementClusterServerType {
+	if setCurrent && s.Type == configtypes.ManagementClusterServerType {
 		persist, err = setCurrentServer(node, s.Name)
 		if err != nil {
 			return err
@@ -139,7 +139,7 @@ func ContextExists(name string) (bool, error) {
 }
 
 // GetCurrentContext retrieves the current context for the specified target
-func GetCurrentContext(target cliapi.Target) (c *configapi.Context, err error) {
+func GetCurrentContext(target configtypes.Target) (c *configtypes.Context, err error) {
 	// Retrieve client config node
 	node, err := getClientConfigNode()
 	if err != nil {
@@ -149,7 +149,7 @@ func GetCurrentContext(target cliapi.Target) (c *configapi.Context, err error) {
 }
 
 // GetAllCurrentContextsMap returns all current context per Target
-func GetAllCurrentContextsMap() (map[cliapi.Target]*configapi.Context, error) {
+func GetAllCurrentContextsMap() (map[configtypes.Target]*configtypes.Context, error) {
 	node, err := getClientConfigNodeNoLock()
 	if err != nil {
 		return nil, err
@@ -194,7 +194,7 @@ func SetCurrentContext(name string) error {
 			return err
 		}
 	}
-	if ctx.Target == cliapi.TargetK8s {
+	if ctx.Target == configtypes.TargetK8s {
 		persist, err = setCurrentServer(node, name)
 		if err != nil {
 			return err
@@ -210,7 +210,7 @@ func SetCurrentContext(name string) error {
 }
 
 // RemoveCurrentContext removed the current context of specified context type
-func RemoveCurrentContext(target cliapi.Target) error {
+func RemoveCurrentContext(target configtypes.Target) error {
 	// Retrieve client config node
 	AcquireTanzuConfigLock()
 	defer ReleaseTanzuConfigLock()
@@ -222,7 +222,7 @@ func RemoveCurrentContext(target cliapi.Target) error {
 	if err != nil {
 		return err
 	}
-	err = removeCurrentContext(node, &configapi.Context{Target: target})
+	err = removeCurrentContext(node, &configtypes.Context{Target: target})
 	if err != nil {
 		return err
 	}
@@ -234,18 +234,18 @@ func RemoveCurrentContext(target cliapi.Target) error {
 }
 
 // EndpointFromContext retrieved the endpoint from the specified context
-func EndpointFromContext(s *configapi.Context) (endpoint string, err error) {
+func EndpointFromContext(s *configtypes.Context) (endpoint string, err error) {
 	switch s.Target {
-	case cliapi.TargetK8s:
+	case configtypes.TargetK8s:
 		return s.ClusterOpts.Endpoint, nil
-	case cliapi.TargetTMC:
+	case configtypes.TargetTMC:
 		return s.GlobalOpts.Endpoint, nil
 	default:
 		return endpoint, fmt.Errorf("unknown server type %q", s.Target)
 	}
 }
 
-func getContext(node *yaml.Node, name string) (*configapi.Context, error) {
+func getContext(node *yaml.Node, name string) (*configtypes.Context, error) {
 	cfg, err := convertNodeToClientConfig(node)
 	if err != nil {
 		return nil, err
@@ -258,7 +258,7 @@ func getContext(node *yaml.Node, name string) (*configapi.Context, error) {
 	return nil, fmt.Errorf("context %v not found", name)
 }
 
-func getCurrentContext(node *yaml.Node, target cliapi.Target) (*configapi.Context, error) {
+func getCurrentContext(node *yaml.Node, target configtypes.Target) (*configtypes.Context, error) {
 	cfg, err := convertNodeToClientConfig(node)
 	if err != nil {
 		return nil, err
@@ -266,7 +266,7 @@ func getCurrentContext(node *yaml.Node, target cliapi.Target) (*configapi.Contex
 	return cfg.GetCurrentContext(target)
 }
 
-func getAllCurrentContextsMap(node *yaml.Node) (map[cliapi.Target]*configapi.Context, error) {
+func getAllCurrentContextsMap(node *yaml.Node) (map[configtypes.Target]*configtypes.Context, error) {
 	cfg, err := convertNodeToClientConfig(node)
 	if err != nil {
 		return nil, err
@@ -274,7 +274,7 @@ func getAllCurrentContextsMap(node *yaml.Node) (map[cliapi.Target]*configapi.Con
 	return cfg.GetAllCurrentContextsMap()
 }
 
-func setContexts(node *yaml.Node, contexts []*configapi.Context) (err error) {
+func setContexts(node *yaml.Node, contexts []*configtypes.Context) (err error) {
 	for _, c := range contexts {
 		_, err = setContext(node, c)
 		if err != nil {
@@ -284,7 +284,7 @@ func setContexts(node *yaml.Node, contexts []*configapi.Context) (err error) {
 	return err
 }
 
-func setContext(node *yaml.Node, ctx *configapi.Context) (persist bool, err error) {
+func setContext(node *yaml.Node, ctx *configtypes.Context) (persist bool, err error) {
 	// Get Patch Strategies from config metadata
 	patchStrategies, err := GetConfigMetadataPatchStrategy()
 	if err != nil {
@@ -349,7 +349,7 @@ func setContext(node *yaml.Node, ctx *configapi.Context) (persist bool, err erro
 	return persistDiscoverySources || persist, err
 }
 
-func setCurrentContext(node *yaml.Node, ctx *configapi.Context) (persist bool, err error) {
+func setCurrentContext(node *yaml.Node, ctx *configtypes.Context) (persist bool, err error) {
 	// Find current context node in the yaml node
 	keys := []nodeutils.Key{
 		{Name: KeyCurrentContext, Type: yaml.MappingNode},
@@ -371,7 +371,7 @@ func setCurrentContext(node *yaml.Node, ctx *configapi.Context) (persist bool, e
 	return persist, err
 }
 
-func removeCurrentContext(node *yaml.Node, ctx *configapi.Context) error {
+func removeCurrentContext(node *yaml.Node, ctx *configtypes.Context) error {
 	// Find current context node in the yaml node
 	keys := []nodeutils.Key{
 		{Name: KeyCurrentContext},

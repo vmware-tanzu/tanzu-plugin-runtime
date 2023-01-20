@@ -9,7 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	configapi "github.com/vmware-tanzu/tanzu-plugin-runtime/apis/config/v1alpha1"
+	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
 
 func setupConfigData() (string, string, string, string) {
@@ -147,23 +147,23 @@ func TestIntegrationWithReplacePatchStrategy(t *testing.T) {
 	// Actions
 
 	// Get CLI discovery sources
-	expectedSources := []configapi.PluginDiscovery{
+	expectedSources := []configtypes.PluginDiscovery{
 		{
-			GCP: &configapi.GCPDiscovery{
+			GCP: &configtypes.GCPDiscovery{
 				Name:         "test",
 				Bucket:       "test-bucket",
 				ManifestPath: "test-manifest-path",
 			},
 		},
 		{
-			GCP: &configapi.GCPDiscovery{
+			GCP: &configtypes.GCPDiscovery{
 				Name:         "test2",
 				Bucket:       "test-bucket2",
 				ManifestPath: "test-manifest-path2",
 			},
 		},
 		{
-			Local: &configapi.LocalDiscovery{
+			Local: &configtypes.LocalDiscovery{
 				Name: "test-local",
 			},
 		},
@@ -174,8 +174,8 @@ func TestIntegrationWithReplacePatchStrategy(t *testing.T) {
 	assert.Equal(t, expectedSources, sources)
 
 	// Get CLI Discovery Source
-	expectedSource := &configapi.PluginDiscovery{
-		GCP: &configapi.GCPDiscovery{
+	expectedSource := &configtypes.PluginDiscovery{
+		GCP: &configtypes.GCPDiscovery{
 			Name:         "test",
 			Bucket:       "test-bucket",
 			ManifestPath: "test-manifest-path",
@@ -187,16 +187,16 @@ func TestIntegrationWithReplacePatchStrategy(t *testing.T) {
 	assert.Equal(t, expectedSource, source)
 
 	// Update CLI discovery sources
-	updatedSources := []configapi.PluginDiscovery{
+	updatedSources := []configtypes.PluginDiscovery{
 		{
-			GCP: &configapi.GCPDiscovery{
+			GCP: &configtypes.GCPDiscovery{
 				Name:         "test",
 				Bucket:       "updated-test-bucket",
 				ManifestPath: "updated-test-manifest-path",
 			},
 		},
 		{
-			OCI: &configapi.OCIDiscovery{
+			OCI: &configtypes.OCIDiscovery{
 				Name:  "test-local",
 				Image: "test-local-image-path",
 			},

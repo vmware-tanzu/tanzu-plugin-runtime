@@ -8,7 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	configapi "github.com/vmware-tanzu/tanzu-plugin-runtime/apis/config/v1alpha1"
+	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
 
 func TestGetAllEnvs(t *testing.T) {
@@ -21,14 +21,14 @@ func TestGetAllEnvs(t *testing.T) {
 	}()
 	tests := []struct {
 		name   string
-		in     *configapi.ClientConfig
+		in     *configtypes.ClientConfig
 		out    map[string]string
 		errStr string
 	}{
 		{
 			name: "success k8s",
-			in: &configapi.ClientConfig{
-				ClientOptions: &configapi.ClientOptions{
+			in: &configtypes.ClientConfig{
+				ClientOptions: &configtypes.ClientOptions{
 					Env: map[string]string{
 						"test": "test",
 					},
@@ -61,14 +61,14 @@ func TestGetEnv(t *testing.T) {
 	}()
 	tests := []struct {
 		name   string
-		in     *configapi.ClientConfig
+		in     *configtypes.ClientConfig
 		out    string
 		errStr string
 	}{
 		{
 			name: "success k8s",
-			in: &configapi.ClientConfig{
-				ClientOptions: &configapi.ClientOptions{
+			in: &configtypes.ClientConfig{
+				ClientOptions: &configtypes.ClientOptions{
 					Env: map[string]string{
 						"test": "test",
 					},
@@ -139,8 +139,8 @@ func TestDeleteEnv(t *testing.T) {
 	// setup
 	func() {
 		LocalDirName = TestLocalDirName
-		cfg := &configapi.ClientConfig{
-			ClientOptions: &configapi.ClientOptions{
+		cfg := &configtypes.ClientConfig{
+			ClientOptions: &configtypes.ClientOptions{
 				Env: map[string]string{
 					"test":  "test",
 					"test2": "test2",

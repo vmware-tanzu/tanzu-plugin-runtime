@@ -9,7 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	configapi "github.com/vmware-tanzu/tanzu-plugin-runtime/apis/config/v1alpha1"
+	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
 
 func setupServersTestData() (string, string, string, string) {
@@ -164,17 +164,17 @@ func TestServersIntegration(t *testing.T) {
 
 	// Get Server
 	server, err := GetServer("test-mc")
-	expected := &configapi.Server{
+	expected := &configtypes.Server{
 		Name: "test-mc",
 		Type: "managementcluster",
-		ManagementClusterOpts: &configapi.ManagementClusterServer{
+		ManagementClusterOpts: &configtypes.ManagementClusterServer{
 			Endpoint: "test-endpoint",
 			Path:     "test-path",
 			Context:  "test-context",
 		},
-		DiscoverySources: []configapi.PluginDiscovery{
+		DiscoverySources: []configtypes.PluginDiscovery{
 			{
-				GCP: &configapi.GCPDiscovery{
+				GCP: &configtypes.GCPDiscovery{
 					Name:         "test",
 					Bucket:       "test-bucket",
 					ManifestPath: "test-manifest-path",
@@ -185,16 +185,16 @@ func TestServersIntegration(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, expected, server)
 	// Add new Server
-	newServer := &configapi.Server{
+	newServer := &configtypes.Server{
 		Name: "test-mc2",
 		Type: "managementcluster",
-		ManagementClusterOpts: &configapi.ManagementClusterServer{
+		ManagementClusterOpts: &configtypes.ManagementClusterServer{
 			Endpoint: "test-endpoint",
 			Path:     "test-path",
 		},
-		DiscoverySources: []configapi.PluginDiscovery{
+		DiscoverySources: []configtypes.PluginDiscovery{
 			{
-				GCP: &configapi.GCPDiscovery{
+				GCP: &configtypes.GCPDiscovery{
 					Name:         "test",
 					Bucket:       "test-bucket",
 					ManifestPath: "test-manifest-path",
@@ -208,16 +208,16 @@ func TestServersIntegration(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, newServer, s)
 	// Update existing Server
-	updatedServer := &configapi.Server{
+	updatedServer := &configtypes.Server{
 		Name: "test-mc2",
 		Type: "managementcluster",
-		ManagementClusterOpts: &configapi.ManagementClusterServer{
+		ManagementClusterOpts: &configtypes.ManagementClusterServer{
 			Endpoint: "test-endpoint-updated",
 			Path:     "test-path",
 		},
-		DiscoverySources: []configapi.PluginDiscovery{
+		DiscoverySources: []configtypes.PluginDiscovery{
 			{
-				GCP: &configapi.GCPDiscovery{
+				GCP: &configtypes.GCPDiscovery{
 					Name:         "test",
 					Bucket:       "test-bucket-updated",
 					ManifestPath: "test-manifest-path",
@@ -310,16 +310,16 @@ current: test-mc2
 	assert.Equal(t, "could not find server \"test-mc\"", err.Error())
 
 	// Add new Server
-	newServer := &configapi.Server{
+	newServer := &configtypes.Server{
 		Name: "test-mc2",
 		Type: "managementcluster",
-		ManagementClusterOpts: &configapi.ManagementClusterServer{
+		ManagementClusterOpts: &configtypes.ManagementClusterServer{
 			Endpoint: "test-endpoint",
 			Path:     "test-path",
 		},
-		DiscoverySources: []configapi.PluginDiscovery{
+		DiscoverySources: []configtypes.PluginDiscovery{
 			{
-				GCP: &configapi.GCPDiscovery{
+				GCP: &configtypes.GCPDiscovery{
 					Name:         "test",
 					Bucket:       "test-bucket",
 					ManifestPath: "test-manifest-path",
@@ -335,16 +335,16 @@ current: test-mc2
 	assert.Equal(t, newServer, s)
 
 	// Update existing Server
-	updatedServer := &configapi.Server{
+	updatedServer := &configtypes.Server{
 		Name: "test-mc2",
 		Type: "managementcluster",
-		ManagementClusterOpts: &configapi.ManagementClusterServer{
+		ManagementClusterOpts: &configtypes.ManagementClusterServer{
 			Endpoint: "test-endpoint-updated",
 			Path:     "test-path",
 		},
-		DiscoverySources: []configapi.PluginDiscovery{
+		DiscoverySources: []configtypes.PluginDiscovery{
 			{
-				GCP: &configapi.GCPDiscovery{
+				GCP: &configtypes.GCPDiscovery{
 					Name:         "test",
 					Bucket:       "test-bucket-updated",
 					ManifestPath: "test-manifest-path",

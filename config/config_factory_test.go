@@ -10,8 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v3"
 
-	cliapi "github.com/vmware-tanzu/tanzu-framework/apis/cli/v1alpha1"
-	configapi "github.com/vmware-tanzu/tanzu-plugin-runtime/apis/config/v1alpha1"
+	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
 
 func setupCfgAndCfgNextGenData() (string, string, string, string) {
@@ -251,25 +250,25 @@ func TestGetClientConfigWithLockAndWithoutLock(t *testing.T) {
 		assert.NotNil(t, node)
 		assert.NoError(t, err)
 
-		expectedCtx := &configapi.Context{
+		expectedCtx := &configtypes.Context{
 			Name:   "test-mc",
-			Target: cliapi.TargetK8s,
-			ClusterOpts: &configapi.ClusterServer{
+			Target: configtypes.TargetK8s,
+			ClusterOpts: &configtypes.ClusterServer{
 				Endpoint:            "test-endpoint",
 				Path:                "test-path",
 				Context:             "test-context",
 				IsManagementCluster: true,
 			},
-			DiscoverySources: []configapi.PluginDiscovery{
+			DiscoverySources: []configtypes.PluginDiscovery{
 				{
-					GCP: &configapi.GCPDiscovery{
+					GCP: &configtypes.GCPDiscovery{
 						Name:         "test",
 						Bucket:       "test-bucket",
 						ManifestPath: "test-manifest-path",
 					},
 				},
 				{
-					GCP: &configapi.GCPDiscovery{
+					GCP: &configtypes.GCPDiscovery{
 						Name:         "test-two",
 						Bucket:       "test-bucket",
 						ManifestPath: "test-manifest-path",
@@ -282,17 +281,17 @@ func TestGetClientConfigWithLockAndWithoutLock(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, expectedCtx, ctx)
 
-		expectedServer := &configapi.Server{
+		expectedServer := &configtypes.Server{
 			Name: "test-mc",
 			Type: "managementcluster",
-			ManagementClusterOpts: &configapi.ManagementClusterServer{
+			ManagementClusterOpts: &configtypes.ManagementClusterServer{
 				Endpoint: "test-endpoint",
 				Path:     "test-path",
 				Context:  "test-context",
 			},
-			DiscoverySources: []configapi.PluginDiscovery{
+			DiscoverySources: []configtypes.PluginDiscovery{
 				{
-					GCP: &configapi.GCPDiscovery{
+					GCP: &configtypes.GCPDiscovery{
 						Name:         "test",
 						Bucket:       "test-bucket",
 						ManifestPath: "test-manifest-path",
@@ -323,25 +322,25 @@ func TestGetClientConfigWithLockAndMigratedToNewConfig(t *testing.T) {
 	assert.NotNil(t, node)
 	assert.NoError(t, err)
 
-	expectedCtx := &configapi.Context{
+	expectedCtx := &configtypes.Context{
 		Name:   "test-mc",
-		Target: cliapi.TargetK8s,
-		ClusterOpts: &configapi.ClusterServer{
+		Target: configtypes.TargetK8s,
+		ClusterOpts: &configtypes.ClusterServer{
 			Endpoint:            "test-endpoint",
 			Path:                "test-path",
 			Context:             "test-context",
 			IsManagementCluster: true,
 		},
-		DiscoverySources: []configapi.PluginDiscovery{
+		DiscoverySources: []configtypes.PluginDiscovery{
 			{
-				GCP: &configapi.GCPDiscovery{
+				GCP: &configtypes.GCPDiscovery{
 					Name:         "test",
 					Bucket:       "test-bucket",
 					ManifestPath: "test-manifest-path",
 				},
 			},
 			{
-				GCP: &configapi.GCPDiscovery{
+				GCP: &configtypes.GCPDiscovery{
 					Name:         "test-two",
 					Bucket:       "test-bucket",
 					ManifestPath: "test-manifest-path",
@@ -377,25 +376,25 @@ func TestGetClientConfigWithoutLockAndMigratedToNewConfig(t *testing.T) {
 	assert.NotNil(t, node)
 	assert.NoError(t, err)
 
-	expectedCtx := &configapi.Context{
+	expectedCtx := &configtypes.Context{
 		Name:   "test-mc",
-		Target: cliapi.TargetK8s,
-		ClusterOpts: &configapi.ClusterServer{
+		Target: configtypes.TargetK8s,
+		ClusterOpts: &configtypes.ClusterServer{
 			Endpoint:            "test-endpoint",
 			Path:                "test-path",
 			Context:             "test-context",
 			IsManagementCluster: true,
 		},
-		DiscoverySources: []configapi.PluginDiscovery{
+		DiscoverySources: []configtypes.PluginDiscovery{
 			{
-				GCP: &configapi.GCPDiscovery{
+				GCP: &configtypes.GCPDiscovery{
 					Name:         "test",
 					Bucket:       "test-bucket",
 					ManifestPath: "test-manifest-path",
 				},
 			},
 			{
-				GCP: &configapi.GCPDiscovery{
+				GCP: &configtypes.GCPDiscovery{
 					Name:         "test-two",
 					Bucket:       "test-bucket",
 					ManifestPath: "test-manifest-path",

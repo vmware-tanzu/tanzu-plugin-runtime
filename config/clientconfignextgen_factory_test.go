@@ -11,8 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/sync/errgroup"
 
-	cliapi "github.com/vmware-tanzu/tanzu-framework/apis/cli/v1alpha1"
-	configapi "github.com/vmware-tanzu/tanzu-plugin-runtime/apis/config/v1alpha1"
+	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
 
 func TestGetClientConfigNextGenNode(t *testing.T) {
@@ -28,7 +27,7 @@ func TestGetClientConfigNextGenNode(t *testing.T) {
 
 	//Assertions
 	assert.NoError(t, err)
-	c := &configapi.ClientConfig{}
+	c := &configtypes.ClientConfig{}
 	expectedNode, err := convertClientConfigToNode(c)
 	expectedNode.Content[0].Style = 0
 	assert.NoError(t, err)
@@ -42,17 +41,17 @@ func TestClientConfigNextGenNodeUpdateInParallel(t *testing.T) {
 			return err
 		}
 
-		ctx := &configapi.Context{
+		ctx := &configtypes.Context{
 			Name:   mcName,
-			Target: cliapi.TargetK8s,
-			ClusterOpts: &configapi.ClusterServer{
+			Target: configtypes.TargetK8s,
+			ClusterOpts: &configtypes.ClusterServer{
 				Path:                "test-path",
 				Context:             "test-context",
 				IsManagementCluster: true,
 			},
-			DiscoverySources: []configapi.PluginDiscovery{
+			DiscoverySources: []configtypes.PluginDiscovery{
 				{
-					GCP: &configapi.GCPDiscovery{
+					GCP: &configtypes.GCPDiscovery{
 						Name:         "test",
 						Bucket:       "updated-test-bucket",
 						ManifestPath: "test-manifest-path",

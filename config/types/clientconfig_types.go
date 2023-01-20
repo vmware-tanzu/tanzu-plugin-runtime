@@ -1,28 +1,27 @@
 // Copyright 2022 VMware, Inc. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-package v1alpha1
+// Package types specifies the types for clientconfig
+package types
 
 import (
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
-	cliapi "github.com/vmware-tanzu/tanzu-framework/apis/cli/v1alpha1"
+	"time"
 )
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
 // ServerType is the type of server.
-// Deprecation targeted for a future version. Superseded by cliapi.Target.
+// Deprecation targeted for a future version. Superseded by Target.
 type ServerType string
 
 const (
 	// ManagementClusterServerType is a management cluster server.
-	// Deprecation targeted for a future version. Superseded by cliapi.TargetK8s.
+	// Deprecation targeted for a future version. Superseded by TargetK8s.
 	ManagementClusterServerType ServerType = "managementcluster"
 
 	// GlobalServerType is a global control plane server.
-	// Deprecation targeted for a future version. Superseded by cliapi.TargetTMC.
+	// Deprecation targeted for a future version. Superseded by TargetTMC.
 	GlobalServerType ServerType = "global"
 )
 
@@ -54,7 +53,7 @@ type Context struct {
 	Name string `json:"name,omitempty" yaml:"name,omitempty"`
 
 	// Target of the context.
-	Target cliapi.Target `json:"target,omitempty" yaml:"target,omitempty"`
+	Target Target `json:"target,omitempty" yaml:"target,omitempty"`
 
 	// GlobalOpts if the context is a global control plane (e.g., TMC).
 	GlobalOpts *GlobalServer `json:"globalOpts,omitempty" yaml:"globalOpts,omitempty"`
@@ -125,7 +124,7 @@ type GlobalServerAuth struct {
 	RefreshToken string `json:"refresh_token,omitempty" yaml:"refresh_token,omitempty"`
 
 	// Expiration times of the token.
-	Expiration metav1.Time `json:"expiration,omitempty" yaml:"expiration,omitempty"`
+	Expiration time.Time `json:"expiration,omitempty" yaml:"expiration,omitempty"`
 
 	// Type of the token (user or client).
 	Type string `json:"type" yaml:"type,omitempty"`
@@ -262,12 +261,8 @@ type GCPPluginRepository struct {
 	RootPath string `json:"rootPath,omitempty" yaml:"rootPath,omitempty"`
 }
 
-// +kubebuilder:object:root=true
-
 // ClientConfig is the Schema for the configs API
 type ClientConfig struct {
-	metav1.TypeMeta   `json:",omitempty" yaml:",omitempty"`
-	metav1.ObjectMeta `json:",omitempty" yaml:",omitempty"`
 	// KnownServers available.
 	// Deprecation targeted for a future version. Superseded by KnownContexts.
 	KnownServers []*Server `json:"servers,omitempty" yaml:"servers,omitempty"`
@@ -280,21 +275,13 @@ type ClientConfig struct {
 	KnownContexts []*Context `json:"contexts,omitempty" yaml:"contexts,omitempty"`
 
 	// CurrentContext for every type.
-	CurrentContext map[cliapi.Target]string `json:"currentContext,omitempty" yaml:"currentContext,omitempty"`
+	CurrentContext map[Target]string `json:"currentContext,omitempty" yaml:"currentContext,omitempty"`
 
 	// ClientOptions are client specific options like feature flags, environment variables, repositories, discoverySources, etc.
 	ClientOptions *ClientOptions `json:"clientOptions,omitempty" yaml:"clientOptions,omitempty"`
 }
 
-// +kubebuilder:object:root=true
-
 // ClientConfigList contains a list of ClientConfig
 type ClientConfigList struct {
-	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []ClientConfig `json:"items"`
-}
-
-func init() {
-	SchemeBuilder.Register(&ClientConfig{}, &ClientConfigList{})
+	Items []ClientConfig `json:"items"`
 }

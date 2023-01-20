@@ -9,7 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	configapi "github.com/vmware-tanzu/tanzu-plugin-runtime/apis/config/v1alpha1"
+	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
 
 func TestIsFeatureEnabled(t *testing.T) {
@@ -22,13 +22,13 @@ func TestIsFeatureEnabled(t *testing.T) {
 	}()
 	tests := []struct {
 		name    string
-		feature map[string]configapi.FeatureMap
+		feature map[string]configtypes.FeatureMap
 		plugin  string
 		key     string
 	}{
 		{
 			name: "success context-aware-cli-for-plugins",
-			feature: map[string]configapi.FeatureMap{
+			feature: map[string]configtypes.FeatureMap{
 				"global": {
 					"context-aware-cli-for-plugins": "true",
 				},
@@ -39,8 +39,8 @@ func TestIsFeatureEnabled(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			cfg := &configapi.ClientConfig{
-				ClientOptions: &configapi.ClientOptions{
+			cfg := &configtypes.ClientConfig{
+				ClientOptions: &configtypes.ClientOptions{
 					Features: tc.feature,
 				},
 			}
@@ -63,7 +63,7 @@ func TestSetAndDeleteFeature(t *testing.T) {
 	}()
 	tests := []struct {
 		name    string
-		feature map[string]configapi.FeatureMap
+		feature map[string]configtypes.FeatureMap
 		plugin  string
 		key     string
 		value   bool
@@ -71,7 +71,7 @@ func TestSetAndDeleteFeature(t *testing.T) {
 	}{
 		{
 			name: "success context-aware-cli-for-plugins",
-			feature: map[string]configapi.FeatureMap{
+			feature: map[string]configtypes.FeatureMap{
 				"global": {
 					"sample":                        "true",
 					"context-aware-cli-for-plugins": "true",
@@ -86,8 +86,8 @@ func TestSetAndDeleteFeature(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			cfg := &configapi.ClientConfig{
-				ClientOptions: &configapi.ClientOptions{
+			cfg := &configtypes.ClientConfig{
+				ClientOptions: &configtypes.ClientOptions{
 					Features: tc.feature,
 				},
 			}
@@ -119,16 +119,16 @@ func TestSetFeature(t *testing.T) {
 	}()
 	tests := []struct {
 		name   string
-		cfg    *configapi.ClientConfig
+		cfg    *configtypes.ClientConfig
 		plugin string
 		key    string
 		value  bool
 	}{
 		{
 			name: "success context-aware-cli-for-plugins",
-			cfg: &configapi.ClientConfig{
-				ClientOptions: &configapi.ClientOptions{
-					Features: map[string]configapi.FeatureMap{
+			cfg: &configtypes.ClientConfig{
+				ClientOptions: &configtypes.ClientOptions{
+					Features: map[string]configtypes.FeatureMap{
 						"global": {
 							"context-aware-cli-for-plugins": "true",
 						},
@@ -141,9 +141,9 @@ func TestSetFeature(t *testing.T) {
 		},
 		{
 			name: "success context-aware-cli-for-plugins",
-			cfg: &configapi.ClientConfig{
-				ClientOptions: &configapi.ClientOptions{
-					Features: map[string]configapi.FeatureMap{
+			cfg: &configtypes.ClientConfig{
+				ClientOptions: &configtypes.ClientOptions{
+					Features: map[string]configtypes.FeatureMap{
 						"global": {
 							"context-aware-cli-for-plugins": "true",
 						},
@@ -156,9 +156,9 @@ func TestSetFeature(t *testing.T) {
 		},
 		{
 			name: "should not update the same feature value",
-			cfg: &configapi.ClientConfig{
-				ClientOptions: &configapi.ClientOptions{
-					Features: map[string]configapi.FeatureMap{
+			cfg: &configtypes.ClientConfig{
+				ClientOptions: &configtypes.ClientOptions{
+					Features: map[string]configtypes.FeatureMap{
 						"global": {
 							"context-aware-cli-for-plugins": "true",
 						},

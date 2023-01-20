@@ -8,7 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	configapi "github.com/vmware-tanzu/tanzu-plugin-runtime/apis/config/v1alpha1"
+	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
 
 func TestSetGetRepository(t *testing.T) {
@@ -21,22 +21,22 @@ func TestSetGetRepository(t *testing.T) {
 
 	tests := []struct {
 		name string
-		cfg  *configapi.ClientConfig
-		in   configapi.PluginRepository
-		out  configapi.PluginRepository
+		cfg  *configtypes.ClientConfig
+		in   configtypes.PluginRepository
+		out  configtypes.PluginRepository
 	}{
 		{
 			name: "should persist repository",
-			cfg:  &configapi.ClientConfig{},
-			in: configapi.PluginRepository{
-				GCPPluginRepository: &configapi.GCPPluginRepository{
+			cfg:  &configtypes.ClientConfig{},
+			in: configtypes.PluginRepository{
+				GCPPluginRepository: &configtypes.GCPPluginRepository{
 					Name:       "test",
 					BucketName: "bucket",
 					RootPath:   "root-path",
 				},
 			},
-			out: configapi.PluginRepository{
-				GCPPluginRepository: &configapi.GCPPluginRepository{
+			out: configtypes.PluginRepository{
+				GCPPluginRepository: &configtypes.GCPPluginRepository{
 					Name:       "test",
 					BucketName: "bucket",
 					RootPath:   "root-path",
@@ -45,12 +45,12 @@ func TestSetGetRepository(t *testing.T) {
 		},
 		{
 			name: "should not persist same repo",
-			cfg: &configapi.ClientConfig{
-				ClientOptions: &configapi.ClientOptions{
-					CLI: &configapi.CLIOptions{
-						Repositories: []configapi.PluginRepository{
+			cfg: &configtypes.ClientConfig{
+				ClientOptions: &configtypes.ClientOptions{
+					CLI: &configtypes.CLIOptions{
+						Repositories: []configtypes.PluginRepository{
 							{
-								GCPPluginRepository: &configapi.GCPPluginRepository{
+								GCPPluginRepository: &configtypes.GCPPluginRepository{
 									Name:       "test",
 									BucketName: "bucket",
 									RootPath:   "root-path",
@@ -60,15 +60,15 @@ func TestSetGetRepository(t *testing.T) {
 					},
 				},
 			},
-			in: configapi.PluginRepository{
-				GCPPluginRepository: &configapi.GCPPluginRepository{
+			in: configtypes.PluginRepository{
+				GCPPluginRepository: &configtypes.GCPPluginRepository{
 					Name:       "test",
 					BucketName: "bucket",
 					RootPath:   "root-path",
 				},
 			},
-			out: configapi.PluginRepository{
-				GCPPluginRepository: &configapi.GCPPluginRepository{
+			out: configtypes.PluginRepository{
+				GCPPluginRepository: &configtypes.GCPPluginRepository{
 					Name:       "test",
 					BucketName: "bucket",
 					RootPath:   "root-path",

@@ -8,22 +8,21 @@ import (
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v3"
 
-	cliapi "github.com/vmware-tanzu/tanzu-framework/apis/cli/v1alpha1"
-	configapi "github.com/vmware-tanzu/tanzu-plugin-runtime/apis/config/v1alpha1"
+	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
 
 // PopulateContexts converts the known servers that are missing in contexts.
 // This is needed when reading the config file persisted by an older core or plugin,
 // so that it is forwards compatible with a new core plugin.
 // Returns true if there was any delta.
-func PopulateContexts(cfg *configapi.ClientConfig) bool {
+func PopulateContexts(cfg *configtypes.ClientConfig) bool {
 	if cfg == nil || len(cfg.KnownServers) == 0 {
 		return false
 	}
 
 	var delta bool
 	if len(cfg.KnownContexts) == 0 {
-		cfg.KnownContexts = make([]*configapi.Context, 0, len(cfg.KnownServers))
+		cfg.KnownContexts = make([]*configtypes.Context, 0, len(cfg.KnownServers))
 	}
 	for _, s := range cfg.KnownServers {
 		if cfg.HasContext(s.Name) {
@@ -47,12 +46,12 @@ func PopulateContexts(cfg *configapi.ClientConfig) bool {
 	return delta
 }
 
-func convertServerToContext(s *configapi.Server) *configapi.Context {
+func convertServerToContext(s *configtypes.Server) *configtypes.Context {
 	if s == nil {
 		return nil
 	}
 
-	return &configapi.Context{
+	return &configtypes.Context{
 		Name:             s.Name,
 		Target:           convertServerTypeToTarget(s.Type),
 		GlobalOpts:       s.GlobalOpts,
@@ -61,23 +60,23 @@ func convertServerToContext(s *configapi.Server) *configapi.Context {
 	}
 }
 
-func convertServerTypeToTarget(t configapi.ServerType) cliapi.Target {
+func convertServerTypeToTarget(t configtypes.ServerType) configtypes.Target {
 	switch t {
-	case configapi.ManagementClusterServerType:
-		return cliapi.TargetK8s
-	case configapi.GlobalServerType:
-		return cliapi.TargetTMC
+	case configtypes.ManagementClusterServerType:
+		return configtypes.TargetK8s
+	case configtypes.GlobalServerType:
+		return configtypes.TargetTMC
 	}
 	// no other server type is supported in v0
-	return cliapi.Target(t)
+	return configtypes.Target(t)
 }
 
-func convertMgmtClusterOptsToClusterOpts(s *configapi.ManagementClusterServer) *configapi.ClusterServer {
+func convertMgmtClusterOptsToClusterOpts(s *configtypes.ManagementClusterServer) *configtypes.ClusterServer {
 	if s == nil {
 		return nil
 	}
 
-	return &configapi.ClusterServer{
+	return &configtypes.ClusterServer{
 		Endpoint:            s.Endpoint,
 		Path:                s.Path,
 		Context:             s.Context,
@@ -88,13 +87,13 @@ func convertMgmtClusterOptsToClusterOpts(s *configapi.ManagementClusterServer) *
 // populateServers converts the known contexts that are missing in servers.
 // This is needed when writing the config file from the newer core or plugin,
 // so that it is backwards compatible with an older core or plugin.
-func populateServers(cfg *configapi.ClientConfig) {
+func populateServers(cfg *configtypes.ClientConfig) {
 	if cfg == nil {
 		return
 	}
 
 	if len(cfg.KnownServers) == 0 {
-		cfg.KnownServers = make([]*configapi.Server, 0, len(cfg.KnownContexts))
+		cfg.KnownServers = make([]*configtypes.Server, 0, len(cfg.KnownContexts))
 	}
 	for _, c := range cfg.KnownContexts {
 		if cfg.HasServer(c.Name) {
@@ -106,21 +105,21 @@ func populateServers(cfg *configapi.ClientConfig) {
 		s := convertContextToServer(c)
 		cfg.KnownServers = append(cfg.KnownServers, s)
 
-		if cfg.CurrentServer == "" && (c.IsManagementCluster() || c.Target == cliapi.TargetTMC) && c.Name == cfg.CurrentContext[c.Target] {
+		if cfg.CurrentServer == "" && (c.IsManagementCluster() || c.Target == configtypes.TargetTMC) && c.Name == cfg.CurrentContext[c.Target] {
 			// This is lossy because only one server can be active at a time in the older CLI.
 			// Using the K8s context for a management cluster or TMC, since these are the two
 			// available publicly at the time of deprecation.
-			cfg.CurrentServer = cfg.CurrentContext[cliapi.TargetK8s]
+			cfg.CurrentServer = cfg.CurrentContext[configtypes.TargetK8s]
 		}
 	}
 }
 
-func convertContextToServer(c *configapi.Context) *configapi.Server {
+func convertContextToServer(c *configtypes.Context) *configtypes.Server {
 	if c == nil {
 		return nil
 	}
 
-	return &configapi.Server{
+	return &configtypes.Server{
 		Name:                  c.Name,
 		Type:                  convertTargetToServerType(c.Target),
 		GlobalOpts:            c.GlobalOpts,
@@ -129,24 +128,24 @@ func convertContextToServer(c *configapi.Context) *configapi.Server {
 	}
 }
 
-func convertTargetToServerType(t cliapi.Target) configapi.ServerType {
+func convertTargetToServerType(t configtypes.Target) configtypes.ServerType {
 	switch t {
-	case cliapi.TargetK8s:
+	case configtypes.TargetK8s:
 		// This is lossy because only management cluster servers are supported by the older CLI.
-		return configapi.ManagementClusterServerType
-	case cliapi.TargetTMC:
-		return configapi.GlobalServerType
+		return configtypes.ManagementClusterServerType
+	case configtypes.TargetTMC:
+		return configtypes.GlobalServerType
 	}
 	// no other context type is supported in v1 yet
-	return configapi.ServerType(t)
+	return configtypes.ServerType(t)
 }
 
-func convertClusterOptsToMgmtClusterOpts(o *configapi.ClusterServer) *configapi.ManagementClusterServer {
+func convertClusterOptsToMgmtClusterOpts(o *configtypes.ClusterServer) *configtypes.ManagementClusterServer {
 	if o == nil || !o.IsManagementCluster {
 		return nil
 	}
 
-	return &configapi.ManagementClusterServer{
+	return &configtypes.ManagementClusterServer{
 		Endpoint: o.Endpoint,
 		Path:     o.Path,
 		Context:  o.Context,
@@ -154,19 +153,19 @@ func convertClusterOptsToMgmtClusterOpts(o *configapi.ClusterServer) *configapi.
 }
 
 // convertNodeToClientConfig converts yaml node to client config type
-func convertNodeToClientConfig(node *yaml.Node) (obj *configapi.ClientConfig, err error) {
+func convertNodeToClientConfig(node *yaml.Node) (obj *configtypes.ClientConfig, err error) {
 	err = node.Decode(&obj)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to convert node to ClientConfig")
 	}
 	if obj == nil {
-		return &configapi.ClientConfig{}, err
+		return &configtypes.ClientConfig{}, err
 	}
 	return obj, err
 }
 
 // convertNodeToMetadata converts yaml node to client config type
-func convertNodeToMetadata(node *yaml.Node) (obj *configapi.Metadata, err error) {
+func convertNodeToMetadata(node *yaml.Node) (obj *configtypes.Metadata, err error) {
 	err = node.Decode(&obj)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to convert node to Metadata")
@@ -175,7 +174,7 @@ func convertNodeToMetadata(node *yaml.Node) (obj *configapi.Metadata, err error)
 }
 
 // convertClientConfigToNode converts client config type to yaml node
-func convertClientConfigToNode(obj *configapi.ClientConfig) (*yaml.Node, error) {
+func convertClientConfigToNode(obj *configtypes.ClientConfig) (*yaml.Node, error) {
 	bytes, err := yaml.Marshal(obj)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to convert obj to node")
@@ -189,7 +188,7 @@ func convertClientConfigToNode(obj *configapi.ClientConfig) (*yaml.Node, error) 
 }
 
 // convertMetadataToNode converts client config type to yaml node
-func convertMetadataToNode(metadata *configapi.Metadata) (*yaml.Node, error) {
+func convertMetadataToNode(metadata *configtypes.Metadata) (*yaml.Node, error) {
 	bytes, err := yaml.Marshal(metadata)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to convert metadata obj to node")
@@ -203,7 +202,7 @@ func convertMetadataToNode(metadata *configapi.Metadata) (*yaml.Node, error) {
 }
 
 // convertServerToNode converts server to yaml node
-func convertServerToNode(obj *configapi.Server) (*yaml.Node, error) {
+func convertServerToNode(obj *configtypes.Server) (*yaml.Node, error) {
 	bytes, err := yaml.Marshal(obj)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to convert obj to node")
@@ -217,7 +216,7 @@ func convertServerToNode(obj *configapi.Server) (*yaml.Node, error) {
 }
 
 // convertPluginRepositoryToNode converts PluginRepository to yaml node
-func convertPluginRepositoryToNode(obj *configapi.PluginRepository) (*yaml.Node, error) {
+func convertPluginRepositoryToNode(obj *configtypes.PluginRepository) (*yaml.Node, error) {
 	bytes, err := yaml.Marshal(obj)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to convert obj to node")
@@ -231,7 +230,7 @@ func convertPluginRepositoryToNode(obj *configapi.PluginRepository) (*yaml.Node,
 }
 
 // convertContextToNode converts context to yaml node
-func convertContextToNode(obj *configapi.Context) (*yaml.Node, error) {
+func convertContextToNode(obj *configtypes.Context) (*yaml.Node, error) {
 	bytes, err := yaml.Marshal(obj)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to convert obj to node")
@@ -245,7 +244,7 @@ func convertContextToNode(obj *configapi.Context) (*yaml.Node, error) {
 }
 
 // convertPluginDiscoveryToNode converts PluginDiscovery to yaml node
-func convertPluginDiscoveryToNode(obj *configapi.PluginDiscovery) (*yaml.Node, error) {
+func convertPluginDiscoveryToNode(obj *configtypes.PluginDiscovery) (*yaml.Node, error) {
 	bytes, err := yaml.Marshal(obj)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to convert obj to node")

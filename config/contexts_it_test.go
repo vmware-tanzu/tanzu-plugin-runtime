@@ -9,8 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	cliapi "github.com/vmware-tanzu/tanzu-framework/apis/cli/v1alpha1"
-	configapi "github.com/vmware-tanzu/tanzu-plugin-runtime/apis/config/v1alpha1"
+	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
 
 func setupContextsData() (string, string, string, string) {
@@ -155,18 +154,18 @@ func TestContextsIntegration(t *testing.T) {
 
 	// Get Context
 	context, err := GetContext("test-mc")
-	expected := &configapi.Context{
+	expected := &configtypes.Context{
 		Name:   "test-mc",
-		Target: cliapi.TargetK8s,
-		ClusterOpts: &configapi.ClusterServer{
+		Target: configtypes.TargetK8s,
+		ClusterOpts: &configtypes.ClusterServer{
 			Endpoint:            "test-endpoint",
 			Path:                "test-path",
 			Context:             "test-context",
 			IsManagementCluster: true,
 		},
-		DiscoverySources: []configapi.PluginDiscovery{
+		DiscoverySources: []configtypes.PluginDiscovery{
 			{
-				GCP: &configapi.GCPDiscovery{
+				GCP: &configtypes.GCPDiscovery{
 					Name:         "test",
 					Bucket:       "test-bucket",
 					ManifestPath: "test-manifest-path",
@@ -177,17 +176,17 @@ func TestContextsIntegration(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, expected, context)
 	// Add new Context
-	newCtx := &configapi.Context{
+	newCtx := &configtypes.Context{
 		Name:   "test-mc2",
-		Target: cliapi.TargetK8s,
-		ClusterOpts: &configapi.ClusterServer{
+		Target: configtypes.TargetK8s,
+		ClusterOpts: &configtypes.ClusterServer{
 			Path:                "test-path",
 			Context:             "test-context",
 			IsManagementCluster: true,
 		},
-		DiscoverySources: []configapi.PluginDiscovery{
+		DiscoverySources: []configtypes.PluginDiscovery{
 			{
-				GCP: &configapi.GCPDiscovery{
+				GCP: &configtypes.GCPDiscovery{
 					Name:         "test",
 					Bucket:       "test-bucket",
 					ManifestPath: "test-manifest-path",
@@ -201,17 +200,17 @@ func TestContextsIntegration(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, newCtx, ctx)
 	// Update existing Context
-	updatedCtx := &configapi.Context{
+	updatedCtx := &configtypes.Context{
 		Name:   "test-mc2",
-		Target: cliapi.TargetK8s,
-		ClusterOpts: &configapi.ClusterServer{
+		Target: configtypes.TargetK8s,
+		ClusterOpts: &configtypes.ClusterServer{
 			Path:                "test-path-updated",
 			Context:             "test-context-updated",
 			IsManagementCluster: true,
 		},
-		DiscoverySources: []configapi.PluginDiscovery{
+		DiscoverySources: []configtypes.PluginDiscovery{
 			{
-				GCP: &configapi.GCPDiscovery{
+				GCP: &configtypes.GCPDiscovery{
 					Name:         "test",
 					Bucket:       "test-bucket-updated",
 					ManifestPath: "test-manifest-path-updated",

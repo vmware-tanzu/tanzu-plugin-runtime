@@ -8,7 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	configapi "github.com/vmware-tanzu/tanzu-plugin-runtime/apis/config/v1alpha1"
+	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
 
 func TestGetMetadata(t *testing.T) {
@@ -24,13 +24,13 @@ func TestGetMetadata(t *testing.T) {
 	tests := []struct {
 		name   string
 		in     string
-		out    *configapi.Metadata
+		out    *configtypes.Metadata
 		errStr string
 	}{
 		{
 			name: "success empty metadata",
 			in:   ``,
-			out:  &configapi.Metadata{},
+			out:  &configtypes.Metadata{},
 		},
 		{
 			name: "success with patch strategies",
@@ -39,8 +39,8 @@ func TestGetMetadata(t *testing.T) {
     contexts.group: replace
     contexts.clusterOpts.annotation: replace
     contexts.discoverySources.gcp.annotation: replace`,
-			out: &configapi.Metadata{
-				ConfigMetadata: &configapi.ConfigMetadata{
+			out: &configtypes.Metadata{
+				ConfigMetadata: &configtypes.ConfigMetadata{
 					PatchStrategy: map[string]string{
 						"contexts.group": "replace",
 						"contexts.discoverySources.gcp.annotation": "replace",
@@ -80,13 +80,13 @@ func TestGetConfigMetadata(t *testing.T) {
 	tests := []struct {
 		name   string
 		in     string
-		out    *configapi.ConfigMetadata
+		out    *configtypes.ConfigMetadata
 		errStr string
 	}{
 		{
 			name:   "success empty metadata",
 			in:     ``,
-			out:    &configapi.ConfigMetadata{},
+			out:    &configtypes.ConfigMetadata{},
 			errStr: "config metadata not found",
 		},
 		{
@@ -96,7 +96,7 @@ func TestGetConfigMetadata(t *testing.T) {
     contexts.group: replace
     contexts.clusterOpts.annotation: replace
     contexts.discoverySources.gcp.annotation: replace`,
-			out: &configapi.ConfigMetadata{
+			out: &configtypes.ConfigMetadata{
 				PatchStrategy: map[string]string{
 					"contexts.group": "replace",
 					"contexts.discoverySources.gcp.annotation": "replace",

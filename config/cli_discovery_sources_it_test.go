@@ -9,7 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	configapi "github.com/vmware-tanzu/tanzu-plugin-runtime/apis/config/v1alpha1"
+	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
 
 func setupData() (string, string, string, string) {
@@ -190,8 +190,8 @@ func TestCLIDiscoverySourceIntegration(t *testing.T) {
 	assert.Equal(t, 2, len(sources))
 
 	// Add new OCI CLI DiscoverySource
-	ds := &configapi.PluginDiscovery{
-		OCI: &configapi.OCIDiscovery{
+	ds := &configtypes.PluginDiscovery{
+		OCI: &configtypes.OCIDiscovery{
 			Name:  "new-default",
 			Image: "new-default-image",
 		},
@@ -209,8 +209,8 @@ func TestCLIDiscoverySourceIntegration(t *testing.T) {
 	assert.Equal(t, 3, len(sources))
 
 	// Update existing OCI CLI DiscoverySource
-	ds = &configapi.PluginDiscovery{
-		OCI: &configapi.OCIDiscovery{
+	ds = &configtypes.PluginDiscovery{
+		OCI: &configtypes.OCIDiscovery{
 			Name:  "default",
 			Image: "default-image",
 		},
@@ -291,8 +291,8 @@ func TestCLIDiscoverySourceIntegrationWithPatchStrategy(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, 2, len(sources))
 	// Add new OCI CLI DiscoverySource
-	ds := &configapi.PluginDiscovery{
-		OCI: &configapi.OCIDiscovery{
+	ds := &configtypes.PluginDiscovery{
+		OCI: &configtypes.OCIDiscovery{
 			Name:  "new-default",
 			Image: "new-default-image",
 		},
@@ -311,8 +311,8 @@ func TestCLIDiscoverySourceIntegrationWithPatchStrategy(t *testing.T) {
 	assert.Equal(t, 3, len(sources))
 
 	// Update existing OCI CLI DiscoverySource
-	ds = &configapi.PluginDiscovery{
-		OCI: &configapi.OCIDiscovery{
+	ds = &configtypes.PluginDiscovery{
+		OCI: &configtypes.OCIDiscovery{
 			Name:  "default",
 			Image: "update-default-image",
 		},

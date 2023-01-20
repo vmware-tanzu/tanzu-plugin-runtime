@@ -1,7 +1,7 @@
 // Copyright 2022 VMware, Inc. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-package v1alpha1
+package types
 
 // Metadata struct type to store config related metadata
 type Metadata struct {

@@ -8,7 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	configapi "github.com/vmware-tanzu/tanzu-plugin-runtime/apis/config/v1alpha1"
+	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
 
 func TestGetCLIDiscoverySources(t *testing.T) {
@@ -21,18 +21,18 @@ func TestGetCLIDiscoverySources(t *testing.T) {
 
 	tests := []struct {
 		name   string
-		in     *configapi.ClientConfig
-		out    []configapi.PluginDiscovery
+		in     *configtypes.ClientConfig
+		out    []configtypes.PluginDiscovery
 		errStr string
 	}{
 		{
 			name: "success get all",
-			in: &configapi.ClientConfig{
-				ClientOptions: &configapi.ClientOptions{
-					CLI: &configapi.CLIOptions{
-						DiscoverySources: []configapi.PluginDiscovery{
+			in: &configtypes.ClientConfig{
+				ClientOptions: &configtypes.ClientOptions{
+					CLI: &configtypes.CLIOptions{
+						DiscoverySources: []configtypes.PluginDiscovery{
 							{
-								GCP: &configapi.GCPDiscovery{
+								GCP: &configtypes.GCPDiscovery{
 									Name:         "test",
 									Bucket:       "updated-test-bucket",
 									ManifestPath: "test-manifest-path",
@@ -42,9 +42,9 @@ func TestGetCLIDiscoverySources(t *testing.T) {
 					},
 				},
 			},
-			out: []configapi.PluginDiscovery{
+			out: []configtypes.PluginDiscovery{
 				{
-					GCP: &configapi.GCPDiscovery{
+					GCP: &configtypes.GCPDiscovery{
 						Name:         "test",
 						Bucket:       "updated-test-bucket",
 						ManifestPath: "test-manifest-path",
@@ -74,17 +74,17 @@ func TestGetCLIDiscoverySource(t *testing.T) {
 
 	tests := []struct {
 		name string
-		in   *configapi.ClientConfig
-		out  *configapi.PluginDiscovery
+		in   *configtypes.ClientConfig
+		out  *configtypes.PluginDiscovery
 	}{
 		{
 			name: "success get",
-			in: &configapi.ClientConfig{
-				ClientOptions: &configapi.ClientOptions{
-					CLI: &configapi.CLIOptions{
-						DiscoverySources: []configapi.PluginDiscovery{
+			in: &configtypes.ClientConfig{
+				ClientOptions: &configtypes.ClientOptions{
+					CLI: &configtypes.CLIOptions{
+						DiscoverySources: []configtypes.PluginDiscovery{
 							{
-								GCP: &configapi.GCPDiscovery{
+								GCP: &configtypes.GCPDiscovery{
 									Name:         "test",
 									Bucket:       "updated-test-bucket",
 									ManifestPath: "test-manifest-path",
@@ -94,8 +94,8 @@ func TestGetCLIDiscoverySource(t *testing.T) {
 					},
 				},
 			},
-			out: &configapi.PluginDiscovery{
-				GCP: &configapi.GCPDiscovery{
+			out: &configtypes.PluginDiscovery{
+				GCP: &configtypes.GCPDiscovery{
 					Name:         "test",
 					Bucket:       "updated-test-bucket",
 					ManifestPath: "test-manifest-path",
@@ -124,21 +124,21 @@ func TestSetCLIDiscoverySources(t *testing.T) {
 
 	tests := []struct {
 		name  string
-		input []configapi.PluginDiscovery
+		input []configtypes.PluginDiscovery
 		total int
 	}{
 		{
 			name: "success add test",
-			input: []configapi.PluginDiscovery{
+			input: []configtypes.PluginDiscovery{
 				{
-					GCP: &configapi.GCPDiscovery{
+					GCP: &configtypes.GCPDiscovery{
 						Name:         "test",
 						Bucket:       "test-bucket",
 						ManifestPath: "test-manifest-path",
 					},
 				},
 				{
-					Local: &configapi.LocalDiscovery{
+					Local: &configtypes.LocalDiscovery{
 						Name: "default",
 						Path: "standalone",
 					},
@@ -148,9 +148,9 @@ func TestSetCLIDiscoverySources(t *testing.T) {
 		},
 		{
 			name: "success add test",
-			input: []configapi.PluginDiscovery{
+			input: []configtypes.PluginDiscovery{
 				{
-					Local: &configapi.LocalDiscovery{
+					Local: &configtypes.LocalDiscovery{
 						Name: "admin-local",
 						Path: "admin",
 					},
@@ -160,9 +160,9 @@ func TestSetCLIDiscoverySources(t *testing.T) {
 		},
 		{
 			name: "success add test",
-			input: []configapi.PluginDiscovery{
+			input: []configtypes.PluginDiscovery{
 				{
-					OCI: &configapi.OCIDiscovery{
+					OCI: &configtypes.OCIDiscovery{
 						Name:  "default",
 						Image: "test-image",
 					},
@@ -172,9 +172,9 @@ func TestSetCLIDiscoverySources(t *testing.T) {
 		},
 		{
 			name: "success update test",
-			input: []configapi.PluginDiscovery{
+			input: []configtypes.PluginDiscovery{
 				{
-					GCP: &configapi.GCPDiscovery{
+					GCP: &configtypes.GCPDiscovery{
 						Name:         "test",
 						Bucket:       "test-updated-bucket",
 						ManifestPath: "test-updated-manifest-path",
@@ -185,9 +185,9 @@ func TestSetCLIDiscoverySources(t *testing.T) {
 		},
 		{
 			name: "should not persist same test",
-			input: []configapi.PluginDiscovery{
+			input: []configtypes.PluginDiscovery{
 				{
-					GCP: &configapi.GCPDiscovery{
+					GCP: &configtypes.GCPDiscovery{
 						Name:         "test",
 						Bucket:       "test-updated-bucket",
 						ManifestPath: "test-updated-manifest-path",
@@ -198,9 +198,9 @@ func TestSetCLIDiscoverySources(t *testing.T) {
 		},
 		{
 			name: "success add default gcp",
-			input: []configapi.PluginDiscovery{
+			input: []configtypes.PluginDiscovery{
 				{
-					GCP: &configapi.GCPDiscovery{
+					GCP: &configtypes.GCPDiscovery{
 						Name:         "default",
 						Bucket:       "test-bucket",
 						ManifestPath: "test-manifest-path",
@@ -211,9 +211,9 @@ func TestSetCLIDiscoverySources(t *testing.T) {
 		},
 		{
 			name: "success add default-local gcp",
-			input: []configapi.PluginDiscovery{
+			input: []configtypes.PluginDiscovery{
 				{
-					GCP: &configapi.GCPDiscovery{
+					GCP: &configtypes.GCPDiscovery{
 						Name:         "default-local",
 						Bucket:       "test-bucket",
 						ManifestPath: "test-manifest-path",
@@ -224,9 +224,9 @@ func TestSetCLIDiscoverySources(t *testing.T) {
 		},
 		{
 			name: "success add default-local local",
-			input: []configapi.PluginDiscovery{
+			input: []configtypes.PluginDiscovery{
 				{
-					Local: &configapi.LocalDiscovery{
+					Local: &configtypes.LocalDiscovery{
 						Name: "default-local",
 						Path: "test-path",
 					},
@@ -236,9 +236,9 @@ func TestSetCLIDiscoverySources(t *testing.T) {
 		},
 		{
 			name: "success add default-local local",
-			input: []configapi.PluginDiscovery{
+			input: []configtypes.PluginDiscovery{
 				{
-					Local: &configapi.LocalDiscovery{
+					Local: &configtypes.LocalDiscovery{
 						Name: "default-local",
 						Path: "test-path",
 					},
@@ -268,18 +268,18 @@ func TestDeleteCLIDiscoverySource(t *testing.T) {
 
 	tests := []struct {
 		name   string
-		src    *configapi.ClientConfig
+		src    *configtypes.ClientConfig
 		input  string
 		count  int
 		errStr string
 	}{{
 		name: "should return err on deleting non existing source",
-		src: &configapi.ClientConfig{
-			ClientOptions: &configapi.ClientOptions{
-				CLI: &configapi.CLIOptions{
-					DiscoverySources: []configapi.PluginDiscovery{
+		src: &configtypes.ClientConfig{
+			ClientOptions: &configtypes.ClientOptions{
+				CLI: &configtypes.CLIOptions{
+					DiscoverySources: []configtypes.PluginDiscovery{
 						{
-							GCP: &configapi.GCPDiscovery{
+							GCP: &configtypes.GCPDiscovery{
 								Name:         "test",
 								Bucket:       "test-bucket",
 								ManifestPath: "test-manifest-path",
@@ -295,12 +295,12 @@ func TestDeleteCLIDiscoverySource(t *testing.T) {
 	},
 		{
 			name: "should delete existing test source",
-			src: &configapi.ClientConfig{
-				ClientOptions: &configapi.ClientOptions{
-					CLI: &configapi.CLIOptions{
-						DiscoverySources: []configapi.PluginDiscovery{
+			src: &configtypes.ClientConfig{
+				ClientOptions: &configtypes.ClientOptions{
+					CLI: &configtypes.CLIOptions{
+						DiscoverySources: []configtypes.PluginDiscovery{
 							{
-								GCP: &configapi.GCPDiscovery{
+								GCP: &configtypes.GCPDiscovery{
 									Name:         "test",
 									Bucket:       "test-bucket",
 									ManifestPath: "test-manifest-path",
@@ -315,19 +315,19 @@ func TestDeleteCLIDiscoverySource(t *testing.T) {
 		},
 		{
 			name: "should delete test2 source",
-			src: &configapi.ClientConfig{
-				ClientOptions: &configapi.ClientOptions{
-					CLI: &configapi.CLIOptions{
-						DiscoverySources: []configapi.PluginDiscovery{
+			src: &configtypes.ClientConfig{
+				ClientOptions: &configtypes.ClientOptions{
+					CLI: &configtypes.CLIOptions{
+						DiscoverySources: []configtypes.PluginDiscovery{
 							{
-								GCP: &configapi.GCPDiscovery{
+								GCP: &configtypes.GCPDiscovery{
 									Name:         "test",
 									Bucket:       "test-bucket",
 									ManifestPath: "test-manifest-path",
 								},
 							},
 							{
-								GCP: &configapi.GCPDiscovery{
+								GCP: &configtypes.GCPDiscovery{
 									Name:         "test2",
 									Bucket:       "test-bucket2",
 									ManifestPath: "test-manifest-path2",
@@ -342,25 +342,25 @@ func TestDeleteCLIDiscoverySource(t *testing.T) {
 		},
 		{
 			name: "should delete local default source",
-			src: &configapi.ClientConfig{
-				ClientOptions: &configapi.ClientOptions{
-					CLI: &configapi.CLIOptions{
-						DiscoverySources: []configapi.PluginDiscovery{
+			src: &configtypes.ClientConfig{
+				ClientOptions: &configtypes.ClientOptions{
+					CLI: &configtypes.CLIOptions{
+						DiscoverySources: []configtypes.PluginDiscovery{
 							{
-								GCP: &configapi.GCPDiscovery{
+								GCP: &configtypes.GCPDiscovery{
 									Name:         "test",
 									Bucket:       "test-bucket",
 									ManifestPath: "test-manifest-path",
 								},
 							},
 							{
-								Local: &configapi.LocalDiscovery{
+								Local: &configtypes.LocalDiscovery{
 									Name: "default",
 									Path: "standalone",
 								},
 							},
 							{
-								Local: &configapi.LocalDiscovery{
+								Local: &configtypes.LocalDiscovery{
 									Name: "admin-local",
 									Path: "admin",
 								},
@@ -398,9 +398,9 @@ func TestIntegrationSetGetDeleteCLIDiscoverySource(t *testing.T) {
 		cleanUp()
 	}()
 
-	sources := []configapi.PluginDiscovery{
+	sources := []configtypes.PluginDiscovery{
 		{
-			GCP: &configapi.GCPDiscovery{
+			GCP: &configtypes.GCPDiscovery{
 				Name:         "default",
 				Bucket:       "test-bucket",
 				ManifestPath: "test-manifest-path",
@@ -449,25 +449,25 @@ func TestSetCLIDiscoverySourceLocalMulti(t *testing.T) {
 		cleanUp()
 	}()
 
-	src := &configapi.ClientConfig{
-		ClientOptions: &configapi.ClientOptions{
-			CLI: &configapi.CLIOptions{},
+	src := &configtypes.ClientConfig{
+		ClientOptions: &configtypes.ClientOptions{
+			CLI: &configtypes.CLIOptions{},
 		},
 	}
-	input := configapi.PluginDiscovery{
-		Local: &configapi.LocalDiscovery{
+	input := configtypes.PluginDiscovery{
+		Local: &configtypes.LocalDiscovery{
 			Name: "admin-local",
 			Path: "admin",
 		},
 	}
-	input2 := configapi.PluginDiscovery{
-		Local: &configapi.LocalDiscovery{
+	input2 := configtypes.PluginDiscovery{
+		Local: &configtypes.LocalDiscovery{
 			Name: "default-local",
 			Path: "standalone",
 		},
 	}
-	updateInput2 := configapi.PluginDiscovery{
-		Local: &configapi.LocalDiscovery{
+	updateInput2 := configtypes.PluginDiscovery{
+		Local: &configtypes.LocalDiscovery{
 			Name: "default-local",
 			Path: "standalone-updated",
 		},
@@ -504,14 +504,14 @@ func TestSetCLIDiscoverySourceWithDefaultAndDefaultLocal(t *testing.T) {
 
 	tests := []struct {
 		name         string
-		input        []configapi.PluginDiscovery
+		input        []configtypes.PluginDiscovery
 		totalSources int
 	}{
 		{
 			name: "success add default-test source",
-			input: []configapi.PluginDiscovery{
+			input: []configtypes.PluginDiscovery{
 				{
-					GCP: &configapi.GCPDiscovery{
+					GCP: &configtypes.GCPDiscovery{
 						Name:         "default-test",
 						Bucket:       "default-test-bucket",
 						ManifestPath: "default-test-manifest-path",
@@ -522,9 +522,9 @@ func TestSetCLIDiscoverySourceWithDefaultAndDefaultLocal(t *testing.T) {
 		},
 		{
 			name: "success add default source",
-			input: []configapi.PluginDiscovery{
+			input: []configtypes.PluginDiscovery{
 				{
-					GCP: &configapi.GCPDiscovery{
+					GCP: &configtypes.GCPDiscovery{
 						Name:         "default",
 						Bucket:       "default-test-bucket",
 						ManifestPath: "default-test-manifest-path",
@@ -535,9 +535,9 @@ func TestSetCLIDiscoverySourceWithDefaultAndDefaultLocal(t *testing.T) {
 		},
 		{
 			name: "success add default-local source",
-			input: []configapi.PluginDiscovery{
+			input: []configtypes.PluginDiscovery{
 				{
-					GCP: &configapi.GCPDiscovery{
+					GCP: &configtypes.GCPDiscovery{
 						Name:         "default-local",
 						Bucket:       "test-bucket",
 						ManifestPath: "test-manifest-path",
@@ -549,9 +549,9 @@ func TestSetCLIDiscoverySourceWithDefaultAndDefaultLocal(t *testing.T) {
 		},
 		{
 			name: "success update default",
-			input: []configapi.PluginDiscovery{
+			input: []configtypes.PluginDiscovery{
 				{
-					GCP: &configapi.GCPDiscovery{
+					GCP: &configtypes.GCPDiscovery{
 						Name:         "default",
 						Bucket:       "default-test-bucket-updated",
 						ManifestPath: "default-test-manifest-path-updated",
@@ -563,9 +563,9 @@ func TestSetCLIDiscoverySourceWithDefaultAndDefaultLocal(t *testing.T) {
 		},
 		{
 			name: "success update default-local",
-			input: []configapi.PluginDiscovery{
+			input: []configtypes.PluginDiscovery{
 				{
-					GCP: &configapi.GCPDiscovery{
+					GCP: &configtypes.GCPDiscovery{
 						Name:         "default-local",
 						Bucket:       "default-test-bucket-updated",
 						ManifestPath: "default-test-manifest-path-updated",
@@ -577,48 +577,48 @@ func TestSetCLIDiscoverySourceWithDefaultAndDefaultLocal(t *testing.T) {
 		},
 		{
 			name: "success add default",
-			input: []configapi.PluginDiscovery{
+			input: []configtypes.PluginDiscovery{
 				{
-					GCP: &configapi.GCPDiscovery{
+					GCP: &configtypes.GCPDiscovery{
 						Name:         "default",
 						Bucket:       "default-test-bucket-updated",
 						ManifestPath: "default-test-manifest-path-updated",
 					},
 				},
 				{
-					Local: &configapi.LocalDiscovery{
+					Local: &configtypes.LocalDiscovery{
 						Name: "test-local",
 						Path: "test-local-path",
 					},
 				},
 				{
-					Local: &configapi.LocalDiscovery{
+					Local: &configtypes.LocalDiscovery{
 						Name: "default",
 						Path: "default-local-path",
 					},
 				},
 				{
-					GCP: &configapi.GCPDiscovery{
+					GCP: &configtypes.GCPDiscovery{
 						Name:         "default",
 						Bucket:       "default-test-bucket-updated2",
 						ManifestPath: "default-test-manifest-path-updated2",
 					},
 				},
 				{
-					GCP: &configapi.GCPDiscovery{
+					GCP: &configtypes.GCPDiscovery{
 						Name:         "test-gcp1",
 						Bucket:       "test-bucket-updated",
 						ManifestPath: "test-manifest-path-updated",
 					},
 				},
 				{
-					Local: &configapi.LocalDiscovery{
+					Local: &configtypes.LocalDiscovery{
 						Name: "default-local",
 						Path: "default-local-path",
 					},
 				},
 				{
-					Local: &configapi.LocalDiscovery{
+					Local: &configtypes.LocalDiscovery{
 						Name: "test-gcp1",
 						Path: "default-local-path",
 					},
@@ -653,60 +653,60 @@ func TestSetCLIDiscoverySourceMultiTypes(t *testing.T) {
 
 	tests := []struct {
 		name         string
-		input        []configapi.PluginDiscovery
+		input        []configtypes.PluginDiscovery
 		totalSources int
 	}{
 
 		{
 			name: "success add multiple discovery source types",
-			input: []configapi.PluginDiscovery{
+			input: []configtypes.PluginDiscovery{
 				{
-					GCP: &configapi.GCPDiscovery{
+					GCP: &configtypes.GCPDiscovery{
 						Name:         "default",
 						Bucket:       "default-test-bucket-updated",
 						ManifestPath: "default-test-manifest-path-updated",
 					},
 				},
 				{
-					Local: &configapi.LocalDiscovery{
+					Local: &configtypes.LocalDiscovery{
 						Name: "test-local",
 						Path: "test-local-path",
 					},
 				},
 				{
-					Local: &configapi.LocalDiscovery{
+					Local: &configtypes.LocalDiscovery{
 						Name: "default",
 						Path: "default-local-path",
 					},
 				},
 				{
-					GCP: &configapi.GCPDiscovery{
+					GCP: &configtypes.GCPDiscovery{
 						Name:         "default",
 						Bucket:       "default-test-bucket-updated2",
 						ManifestPath: "default-test-manifest-path-updated2",
 					},
 				},
 				{
-					GCP: &configapi.GCPDiscovery{
+					GCP: &configtypes.GCPDiscovery{
 						Name:         "test-gcp1",
 						Bucket:       "test-bucket-updated",
 						ManifestPath: "test-manifest-path-updated",
 					},
 				},
 				{
-					Local: &configapi.LocalDiscovery{
+					Local: &configtypes.LocalDiscovery{
 						Name: "default-local",
 						Path: "default-local-path",
 					},
 				},
 				{
-					Local: &configapi.LocalDiscovery{
+					Local: &configtypes.LocalDiscovery{
 						Name: "test-gcp1",
 						Path: "default-local-path",
 					},
 				},
 				{
-					GCP: &configapi.GCPDiscovery{
+					GCP: &configtypes.GCPDiscovery{
 						Name:         "test-gcp2",
 						Bucket:       "test-bucket-updated",
 						ManifestPath: "test-manifest-path-updated",

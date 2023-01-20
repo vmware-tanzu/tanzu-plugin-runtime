@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	configapi "github.com/vmware-tanzu/tanzu-plugin-runtime/apis/config/v1alpha1"
+	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
 
 func TestSetGetDeleteServer(t *testing.T) {
@@ -20,17 +20,17 @@ func TestSetGetDeleteServer(t *testing.T) {
 		cleanUp()
 	}()
 
-	server1 := &configapi.Server{
+	server1 := &configtypes.Server{
 		Name: "test1",
 		Type: "managementcluster",
-		ManagementClusterOpts: &configapi.ManagementClusterServer{
+		ManagementClusterOpts: &configtypes.ManagementClusterServer{
 			Endpoint: "test-endpoint",
 			Path:     "test-path",
 			Context:  "test-server",
 		},
-		DiscoverySources: []configapi.PluginDiscovery{
+		DiscoverySources: []configtypes.PluginDiscovery{
 			{
-				GCP: &configapi.GCPDiscovery{
+				GCP: &configtypes.GCPDiscovery{
 					Name:         "test",
 					Bucket:       "test-bucket",
 					ManifestPath: "test-manifest-path",
@@ -39,17 +39,17 @@ func TestSetGetDeleteServer(t *testing.T) {
 		},
 	}
 
-	server2 := &configapi.Server{
+	server2 := &configtypes.Server{
 		Name: "test2",
 		Type: "managementcluster",
-		ManagementClusterOpts: &configapi.ManagementClusterServer{
+		ManagementClusterOpts: &configtypes.ManagementClusterServer{
 			Endpoint: "test-endpoint",
 			Path:     "test-path",
 			Context:  "test-server",
 		},
-		DiscoverySources: []configapi.PluginDiscovery{
+		DiscoverySources: []configtypes.PluginDiscovery{
 			{
-				GCP: &configapi.GCPDiscovery{
+				GCP: &configtypes.GCPDiscovery{
 					Name:         "test",
 					Bucket:       "test-bucket",
 					ManifestPath: "test-manifest-path",
@@ -187,23 +187,23 @@ func TestSetServer(t *testing.T) {
 
 	tcs := []struct {
 		name    string
-		server  *configapi.Server
+		server  *configtypes.Server
 		current bool
 		errStr  string
 	}{
 		{
 			name: "should add new server and set current on empty config",
-			server: &configapi.Server{
+			server: &configtypes.Server{
 				Name: "test",
 				Type: "managementcluster",
-				ManagementClusterOpts: &configapi.ManagementClusterServer{
+				ManagementClusterOpts: &configtypes.ManagementClusterServer{
 					Endpoint: "test-endpoint",
 					Path:     "test-path",
 					Context:  "test-server",
 				},
-				DiscoverySources: []configapi.PluginDiscovery{
+				DiscoverySources: []configtypes.PluginDiscovery{
 					{
-						GCP: &configapi.GCPDiscovery{
+						GCP: &configtypes.GCPDiscovery{
 							Name:         "test",
 							Bucket:       "test-bucket",
 							ManifestPath: "test-manifest-path",
@@ -215,17 +215,17 @@ func TestSetServer(t *testing.T) {
 		},
 		{
 			name: "should add new server but not current",
-			server: &configapi.Server{
+			server: &configtypes.Server{
 				Name: "test2",
 				Type: "managementcluster",
-				ManagementClusterOpts: &configapi.ManagementClusterServer{
+				ManagementClusterOpts: &configtypes.ManagementClusterServer{
 					Endpoint: "test-endpoint",
 					Path:     "test-path",
 					Context:  "test-server",
 				},
-				DiscoverySources: []configapi.PluginDiscovery{
+				DiscoverySources: []configtypes.PluginDiscovery{
 					{
-						GCP: &configapi.GCPDiscovery{
+						GCP: &configtypes.GCPDiscovery{
 							Name:         "test",
 							Bucket:       "test-bucket",
 							ManifestPath: "test-manifest-path",
@@ -236,10 +236,10 @@ func TestSetServer(t *testing.T) {
 		},
 		{
 			name: "success tmc current",
-			server: &configapi.Server{
+			server: &configtypes.Server{
 				Name: "test-tmc1",
 				Type: "tmc",
-				GlobalOpts: &configapi.GlobalServer{
+				GlobalOpts: &configtypes.GlobalServer{
 					Endpoint: "test-endpoint",
 				},
 			},
@@ -247,27 +247,27 @@ func TestSetServer(t *testing.T) {
 		},
 		{
 			name: "success tmc not_current",
-			server: &configapi.Server{
+			server: &configtypes.Server{
 				Name: "test-tmc2",
 				Type: "tmc",
-				GlobalOpts: &configapi.GlobalServer{
+				GlobalOpts: &configtypes.GlobalServer{
 					Endpoint: "test-endpoint",
 				},
 			},
 		},
 		{
 			name: "success update test-mc",
-			server: &configapi.Server{
+			server: &configtypes.Server{
 				Name: "test",
 				Type: "managementcluster",
-				ManagementClusterOpts: &configapi.ManagementClusterServer{
+				ManagementClusterOpts: &configtypes.ManagementClusterServer{
 					Endpoint: "test-endpoint",
 					Path:     "test-path",
 					Context:  "test-server",
 				},
-				DiscoverySources: []configapi.PluginDiscovery{
+				DiscoverySources: []configtypes.PluginDiscovery{
 					{
-						GCP: &configapi.GCPDiscovery{
+						GCP: &configtypes.GCPDiscovery{
 							Name:         "test",
 							Bucket:       "test-bucket",
 							ManifestPath: "test-manifest-path",
@@ -278,10 +278,10 @@ func TestSetServer(t *testing.T) {
 		},
 		{
 			name: "success update tmc",
-			server: &configapi.Server{
+			server: &configtypes.Server{
 				Name: "test-tmc",
 				Type: "tmc",
-				GlobalOpts: &configapi.GlobalServer{
+				GlobalOpts: &configtypes.GlobalServer{
 					Endpoint: "updated-test-endpoint",
 				},
 			},
@@ -413,23 +413,23 @@ func TestSetSingleServer(t *testing.T) {
 
 	tcs := []struct {
 		name    string
-		server  *configapi.Server
+		server  *configtypes.Server
 		current bool
 		errStr  string
 	}{
 		{
 			name: "success k8s current",
-			server: &configapi.Server{
+			server: &configtypes.Server{
 				Name: "test",
 				Type: "managementcluster",
-				ManagementClusterOpts: &configapi.ManagementClusterServer{
+				ManagementClusterOpts: &configtypes.ManagementClusterServer{
 					Endpoint: "test-endpoint",
 					Path:     "test-path",
 					Context:  "test-server",
 				},
-				DiscoverySources: []configapi.PluginDiscovery{
+				DiscoverySources: []configtypes.PluginDiscovery{
 					{
-						GCP: &configapi.GCPDiscovery{
+						GCP: &configtypes.GCPDiscovery{
 							Name:         "test",
 							Bucket:       "test-bucket",
 							ManifestPath: "test-manifest-path",
@@ -468,23 +468,23 @@ func TestSetSingleServerWithMigrateToNewConfig(t *testing.T) {
 
 	tcs := []struct {
 		name    string
-		server  *configapi.Server
+		server  *configtypes.Server
 		current bool
 		errStr  string
 	}{
 		{
 			name: "success k8s current",
-			server: &configapi.Server{
+			server: &configtypes.Server{
 				Name: "test",
 				Type: "managementcluster",
-				ManagementClusterOpts: &configapi.ManagementClusterServer{
+				ManagementClusterOpts: &configtypes.ManagementClusterServer{
 					Endpoint: "test-endpoint",
 					Path:     "test-path",
 					Context:  "test-server",
 				},
-				DiscoverySources: []configapi.PluginDiscovery{
+				DiscoverySources: []configtypes.PluginDiscovery{
 					{
-						GCP: &configapi.GCPDiscovery{
+						GCP: &configtypes.GCPDiscovery{
 							Name:         "test",
 							Bucket:       "test-bucket",
 							ManifestPath: "test-manifest-path",

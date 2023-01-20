@@ -9,11 +9,11 @@ import (
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v3"
 
-	configapi "github.com/vmware-tanzu/tanzu-plugin-runtime/apis/config/v1alpha1"
+	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
 
 // GetClientConfig retrieves the config from the local directory with file lock
-func GetClientConfig() (cfg *configapi.ClientConfig, err error) {
+func GetClientConfig() (cfg *configtypes.ClientConfig, err error) {
 	// Retrieve client config node
 	node, err := getClientConfigNode()
 	if err != nil {
@@ -29,7 +29,7 @@ func GetClientConfig() (cfg *configapi.ClientConfig, err error) {
 }
 
 // GetClientConfigNoLock retrieves the config from the local directory without acquiring the lock
-func GetClientConfigNoLock() (cfg *configapi.ClientConfig, err error) {
+func GetClientConfigNoLock() (cfg *configtypes.ClientConfig, err error) {
 	node, err := getClientConfigNodeNoLock()
 	if err != nil {
 		return nil, err
@@ -46,7 +46,7 @@ func GetClientConfigNoLock() (cfg *configapi.ClientConfig, err error) {
 // Make sure to Acquire and Release tanzu lock when reading/writing to the
 // tanzu client configuration
 // Deprecated: StoreClientConfig is deprecated. Avoid using this method for Delete operations. Use New Config API methods.
-func StoreClientConfig(cfg *configapi.ClientConfig) error {
+func StoreClientConfig(cfg *configtypes.ClientConfig) error {
 	// new plugins would be setting only contexts, so populate servers for backwards compatibility
 	populateServers(cfg)
 	// old plugins would be setting only servers, so populate contexts for forwards compatibility
@@ -55,18 +55,7 @@ func StoreClientConfig(cfg *configapi.ClientConfig) error {
 	if err != nil {
 		return err
 	}
-	if cfg.Kind != "" {
-		_, err = setKind(node, cfg.Kind)
-		if err != nil {
-			return err
-		}
-	}
-	if cfg.APIVersion != "" {
-		_, err = setAPIVersion(node, cfg.APIVersion)
-		if err != nil {
-			return err
-		}
-	}
+
 	err = setServers(node, cfg.KnownServers)
 	if err != nil {
 		return err
@@ -92,7 +81,7 @@ func StoreClientConfig(cfg *configapi.ClientConfig) error {
 	return persistConfig(node)
 }
 
-func clientConfigSetClientOptions(cfg *configapi.ClientConfig, node *yaml.Node) error {
+func clientConfigSetClientOptions(cfg *configtypes.ClientConfig, node *yaml.Node) error {
 	if cfg.ClientOptions != nil {
 		err := clientConfigSetFeatures(cfg, node)
 		if err != nil {
@@ -110,7 +99,7 @@ func clientConfigSetClientOptions(cfg *configapi.ClientConfig, node *yaml.Node) 
 	return nil
 }
 
-func clientConfigSetCLI(cfg *configapi.ClientConfig, node *yaml.Node) (err error) {
+func clientConfigSetCLI(cfg *configtypes.ClientConfig, node *yaml.Node) (err error) {
 	if cfg.ClientOptions.CLI != nil {
 		err = clientConfigSetCLIRepositories(cfg, node)
 		if err != nil {
@@ -142,7 +131,7 @@ func clientConfigSetCLI(cfg *configapi.ClientConfig, node *yaml.Node) (err error
 	return nil
 }
 
-func clientConfigSetCLIDiscoverySources(cfg *configapi.ClientConfig, node *yaml.Node) error {
+func clientConfigSetCLIDiscoverySources(cfg *configtypes.ClientConfig, node *yaml.Node) error {
 	if cfg.ClientOptions.CLI.DiscoverySources != nil && len(cfg.ClientOptions.CLI.DiscoverySources) != 0 {
 		err := setCLIDiscoverySources(node, cfg.ClientOptions.CLI.DiscoverySources)
 		if err != nil {
@@ -152,7 +141,7 @@ func clientConfigSetCLIDiscoverySources(cfg *configapi.ClientConfig, node *yaml.
 	return nil
 }
 
-func clientConfigSetCLIRepositories(cfg *configapi.ClientConfig, node *yaml.Node) error {
+func clientConfigSetCLIRepositories(cfg *configtypes.ClientConfig, node *yaml.Node) error {
 	if cfg.ClientOptions.CLI.Repositories != nil && len(cfg.ClientOptions.CLI.Repositories) != 0 {
 		err := setCLIRepositories(node, cfg.ClientOptions.CLI.Repositories)
 		if err != nil {
@@ -162,7 +151,7 @@ func clientConfigSetCLIRepositories(cfg *configapi.ClientConfig, node *yaml.Node
 	return nil
 }
 
-func clientConfigSetEnvs(cfg *configapi.ClientConfig, node *yaml.Node) error {
+func clientConfigSetEnvs(cfg *configtypes.ClientConfig, node *yaml.Node) error {
 	if cfg.ClientOptions.Env != nil {
 		for key, value := range cfg.ClientOptions.Env {
 			_, err := setEnv(node, key, value)
@@ -174,7 +163,7 @@ func clientConfigSetEnvs(cfg *configapi.ClientConfig, node *yaml.Node) error {
 	return nil
 }
 
-func clientConfigSetFeatures(cfg *configapi.ClientConfig, node *yaml.Node) error {
+func clientConfigSetFeatures(cfg *configtypes.ClientConfig, node *yaml.Node) error {
 	if cfg.ClientOptions.Features != nil {
 		for plugin := range cfg.ClientOptions.Features {
 			for key, value := range cfg.ClientOptions.Features[plugin] {
@@ -188,7 +177,7 @@ func clientConfigSetFeatures(cfg *configapi.ClientConfig, node *yaml.Node) error
 	return nil
 }
 
-func clientConfigSetCurrentContext(cfg *configapi.ClientConfig, node *yaml.Node) error {
+func clientConfigSetCurrentContext(cfg *configtypes.ClientConfig, node *yaml.Node) error {
 	if cfg.CurrentContext != nil {
 		for _, contextName := range cfg.CurrentContext {
 			ctx, contextErr := cfg.GetContext(contextName)

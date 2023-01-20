@@ -9,9 +9,10 @@ import (
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v3"
 
-	configapi "github.com/vmware-tanzu/tanzu-plugin-runtime/apis/config/v1alpha1"
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/config/collectionutils"
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/config/nodeutils"
+
+	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
 
 // DiscoveryType constants
@@ -28,7 +29,7 @@ const (
 )
 
 // setDiscoverySources adds or updates the node discoverySources
-func setDiscoverySources(node *yaml.Node, discoverySources []configapi.PluginDiscovery, patchStrategyOpts ...nodeutils.PatchStrategyOpts) (persist bool, err error) {
+func setDiscoverySources(node *yaml.Node, discoverySources []configtypes.PluginDiscovery, patchStrategyOpts ...nodeutils.PatchStrategyOpts) (persist bool, err error) {
 	var anyPersists []bool
 	isTrue := func(item bool) bool { return item }
 	// Find the discovery sources node in the specific yaml node
@@ -52,7 +53,7 @@ func setDiscoverySources(node *yaml.Node, discoverySources []configapi.PluginDis
 }
 
 //nolint:gocyclo
-func setDiscoverySource(discoverySourcesNode *yaml.Node, discoverySource configapi.PluginDiscovery, patchStrategyOpts ...nodeutils.PatchStrategyOpts) (persist bool, err error) {
+func setDiscoverySource(discoverySourcesNode *yaml.Node, discoverySource configtypes.PluginDiscovery, patchStrategyOpts ...nodeutils.PatchStrategyOpts) (persist bool, err error) {
 	// Convert discoverySource change obj to yaml node
 	newNode, err := convertPluginDiscoveryToNode(&discoverySource)
 	if err != nil {
@@ -133,7 +134,7 @@ func setDiscoverySource(discoverySourcesNode *yaml.Node, discoverySource configa
 	return persist, err
 }
 
-func getDiscoverySourceTypeAndName(discoverySource configapi.PluginDiscovery) (string, string) {
+func getDiscoverySourceTypeAndName(discoverySource configtypes.PluginDiscovery) (string, string) {
 	if discoverySource.GCP != nil && discoverySource.GCP.Name != "" {
 		return DiscoveryTypeGCP, discoverySource.GCP.Name
 	} else if discoverySource.OCI != nil && discoverySource.OCI.Name != "" {

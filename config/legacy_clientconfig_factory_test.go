@@ -7,10 +7,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 
-	cliapi "github.com/vmware-tanzu/tanzu-framework/apis/cli/v1alpha1"
-	configapi "github.com/vmware-tanzu/tanzu-plugin-runtime/apis/config/v1alpha1"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestStoreClientConfig(t *testing.T) {
@@ -36,7 +35,7 @@ func TestStoreClientConfig(t *testing.T) {
 	assert.Equal(t, expectedCfg2, string(file))
 }
 
-func setupStoreClientConfigData() (string, string, string, string, *configapi.ClientConfig) {
+func setupStoreClientConfigData() (string, string, string, string, *types.ClientConfig) {
 	cfg := `clientOptions:
   cli:
     discoverySources:
@@ -167,19 +166,19 @@ currentContext:
     kubernetes: test-mc
 `
 
-	c := &configapi.ClientConfig{
-		KnownServers: []*configapi.Server{
+	c := &types.ClientConfig{
+		KnownServers: []*types.Server{
 			{
 				Name: "test-mc",
-				Type: configapi.ManagementClusterServerType,
-				ManagementClusterOpts: &configapi.ManagementClusterServer{
+				Type: types.ManagementClusterServerType,
+				ManagementClusterOpts: &types.ManagementClusterServer{
 					Endpoint: "test-endpoint",
 					Context:  "test-context",
 					Path:     "test-path",
 				},
-				DiscoverySources: []configapi.PluginDiscovery{
+				DiscoverySources: []types.PluginDiscovery{
 					{
-						GCP: &configapi.GCPDiscovery{
+						GCP: &types.GCPDiscovery{
 							Name:         "test",
 							Bucket:       "test-bucket",
 							ManifestPath: "test-manifest-path",
@@ -189,26 +188,26 @@ currentContext:
 			},
 		},
 		CurrentServer: "test-mc",
-		KnownContexts: []*configapi.Context{
+		KnownContexts: []*types.Context{
 			{
 				Name:   "test-mc",
-				Target: cliapi.TargetK8s,
-				ClusterOpts: &configapi.ClusterServer{
+				Target: types.TargetK8s,
+				ClusterOpts: &types.ClusterServer{
 					Endpoint:            "test-context-endpoint",
 					Path:                "test-context-path",
 					Context:             "test-context",
 					IsManagementCluster: true,
 				},
-				DiscoverySources: []configapi.PluginDiscovery{
+				DiscoverySources: []types.PluginDiscovery{
 					{
-						GCP: &configapi.GCPDiscovery{
+						GCP: &types.GCPDiscovery{
 							Name:         "test2",
 							Bucket:       "ctx-test-bucket",
 							ManifestPath: "ctx-test-manifest-path",
 						},
 					},
 					{
-						Local: &configapi.LocalDiscovery{
+						Local: &types.LocalDiscovery{
 							Name: "test",
 							Path: "test-local-path",
 						},
@@ -216,31 +215,31 @@ currentContext:
 				},
 			},
 		},
-		CurrentContext: map[cliapi.Target]string{
-			cliapi.TargetK8s: "test-mc",
+		CurrentContext: map[types.Target]string{
+			types.TargetK8s: "test-mc",
 		},
-		ClientOptions: &configapi.ClientOptions{
-			CLI: &configapi.CLIOptions{
-				Repositories: []configapi.PluginRepository{
+		ClientOptions: &types.ClientOptions{
+			CLI: &types.CLIOptions{
+				Repositories: []types.PluginRepository{
 					{
-						GCPPluginRepository: &configapi.GCPPluginRepository{
+						GCPPluginRepository: &types.GCPPluginRepository{
 							Name:       "test",
 							BucketName: "bucket",
 							RootPath:   "root-path",
 						},
 					},
 				},
-				DiscoverySources: []configapi.PluginDiscovery{
+				DiscoverySources: []types.PluginDiscovery{
 					{
-						GCP: &configapi.GCPDiscovery{
+						GCP: &types.GCPDiscovery{
 							Name:         "test",
 							Bucket:       "ctx-test-bucket",
 							ManifestPath: "ctx-test-manifest-path",
 						},
 					},
 				},
-				UnstableVersionSelector: configapi.VersionSelectorLevel("unstable-version"),
-				Edition:                 configapi.EditionSelector("test=tkg"),
+				UnstableVersionSelector: types.VersionSelectorLevel("unstable-version"),
+				Edition:                 types.EditionSelector("test=tkg"),
 				BOMRepo:                 "test-bomrepo",
 				CompatibilityFilePath:   "test-compatibility-file-path",
 			},

@@ -9,12 +9,12 @@ import (
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v3"
 
-	configapi "github.com/vmware-tanzu/tanzu-plugin-runtime/apis/config/v1alpha1"
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/config/nodeutils"
+	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
 
 // GetCLIRepositories retrieves cli repositories
-func GetCLIRepositories() ([]configapi.PluginRepository, error) {
+func GetCLIRepositories() ([]configtypes.PluginRepository, error) {
 	// Retrieve client config node
 	node, err := getClientConfigNode()
 	if err != nil {
@@ -25,7 +25,7 @@ func GetCLIRepositories() ([]configapi.PluginRepository, error) {
 }
 
 // GetCLIRepository retrieves cli repository by name
-func GetCLIRepository(name string) (*configapi.PluginRepository, error) {
+func GetCLIRepository(name string) (*configtypes.PluginRepository, error) {
 	// Retrieve client config node
 	node, err := getClientConfigNode()
 	if err != nil {
@@ -36,7 +36,7 @@ func GetCLIRepository(name string) (*configapi.PluginRepository, error) {
 }
 
 // SetCLIRepository add or update a repository
-func SetCLIRepository(repository configapi.PluginRepository) (err error) {
+func SetCLIRepository(repository configtypes.PluginRepository) (err error) {
 	// Retrieve client config node
 	AcquireTanzuConfigLock()
 	defer ReleaseTanzuConfigLock()
@@ -82,7 +82,7 @@ func DeleteCLIRepository(name string) error {
 	return persistConfig(node)
 }
 
-func getCLIRepositories(node *yaml.Node) ([]configapi.PluginRepository, error) {
+func getCLIRepositories(node *yaml.Node) ([]configtypes.PluginRepository, error) {
 	cfg, err := convertNodeToClientConfig(node)
 	if err != nil {
 		return nil, err
@@ -93,7 +93,7 @@ func getCLIRepositories(node *yaml.Node) ([]configapi.PluginRepository, error) {
 	return nil, errors.New("cli repositories not found")
 }
 
-func getCLIRepository(node *yaml.Node, name string) (*configapi.PluginRepository, error) {
+func getCLIRepository(node *yaml.Node, name string) (*configtypes.PluginRepository, error) {
 	cfg, err := convertNodeToClientConfig(node)
 	if err != nil {
 		return nil, err
@@ -109,7 +109,7 @@ func getCLIRepository(node *yaml.Node, name string) (*configapi.PluginRepository
 	return nil, errors.New("cli repository not found")
 }
 
-func setCLIRepositories(node *yaml.Node, repos []configapi.PluginRepository) (err error) {
+func setCLIRepositories(node *yaml.Node, repos []configtypes.PluginRepository) (err error) {
 	for _, repository := range repos {
 		_, err = setCLIRepository(node, repository)
 		if err != nil {
@@ -119,7 +119,7 @@ func setCLIRepositories(node *yaml.Node, repos []configapi.PluginRepository) (er
 	return err
 }
 
-func setCLIRepository(node *yaml.Node, repository configapi.PluginRepository) (persist bool, err error) {
+func setCLIRepository(node *yaml.Node, repository configtypes.PluginRepository) (persist bool, err error) {
 	// Retrieve the patch strategies from config metadata
 	patchStrategies, err := GetConfigMetadataPatchStrategy()
 	if err != nil {
@@ -174,7 +174,7 @@ func deleteCLIRepository(node *yaml.Node, name string) error {
 	return nil
 }
 
-func setRepository(repositoriesNode *yaml.Node, repository configapi.PluginRepository, patchStrategyOpts ...nodeutils.PatchStrategyOpts) (persist bool, err error) {
+func setRepository(repositoriesNode *yaml.Node, repository configtypes.PluginRepository, patchStrategyOpts ...nodeutils.PatchStrategyOpts) (persist bool, err error) {
 	newNode, err := convertPluginRepositoryToNode(&repository)
 	if err != nil {
 		return persist, err
@@ -221,7 +221,7 @@ func setRepository(repositoriesNode *yaml.Node, repository configapi.PluginRepos
 	return persist, err
 }
 
-func getRepositoryTypeAndName(repository configapi.PluginRepository) (string, string) {
+func getRepositoryTypeAndName(repository configtypes.PluginRepository) (string, string) {
 	if repository.GCPPluginRepository != nil && repository.GCPPluginRepository.Name != "" {
 		return "gcpPluginRepository", repository.GCPPluginRepository.Name
 	}

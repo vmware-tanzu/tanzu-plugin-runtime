@@ -10,7 +10,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
-	configapi "github.com/vmware-tanzu/tanzu-plugin-runtime/apis/config/v1alpha1"
+	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
 
 func setUpRepositoriesData() (string, string, string, string) {
@@ -212,8 +212,8 @@ func TestCLIRepositoriesIntegration(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(repos))
 	// Add new CLI Repository
-	newRepo := &configapi.PluginRepository{
-		GCPPluginRepository: &configapi.GCPPluginRepository{
+	newRepo := &configtypes.PluginRepository{
+		GCPPluginRepository: &configtypes.GCPPluginRepository{
 			Name:       "new-repo",
 			BucketName: "new-bucket",
 			RootPath:   "new-root-path",
@@ -231,8 +231,8 @@ func TestCLIRepositoriesIntegration(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, 2, len(repos))
 	// Update existing CLI Repository
-	existingRepo := &configapi.PluginRepository{
-		GCPPluginRepository: &configapi.GCPPluginRepository{
+	existingRepo := &configtypes.PluginRepository{
+		GCPPluginRepository: &configtypes.GCPPluginRepository{
 			Name:       "core",
 			BucketName: "update-bucket",
 			RootPath:   "new-root-path",

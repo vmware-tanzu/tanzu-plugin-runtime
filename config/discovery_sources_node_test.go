@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v3"
 
-	configapi "github.com/vmware-tanzu/tanzu-plugin-runtime/apis/config/v1alpha1"
+	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
 
 func TestSetDiscoverySource(t *testing.T) {
@@ -21,14 +21,14 @@ func TestSetDiscoverySource(t *testing.T) {
 	}()
 	tests := []struct {
 		name            string
-		discoverySource configapi.PluginDiscovery
+		discoverySource configtypes.PluginDiscovery
 		contextNode     *yaml.Node
 		errStr          string
 	}{
 		{
 			name: "success k8s",
-			discoverySource: configapi.PluginDiscovery{
-				GCP: &configapi.GCPDiscovery{
+			discoverySource: configtypes.PluginDiscovery{
+				GCP: &configtypes.GCPDiscovery{
 					Name:         "test",
 					Bucket:       "updated-test-bucket",
 					ManifestPath: "test-manifest-path",

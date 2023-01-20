@@ -15,8 +15,7 @@ import (
 	"github.com/tj/assert"
 	"golang.org/x/sync/errgroup"
 
-	cliv1alpha1 "github.com/vmware-tanzu/tanzu-framework/apis/cli/v1alpha1"
-	configapi "github.com/vmware-tanzu/tanzu-plugin-runtime/apis/config/v1alpha1"
+	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
 
 func cleanupDir(dir string) {
@@ -36,15 +35,15 @@ func TestClientConfig(t *testing.T) {
 		cleanUp()
 	}()
 
-	server0 := &configapi.Server{
+	server0 := &configtypes.Server{
 		Name: "test",
-		Type: configapi.ManagementClusterServerType,
-		ManagementClusterOpts: &configapi.ManagementClusterServer{
+		Type: configtypes.ManagementClusterServerType,
+		ManagementClusterOpts: &configtypes.ManagementClusterServer{
 			Path: "test",
 		},
 	}
-	testCtx := &configapi.ClientConfig{
-		KnownServers: []*configapi.Server{
+	testCtx := &configtypes.ClientConfig{
+		KnownServers: []*configtypes.Server{
 			server0,
 		},
 		CurrentServer: "test",
@@ -61,10 +60,10 @@ func TestClientConfig(t *testing.T) {
 	e, err := ServerExists("test")
 	require.NoError(t, err)
 	require.True(t, e)
-	server1 := &configapi.Server{
+	server1 := &configtypes.Server{
 		Name: "test1",
-		Type: configapi.ManagementClusterServerType,
-		ManagementClusterOpts: &configapi.ManagementClusterServer{
+		Type: configtypes.ManagementClusterServerType,
+		ManagementClusterOpts: &configtypes.ManagementClusterServer{
 			Path: "test1",
 		},
 	}
@@ -119,12 +118,12 @@ func TestConfigLegacyDirWithEnvConfigKey(t *testing.T) {
 	defer cleanupDir(legacyLocalDirName)
 
 	//Setup data
-	testCfg := &configapi.ClientConfig{
-		KnownServers: []*configapi.Server{
+	testCfg := &configtypes.ClientConfig{
+		KnownServers: []*configtypes.Server{
 			{
 				Name: "test",
-				Type: configapi.ManagementClusterServerType,
-				ManagementClusterOpts: &configapi.ManagementClusterServer{
+				Type: configtypes.ManagementClusterServerType,
+				ManagementClusterOpts: &configtypes.ManagementClusterServer{
 					Path: "test",
 				},
 			},
@@ -140,10 +139,10 @@ func TestConfigLegacyDirWithEnvConfigKey(t *testing.T) {
 
 	_, err = GetClientConfig()
 	require.NoError(t, err)
-	server1 := &configapi.Server{
+	server1 := &configtypes.Server{
 		Name: "test1",
-		Type: configapi.ManagementClusterServerType,
-		ManagementClusterOpts: &configapi.ManagementClusterServer{
+		Type: configtypes.ManagementClusterServerType,
+		ManagementClusterOpts: &configtypes.ManagementClusterServer{
 			Path: "test1",
 		},
 	}
@@ -201,12 +200,12 @@ func TestConfigLegacyDirWithoutEnvConfigKey(t *testing.T) {
 	defer cleanupDir(legacyLocalDirName)
 
 	//Setup data
-	testCfg := &configapi.ClientConfig{
-		KnownServers: []*configapi.Server{
+	testCfg := &configtypes.ClientConfig{
+		KnownServers: []*configtypes.Server{
 			{
 				Name: "test",
-				Type: configapi.ManagementClusterServerType,
-				ManagementClusterOpts: &configapi.ManagementClusterServer{
+				Type: configtypes.ManagementClusterServerType,
+				ManagementClusterOpts: &configtypes.ManagementClusterServer{
 					Path: "test",
 				},
 			},
@@ -222,10 +221,10 @@ func TestConfigLegacyDirWithoutEnvConfigKey(t *testing.T) {
 
 	_, err = GetClientConfig()
 	require.NoError(t, err)
-	server1 := &configapi.Server{
+	server1 := &configtypes.Server{
 		Name: "test1",
-		Type: configapi.ManagementClusterServerType,
-		ManagementClusterOpts: &configapi.ManagementClusterServer{
+		Type: configtypes.ManagementClusterServerType,
+		ManagementClusterOpts: &configtypes.ManagementClusterServer{
 			Path: "test1",
 		},
 	}
@@ -261,10 +260,10 @@ func TestClientConfigUpdateInParallel(t *testing.T) {
 		if err != nil {
 			return err
 		}
-		s := &configapi.Server{
+		s := &configtypes.Server{
 			Name: mcName,
-			Type: configapi.ManagementClusterServerType,
-			ManagementClusterOpts: &configapi.ManagementClusterServer{
+			Type: configtypes.ManagementClusterServerType,
+			ManagementClusterOpts: &configtypes.ManagementClusterServer{
 				Context: "fake-context",
 				Path:    "fake-path",
 			},
@@ -314,16 +313,16 @@ func TestClientConfigUpdateInParallel(t *testing.T) {
 func TestEndpointFromContext(t *testing.T) {
 	tcs := []struct {
 		name     string
-		ctx      *configapi.Context
+		ctx      *configtypes.Context
 		endpoint string
 		errStr   string
 	}{
 		{
 			name: "success k8s",
-			ctx: &configapi.Context{
+			ctx: &configtypes.Context{
 				Name:   "test-mc",
-				Target: cliv1alpha1.TargetK8s,
-				ClusterOpts: &configapi.ClusterServer{
+				Target: configtypes.TargetK8s,
+				ClusterOpts: &configtypes.ClusterServer{
 					Endpoint:            "test-endpoint",
 					Path:                "test-path",
 					Context:             "test-context",
@@ -333,20 +332,20 @@ func TestEndpointFromContext(t *testing.T) {
 		},
 		{
 			name: "success tmc current",
-			ctx: &configapi.Context{
+			ctx: &configtypes.Context{
 				Name:   "test-tmc",
-				Target: cliv1alpha1.TargetTMC,
-				GlobalOpts: &configapi.GlobalServer{
+				Target: configtypes.TargetTMC,
+				GlobalOpts: &configtypes.GlobalServer{
 					Endpoint: "test-endpoint",
 				},
 			},
 		},
 		{
 			name: "failure",
-			ctx: &configapi.Context{
+			ctx: &configtypes.Context{
 				Name:   "test-dummy",
 				Target: "dummy",
-				ClusterOpts: &configapi.ClusterServer{
+				ClusterOpts: &configtypes.ClusterServer{
 					Endpoint:            "test-endpoint",
 					Path:                "test-path",
 					Context:             "test-context",

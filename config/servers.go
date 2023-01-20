@@ -9,12 +9,12 @@ import (
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v3"
 
-	configapi "github.com/vmware-tanzu/tanzu-plugin-runtime/apis/config/v1alpha1"
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/config/nodeutils"
+	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
 
 // GetServer retrieves server by name
-func GetServer(name string) (*configapi.Server, error) {
+func GetServer(name string) (*configtypes.Server, error) {
 	// Retrieve client config node
 	node, err := getClientConfigNode()
 	if err != nil {
@@ -30,7 +30,7 @@ func ServerExists(name string) (bool, error) {
 }
 
 // GetCurrentServer retrieves the current server
-func GetCurrentServer() (*configapi.Server, error) {
+func GetCurrentServer() (*configtypes.Server, error) {
 	// Retrieve client config node
 	node, err := getClientConfigNode()
 	if err != nil {
@@ -108,17 +108,17 @@ func RemoveCurrentServer(name string) error {
 }
 
 // PutServer add or update server and currentServer
-func PutServer(s *configapi.Server, setCurrent bool) error {
+func PutServer(s *configtypes.Server, setCurrent bool) error {
 	return SetServer(s, setCurrent)
 }
 
 // AddServer add or update server and currentServer
-func AddServer(s *configapi.Server, setCurrent bool) error {
+func AddServer(s *configtypes.Server, setCurrent bool) error {
 	return SetServer(s, setCurrent)
 }
 
 // SetServer add or update server and currentServer
-func SetServer(s *configapi.Server, setCurrent bool) error {
+func SetServer(s *configtypes.Server, setCurrent bool) error {
 	// Acquire tanzu config lock
 	AcquireTanzuConfigLock()
 	defer ReleaseTanzuConfigLock()
@@ -136,7 +136,7 @@ func SetServer(s *configapi.Server, setCurrent bool) error {
 			return err
 		}
 	}
-	if setCurrent && s.Type == configapi.ManagementClusterServerType {
+	if setCurrent && s.Type == configtypes.ManagementClusterServerType {
 		persist, err = setCurrentServer(node, s.Name)
 		if err != nil {
 			return err
@@ -157,7 +157,7 @@ func SetServer(s *configapi.Server, setCurrent bool) error {
 	return nil
 }
 
-func frontFillContexts(s *configapi.Server, setCurrent bool, node *yaml.Node) error {
+func frontFillContexts(s *configtypes.Server, setCurrent bool, node *yaml.Node) error {
 	// Front fill Context and CurrentContext
 	c := convertServerToContext(s)
 	persist, err := setContext(node, c)
@@ -232,7 +232,7 @@ func setCurrentServer(node *yaml.Node, name string) (persist bool, err error) {
 		return false, err
 	}
 
-	if s.Type != configapi.ManagementClusterServerType {
+	if s.Type != configtypes.ManagementClusterServerType {
 		return false, errors.Errorf("cannot set non management-cluster server as current server")
 	}
 
@@ -251,7 +251,7 @@ func setCurrentServer(node *yaml.Node, name string) (persist bool, err error) {
 	return persist, err
 }
 
-func getServer(node *yaml.Node, name string) (*configapi.Server, error) {
+func getServer(node *yaml.Node, name string) (*configtypes.Server, error) {
 	cfg, err := convertNodeToClientConfig(node)
 	if err != nil {
 		return nil, err
@@ -264,7 +264,7 @@ func getServer(node *yaml.Node, name string) (*configapi.Server, error) {
 	return nil, fmt.Errorf("could not find server %q", name)
 }
 
-func getCurrentServer(node *yaml.Node) (s *configapi.Server, err error) {
+func getCurrentServer(node *yaml.Node) (s *configtypes.Server, err error) {
 	cfg, err := convertNodeToClientConfig(node)
 	if err != nil {
 		return nil, err
@@ -313,7 +313,7 @@ func removeServer(node *yaml.Node, name string) error {
 	return nil
 }
 
-func setServers(node *yaml.Node, servers []*configapi.Server) error {
+func setServers(node *yaml.Node, servers []*configtypes.Server) error {
 	for _, server := range servers {
 		_, err := setServer(node, server)
 		if err != nil {
@@ -323,7 +323,7 @@ func setServers(node *yaml.Node, servers []*configapi.Server) error {
 	return nil
 }
 
-func setServer(node *yaml.Node, s *configapi.Server) (persist bool, err error) {
+func setServer(node *yaml.Node, s *configtypes.Server) (persist bool, err error) {
 	// Get Patch Strategies
 	patchStrategies, err := GetConfigMetadataPatchStrategy()
 	if err != nil {
@@ -385,11 +385,11 @@ func setServer(node *yaml.Node, s *configapi.Server) (persist bool, err error) {
 }
 
 // EndpointFromServer returns the endpoint from server.
-func EndpointFromServer(s *configapi.Server) (endpoint string, err error) {
+func EndpointFromServer(s *configtypes.Server) (endpoint string, err error) {
 	switch s.Type {
-	case configapi.ManagementClusterServerType:
+	case configtypes.ManagementClusterServerType:
 		return s.ManagementClusterOpts.Endpoint, nil
-	case configapi.GlobalServerType:
+	case configtypes.GlobalServerType:
 		return s.GlobalOpts.Endpoint, nil
 	default:
 		return endpoint, fmt.Errorf("unknown server type %q", s.Type)

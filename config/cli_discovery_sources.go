@@ -9,12 +9,12 @@ import (
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v3"
 
-	configapi "github.com/vmware-tanzu/tanzu-plugin-runtime/apis/config/v1alpha1"
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/config/nodeutils"
+	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
 
 // GetCLIDiscoverySources retrieves cli discovery sources
-func GetCLIDiscoverySources() ([]configapi.PluginDiscovery, error) {
+func GetCLIDiscoverySources() ([]configtypes.PluginDiscovery, error) {
 	// Retrieve client config node
 	node, err := getClientConfigNode()
 	if err != nil {
@@ -25,7 +25,7 @@ func GetCLIDiscoverySources() ([]configapi.PluginDiscovery, error) {
 }
 
 // GetCLIDiscoverySource retrieves cli discovery source by name assuming that there should only be one source with the name, returns the first match
-func GetCLIDiscoverySource(name string) (*configapi.PluginDiscovery, error) {
+func GetCLIDiscoverySource(name string) (*configtypes.PluginDiscovery, error) {
 	// Retrieve client config node
 	node, err := getClientConfigNode()
 	if err != nil {
@@ -36,7 +36,7 @@ func GetCLIDiscoverySource(name string) (*configapi.PluginDiscovery, error) {
 }
 
 // SetCLIDiscoverySources Add/Update array of cli discovery sources to the yaml node
-func SetCLIDiscoverySources(discoverySources []configapi.PluginDiscovery) (err error) {
+func SetCLIDiscoverySources(discoverySources []configtypes.PluginDiscovery) (err error) {
 	// Retrieve client config node
 	AcquireTanzuConfigLock()
 	defer ReleaseTanzuConfigLock()
@@ -63,7 +63,7 @@ func SetCLIDiscoverySources(discoverySources []configapi.PluginDiscovery) (err e
 }
 
 // SetCLIDiscoverySource add or update a cli discoverySource
-func SetCLIDiscoverySource(discoverySource configapi.PluginDiscovery) (err error) {
+func SetCLIDiscoverySource(discoverySource configtypes.PluginDiscovery) (err error) {
 	// Retrieve client config node
 	AcquireTanzuConfigLock()
 	defer ReleaseTanzuConfigLock()
@@ -106,7 +106,7 @@ func DeleteCLIDiscoverySource(name string) error {
 	return persistConfig(node)
 }
 
-func getCLIDiscoverySources(node *yaml.Node) ([]configapi.PluginDiscovery, error) {
+func getCLIDiscoverySources(node *yaml.Node) ([]configtypes.PluginDiscovery, error) {
 	cfg, err := convertNodeToClientConfig(node)
 	if err != nil {
 		return nil, err
@@ -117,7 +117,7 @@ func getCLIDiscoverySources(node *yaml.Node) ([]configapi.PluginDiscovery, error
 	return nil, errors.New("cli discovery sources not found")
 }
 
-func getCLIDiscoverySource(node *yaml.Node, name string) (*configapi.PluginDiscovery, error) {
+func getCLIDiscoverySource(node *yaml.Node, name string) (*configtypes.PluginDiscovery, error) {
 	cfg, err := convertNodeToClientConfig(node)
 	if err != nil {
 		return nil, err
@@ -134,7 +134,7 @@ func getCLIDiscoverySource(node *yaml.Node, name string) (*configapi.PluginDisco
 }
 
 // setCLIDiscoverySources Add/Update array of cli discovery sources to the yaml node
-func setCLIDiscoverySources(node *yaml.Node, discoverySources []configapi.PluginDiscovery) (err error) {
+func setCLIDiscoverySources(node *yaml.Node, discoverySources []configtypes.PluginDiscovery) (err error) {
 	for _, discoverySource := range discoverySources {
 		_, err = setCLIDiscoverySource(node, discoverySource)
 		if err != nil {
@@ -145,7 +145,7 @@ func setCLIDiscoverySources(node *yaml.Node, discoverySources []configapi.Plugin
 }
 
 // setCLIDiscoverySource Add/Update cli discovery source in the yaml node
-func setCLIDiscoverySource(node *yaml.Node, discoverySource configapi.PluginDiscovery) (persist bool, err error) {
+func setCLIDiscoverySource(node *yaml.Node, discoverySource configtypes.PluginDiscovery) (persist bool, err error) {
 	// Retrieve the patch strategies from config metadata
 	patchStrategies, err := GetConfigMetadataPatchStrategy()
 	if err != nil {

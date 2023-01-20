@@ -14,7 +14,7 @@ import (
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v3"
 
-	configapi "github.com/vmware-tanzu/tanzu-plugin-runtime/apis/config/v1alpha1"
+	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
 
 // getClientConfigNode retrieves the multi config from the local directory with file lock
@@ -77,7 +77,7 @@ func getClientConfigNoLock() (*yaml.Node, error) {
 
 // newClientConfigNode create and return new client config node
 func newClientConfigNode() (*yaml.Node, error) {
-	c := &configapi.ClientConfig{}
+	c := &configtypes.ClientConfig{}
 	node, err := convertClientConfigToNode(c)
 	node.Content[0].Style = 0
 	if err != nil {

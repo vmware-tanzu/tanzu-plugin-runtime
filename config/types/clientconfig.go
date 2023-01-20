@@ -1,15 +1,34 @@
 // Copyright 2022 VMware, Inc. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-package v1alpha1
+package types
 
 import (
 	"errors"
 	"fmt"
 	"strconv"
 	"strings"
+)
 
-	cliapi "github.com/vmware-tanzu/tanzu-framework/apis/cli/v1alpha1"
+// Target is the namespace of the CLI to which plugin is applicable
+type Target string
+
+const (
+	// TargetK8s is a kubernetes target of the CLI
+	TargetK8s Target = "kubernetes"
+	targetK8s Target = "k8s"
+
+	// TargetTMC is a Tanzu Mission Control target of the CLI
+	TargetTMC Target = "mission-control"
+	targetTMC Target = "tmc"
+
+	// TargetNone is used for plugins that are not associated with any target
+	TargetNone Target = ""
+)
+
+var (
+	// SupportedTargets is a list of all supported Target
+	SupportedTargets = []Target{TargetK8s, TargetTMC}
 )
 
 const (
@@ -89,7 +108,7 @@ func (c *ClientConfig) HasContext(name string) bool {
 }
 
 // GetCurrentContext returns the current context for the given type.
-func (c *ClientConfig) GetCurrentContext(target cliapi.Target) (*Context, error) {
+func (c *ClientConfig) GetCurrentContext(target Target) (*Context, error) {
 	ctxName := c.CurrentContext[target]
 	if ctxName == "" {
 		return nil, fmt.Errorf("no current context set for target %q", target)
@@ -102,9 +121,9 @@ func (c *ClientConfig) GetCurrentContext(target cliapi.Target) (*Context, error)
 }
 
 // GetAllCurrentContextsMap returns all current context per Target
-func (c *ClientConfig) GetAllCurrentContextsMap() (map[cliapi.Target]*Context, error) {
-	currentContexts := make(map[cliapi.Target]*Context)
-	for _, target := range cliapi.SupportedTargets {
+func (c *ClientConfig) GetAllCurrentContextsMap() (map[Target]*Context, error) {
+	currentContexts := make(map[Target]*Context)
+	for _, target := range SupportedTargets {
 		context, err := c.GetCurrentContext(target)
 		if err == nil && context != nil {
 			currentContexts[target] = context
@@ -128,16 +147,16 @@ func (c *ClientConfig) GetAllCurrentContextsList() ([]string, error) {
 }
 
 // SetCurrentContext sets the current context for the given target.
-func (c *ClientConfig) SetCurrentContext(target cliapi.Target, ctxName string) error {
+func (c *ClientConfig) SetCurrentContext(target Target, ctxName string) error {
 	if c.CurrentContext == nil {
-		c.CurrentContext = make(map[cliapi.Target]string)
+		c.CurrentContext = make(map[Target]string)
 	}
 	c.CurrentContext[target] = ctxName
 	ctx, err := c.GetContext(ctxName)
 	if err != nil {
 		return err
 	}
-	if ctx.IsManagementCluster() || ctx.Target == cliapi.TargetTMC {
+	if ctx.IsManagementCluster() || ctx.Target == TargetTMC {
 		c.CurrentServer = ctxName
 	}
 	return nil
@@ -145,7 +164,7 @@ func (c *ClientConfig) SetCurrentContext(target cliapi.Target, ctxName string) e
 
 // IsManagementCluster tells if the context is for a management cluster.
 func (c *Context) IsManagementCluster() bool {
-	return c != nil && c.Target == cliapi.TargetK8s && c.ClusterOpts != nil && c.ClusterOpts.IsManagementCluster
+	return c != nil && c.Target == TargetK8s && c.ClusterOpts != nil && c.ClusterOpts.IsManagementCluster
 }
 
 // SetUnstableVersionSelector will help determine the unstable versions supported

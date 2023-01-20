@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/sync/errgroup"
 
-	configapi "github.com/vmware-tanzu/tanzu-plugin-runtime/apis/config/v1alpha1"
+	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
 
 func TestClientConfigNodeUpdateInParallel(t *testing.T) {
@@ -21,10 +21,10 @@ func TestClientConfigNodeUpdateInParallel(t *testing.T) {
 			return err
 		}
 
-		s := &configapi.Server{
+		s := &configtypes.Server{
 			Name: mcName,
-			Type: configapi.ManagementClusterServerType,
-			ManagementClusterOpts: &configapi.ManagementClusterServer{
+			Type: configtypes.ManagementClusterServerType,
+			ManagementClusterOpts: &configtypes.ManagementClusterServer{
 				Context: "fake-context",
 				Path:    "fake-path",
 			},

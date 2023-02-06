@@ -21,16 +21,16 @@ Note: due to the fact that information in the CFG_NG file directly affects the m
 ### Runtime Config APIs
 
 ``` go
-func GetServer(name string) error
+func GetServerAPI(name string) error
 func SetServer(server Server) error
 func DeleteServer(serverName string) error
 func GetCurrentServer() error
 func SetCurrentServer(currentServer string) error
 func DeleteCurrentServer() error
 
-func GetContext(name string) error
+func GetContextAPI(name string) error
 func HasContext(name string) error
-func SetContext(context Context) error
+func SetContextAPI(context Context) error
 func DeleteContext(name string) error
 func GetCurrentContext(contextType ContextType) error
 func SetCurrentContext(context Context) error
@@ -62,7 +62,7 @@ Ex:- Add new context - The new context will be stored in CFG_NG.
 ``` go
 import configapi "github.com/vmware-tanzu/tanzu-framework/cli/runtime/apis/config/v1alpha1"
 
-err := configapi.SetContext(newContextObject, booleanToSetThisContextAsCurrent)
+err := configapi.SetContextAPI(newContextObject, booleanToSetThisContextAsCurrent)
 if err != nil{
  // Failed to add new context
  fmt.Println(err.Error())

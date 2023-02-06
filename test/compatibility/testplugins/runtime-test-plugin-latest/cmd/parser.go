@@ -20,8 +20,8 @@ func parseContext(context string) (*configtypes.Context, error) {
 }
 
 // parseServer unmarshalls string to Server struct
-func parseServer(server string) (*configtypes.Server, error) {
-	var s configtypes.Server
+func parseServer(server string) (*configtypes.Server, error) { // nolint:staticcheck // Deprecated
+	var s configtypes.Server // nolint:staticcheck // Deprecated
 	err := yaml.Unmarshal([]byte(server), &s)
 	if err != nil {
 		return nil, err

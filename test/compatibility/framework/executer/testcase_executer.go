@@ -19,7 +19,7 @@ func Execute(t *core.TestCase) {
 	// Loop through each command
 	for _, cmd := range t.Commands {
 		for _, api := range cmd.APIs {
-			ginkgo.By(fmt.Sprintf("Runnning %v - %v", api.Name, api.Version))
+			ginkgo.By(fmt.Sprintf("Running %v - %v", api.Name, api.Version))
 			// Construct the runtime-test-plugin-x_xx_xx command to execute
 			pluginCommand, err := core.ConstructTestPluginCmd(api.Version, cmd.APIs)
 			gomega.Expect(err).To(gomega.BeNil())

@@ -30,6 +30,11 @@ var apiHandlers = map[core.RuntimeAPIName]func(*core.API) *core.APIResponse{
 	core.SetCurrentServerAPIName:    triggerSetCurrentServerAPI,
 	core.GetCurrentServerAPIName:    triggerGetCurrentServerAPI,
 	core.RemoveCurrentServerAPIName: triggerRemoveCurrentServerAPI,
+
+	// Feature APIs
+	core.SetFeatureAPI:       triggerSetFeatureAPI,
+	core.IsFeatureEnabledAPI: triggerIsFeatureEnabledAPI,
+	core.DeleteFeatureAPI:    triggerDeleteFeatureAPI,
 }
 
 // triggerAPIs trigger runtime apis and construct logs

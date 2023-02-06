@@ -26,20 +26,30 @@ const (
 	SetCurrentServerAPIName    RuntimeAPIName = "SetCurrentServer"
 	GetCurrentServerAPIName    RuntimeAPIName = "GetCurrentServer"
 	RemoveCurrentServerAPIName RuntimeAPIName = "RemoveCurrentServer"
+
+	SetFeatureAPI         RuntimeAPIName = "SetFeature"
+	IsFeatureEnabledAPI   RuntimeAPIName = "IsFeatureEnabled"
+	IsFeatureActivatedAPI RuntimeAPIName = "IsFeatureActivated"
+	DeleteFeatureAPI      RuntimeAPIName = "DeleteFeature"
 )
 
 // APIArgumentType describes all the arguments types required for Runtime APIs
 type APIArgumentType string
 
 const (
-	Context     APIArgumentType = "context"
-	ContextName APIArgumentType = "contextName"
-	SetCurrent  APIArgumentType = "setCurrent"
-	Server      APIArgumentType = "server"
-	ServerName  APIArgumentType = "serverName"
-	Name        APIArgumentType = "name"
-	Target      APIArgumentType = "target"
-	ContextType APIArgumentType = "contextType"
+	ClientConfig APIArgumentType = "clientConfig"
+	Context      APIArgumentType = "context"
+	ContextName  APIArgumentType = "contextName"
+	SetCurrent   APIArgumentType = "setCurrent"
+	Server       APIArgumentType = "server"
+	ServerName   APIArgumentType = "serverName"
+	Name         APIArgumentType = "name"
+	Target       APIArgumentType = "target"
+	ContextType  APIArgumentType = "contextType"
+	Feature      APIArgumentType = "feature"
+	Plugin       APIArgumentType = "plugin"
+	Key          APIArgumentType = "key"
+	Value        APIArgumentType = "value"
 )
 
 type Result string

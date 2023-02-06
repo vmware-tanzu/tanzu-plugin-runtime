@@ -12,7 +12,7 @@ import (
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 )
 
-func TestTriggerAPIs(t *testing.T) {
+func TestTriggerContextAPIs(t *testing.T) {
 	_, cleanup := core.SetupTempCfgFiles()
 	defer func() {
 		cleanup()

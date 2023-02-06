@@ -9,6 +9,6 @@ const (
 )
 
 const (
-	CtxCompatibilityOne string = "compatibility-one"
-	CtxCompatibilityTwo string = "compatibility-two"
+	CompatibilityTestOne string = "compatibility-test-one"
+	CompatibilityTestTwo string = "compatibility-test-two"
 )

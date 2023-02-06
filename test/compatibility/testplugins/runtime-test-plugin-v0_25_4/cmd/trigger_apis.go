@@ -11,6 +11,7 @@ import (
 
 // Route to runtime API method call based on passed command value
 var apiHandlers = map[core.RuntimeAPIName]func(*core.API) *core.APIResponse{
+	// Context APIs
 	core.AddContextAPIName:        triggerAddContextAPI,
 	core.SetContextAPIName:        triggerAddContextAPI,
 	core.GetContextAPIName:        triggerGetContextAPI,
@@ -18,7 +19,7 @@ var apiHandlers = map[core.RuntimeAPIName]func(*core.API) *core.APIResponse{
 	core.DeleteContextAPIName:     triggerRemoveContextAPI,
 	core.SetCurrentContextAPIName: triggerSetCurrentContextAPI,
 	core.GetCurrentContextAPIName: triggerGetCurrentContextAPI,
-
+	// Server APIs
 	core.AddServerAPIName:        triggerAddServerAPI,
 	core.SetServerAPIName:        triggerSetServerAPI,
 	core.PutServerAPIName:        triggerSetServerAPI,

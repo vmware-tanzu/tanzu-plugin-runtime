@@ -11,6 +11,7 @@ import (
 
 // Route to runtime API method call based on passed command value
 var apiHandlers = map[core.RuntimeAPIName]func(*core.API) *core.APIResponse{
+	// Server APIs
 	core.SetServerAPIName:        triggerSetServerAPI,
 	core.AddServerAPIName:        triggerSetServerAPI,
 	core.PutServerAPIName:        triggerSetServerAPI,

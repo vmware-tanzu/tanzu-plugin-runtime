@@ -38,6 +38,10 @@ When writing a test involving two versions of Runtime library APIs a test writer
 
 Build and Run compatibility tests
 
+This command will build all the runtime specific test plugins and run all the tests available in `/test/framework/compatibilitytests directory`
+
+Internally runs `build-compatibility-test-plugins` and `run-compatibility-tests` commands
+
 ```shell
 make compatibility-tests
 ```
@@ -49,6 +53,8 @@ make build-compatibility-test-plugins
 ```
 
 Run all compatibility tests
+
+Runs all the tests available in `/test/framework/compatibilitytests directory`
 
 ``` shell
 make run-compatibility-tests

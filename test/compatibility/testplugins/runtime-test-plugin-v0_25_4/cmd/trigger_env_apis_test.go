@@ -11,6 +11,12 @@ import (
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 )
 
+const defaultEnv = `
+clientOptions:
+    env:
+        compatibility-tests: "default-env-val"
+`
+
 func TestTriggerEnvAPIs(t *testing.T) {
 	_, cleanup := core.SetupTempCfgFiles()
 	defer func() {
@@ -24,15 +30,14 @@ func TestTriggerEnvAPIs(t *testing.T) {
 		expectedLogs map[core.RuntimeAPIName][]core.APILog
 	}{
 		{
-			name:    "Trigger SetEnv API",
-			apiName: core.SetEnvAPI,
+			name:    "Trigger StoreClientConfig API",
+			apiName: core.StoreClientConfigAPI,
 			apis: []core.API{
 				{
-					Name:    core.SetEnvAPI,
+					Name:    core.StoreClientConfigAPI,
 					Version: core.VersionLatest,
 					Arguments: map[core.APIArgumentType]interface{}{
-						core.Key:   "compatibility-tests",
-						core.Value: "default-env-val",
+						core.ClientConfig: defaultEnv,
 					},
 					Output: &core.Output{
 						Result:  "success",
@@ -42,7 +47,7 @@ func TestTriggerEnvAPIs(t *testing.T) {
 			},
 
 			expectedLogs: map[core.RuntimeAPIName][]core.APILog{
-				core.SetEnvAPI: {
+				core.StoreClientConfigAPI: {
 					{
 						APIResponse: &core.APIResponse{
 							ResponseBody: "",

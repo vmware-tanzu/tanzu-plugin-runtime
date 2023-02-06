@@ -28,3 +28,13 @@ func parseServer(server string) (*configapi.Server, error) {
 	}
 	return &s, nil
 }
+
+// parseClientConfig unmarshalls string to ClientConfig struct
+func parseClientConfig(cfgStr string) (*configapi.ClientConfig, error) {
+	var cfg configapi.ClientConfig
+	err := yaml.Unmarshal([]byte(cfgStr), &cfg)
+	if err != nil {
+		return nil, err
+	}
+	return &cfg, nil
+}

@@ -13,6 +13,7 @@ const (
 	CompatibilityTestsPlugin     string = "compatibility-tests-plugin"
 	CompatibilityTestsPluginKey  string = "compatibility-tests-plugin-key"
 	CompatibilityTestsPluginKey0 string = "compatibility-tests-plugin-key0"
+	CompatibilityTestsPluginKey1 string = "compatibility-tests-plugin-key1"
 )
 
 // DefaultIsFeatureEnabledCommand creates a IsFeatureEnabled Command with default input and output options

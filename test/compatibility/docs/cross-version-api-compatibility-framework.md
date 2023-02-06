@@ -34,6 +34,7 @@ type API struct {
 type Output struct {
    Result  Result `json:"result" yaml:"result"`
    Content string `json:"content" yaml:"content"`
+   ValidationStrategy ValidationStrategy `json:"validationstrategy" yaml:"validationstrategy"`
 }
 
 type Result string

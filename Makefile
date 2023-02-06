@@ -11,6 +11,7 @@ GOOS ?= $(shell go env GOOS)
 GOARCH ?= $(shell go env GOARCH)
 GOHOSTOS ?= $(shell go env GOHOSTOS)
 GOHOSTARCH ?= $(shell go env GOHOSTARCH)
+GOTEST_VERBOSE ?= -v
 
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
 ifeq (,$(shell go env GOBIN))
@@ -19,6 +20,7 @@ else
 GOBIN=$(shell go env GOBIN)
 endif
 GO := go
+GINKGO := ginkgo
 
 # Directories
 TOOLS_DIR := $(abspath $(ROOT_DIR)/hack/tools)
@@ -30,7 +32,8 @@ GOIMPORTS          := $(TOOLS_BIN_DIR)/goimports
 GOLANGCI_LINT      := $(TOOLS_BIN_DIR)/golangci-lint
 VALE               := $(TOOLS_BIN_DIR)/vale
 MISSPELL           := $(TOOLS_BIN_DIR)/misspell
-TOOLING_BINARIES   := $(GOIMPORTS) $(GOLANGCI_LINT) $(VALE) $(MISSPELL)
+GINKGO             := $(TOOLS_BIN_DIR)/ginkgo
+TOOLING_BINARIES   := $(GOIMPORTS) $(GOLANGCI_LINT) $(VALE) $(MISSPELL) $(GINKGO)
 
 ## --------------------------------------
 ## Help
@@ -53,7 +56,7 @@ all: modules test lint ## ## Run all major targets (lint, test, modules)
 .PHONY: test
 test: fmt ## Run Tests
 	make -C test/plugins all
-	${GO} test ./... -timeout 60m -race -coverprofile coverage.txt -v
+	${GO} test ./... -timeout 60m -race -coverprofile coverage.txt ## Exclude Compatibility Tests
 
 .PHONY: fmt
 fmt: $(GOIMPORTS) ## Run goimports
@@ -115,3 +118,29 @@ $(TOOLING_BINARIES):
 .PHONY: clean
 clean: ## Remove all generated binaries
 	make -C test/plugins clean
+
+GO_MODULES=$(shell find . -path "*/go.mod" | xargs -I _ dirname _)
+
+## --------------------------------------
+## Compatibility Testing
+## --------------------------------------
+
+.PHONY: build-compatibility-test-plugins
+build-compatibility-test-plugins: ## Builds all runtime compatibility test plugins
+	cd ./test/compatibility/testplugins && mkdir -p bin
+	cd ./test/compatibility/testplugins/runtime-test-plugin-v0_11_6 && ${GO} mod tidy && GOOS=$(OS) GOARCH=$(ARCH) ${GO} build -o ../bin
+	cd ./test/compatibility/testplugins/runtime-test-plugin-v0_25_4 && ${GO} mod tidy && GOOS=$(OS) GOARCH=$(ARCH) ${GO} build -o ../bin
+	cd ./test/compatibility/testplugins/runtime-test-plugin-v0_28_0 && ${GO} mod tidy && GOOS=$(OS) GOARCH=$(ARCH) ${GO} build -o ../bin
+	cd ./test/compatibility/testplugins/runtime-test-plugin-latest && ${GO} mod tidy && GOOS=$(OS) GOARCH=$(ARCH) ${GO} build -o ../bin
+
+.PHONY: run-compatibility-tests
+run-compatibility-tests: ## Run Compatibility tests
+	cd ./test/compatibility/framework/compatibilitytests && ${GINKGO} --keep-going --fail-fast --race -r --randomize-all -v --trace --output-dir ./../../../reports --junit-report compatibility-tests.xml; \
+
+.PHONY: context-api-compatibility-tests
+context-api-compatibility-tests: ## Run Compatibility tests
+	 ${GO} test `go list ./test/compatibility/framework/compatibilitytests/context...` -v -timeout 60m -race;\
+
+
+.PHONY: compatibility-tests
+compatibility-tests: tools build-compatibility-test-plugins run-compatibility-tests ## Build and Run Compatibility tests

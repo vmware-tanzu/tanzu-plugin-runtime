@@ -34,4 +34,4 @@ Cross Version API Compatibility testing simulates the interaction of APIs
 provided by different versions of plugin runtimes to ensure that they can
 interoperate with one another.
 
-For more details go to [Cross-version API Compatibility](./test/cross-version-api-compatibility.md)
+For more details go to [Cross-version API Compatibility](test/compatibility/docs/cross-version-api-compatibility.md)

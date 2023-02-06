@@ -23,6 +23,7 @@ GOIMPORTS_VERSION=0.1.12
 VALE_VERSION=2.20.1
 GOLANGCI_LINT_VERSION=1.46.0
 MISSPELL_VERSION=0.3.4
+GINKGO_VERSION=2.9.0
 
 # Host information.
 HOST_OS=$(shell go env GOOS)
@@ -33,6 +34,7 @@ GOIMPORTS      	   := $(BIN_DIR)/goimports
 VALE               := $(BIN_DIR)/vale
 GOLANGCI_LINT      := $(BIN_DIR)/golangci-lint
 MISSPELL           := $(BIN_DIR)/misspell
+GINKGO             := $(BIN_DIR)/ginkgo
 ## --------------------------------------
 ## Help
 ## --------------------------------------
@@ -68,6 +70,11 @@ misspell: $(MISSPELL) ## Install misspell
 $(MISSPELL):
 	mkdir -p $(BIN_DIR)
 	GOBIN=$(ROOT_DIR)/hack/tools/$(BIN_DIR) go install  github.com/client9/misspell/cmd/misspell@v$(MISSPELL_VERSION)
+
+ginkgo: $(GINKGO) ## Install goimports
+$(GINKGO):
+	mkdir -p $(BIN_DIR)
+	GOBIN=$(ROOT_DIR)/hack/tools/$(BIN_DIR) go install github.com/onsi/ginkgo/v2/ginkgo@v$(GINKGO_VERSION)
 
 ## --------------------------------------
 ## Cleanup

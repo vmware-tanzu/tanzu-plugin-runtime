@@ -8,23 +8,20 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	configapi "github.com/vmware-tanzu/tanzu-framework/apis/config/v1alpha1"
-
+	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 )
 
-func TestTriggerAPIs(t *testing.T) {
+func TestTriggerServerAPIs(t *testing.T) {
 	_, cleanup := core.SetupTempCfgFiles()
 	defer func() {
 		cleanup()
 	}()
-
-	ctx := `name: context-one
-type: k8s
+	server := `name: compatibility-test-one
+type: managementcluster
 globalOpts:
-  endpoint: test-endpoint
+    endpoint: test-endpoint
 `
-
 	var tests = []struct {
 		name         string
 		apiName      core.RuntimeAPIName
@@ -32,14 +29,14 @@ globalOpts:
 		expectedLogs map[core.RuntimeAPIName][]core.APILog
 	}{
 		{
-			name:    "Trigger SetContext API",
-			apiName: core.SetContextAPIName,
+			name:    "Trigger SetServerAPI",
+			apiName: core.SetServerAPIName,
 			apis: []core.API{
 				{
-					Name:    core.SetContextAPIName,
+					Name:    core.SetServerAPIName,
 					Version: core.VersionLatest,
 					Arguments: map[core.APIArgumentType]interface{}{
-						core.Context:    ctx,
+						core.Server:     server,
 						core.SetCurrent: false,
 					},
 					Output: &core.Output{
@@ -50,7 +47,7 @@ globalOpts:
 			},
 
 			expectedLogs: map[core.RuntimeAPIName][]core.APILog{
-				core.SetContextAPIName: {
+				core.SetServerAPIName: {
 					{
 						APIResponse: &core.APIResponse{
 							ResponseBody: "",
@@ -62,14 +59,14 @@ globalOpts:
 		},
 
 		{
-			name:    "Trigger GetContext API",
-			apiName: core.GetContextAPIName,
+			name:    "Trigger GetServerAPI",
+			apiName: core.GetServerAPIName,
 			apis: []core.API{
 				{
-					Name:    core.SetContextAPIName,
+					Name:    core.SetServerAPIName,
 					Version: core.VersionLatest,
 					Arguments: map[core.APIArgumentType]interface{}{
-						core.Context:    ctx,
+						core.Server:     server,
 						core.SetCurrent: false,
 					},
 					Output: &core.Output{
@@ -78,26 +75,26 @@ globalOpts:
 					},
 				},
 				{
-					Name:    core.GetContextAPIName,
+					Name:    core.GetServerAPIName,
 					Version: core.VersionLatest,
 					Arguments: map[core.APIArgumentType]interface{}{
-						core.ContextName: "context-one",
+						core.ServerName: "compatibility-test-one",
 					},
 					Output: &core.Output{
 						Result:  "success",
-						Content: ctx,
+						Content: server,
 					},
 				},
 			},
 
 			expectedLogs: map[core.RuntimeAPIName][]core.APILog{
-				core.GetContextAPIName: {
+				core.GetServerAPIName: {
 					{
 						APIResponse: &core.APIResponse{
-							ResponseBody: &configapi.Context{
-								Name: "context-one",
-								Type: "k8s",
-								GlobalOpts: &configapi.GlobalServer{
+							ResponseBody: &configtypes.Server{
+								Name: "compatibility-test-one",
+								Type: configtypes.ManagementClusterServerType,
+								GlobalOpts: &configtypes.GlobalServer{
 									Endpoint: "test-endpoint",
 								},
 							},
@@ -109,14 +106,14 @@ globalOpts:
 		},
 
 		{
-			name:    "Trigger RemoveContext API",
-			apiName: core.RemoveContextAPIName,
+			name:    "Trigger RemoveServerAPI",
+			apiName: core.RemoveServerAPIName,
 			apis: []core.API{
 				{
-					Name:    core.SetContextAPIName,
+					Name:    core.SetServerAPIName,
 					Version: core.VersionLatest,
 					Arguments: map[core.APIArgumentType]interface{}{
-						core.Context:    ctx,
+						core.Server:     server,
 						core.SetCurrent: false,
 					},
 					Output: &core.Output{
@@ -125,10 +122,10 @@ globalOpts:
 					},
 				},
 				{
-					Name:    core.RemoveContextAPIName,
+					Name:    core.RemoveServerAPIName,
 					Version: core.VersionLatest,
 					Arguments: map[core.APIArgumentType]interface{}{
-						core.ContextName: "context-one",
+						core.ServerName: "compatibility-test-one",
 					},
 					Output: &core.Output{
 						Result:  "success",
@@ -138,7 +135,7 @@ globalOpts:
 			},
 
 			expectedLogs: map[core.RuntimeAPIName][]core.APILog{
-				core.RemoveContextAPIName: {
+				core.RemoveServerAPIName: {
 					{
 						APIResponse: &core.APIResponse{
 							ResponseBody: "",
@@ -150,14 +147,14 @@ globalOpts:
 		},
 
 		{
-			name:    "Trigger DeleteContext API",
-			apiName: core.DeleteContextAPIName,
+			name:    "Trigger DeleteServerAPI",
+			apiName: core.DeleteServerAPIName,
 			apis: []core.API{
 				{
-					Name:    core.SetContextAPIName,
+					Name:    core.SetServerAPIName,
 					Version: core.VersionLatest,
 					Arguments: map[core.APIArgumentType]interface{}{
-						core.Context:    ctx,
+						core.Server:     server,
 						core.SetCurrent: false,
 					},
 					Output: &core.Output{
@@ -166,10 +163,10 @@ globalOpts:
 					},
 				},
 				{
-					Name:    core.DeleteContextAPIName,
+					Name:    core.DeleteServerAPIName,
 					Version: core.VersionLatest,
 					Arguments: map[core.APIArgumentType]interface{}{
-						core.ContextName: "context-one",
+						core.ServerName: "compatibility-test-one",
 					},
 					Output: &core.Output{
 						Result:  "success",
@@ -179,7 +176,7 @@ globalOpts:
 			},
 
 			expectedLogs: map[core.RuntimeAPIName][]core.APILog{
-				core.DeleteContextAPIName: {
+				core.DeleteServerAPIName: {
 					{
 						APIResponse: &core.APIResponse{
 							ResponseBody: "",
@@ -191,14 +188,14 @@ globalOpts:
 		},
 
 		{
-			name:    "Trigger SetCurrentContext API",
-			apiName: core.SetCurrentContextAPIName,
+			name:    "Trigger SetCurrentServerAPI",
+			apiName: core.SetCurrentServerAPIName,
 			apis: []core.API{
 				{
-					Name:    core.SetContextAPIName,
+					Name:    core.SetServerAPIName,
 					Version: core.VersionLatest,
 					Arguments: map[core.APIArgumentType]interface{}{
-						core.Context:    ctx,
+						core.Server:     server,
 						core.SetCurrent: false,
 					},
 					Output: &core.Output{
@@ -207,10 +204,10 @@ globalOpts:
 					},
 				},
 				{
-					Name:    core.SetCurrentContextAPIName,
+					Name:    core.SetCurrentServerAPIName,
 					Version: core.VersionLatest,
 					Arguments: map[core.APIArgumentType]interface{}{
-						core.ContextName: "context-one",
+						core.ServerName: "compatibility-test-one",
 					},
 					Output: &core.Output{
 						Result:  "success",
@@ -220,7 +217,7 @@ globalOpts:
 			},
 
 			expectedLogs: map[core.RuntimeAPIName][]core.APILog{
-				core.SetCurrentContextAPIName: {
+				core.SetCurrentServerAPIName: {
 					{
 						APIResponse: &core.APIResponse{
 							ResponseBody: "",
@@ -232,14 +229,14 @@ globalOpts:
 		},
 
 		{
-			name:    "Trigger GetCurrentContext API",
-			apiName: core.GetCurrentContextAPIName,
+			name:    "Trigger GetCurrentServerAPI",
+			apiName: core.GetCurrentServerAPIName,
 			apis: []core.API{
 				{
-					Name:    core.SetContextAPIName,
+					Name:    core.SetServerAPIName,
 					Version: core.VersionLatest,
 					Arguments: map[core.APIArgumentType]interface{}{
-						core.Context:    ctx,
+						core.Server:     server,
 						core.SetCurrent: false,
 					},
 					Output: &core.Output{
@@ -248,10 +245,10 @@ globalOpts:
 					},
 				},
 				{
-					Name:    core.SetCurrentContextAPIName,
+					Name:    core.SetCurrentServerAPIName,
 					Version: core.VersionLatest,
 					Arguments: map[core.APIArgumentType]interface{}{
-						core.ContextName: "context-one",
+						core.ServerName: "compatibility-test-one",
 					},
 					Output: &core.Output{
 						Result:  "success",
@@ -259,30 +256,82 @@ globalOpts:
 					},
 				},
 				{
-					Name:    core.GetCurrentContextAPIName,
+					Name:    core.GetCurrentServerAPIName,
 					Version: core.VersionLatest,
 					Arguments: map[core.APIArgumentType]interface{}{
-						core.ContextType: "k8s",
+						core.Target: "kubernetes",
 					},
 					Output: &core.Output{
 						Result:  "success",
-						Content: ctx,
+						Content: server,
 					},
 				},
 			},
 
 			expectedLogs: map[core.RuntimeAPIName][]core.APILog{
-				core.GetCurrentContextAPIName: {
+				core.GetCurrentServerAPIName: {
 					{
 						APIResponse: &core.APIResponse{
-							ResponseBody: &configapi.Context{
-								Name: "context-one",
-								Type: "k8s",
-								GlobalOpts: &configapi.GlobalServer{
+							ResponseBody: &configtypes.Server{
+								Name: "compatibility-test-one",
+								Type: configtypes.ManagementClusterServerType,
+								GlobalOpts: &configtypes.GlobalServer{
 									Endpoint: "test-endpoint",
 								},
 							},
 							ResponseType: core.MapResponse,
+						},
+					},
+				},
+			},
+		},
+
+		{
+			name:    "Trigger RemoveCurrentServerAPI",
+			apiName: core.RemoveCurrentServerAPIName,
+			apis: []core.API{
+				{
+					Name:    core.SetServerAPIName,
+					Version: core.VersionLatest,
+					Arguments: map[core.APIArgumentType]interface{}{
+						core.Server:     server,
+						core.SetCurrent: false,
+					},
+					Output: &core.Output{
+						Result:  "success",
+						Content: "",
+					},
+				},
+				{
+					Name:    core.SetCurrentServerAPIName,
+					Version: core.VersionLatest,
+					Arguments: map[core.APIArgumentType]interface{}{
+						core.ServerName: "compatibility-test-one",
+					},
+					Output: &core.Output{
+						Result:  "success",
+						Content: "",
+					},
+				},
+				{
+					Name:    core.RemoveCurrentServerAPIName,
+					Version: core.VersionLatest,
+					Arguments: map[core.APIArgumentType]interface{}{
+						core.ServerName: "compatibility-test-one",
+					},
+					Output: &core.Output{
+						Result:  "success",
+						Content: "",
+					},
+				},
+			},
+
+			expectedLogs: map[core.RuntimeAPIName][]core.APILog{
+				core.RemoveCurrentServerAPIName: {
+					{
+						APIResponse: &core.APIResponse{
+							ResponseBody: "",
+							ResponseType: core.StringResponse,
 						},
 					},
 				},

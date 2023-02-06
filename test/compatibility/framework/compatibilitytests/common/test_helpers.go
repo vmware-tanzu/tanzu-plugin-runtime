@@ -9,8 +9,11 @@ const (
 )
 
 const (
-	CompatibilityTestOne string = "compatibility-test-one"
-	CompatibilityTestTwo string = "compatibility-test-two"
+	CompatibilityTestOne         string = "compatibility-test-one"
+	CompatibilityTestTwo         string = "compatibility-test-two"
+	CompatibilityTestsPlugin     string = "compatibility-tests-plugin"
+	CompatibilityTestsPluginKey  string = "compatibility-tests-plugin-key"
+	CompatibilityTestsPluginKey0 string = "compatibility-tests-plugin-key0"
 )
 
 // global constants

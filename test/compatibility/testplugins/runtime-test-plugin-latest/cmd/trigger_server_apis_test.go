@@ -44,10 +44,28 @@ globalOpts:
 						Content: "",
 					},
 				},
+				{
+					Name:    core.SetServerAPIName,
+					Version: core.VersionLatest,
+					Arguments: map[core.APIArgumentType]interface{}{
+						core.Server:     server,
+						core.SetCurrent: false,
+					},
+					Output: &core.Output{
+						Result:  "success",
+						Content: "",
+					},
+				},
 			},
 
 			expectedLogs: map[core.RuntimeAPIName][]core.APILog{
 				core.SetServerAPIName: {
+					{
+						APIResponse: &core.APIResponse{
+							ResponseBody: "",
+							ResponseType: core.StringResponse,
+						},
+					},
 					{
 						APIResponse: &core.APIResponse{
 							ResponseBody: "",

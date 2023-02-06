@@ -15,23 +15,10 @@ import (
 // DefaultSetContextInputOptions helper method to construct SetContext API input options
 func DefaultSetContextInputOptions(version core.RuntimeVersion, contextName string) *framework.SetContextInputOptions {
 	switch version {
-	case core.VersionLatest:
+	case core.VersionLatest, core.Version0280:
 		return &framework.SetContextInputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
-				RuntimeVersion: core.VersionLatest,
-			},
-			ContextOpts: &framework.ContextOpts{
-				Name:   contextName,
-				Target: framework.TargetK8s,
-				GlobalOpts: &framework.GlobalServerOpts{
-					Endpoint: "default-compatibility-test-endpoint",
-				},
-			},
-		}
-	case core.Version0280:
-		return &framework.SetContextInputOptions{
-			RuntimeAPIVersion: &core.RuntimeAPIVersion{
-				RuntimeVersion: core.Version0280,
+				RuntimeVersion: version,
 			},
 			ContextOpts: &framework.ContextOpts{
 				Name:   contextName,
@@ -69,27 +56,12 @@ func DefaultGetContextInputOptions(version core.RuntimeVersion, contextName stri
 }
 
 // DefaultGetContextOutputOptions helper method to construct GetContext API output options
-// nolint: dupl
 func DefaultGetContextOutputOptions(version core.RuntimeVersion, contextName string) *framework.GetContextOutputOptions {
 	switch version {
-	case core.VersionLatest:
+	case core.VersionLatest, core.Version0280:
 		return &framework.GetContextOutputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
-				RuntimeVersion: core.VersionLatest,
-			},
-			ContextOpts: &framework.ContextOpts{
-				Name:   contextName,
-				Target: framework.TargetK8s,
-				GlobalOpts: &framework.GlobalServerOpts{
-					Endpoint: common.DefaultEndpoint,
-				},
-			},
-			ValidationStrategy: core.ValidationStrategyStrict,
-		}
-	case core.Version0280:
-		return &framework.GetContextOutputOptions{
-			RuntimeAPIVersion: &core.RuntimeAPIVersion{
-				RuntimeVersion: core.Version0280,
+				RuntimeVersion: version,
 			},
 			ContextOpts: &framework.ContextOpts{
 				Name:   contextName,
@@ -118,20 +90,12 @@ func DefaultGetContextOutputOptions(version core.RuntimeVersion, contextName str
 }
 
 // DefaultGetContextOutputOptionsWithError helper method to construct GetContext API output options with error
-// nolint: dupl
 func DefaultGetContextOutputOptionsWithError(version core.RuntimeVersion, contextName string) *framework.GetContextOutputOptions {
 	switch version {
-	case core.VersionLatest:
+	case core.VersionLatest, core.Version0280:
 		return &framework.GetContextOutputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
-				RuntimeVersion: core.VersionLatest,
-			},
-			Error: fmt.Sprintf("context %v not found", contextName),
-		}
-	case core.Version0280:
-		return &framework.GetContextOutputOptions{
-			RuntimeAPIVersion: &core.RuntimeAPIVersion{
-				RuntimeVersion: core.Version0280,
+				RuntimeVersion: version,
 			},
 			Error: fmt.Sprintf("context %v not found", contextName),
 		}
@@ -159,17 +123,10 @@ func DefaultSetCurrentContextInputOptions(version core.RuntimeVersion, contextNa
 // DefaultGetCurrentContextInputOptions helper method to construct GetCurrentContext API input options
 func DefaultGetCurrentContextInputOptions(version core.RuntimeVersion) *framework.GetCurrentContextInputOptions {
 	switch version {
-	case core.VersionLatest:
+	case core.VersionLatest, core.Version0280:
 		return &framework.GetCurrentContextInputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
-				RuntimeVersion: core.VersionLatest,
-			},
-			Target: framework.TargetK8s,
-		}
-	case core.Version0280:
-		return &framework.GetCurrentContextInputOptions{
-			RuntimeAPIVersion: &core.RuntimeAPIVersion{
-				RuntimeVersion: core.Version0280,
+				RuntimeVersion: version,
 			},
 			Target: framework.TargetK8s,
 		}
@@ -185,27 +142,12 @@ func DefaultGetCurrentContextInputOptions(version core.RuntimeVersion) *framewor
 }
 
 // DefaultGetCurrentContextOutputOptions helper method to construct GetCurrentContext API output options
-// nolint: dupl
 func DefaultGetCurrentContextOutputOptions(version core.RuntimeVersion, contextName string) *framework.GetCurrentContextOutputOptions {
 	switch version {
-	case core.VersionLatest:
+	case core.VersionLatest, core.Version0280:
 		return &framework.GetCurrentContextOutputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: core.VersionLatest,
-			},
-			ContextOpts: &framework.ContextOpts{
-				Name:   contextName,
-				Target: framework.TargetK8s,
-				GlobalOpts: &framework.GlobalServerOpts{
-					Endpoint: common.DefaultEndpoint,
-				},
-			},
-			ValidationStrategy: core.ValidationStrategyStrict,
-		}
-	case core.Version0280:
-		return &framework.GetCurrentContextOutputOptions{
-			RuntimeAPIVersion: &core.RuntimeAPIVersion{
-				RuntimeVersion: core.Version0280,
 			},
 			ContextOpts: &framework.ContextOpts{
 				Name:   contextName,
@@ -234,17 +176,9 @@ func DefaultGetCurrentContextOutputOptions(version core.RuntimeVersion, contextN
 }
 
 // DefaultGetCurrentContextOutputOptionsWithError helper method to construct GetCurrentContext API output options with error
-// nolint: dupl
 func DefaultGetCurrentContextOutputOptionsWithError(version core.RuntimeVersion) *framework.GetCurrentContextOutputOptions {
 	switch version {
-	case core.VersionLatest:
-		return &framework.GetCurrentContextOutputOptions{
-			RuntimeAPIVersion: &core.RuntimeAPIVersion{
-				RuntimeVersion: version,
-			},
-			Error: fmt.Sprintf("no current context set for target \"%v\"", framework.TargetK8s),
-		}
-	case core.Version0280:
+	case core.VersionLatest, core.Version0280:
 		return &framework.GetCurrentContextOutputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: version,
@@ -259,24 +193,16 @@ func DefaultGetCurrentContextOutputOptionsWithError(version core.RuntimeVersion)
 			Error: fmt.Sprintf("no current context set for type \"%v\"", framework.CtxTypeK8s),
 		}
 	}
-
 	return nil
 }
 
 // DefaultRemoveCurrentContextInputOptions helper method to construct RemoveCurrentContext API input options
 func DefaultRemoveCurrentContextInputOptions(version core.RuntimeVersion) *framework.RemoveCurrentContextInputOptions {
 	switch version {
-	case core.VersionLatest:
+	case core.VersionLatest, core.Version0280:
 		return &framework.RemoveCurrentContextInputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
-				RuntimeVersion: core.VersionLatest,
-			},
-			Target: framework.TargetK8s,
-		}
-	case core.Version0280:
-		return &framework.RemoveCurrentContextInputOptions{
-			RuntimeAPIVersion: &core.RuntimeAPIVersion{
-				RuntimeVersion: core.Version0280,
+				RuntimeVersion: version,
 			},
 			Target: framework.TargetK8s,
 		}
@@ -285,17 +211,9 @@ func DefaultRemoveCurrentContextInputOptions(version core.RuntimeVersion) *frame
 }
 
 // DefaultRemoveCurrentContextOutputOptionsWithError helper method to construct RemoveCurrentContext API output option
-// nolint: dupl
 func DefaultRemoveCurrentContextOutputOptionsWithError(version core.RuntimeVersion) *framework.RemoveCurrentContextOutputOptions {
 	switch version {
-	case core.VersionLatest:
-		return &framework.RemoveCurrentContextOutputOptions{
-			RuntimeAPIVersion: &core.RuntimeAPIVersion{
-				RuntimeVersion: version,
-			},
-			Error: fmt.Sprintf("no current context set for target \"%v\"", framework.TargetK8s),
-		}
-	case core.Version0280:
+	case core.VersionLatest, core.Version0280:
 		return &framework.RemoveCurrentContextOutputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: version,
@@ -310,7 +228,6 @@ func DefaultRemoveCurrentContextOutputOptionsWithError(version core.RuntimeVersi
 			Error: fmt.Sprintf("no current context set for type \"%v\"", framework.CtxTypeK8s),
 		}
 	}
-
 	return nil
 }
 
@@ -325,20 +242,12 @@ func DefaultDeleteContextInputOptions(version core.RuntimeVersion, contextName s
 }
 
 // DefaultDeleteContextOutputOptionsWithError helper method to construct DeleteContext API output options
-// nolint: dupl
 func DefaultDeleteContextOutputOptionsWithError(version core.RuntimeVersion, contextName string) *framework.DeleteContextOutputOptions {
 	switch version {
-	case core.VersionLatest:
+	case core.VersionLatest, core.Version0280:
 		return &framework.DeleteContextOutputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
-				RuntimeVersion: core.VersionLatest,
-			},
-			Error: fmt.Sprintf("context %v not found", contextName),
-		}
-	case core.Version0280:
-		return &framework.DeleteContextOutputOptions{
-			RuntimeAPIVersion: &core.RuntimeAPIVersion{
-				RuntimeVersion: core.Version0280,
+				RuntimeVersion: version,
 			},
 			Error: fmt.Sprintf("context %v not found", contextName),
 		}

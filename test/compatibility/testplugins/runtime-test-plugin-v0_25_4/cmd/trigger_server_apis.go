@@ -38,6 +38,20 @@ func triggerSetServerAPI(api *core.API) *core.APIResponse {
 	return setServer(server, setCurrent)
 }
 
+// triggerAddServerAPI trigger add server runtime api
+func triggerAddServerAPI(api *core.API) *core.APIResponse {
+	// Parse arguments needed to trigger the runtime api
+	server, err := parseServer(api.Arguments[core.Server].(string))
+	if err != nil {
+		return &core.APIResponse{
+			ResponseType: core.ErrorResponse,
+			ResponseBody: fmt.Errorf("failed to parse server from argument %v with error %v ", core.Server, err.Error()),
+		}
+	}
+	setCurrent := api.Arguments[core.SetCurrent].(bool)
+	return addServer(server, setCurrent)
+}
+
 // triggerRemoveServerAPI trigger remove context runtime api
 func triggerRemoveServerAPI(api *core.API) *core.APIResponse {
 	// Parse arguments needed to trigger the runtime api
@@ -70,7 +84,22 @@ func triggerGetCurrentServerAPI(*core.API) *core.APIResponse {
 }
 
 func setServer(server *configapi.Server, setCurrent bool) *core.APIResponse {
-	// Call runtime SetServer API
+	// Call runtime PutServer API
+	err := configlib.PutServer(server, setCurrent)
+	if err != nil {
+		return &core.APIResponse{
+			ResponseType: core.ErrorResponse,
+			ResponseBody: err.Error(),
+		}
+	}
+	return &core.APIResponse{
+		ResponseBody: "",
+		ResponseType: core.StringResponse,
+	}
+}
+
+func addServer(server *configapi.Server, setCurrent bool) *core.APIResponse {
+	// Call runtime AddServer API
 	err := configlib.AddServer(server, setCurrent)
 	if err != nil {
 		return &core.APIResponse{

@@ -6,6 +6,8 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/pkg/errors"
+
 	configlib "github.com/vmware-tanzu/tanzu-plugin-runtime/config"
 	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
@@ -109,7 +111,7 @@ func setServer(server *configtypes.Server, setCurrent bool) *core.APIResponse {
 	if err != nil {
 		return &core.APIResponse{
 			ResponseType: core.ErrorResponse,
-			ResponseBody: err.Error(),
+			ResponseBody: errors.Wrap(err, "failed"),
 		}
 	}
 	return &core.APIResponse{

@@ -1,67 +1,94 @@
-
 # Backward Compatibility
 
-Verify that plugin developed with new Tanzu Plugin Runtime (Ex v1.0.0) works along with plugin developed with old Tanzu Plugin Runtime(Ex v0.28.0).
-
 ## Framework
-
-## Phase 1
-
-### Summary
-
-Compatibility Test Framework provides test helper functions to write `go test cases`.
-
-Test writer is responsible for writing the go tests using the framework provided helper methods.
-As a test writer you should be knowledgeable on specific APIs and specific Runtime libraries  i.e. what arguments each API takes and what it returns.
-Test writers should also be familiar with how to write combination tests with multiple APIs i.e when testing mutators and reader APIs together.
-
-For Example:-  Running SetContext alone in the test will not be a good test as it does not validate the actual context that is set in the config yaml file. But when SetContext is combined with GetContext/ GetCurrentContext making the tests more solid.
-
-When writing a test involving two versions of Runtime library APIs a test writer should be aware of what specific fields are added or removed from the API method for those 2 versions and design tests accordingly.
-
-### Commands
-
-`make backward-compatibility-tests` - Will internally run all `**_test.go` files from compatibility-tests directory.
 
 ### How to write a test?
 
 Each Test is of below type
 
 ``` go
-type TestSuite struct {
-    // Name of the test suite
-  Name      string      `json:"name" yaml:"name"`
-  TestCases []*TestCase `json:"testcases" yaml:"testcases"`
-}
+// Copyright 2023 VMware, Inc. All Rights Reserved.
+// SPDX-License-Identifier: Apache-2.0
+
+package framework
+
+// TestCase represents the list of commands to execute as part of test case
 type TestCase struct {
-    // Name of the test case
-  Name     string     `json:"name" yaml:"name"`
-  // Series of commands to execute
-  Commands []*Command `json:"commands" yaml:"commands"`
+   Commands []*Command `json:"commands" yaml:"commands"`
 }
 
+// Command represents the list of apis to execute as part of command execution
 type Command struct {
-    // Versions of Runtime library to run the APIs
-  Versions []string `json:"versions" yaml:"versions"`
-  // Runtime library APIs to run
-  APIs     []*API   `json:"apis" yaml:"apis"`
+   APIs []*API `json:"apis" yaml:"apis"`
 }
 
+// API represents the runtime api to execute
 type API struct {
-    // Name of the Runtime API method
-  Name      string                 `json:"name" yaml:"name"`
-  // Runtime API method parameters
-  Arguments map[string]interface{} `json:"arguments" yaml:"arguments"`
-  // Runtime API method response object for validation
-  Output    *Output                `json:"output" yaml:"output"`
+   Name      RuntimeAPIName         `json:"name" yaml:"name"`
+   Version   RuntimeVersion         `json:"version" yaml:"version"`
+   Arguments map[string]interface{} `json:"arguments" yaml:"arguments"`
+   Output    *Output                `json:"output" yaml:"output"`
 }
 
+// Output represents the runtime api expected output for validation
 type Output struct {
-    // Result of the Runtime API method Ex: success, failed
-  Result  string `json:"result" yaml:"result"`
-  // Context is the yaml representation of expected response of the specific Runtime API method
-  Content string `json:"content" yaml:"content"`
+   Result  Result `json:"result" yaml:"result"`
+   Content string `json:"content" yaml:"content"`
 }
+
+type Result string
+
+const (
+   Success Result = "success"
+   Failed         = "failed"
+)
+
+// RuntimeAPIVersion represents the runtime library version
+type RuntimeAPIVersion struct {
+   RuntimeVersion RuntimeVersion `json:"runtimeVersion,omitempty" yaml:"runtimeVersion,omitempty"`
+}
+
+// RuntimeVersion Runtime library versions
+type RuntimeVersion string
+
+const (
+   Version0116 RuntimeVersion = "v0.11.6"
+   Version0254                = "v0.25.4"
+   Version0280                = "v0.28.0"
+   Version100                 = "v1.0.0"
+)
+
+// NewTestCase creates an instance of TestCase
+func NewTestCase() *TestCase {
+   return &TestCase{}
+}
+
+// Add series of commands to test case to be executed in sequence
+func (t *TestCase) Add(command ...*Command) *TestCase {
+   t.Commands = append(t.Commands, command...)
+   return t
+}
+
+// APILog represents the logs/output/errors returned from runtime apis
+type APILog struct {
+   APIResponse *APIResponse `json:"apiResponse" yaml:"apiResponse"`
+   APIError    string       `json:"error" yaml:"error"`
+}
+
+// APIResponse represents the output response returned from runtime apis
+type APIResponse struct {
+   ResponseType ResponseType `json:"responseType" yaml:"responseType"`
+   ResponseBody interface{}  `json:"responseBody" yaml:"responseBody"`
+}
+
+type ResponseType string
+
+const (
+   MapResponse     ResponseType = "map"
+   BooleanResponse              = "bool"
+   StringResponse               = "str"
+   IntegerResponse              = "int"
+)
 ```
 
 **Arguments Type**
@@ -80,57 +107,7 @@ Each Test Case accepts
   - `arguments` API Method Arguments.
   - `output` API Method Expected Output for validation.
 
-Example:-  Runs Runtime V1.0.0 SetContext and RuntimeV0.28.0 GetContext API methods.
-
-TestCase-1:
-
-``` go
-func TestContextAPI(t *testing.T) {
-    // Build Test Suite
-    testSuite := types.NewTestSuite(
-        types.WithTestSuiteName("Context API"),
-        types.WithTestCases(
-            types.NewTestCase(
-                types.WithTestCaseName("Runtime v1.0.0 SetContext and Runtime v0.28.0 GetContext"),
-                types.WithTestCaseCommands(
-                    types.NewCommand(
-                        types.WithCommandVersions([]string{"v1.0.0"}),
-                        types.WithCommandAPIs(
-                            helpers.APIForSetContext("v1.0.0"),
-                        ),
-                    ),
-                    types.NewCommand(
-                        types.WithCommandVersions([]string{"v0.28.0"}),
-                        types.WithCommandAPIs(
-                            helpers.APIForGetContext("v1.0.0"),
-                        ),
-                    ),
-                ),
-            ),
-        ),
-    )
-    // Execute Test Suite
-    response := testSuite.Execute()
-    // Perform Assertion
-    assert.Equal(t, response, "success")
-}
-```
-
-``` go
-func (t *TestSuite) Execute() string
-```
-
-Execute() will parse the TestSuite and run each command and version as specified and validate the return response of each command execution.
-
-``` go
-// helpers.go
-func APIForGetContext(version string, options ...types.APIOption) *API
-func APIForSetContext(version string, options ...types.APIOption) *API
-```
-
-*options can accept arguments and outputContent - default values are used if not provided
-
-Running the above *testcase-1* Internally the framework generates below commands.
+Running the  *testcase_1*, the framework generates below commands internally to trigger specific runtime version libraries.
 
 #### Below command is generated to run Runtime lib v1.0.0 SetContext API method as per testcase-1
 

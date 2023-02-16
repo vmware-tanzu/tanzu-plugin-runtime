@@ -20,7 +20,7 @@ For more details about the design and apis go to [Config API](docs/config.md)
 
 ### Overview
 
-This testing ensures that plugins developed with different Runtime versions work as expected as long as those runtime versions are supported.
-Current testing verifies that plugin developed with new Tanzu Plugin Runtime (Ex :- v1.0.0) works along with the plugin developed with old Tanzu Plugin Runtime versions like v0.28.0, v0.25.0, v0.11.0.
+Backward Compatibility Runtime testing ensures that APIs of different Tanzu Plugin Runtime versions work as expected as long as those Tanzu Plugin Runtime versions are supported.
+Backward Compatibility Runtime testing verifies that APIs with new Tanzu Plugin Runtime (Ex :- v1.0.0) works along with old APIs of Tanzu Plugin Runtime versions like v0.28.0, v0.25.4, v0.11.6.
 
-For more details go to [Backward Compatibility](BACKWARD_COMPATIBILITY.md)
+For more details go to [Backward Compatibility](./test/BACKWARD_COMPATIBILITY.md)

@@ -1,7 +1,8 @@
 package cmd
 
 import (
-	. "github.com/onsi/gomega"
+	"fmt"
+
 	configtypes "github.com/vmware-tanzu/tanzu-framework/apis/config/v1alpha1"
 	configlib "github.com/vmware-tanzu/tanzu-framework/pkg/v1/config"
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/compatibility-test-plugins/helpers"
@@ -25,7 +26,9 @@ func triggerContextAPIs(api *compatibilitytestingframework.API, logs map[compati
 func triggerGetContextAPI(api *compatibilitytestingframework.API) compatibilitytestingframework.APILog {
 	// Parse arguments needed to trigger the runtime api
 	ctxName, err := helpers.ParseStr(api.Arguments["contextName"])
-	Expect(err).To(BeNil())
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	//Call runtime GetContextAPIName() API function
 	ctx, err := configlib.GetContext(ctxName)
@@ -46,7 +49,9 @@ func triggerGetContextAPI(api *compatibilitytestingframework.API) compatibilityt
 func triggerSetContextAPI(api *compatibilitytestingframework.API) compatibilitytestingframework.APILog {
 	// Parse arguments needed to trigger the runtime api
 	ctx, err := parseContext(api.Arguments["context"].(string))
-	Expect(err).To(BeNil())
+	if err != nil {
+		fmt.Println(err)
+	}
 	isCurrent := api.Arguments["isCurrent"].(bool)
 
 	// Call the runtime SetContextAPIName API function

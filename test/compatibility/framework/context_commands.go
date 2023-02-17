@@ -14,8 +14,8 @@ import (
 // Input Parameter: setContextOutputOptions has details about expected output from Runtime SetContextAPIName API call.
 // Return:  command to execute or error if any validations fails for SetContextInputOptions or SetContextOutputOptions
 // This method does validate the input parameters  SetContextInputOptions/SetContextOutputOptions based on Runtime API Version
-// For more details about supported parameters refer to SetContextInputOptions/SetContextOutputOptions defintion(and CtxOptions struct, which is embedded).
-func NewSetContextCommand(setContextInputOptions SetContextInputOptions, setContextOutputOptions SetContextOutputOptions) (*Command, error) {
+// For more details about supported parameters refer to SetContextInputOptions/SetContextOutputOptions definition(and CtxOptions struct, which is embedded).
+func NewSetContextCommand(setContextInputOptions *SetContextInputOptions, setContextOutputOptions *SetContextOutputOptions) (*Command, error) {
 	// Init the Command object
 	c := &Command{}
 
@@ -26,9 +26,7 @@ func NewSetContextCommand(setContextInputOptions SetContextInputOptions, setCont
 
 	// Validate the SetContext Input Options
 	_, err := ValidateSetContextInputOptionsAsPerRuntimeVersion(setContextInputOptions)
-	if err != nil {
-		return nil, err
-	}
+	Expect(err).To(BeNil())
 
 	// Construct the set context api arguments and output
 	bytes, err := yaml.Marshal(setContextInputOptions.ContextOpts)
@@ -51,9 +49,9 @@ func NewSetContextCommand(setContextInputOptions SetContextInputOptions, setCont
 	var res Result
 	var content string
 
-	if setContextOutputOptions.error != "" {
+	if setContextOutputOptions != nil && setContextOutputOptions.Error != "" {
 		res = Failed
-		content = setContextOutputOptions.error
+		content = setContextOutputOptions.Error
 	} else {
 		res = Success
 		content = ""
@@ -70,7 +68,7 @@ func NewSetContextCommand(setContextInputOptions SetContextInputOptions, setCont
 
 // NewGetContextCommand creates a get context command object from inputOptions and outputOptions
 // Creates the context specific command based on runtimeVersion passed in inputOptions also validates if the required input and outputOptions are passed
-func NewGetContextCommand(getContextInputOptions GetContextInputOptions, getContextOutputOptions GetContextOutputOptions) (*Command, error) {
+func NewGetContextCommand(getContextInputOptions *GetContextInputOptions, getContextOutputOptions *GetContextOutputOptions) (*Command, error) {
 	// Init the Command object
 	c := &Command{}
 	// Init the API object
@@ -79,7 +77,6 @@ func NewGetContextCommand(getContextInputOptions GetContextInputOptions, getCont
 	api.Version = getContextInputOptions.RuntimeVersion
 
 	// Validate the Input Options
-	Expect(getContextInputOptions.ContextName).To(Not(Equal("")))
 	if getContextInputOptions.ContextName == "" {
 		return nil, errors.New("context name is required")
 	}
@@ -95,11 +92,8 @@ func NewGetContextCommand(getContextInputOptions GetContextInputOptions, getCont
 
 	if getContextOutputOptions.ContextOpts != nil {
 		// Validate the Output Options
-		getContextOutputOptions.RuntimeVersion = getContextInputOptions.RuntimeVersion
 		_, err := ValidateGetContextOutputOptionsAsPerRuntimeVersion(getContextOutputOptions)
-		if err != nil {
-			return nil, err
-		}
+		Expect(err).To(BeNil())
 
 		// Construct get context output context opts
 		bytes, err := yaml.Marshal(getContextOutputOptions.ContextOpts)
@@ -107,9 +101,9 @@ func NewGetContextCommand(getContextInputOptions GetContextInputOptions, getCont
 
 		content = string(bytes)
 		res = Success
-	} else if getContextOutputOptions.error != "" {
+	} else if getContextOutputOptions.Error != "" {
 		res = Failed
-		content = ""
+		content = getContextOutputOptions.Error
 	}
 
 	api.Output = &Output{

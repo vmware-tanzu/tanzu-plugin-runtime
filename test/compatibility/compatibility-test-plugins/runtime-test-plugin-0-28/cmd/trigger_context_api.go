@@ -1,7 +1,8 @@
 package cmd
 
 import (
-	. "github.com/onsi/gomega"
+	"fmt"
+
 	configtypes "github.com/vmware-tanzu/tanzu-framework/cli/runtime/apis/config/v1alpha1"
 	configlib "github.com/vmware-tanzu/tanzu-framework/cli/runtime/config"
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/compatibility-test-plugins/helpers"
@@ -25,7 +26,9 @@ func triggerContextAPIs(api *compatibilitytestingframework.API, logs map[compati
 func triggerGetContextAPI(api *compatibilitytestingframework.API) compatibilitytestingframework.APILog {
 	// Parse arguments needed to trigger the runtime api
 	ctxName, err := helpers.ParseStr(api.Arguments["contextName"])
-	Expect(err).To(BeNil())
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	//Call runtime GetContext API function
 	ctx, err := configlib.GetContext(ctxName)
@@ -34,10 +37,17 @@ func triggerGetContextAPI(api *compatibilitytestingframework.API) compatibilityt
 	log := compatibilitytestingframework.APILog{}
 	if err != nil {
 		log.APIError = err.Error()
+		log.APIResponse = &compatibilitytestingframework.APIResponse{
+			ResponseType: compatibilitytestingframework.ErrorResponse,
+			ResponseBody: err.Error(),
+		}
 	}
-	log.APIResponse = &compatibilitytestingframework.APIResponse{
-		ResponseBody: ctx,
-		ResponseType: compatibilitytestingframework.MapResponse,
+
+	if ctx != nil {
+		log.APIResponse = &compatibilitytestingframework.APIResponse{
+			ResponseBody: ctx,
+			ResponseType: compatibilitytestingframework.MapResponse,
+		}
 	}
 	return log
 }
@@ -46,7 +56,9 @@ func triggerGetContextAPI(api *compatibilitytestingframework.API) compatibilityt
 func triggerSetContextAPI(api *compatibilitytestingframework.API) compatibilitytestingframework.APILog {
 	// Parse arguments needed to trigger the runtime api
 	ctx, err := parseContext(api.Arguments["context"].(string))
-	Expect(err).To(BeNil())
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	isCurrent := api.Arguments["isCurrent"].(bool)
 
@@ -57,11 +69,17 @@ func triggerSetContextAPI(api *compatibilitytestingframework.API) compatibilityt
 	log := compatibilitytestingframework.APILog{}
 	if err != nil {
 		log.APIError = err.Error()
+		log.APIResponse = &compatibilitytestingframework.APIResponse{
+			ResponseType: compatibilitytestingframework.ErrorResponse,
+			ResponseBody: err.Error(),
+		}
+	} else {
+		log.APIResponse = &compatibilitytestingframework.APIResponse{
+			ResponseBody: "",
+			ResponseType: compatibilitytestingframework.StringResponse,
+		}
 	}
-	log.APIResponse = &compatibilitytestingframework.APIResponse{
-		ResponseBody: "",
-		ResponseType: compatibilitytestingframework.StringResponse,
-	}
+
 	return log
 }
 
@@ -72,6 +90,5 @@ func parseContext(context string) (*configtypes.Context, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	return &ctx, nil
 }

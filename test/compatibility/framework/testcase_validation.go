@@ -15,9 +15,7 @@ import (
 func ValidateAPIsOutput(apis []*API, stdout string) {
 	// Construct logs
 	logs := unmarshallStdout(stdout)
-
 	for _, api := range apis {
-
 		for _, log := range logs[api.Name] {
 			if log.APIResponse.ResponseType == StringResponse {
 				actual := fmt.Sprintf("%v", log.APIResponse.ResponseBody)
@@ -28,7 +26,7 @@ func ValidateAPIsOutput(apis []*API, stdout string) {
 				expected := strToMap(api.Output.Content)
 				Expect(actual).To(Equal(expected))
 				Expect(reflect.DeepEqual(actual, expected)).To(Equal(true))
-			} else if log.APIResponse.ResponseType == "" {
+			} else if log.APIResponse.ResponseType == ErrorResponse {
 				//Check for errors
 				actual := log.APIError
 				expected := api.Output.Content
@@ -43,10 +41,7 @@ func unmarshallStdout(s string) map[RuntimeAPIName][]APILog {
 	var logs map[RuntimeAPIName][]APILog
 
 	err := yaml.Unmarshal([]byte(s), &logs)
-	if err != nil {
-		fmt.Println("unmarshallStdout", err)
-		Expect(err).To(BeNil())
-	}
+	Expect(err).To(BeNil())
 
 	return logs
 }

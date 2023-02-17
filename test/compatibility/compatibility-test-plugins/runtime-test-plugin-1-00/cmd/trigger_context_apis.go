@@ -1,7 +1,8 @@
 package cmd
 
 import (
-	. "github.com/onsi/gomega"
+	"fmt"
+
 	configlib "github.com/vmware-tanzu/tanzu-plugin-runtime/config"
 	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/compatibility-test-plugins/helpers"
@@ -11,13 +12,15 @@ import (
 
 // triggerContextAPIs trigger context related runtime apis and construct logs
 func triggerContextAPIs(api *compatibilitytestingframework.API, logs map[compatibilitytestingframework.RuntimeAPIName][]compatibilitytestingframework.APILog) {
+	// If API name is SetContext then trigger SetContext() API
 	if api.Name == compatibilitytestingframework.SetContextAPIName {
 		log := triggerSetContextAPI(api)
 		logs[compatibilitytestingframework.SetContextAPIName] = append(logs[compatibilitytestingframework.SetContextAPIName], log)
 	}
+	// If API name is GetContext then trigger GetContext() API
 	if api.Name == compatibilitytestingframework.GetContextAPIName {
 		log := triggerGetContextAPI(api)
-		logs[compatibilitytestingframework.SetContextAPIName] = append(logs[compatibilitytestingframework.SetContextAPIName], log)
+		logs[compatibilitytestingframework.GetContextAPIName] = append(logs[compatibilitytestingframework.GetContextAPIName], log)
 	}
 }
 
@@ -25,20 +28,30 @@ func triggerContextAPIs(api *compatibilitytestingframework.API, logs map[compati
 func triggerGetContextAPI(api *compatibilitytestingframework.API) compatibilitytestingframework.APILog {
 	// Parse arguments needed to trigger the runtime api
 	ctxName, err := helpers.ParseStr(api.Arguments["contextName"])
-	Expect(err).To(BeNil())
+	if err != nil {
+		fmt.Println("triggerGetContextAPI1", err)
+	}
 
-	//Call runtime GetContextAPIName() API function
+	//Call runtime GetContext() API function
 	ctx, err := configlib.GetContext(ctxName)
 
 	// Construct logging
 	log := compatibilitytestingframework.APILog{}
 	if err != nil {
 		log.APIError = err.Error()
+		log.APIResponse = &compatibilitytestingframework.APIResponse{
+			ResponseType: compatibilitytestingframework.ErrorResponse,
+			ResponseBody: err.Error(),
+		}
 	}
-	log.APIResponse = &compatibilitytestingframework.APIResponse{
-		ResponseBody: ctx,
-		ResponseType: compatibilitytestingframework.MapResponse,
+
+	if ctx != nil {
+		log.APIResponse = &compatibilitytestingframework.APIResponse{
+			ResponseBody: ctx,
+			ResponseType: compatibilitytestingframework.MapResponse,
+		}
 	}
+
 	return log
 }
 
@@ -46,8 +59,9 @@ func triggerGetContextAPI(api *compatibilitytestingframework.API) compatibilityt
 func triggerSetContextAPI(api *compatibilitytestingframework.API) compatibilitytestingframework.APILog {
 	// Parse arguments needed to trigger the runtime api
 	ctx, err := parseContext(api.Arguments["context"].(string))
-	Expect(err).To(BeNil())
-
+	if err != nil {
+		fmt.Println("triggerGetContextAPI2", err)
+	}
 	isCurrent := api.Arguments["isCurrent"].(bool)
 
 	// Call the runtime SetContextAPIName API function
@@ -57,11 +71,17 @@ func triggerSetContextAPI(api *compatibilitytestingframework.API) compatibilityt
 	log := compatibilitytestingframework.APILog{}
 	if err != nil {
 		log.APIError = err.Error()
+		log.APIResponse = &compatibilitytestingframework.APIResponse{
+			ResponseType: compatibilitytestingframework.ErrorResponse,
+			ResponseBody: err.Error(),
+		}
+	} else {
+		log.APIResponse = &compatibilitytestingframework.APIResponse{
+			ResponseBody: "",
+			ResponseType: compatibilitytestingframework.StringResponse,
+		}
 	}
-	log.APIResponse = &compatibilitytestingframework.APIResponse{
-		ResponseBody: "",
-		ResponseType: compatibilitytestingframework.StringResponse,
-	}
+
 	return log
 }
 
@@ -72,6 +92,5 @@ func parseContext(context string) (*configtypes.Context, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	return &ctx, nil
 }

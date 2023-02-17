@@ -6,7 +6,6 @@ package cmd
 import (
 	"fmt"
 
-	. "github.com/onsi/gomega"
 	"github.com/spf13/cobra"
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/compatibility-test-plugins/helpers"
 	compatibilitytestingtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework"
@@ -21,7 +20,9 @@ var (
 		Short: "A test command that parse the apis file and trigger the runtime library apis",
 		Run: func(cmd *cobra.Command, args []string) {
 			apis, err := helpers.GetTestData(file)
-			Expect(err).To(BeNil())
+			if err != nil {
+				fmt.Println(err)
+			}
 			runAPIs(apis)
 		},
 	}
@@ -39,8 +40,7 @@ func runAPIs(apis []compatibilitytestingtypes.API) {
 	// Log the output to stdout
 	bytes, err := yaml.Marshal(logs)
 	if err != nil {
-		fmt.Println("RunAPIs", err)
-		Expect(err).To(BeNil())
+		fmt.Println("runAPIs", err)
 	}
 	fmt.Println(string(bytes))
 }

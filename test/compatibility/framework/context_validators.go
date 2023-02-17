@@ -10,7 +10,7 @@ import (
 )
 
 // ValidateSetContextInputOptionsAsPerRuntimeVersion validate the setContextInputOptions as per runtime version i.e. check whether mandatory fields are set and throw error if missing
-func ValidateSetContextInputOptionsAsPerRuntimeVersion(setContextInputOptions SetContextInputOptions) (bool, error) {
+func ValidateSetContextInputOptionsAsPerRuntimeVersion(setContextInputOptions *SetContextInputOptions) (bool, error) {
 	var valid bool
 	switch setContextInputOptions.RuntimeVersion {
 	case Version100, Version0280:
@@ -32,7 +32,7 @@ func ValidateSetContextInputOptionsAsPerRuntimeVersion(setContextInputOptions Se
 }
 
 // ValidateGetContextOutputOptionsAsPerRuntimeVersion validate the getContextOutputOptions as per runtime version i.e. check whether the expected fields are supported for the runtime version specified
-func ValidateGetContextOutputOptionsAsPerRuntimeVersion(getContextOutputOptions GetContextOutputOptions) (bool, error) {
+func ValidateGetContextOutputOptionsAsPerRuntimeVersion(getContextOutputOptions *GetContextOutputOptions) (bool, error) {
 	var valid bool
 	switch getContextOutputOptions.RuntimeVersion {
 	case Version100, Version0280:

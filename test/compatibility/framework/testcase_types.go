@@ -79,4 +79,5 @@ const (
 	BooleanResponse              = "bool"
 	StringResponse               = "str"
 	IntegerResponse              = "int"
+	ErrorResponse                = "err"
 )

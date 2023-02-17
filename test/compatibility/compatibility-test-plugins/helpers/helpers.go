@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"os"
 
-	. "github.com/onsi/gomega"
 	compatibilitytestingframework "github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework"
 	"gopkg.in/yaml.v3"
 )
@@ -65,16 +64,21 @@ func SetupTempCfgFiles() (files []*os.File, cleanup func()) {
 
 	err = os.Setenv("TANZU_CONFIG_METADATA", cfgMetadataFile.Name())
 
-	fmt.Println(err)
 	cleanup = func() {
 		err = os.Remove(cfgFile.Name())
-		Expect(err).To(BeNil())
+		if err != nil {
+			fmt.Println(err)
+		}
 
 		err = os.Remove(cfgNextGenFile.Name())
-		Expect(err).To(BeNil())
+		if err != nil {
+			fmt.Println(err)
+		}
 
 		err = os.Remove(cfgMetadataFile.Name())
-		Expect(err).To(BeNil())
+		if err != nil {
+			fmt.Println(err)
+		}
 	}
 
 	return []*os.File{cfgFile, cfgNextGenFile, cfgMetadataFile}, cleanup

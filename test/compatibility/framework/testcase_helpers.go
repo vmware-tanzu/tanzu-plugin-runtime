@@ -10,6 +10,7 @@ import (
 	"os/exec"
 	"strings"
 
+	. "github.com/onsi/gomega"
 	"gopkg.in/yaml.v3"
 )
 
@@ -21,6 +22,24 @@ const (
 	pluginV028 = "runtime-test-plugin-0-28"
 	pluginV100 = "runtime-test-plugin-1-00"
 )
+
+// constructTestPluginCmd constructs the specific runtime test plugin command as per runtime version and apis
+func constructTestPluginCmd(version RuntimeVersion, apis []*API) (string, error) {
+
+	// Create root command for the specified runtime version
+	pluginCommand := makeRootCommand(version)
+
+	// Create a temp file with apis to execute
+	fileName, err := writeAPIsToTempFile(apis)
+	if err != nil {
+		return "", err
+	}
+
+	pluginCommand += " --file " + fileName
+
+	fmt.Println("Generated  cmd", pluginCommand)
+	return pluginCommand, nil
+}
 
 // makeRootCommand construct the root runtime test plugin command as per runtime version specified
 func makeRootCommand(version RuntimeVersion) string {
@@ -64,31 +83,15 @@ func Exec(command string) (stdOut, stdErr *bytes.Buffer, err error) {
 	cmdName := cmdInput[0]
 	cmdArgs := cmdInput[1:]
 
-	cmd := exec.Command(cmdName, cmdArgs...)
 	var stdout, stderr bytes.Buffer
+	cmd := exec.Command(cmdName, cmdArgs...)
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
 	err = cmd.Run()
 	if err != nil {
-		return nil, nil, fmt.Errorf(fmt.Sprintf("error while running %s", command), err)
+		return &stdout, &stderr, fmt.Errorf(fmt.Sprintf("error while running %s", command), err)
 	}
 	return &stdout, &stderr, nil
-}
-
-// constructTestPluginCmd constructs the specific runtime test plugin command as per runtime version and apis
-func constructTestPluginCmd(version RuntimeVersion, apis []*API) (string, error) {
-	pluginCommand := makeRootCommand(version)
-
-	fileName, err := writeAPIsToTempFile(apis)
-	if err != nil {
-		fmt.Println(err)
-		return "", err
-	}
-
-	pluginCommand += " --file " + fileName
-
-	fmt.Println("Generated  cmd", pluginCommand)
-	return pluginCommand, nil
 }
 
 // strToMap convert str represented struct data to map
@@ -100,4 +103,39 @@ func strToMap(s string) map[string]interface{} {
 		fmt.Println(err)
 	}
 	return mapper
+}
+
+// SetupTempCfgFiles mock runtime config files
+func SetupTempCfgFiles() (files []*os.File, cleanup func()) {
+	// Setup config data
+	cfgFile, err := os.CreateTemp("", "tanzu_config")
+
+	err = os.WriteFile(cfgFile.Name(), []byte{}, 0644)
+
+	err = os.Setenv("TANZU_CONFIG", cfgFile.Name())
+
+	cfgNextGenFile, err := os.CreateTemp("", "tanzu_config_ng")
+
+	err = os.WriteFile(cfgNextGenFile.Name(), []byte{}, 0644)
+
+	err = os.Setenv("TANZU_CONFIG_NEXT_GEN", cfgNextGenFile.Name())
+
+	cfgMetadataFile, err := os.CreateTemp("", "tanzu_config_metadata")
+
+	err = os.WriteFile(cfgMetadataFile.Name(), []byte{}, 0644)
+
+	err = os.Setenv("TANZU_CONFIG_METADATA", cfgMetadataFile.Name())
+
+	cleanup = func() {
+		err = os.Remove(cfgFile.Name())
+		Expect(err).To(BeNil())
+
+		err = os.Remove(cfgNextGenFile.Name())
+		Expect(err).To(BeNil())
+
+		err = os.Remove(cfgMetadataFile.Name())
+		Expect(err).To(BeNil())
+	}
+
+	return []*os.File{cfgFile, cfgNextGenFile, cfgMetadataFile}, cleanup
 }

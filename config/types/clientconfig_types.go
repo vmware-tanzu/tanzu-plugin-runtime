@@ -1,7 +1,7 @@
 // Copyright 2022 VMware, Inc. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-// Package core specifies the core for clientconfig
+// Package types specifies the types for clientconfig
 package types
 
 import (

@@ -1,3 +1,6 @@
+// Copyright 2023 VMware, Inc. All Rights Reserved.
+// SPDX-License-Identifier: Apache-2.0
+
 package core
 
 import (
@@ -11,16 +14,41 @@ import (
 func SetupTempCfgFiles() (files []*os.File, cleanup func()) {
 	// Setup config data
 	cfgFile, err := os.CreateTemp("", "tanzu_config")
+	if err != nil {
+		fmt.Println(err)
+	}
 	err = os.WriteFile(cfgFile.Name(), []byte{}, 0644)
+	if err != nil {
+		fmt.Println(err)
+	}
 	err = os.Setenv("TANZU_CONFIG", cfgFile.Name())
-
+	if err != nil {
+		fmt.Println(err)
+	}
 	cfgNextGenFile, err := os.CreateTemp("", "tanzu_config_ng")
+	if err != nil {
+		fmt.Println(err)
+	}
 	err = os.WriteFile(cfgNextGenFile.Name(), []byte{}, 0644)
+	if err != nil {
+		fmt.Println(err)
+	}
 	err = os.Setenv("TANZU_CONFIG_NEXT_GEN", cfgNextGenFile.Name())
-
+	if err != nil {
+		fmt.Println(err)
+	}
 	cfgMetadataFile, err := os.CreateTemp("", "tanzu_config_metadata")
+	if err != nil {
+		fmt.Println(err)
+	}
 	err = os.WriteFile(cfgMetadataFile.Name(), []byte{}, 0644)
+	if err != nil {
+		fmt.Println(err)
+	}
 	err = os.Setenv("TANZU_CONFIG_METADATA", cfgMetadataFile.Name())
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	cleanup = func() {
 		err = os.Remove(cfgFile.Name())
@@ -57,7 +85,7 @@ func ParseRuntimeAPIsFromFile(filePath string) ([]API, error) {
 	return apis, nil
 }
 
-//ParseStr converts interface{} to string type
+// ParseStr converts interface{} to string type
 func ParseStr(val interface{}) (string, error) {
 	var value string
 

@@ -38,7 +38,7 @@ clientOptions:
       context-target: 'false'
       tkr-version-v1alpha3-beta: 'false'
     management-cluster:
-      aws-instance-core-exclude-arm: 'true'
+      aws-instance-types-exclude-arm: 'true'
       custom-nameservers: 'false'
       dual-stack-ipv4-primary: 'false'
       dual-stack-ipv6-primary: 'false'
@@ -126,7 +126,7 @@ clientOptions:
             context-target: 'false'
             tkr-version-v1alpha3-beta: 'false'
         management-cluster:
-            aws-instance-core-exclude-arm: 'true'
+            aws-instance-types-exclude-arm: 'true'
             custom-nameservers: 'false'
             dual-stack-ipv4-primary: 'false'
             dual-stack-ipv6-primary: 'false'
@@ -529,7 +529,7 @@ clientOptions:
       context-target: 'false'
       tkr-version-v1alpha3-beta: 'false'
     management-cluster:
-      aws-instance-core-exclude-arm: 'true'
+      aws-instance-types-exclude-arm: 'true'
       custom-nameservers: 'false'
       dual-stack-ipv4-primary: 'false'
       dual-stack-ipv6-primary: 'false'
@@ -599,7 +599,7 @@ clientOptions:
             context-target: 'false'
             tkr-version-v1alpha3-beta: 'false'
         management-cluster:
-            aws-instance-core-exclude-arm: 'true'
+            aws-instance-types-exclude-arm: 'true'
             custom-nameservers: 'false'
             dual-stack-ipv4-primary: 'false'
             dual-stack-ipv6-primary: 'false'
@@ -636,7 +636,7 @@ clientOptions:
       context-target: 'false'
       tkr-version-v1alpha3-beta: 'false'
     management-cluster:
-      aws-instance-core-exclude-arm: 'true'
+      aws-instance-types-exclude-arm: 'true'
       custom-nameservers: 'false'
       dual-stack-ipv4-primary: 'false'
       dual-stack-ipv6-primary: 'false'
@@ -736,7 +736,7 @@ clientOptions:
             context-target: 'false'
             tkr-version-v1alpha3-beta: 'false'
         management-cluster:
-            aws-instance-core-exclude-arm: 'true'
+            aws-instance-types-exclude-arm: 'true'
             custom-nameservers: 'false'
             dual-stack-ipv4-primary: 'false'
             dual-stack-ipv6-primary: 'false'
@@ -803,7 +803,7 @@ clientOptions:
       context-target: 'false'
       tkr-version-v1alpha3-beta: 'false'
     management-cluster:
-      aws-instance-core-exclude-arm: 'true'
+      aws-instance-types-exclude-arm: 'true'
       custom-nameservers: 'false'
       dual-stack-ipv4-primary: 'false'
       dual-stack-ipv6-primary: 'false'
@@ -903,7 +903,7 @@ clientOptions:
             context-target: 'false'
             tkr-version-v1alpha3-beta: 'false'
         management-cluster:
-            aws-instance-core-exclude-arm: 'true'
+            aws-instance-types-exclude-arm: 'true'
             custom-nameservers: 'false'
             dual-stack-ipv4-primary: 'false'
             dual-stack-ipv6-primary: 'false'
@@ -970,7 +970,7 @@ clientOptions:
       context-target: 'false'
       tkr-version-v1alpha3-beta: 'false'
     management-cluster:
-      aws-instance-core-exclude-arm: 'true'
+      aws-instance-types-exclude-arm: 'true'
       custom-nameservers: 'false'
       dual-stack-ipv4-primary: 'false'
       dual-stack-ipv6-primary: 'false'
@@ -1042,7 +1042,7 @@ clientOptions:
             context-target: 'false'
             tkr-version-v1alpha3-beta: 'false'
         management-cluster:
-            aws-instance-core-exclude-arm: 'true'
+            aws-instance-types-exclude-arm: 'true'
             custom-nameservers: 'false'
             dual-stack-ipv4-primary: 'false'
             dual-stack-ipv6-primary: 'false'
@@ -1104,7 +1104,7 @@ clientOptions:
       context-target: 'false'
       tkr-version-v1alpha3-beta: 'false'
     management-cluster:
-      aws-instance-core-exclude-arm: 'true'
+      aws-instance-types-exclude-arm: 'true'
       custom-nameservers: 'false'
       dual-stack-ipv4-primary: 'false'
       dual-stack-ipv6-primary: 'false'
@@ -1177,7 +1177,7 @@ clientOptions:
             context-target: 'false'
             tkr-version-v1alpha3-beta: 'false'
         management-cluster:
-            aws-instance-core-exclude-arm: 'true'
+            aws-instance-types-exclude-arm: 'true'
             custom-nameservers: 'false'
             dual-stack-ipv4-primary: 'false'
             dual-stack-ipv6-primary: 'false'

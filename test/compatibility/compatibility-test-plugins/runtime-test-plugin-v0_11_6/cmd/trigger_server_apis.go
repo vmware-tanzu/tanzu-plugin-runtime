@@ -1,3 +1,6 @@
+// Copyright 2023 VMware, Inc. All Rights Reserved.
+// SPDX-License-Identifier: Apache-2.0
+
 package cmd
 
 import (
@@ -9,7 +12,7 @@ import (
 )
 
 // triggerServerAPIs trigger context related runtime apis and construct logs
-func triggerServerAPIs(api *compatibilitytestingframework.API, logs map[string][]compatibilitytestingframework.APILog) {
+func triggerServerAPIs(api *compatibilitytestingframework.API, logs map[compatibilitytestingframework.RuntimeAPIName][]compatibilitytestingframework.APILog) {
 	if api.Name == compatibilitytestingframework.AddServerAPIName {
 		log := triggerAddServerAPI(api)
 		logs[compatibilitytestingframework.AddServerAPIName] = append(logs[compatibilitytestingframework.AddServerAPIName], log)

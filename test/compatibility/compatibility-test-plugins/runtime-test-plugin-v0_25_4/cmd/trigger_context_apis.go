@@ -1,3 +1,6 @@
+// Copyright 2023 VMware, Inc. All Rights Reserved.
+// SPDX-License-Identifier: Apache-2.0
+
 package cmd
 
 import (
@@ -29,7 +32,7 @@ func triggerGetContextAPI(api *compatibilitytestingframework.API) compatibilityt
 		fmt.Println(err)
 	}
 
-	//Call runtime GetContextAPIName() API function
+	// Call runtime GetContext() API function
 	ctx, err := configlib.GetContext(ctxName)
 
 	// Construct logging
@@ -53,7 +56,7 @@ func triggerSetContextAPI(api *compatibilitytestingframework.API) compatibilityt
 	}
 	isCurrent := api.Arguments["isCurrent"].(bool)
 
-	// Call the runtime SetContextAPIName API function
+	// Call the runtime SetContext() API function
 	err = configlib.AddContext(ctx, isCurrent)
 
 	// Construct logging

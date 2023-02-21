@@ -31,7 +31,7 @@ type Result string
 
 const (
 	Success Result = "success"
-	Failed         = "failed"
+	Failed  Result = "failed"
 )
 
 // RuntimeAPIVersion represents the runtime library version
@@ -44,9 +44,9 @@ type RuntimeVersion string
 
 const (
 	Version0116 RuntimeVersion = "v0.11.6"
-	Version0254                = "v0.25.4"
-	Version0280                = "v0.28.0"
-	Version100                 = "v1.0.0"
+	Version0254 RuntimeVersion = "v0.25.4"
+	Version0280 RuntimeVersion = "v0.28.0"
+	Version100  RuntimeVersion = "v1.0.0"
 )
 
 // NewTestCase creates an instance of TestCase
@@ -76,8 +76,8 @@ type ResponseType string
 
 const (
 	MapResponse     ResponseType = "map"
-	BooleanResponse              = "bool"
-	StringResponse               = "str"
-	IntegerResponse              = "int"
-	ErrorResponse                = "err"
+	BooleanResponse ResponseType = "bool"
+	StringResponse  ResponseType = "str"
+	IntegerResponse ResponseType = "int"
+	ErrorResponse   ResponseType = "err"
 )

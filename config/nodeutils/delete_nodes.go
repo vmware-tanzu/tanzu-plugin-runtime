@@ -78,7 +78,7 @@ func deleteNodes(src, dst *yaml.Node, patchStrategyKey string, patchStrategies m
 			return errors.Wrap(err, "delete at key "+src.Content[0].Value)
 		}
 	default:
-		return errors.New("unknown node type: can only replace known node core")
+		return errors.New("unknown node type: can only replace known node types")
 	}
 	return nil
 }

@@ -7,7 +7,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	compatibilitytestingtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
+	compatibilitytestingcore "github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 	"gopkg.in/yaml.v3"
 )
 
@@ -19,13 +19,13 @@ var (
 		Short: "A test command that parse the file and trigger the runtime apis",
 		Run: func(cmd *cobra.Command, args []string) {
 			// Parse the file into array of apis struct
-			apis, err := compatibilitytestingtypes.ParseRuntimeAPIsFromFile(file)
+			apis, err := compatibilitytestingcore.ParseRuntimeAPIsFromFile(file)
 			if err != nil {
 				fmt.Println(err)
 			}
 
 			// mock config files
-			_, cleanUp := compatibilitytestingtypes.SetupTempCfgFiles()
+			_, cleanUp := compatibilitytestingcore.SetupTempCfgFiles()
 			defer func() {
 				cleanUp()
 			}()
@@ -40,7 +40,7 @@ func init() {
 }
 
 // runAPIs loop through the apis and trigger the runtime api methods and print logs to stdout
-func runAPIs(apis []compatibilitytestingtypes.API) {
+func runAPIs(apis []compatibilitytestingcore.API) {
 	logs := triggerAPIs(apis)
 
 	// Log the output to stdout

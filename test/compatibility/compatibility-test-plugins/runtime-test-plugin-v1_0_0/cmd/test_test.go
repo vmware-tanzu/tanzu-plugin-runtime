@@ -6,20 +6,20 @@ package cmd
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	compatibilitytestingframework "github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
+	compatibilitytestingcore "github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 )
 
 var _ = Describe("Test Root method", func() {
 
 	BeforeEach(func() {
-		compatibilitytestingframework.SetupTempCfgFiles()
+		compatibilitytestingcore.SetupTempCfgFiles()
 	})
 
 	Context("Test runAPIs", func() {
 
 		It("runAPIs with SetContext api data", func() {
 
-			apis, err := compatibilitytestingframework.ParseRuntimeAPIsFromFile("/var/folders/gw/3kzrkntn5rzbs4xhktdvdfjr0000gq/T/runtime_compatibility_testing4086182328")
+			apis, err := compatibilitytestingcore.ParseRuntimeAPIsFromFile("/var/folders/gw/3kzrkntn5rzbs4xhktdvdfjr0000gq/T/runtime_compatibility_testing4086182328")
 
 			Expect(err).To(BeNil())
 

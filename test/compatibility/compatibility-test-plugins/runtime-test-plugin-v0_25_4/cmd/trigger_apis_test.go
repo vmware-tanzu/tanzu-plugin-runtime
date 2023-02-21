@@ -1,3 +1,6 @@
+// Copyright 2023 VMware, Inc. All Rights Reserved.
+// SPDX-License-Identifier: Apache-2.0
+
 package cmd
 
 import (
@@ -5,23 +8,23 @@ import (
 	. "github.com/onsi/gomega"
 
 	configapi "github.com/vmware-tanzu/tanzu-framework/apis/config/v1alpha1"
-	compatibilitytestingframework "github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
+	compatibilitytestingcore "github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 )
 
 var _ = Describe("Test RunAPIs method", func() {
 
 	BeforeEach(func() {
-		compatibilitytestingframework.SetupTempCfgFiles()
+		compatibilitytestingcore.SetupTempCfgFiles()
 	})
 
 	Context("Test TriggerAPIs", func() {
 
 		It("using SetContextAPIName and GetContextAPIName", func() {
 
-			apis := []compatibilitytestingframework.API{
+			apis := []compatibilitytestingcore.API{
 				{
-					Name:    compatibilitytestingframework.SetContextAPIName,
-					Version: compatibilitytestingframework.Version100,
+					Name:    compatibilitytestingcore.SetContextAPIName,
+					Version: compatibilitytestingcore.Version100,
 					Arguments: map[string]interface{}{
 						"context": `name: context-one
 target: kubernetes
@@ -30,19 +33,19 @@ globalOpts:
 `,
 						"isCurrent": false,
 					},
-					Output: &compatibilitytestingframework.Output{
-						Result:  compatibilitytestingframework.Success,
+					Output: &compatibilitytestingcore.Output{
+						Result:  compatibilitytestingcore.Success,
 						Content: "",
 					},
 				},
 				{
-					Name:    compatibilitytestingframework.GetContextAPIName,
-					Version: compatibilitytestingframework.Version100,
+					Name:    compatibilitytestingcore.GetContextAPIName,
+					Version: compatibilitytestingcore.Version100,
 					Arguments: map[string]interface{}{
 						"contextName": "context-one",
 					},
-					Output: &compatibilitytestingframework.Output{
-						Result: compatibilitytestingframework.Success,
+					Output: &compatibilitytestingcore.Output{
+						Result: compatibilitytestingcore.Success,
 						Content: `name: context-one
 target: kubernetes
 globalOpts:
@@ -52,19 +55,19 @@ globalOpts:
 				},
 			}
 
-			expectedLogs := map[compatibilitytestingframework.RuntimeAPIName][]compatibilitytestingframework.APILog{
+			expectedLogs := map[compatibilitytestingcore.RuntimeAPIName][]compatibilitytestingcore.APILog{
 				"SetContextAPIName": {
 					{
-						APIResponse: &compatibilitytestingframework.APIResponse{
+						APIResponse: &compatibilitytestingcore.APIResponse{
 							ResponseBody: "",
-							ResponseType: compatibilitytestingframework.StringResponse,
+							ResponseType: compatibilitytestingcore.StringResponse,
 						},
 						APIError: "",
 					},
 				},
 				"GetContextAPIName": {
 					{
-						APIResponse: &compatibilitytestingframework.APIResponse{
+						APIResponse: &compatibilitytestingcore.APIResponse{
 							ResponseBody: &configapi.Context{
 								Name: "context-one",
 								Type: configapi.CtxTypeK8s,
@@ -72,7 +75,7 @@ globalOpts:
 									Endpoint: "test-endpoint",
 								},
 							},
-							ResponseType: compatibilitytestingframework.MapResponse,
+							ResponseType: compatibilitytestingcore.MapResponse,
 						},
 						APIError: "",
 					},
@@ -81,8 +84,8 @@ globalOpts:
 
 			logs := triggerAPIs(apis)
 
-			Expect(expectedLogs[compatibilitytestingframework.SetContextAPIName]).To(Equal(logs[compatibilitytestingframework.SetContextAPIName]))
-			Expect(expectedLogs[compatibilitytestingframework.GetContextAPIName]).To(Equal(logs[compatibilitytestingframework.GetContextAPIName]))
+			Expect(expectedLogs[compatibilitytestingcore.SetContextAPIName]).To(Equal(logs[compatibilitytestingcore.SetContextAPIName]))
+			Expect(expectedLogs[compatibilitytestingcore.GetContextAPIName]).To(Equal(logs[compatibilitytestingcore.GetContextAPIName]))
 		})
 	})
 })

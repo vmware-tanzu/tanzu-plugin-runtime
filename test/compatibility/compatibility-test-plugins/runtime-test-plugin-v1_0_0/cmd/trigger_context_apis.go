@@ -8,28 +8,28 @@ import (
 
 	configlib "github.com/vmware-tanzu/tanzu-plugin-runtime/config"
 	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
-	compatibilitytestingframework "github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
+	compatibilitytestingcore "github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 	"gopkg.in/yaml.v3"
 )
 
 // triggerContextAPIs trigger context related runtime apis and construct logs
-func triggerContextAPIs(api *compatibilitytestingframework.API, logs map[compatibilitytestingframework.RuntimeAPIName][]compatibilitytestingframework.APILog) {
+func triggerContextAPIs(api *compatibilitytestingcore.API, logs map[compatibilitytestingcore.RuntimeAPIName][]compatibilitytestingcore.APILog) {
 	// If API name is SetContext then trigger SetContext() API
-	if api.Name == compatibilitytestingframework.SetContextAPIName {
+	if api.Name == compatibilitytestingcore.SetContextAPIName {
 		log := triggerSetContextAPI(api)
-		logs[compatibilitytestingframework.SetContextAPIName] = append(logs[compatibilitytestingframework.SetContextAPIName], log)
+		logs[compatibilitytestingcore.SetContextAPIName] = append(logs[compatibilitytestingcore.SetContextAPIName], log)
 	}
 	// If API name is GetContext then trigger GetContext() API
-	if api.Name == compatibilitytestingframework.GetContextAPIName {
+	if api.Name == compatibilitytestingcore.GetContextAPIName {
 		log := triggerGetContextAPI(api)
-		logs[compatibilitytestingframework.GetContextAPIName] = append(logs[compatibilitytestingframework.GetContextAPIName], log)
+		logs[compatibilitytestingcore.GetContextAPIName] = append(logs[compatibilitytestingcore.GetContextAPIName], log)
 	}
 }
 
 // triggerGetContextAPI trigger get context runtime api
-func triggerGetContextAPI(api *compatibilitytestingframework.API) compatibilitytestingframework.APILog {
+func triggerGetContextAPI(api *compatibilitytestingcore.API) compatibilitytestingcore.APILog {
 	// Parse arguments needed to trigger the runtime api
-	ctxName, err := compatibilitytestingframework.ParseStr(api.Arguments["contextName"])
+	ctxName, err := compatibilitytestingcore.ParseStr(api.Arguments["contextName"])
 	if err != nil {
 		fmt.Println("triggerGetContextAPI1", err)
 	}
@@ -38,19 +38,19 @@ func triggerGetContextAPI(api *compatibilitytestingframework.API) compatibilityt
 	ctx, err := configlib.GetContext(ctxName)
 
 	// Construct logging
-	log := compatibilitytestingframework.APILog{}
+	log := compatibilitytestingcore.APILog{}
 	if err != nil {
 		log.APIError = err.Error()
-		log.APIResponse = &compatibilitytestingframework.APIResponse{
-			ResponseType: compatibilitytestingframework.ErrorResponse,
+		log.APIResponse = &compatibilitytestingcore.APIResponse{
+			ResponseType: compatibilitytestingcore.ErrorResponse,
 			ResponseBody: err.Error(),
 		}
 	}
 
 	if ctx != nil {
-		log.APIResponse = &compatibilitytestingframework.APIResponse{
+		log.APIResponse = &compatibilitytestingcore.APIResponse{
 			ResponseBody: ctx,
-			ResponseType: compatibilitytestingframework.MapResponse,
+			ResponseType: compatibilitytestingcore.MapResponse,
 		}
 	}
 
@@ -58,7 +58,7 @@ func triggerGetContextAPI(api *compatibilitytestingframework.API) compatibilityt
 }
 
 // triggerSetContextAPI trigger set context runtime api
-func triggerSetContextAPI(api *compatibilitytestingframework.API) compatibilitytestingframework.APILog {
+func triggerSetContextAPI(api *compatibilitytestingcore.API) compatibilitytestingcore.APILog {
 	// Parse arguments needed to trigger the runtime api
 	ctx, err := parseContext(api.Arguments["context"].(string))
 	if err != nil {
@@ -70,17 +70,17 @@ func triggerSetContextAPI(api *compatibilitytestingframework.API) compatibilityt
 	err = configlib.SetContext(ctx, isCurrent)
 
 	// Construct logging
-	log := compatibilitytestingframework.APILog{}
+	log := compatibilitytestingcore.APILog{}
 	if err != nil {
 		log.APIError = err.Error()
-		log.APIResponse = &compatibilitytestingframework.APIResponse{
-			ResponseType: compatibilitytestingframework.ErrorResponse,
+		log.APIResponse = &compatibilitytestingcore.APIResponse{
+			ResponseType: compatibilitytestingcore.ErrorResponse,
 			ResponseBody: err.Error(),
 		}
 	} else {
-		log.APIResponse = &compatibilitytestingframework.APIResponse{
+		log.APIResponse = &compatibilitytestingcore.APIResponse{
 			ResponseBody: "",
-			ResponseType: compatibilitytestingframework.StringResponse,
+			ResponseType: compatibilitytestingcore.StringResponse,
 		}
 	}
 

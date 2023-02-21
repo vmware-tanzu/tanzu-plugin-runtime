@@ -7,44 +7,44 @@ import (
 	. "github.com/onsi/gomega"
 	configtypes "github.com/vmware-tanzu/tanzu-framework/apis/config/v1alpha1"
 	configlib "github.com/vmware-tanzu/tanzu-framework/pkg/v1/config"
-	compatibilitytestingframework "github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
+	compatibilitytestingcore "github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 	"gopkg.in/yaml.v3"
 )
 
 // triggerServerAPIs trigger context related runtime apis and construct logs
-func triggerServerAPIs(api *compatibilitytestingframework.API, logs map[compatibilitytestingframework.RuntimeAPIName][]compatibilitytestingframework.APILog) {
-	if api.Name == compatibilitytestingframework.AddServerAPIName {
+func triggerServerAPIs(api *compatibilitytestingcore.API, logs map[compatibilitytestingcore.RuntimeAPIName][]compatibilitytestingcore.APILog) {
+	if api.Name == compatibilitytestingcore.AddServerAPIName {
 		log := triggerAddServerAPI(api)
-		logs[compatibilitytestingframework.AddServerAPIName] = append(logs[compatibilitytestingframework.AddServerAPIName], log)
+		logs[compatibilitytestingcore.AddServerAPIName] = append(logs[compatibilitytestingcore.AddServerAPIName], log)
 	}
-	if api.Name == compatibilitytestingframework.GetServerAPIName {
+	if api.Name == compatibilitytestingcore.GetServerAPIName {
 		log := triggerGetServerAPI(api)
-		logs[compatibilitytestingframework.GetServerAPIName] = append(logs[compatibilitytestingframework.GetServerAPIName], log)
+		logs[compatibilitytestingcore.GetServerAPIName] = append(logs[compatibilitytestingcore.GetServerAPIName], log)
 	}
 }
 
 // triggerGetServerAPI trigger get context runtime api
-func triggerGetServerAPI(api *compatibilitytestingframework.API) compatibilitytestingframework.APILog {
+func triggerGetServerAPI(api *compatibilitytestingcore.API) compatibilitytestingcore.APILog {
 	// Parse arguments needed to trigger the runtime api
-	serverName, err := compatibilitytestingframework.ParseStr(api.Arguments["serverName"])
+	serverName, err := compatibilitytestingcore.ParseStr(api.Arguments["serverName"])
 	Expect(err).To(BeNil())
 	//Call runtime GetServer API
 	server, err := configlib.GetServer(serverName)
 
 	// Construct logging
-	log := compatibilitytestingframework.APILog{}
+	log := compatibilitytestingcore.APILog{}
 	if err != nil {
 		log.APIError = err.Error()
 	}
-	log.APIResponse = &compatibilitytestingframework.APIResponse{
+	log.APIResponse = &compatibilitytestingcore.APIResponse{
 		ResponseBody: server,
-		ResponseType: compatibilitytestingframework.MapResponse,
+		ResponseType: compatibilitytestingcore.MapResponse,
 	}
 	return log
 }
 
 // triggerAddServerAPI trigger set context runtime api
-func triggerAddServerAPI(api *compatibilitytestingframework.API) compatibilitytestingframework.APILog {
+func triggerAddServerAPI(api *compatibilitytestingcore.API) compatibilitytestingcore.APILog {
 	// Parse arguments needed to trigger the runtime api
 	server, err := parseServer(api.Arguments["server"].(string))
 	Expect(err).To(BeNil())
@@ -54,13 +54,13 @@ func triggerAddServerAPI(api *compatibilitytestingframework.API) compatibilityte
 	err = configlib.AddServer(server, isCurrent)
 
 	// Construct logging
-	log := compatibilitytestingframework.APILog{}
+	log := compatibilitytestingcore.APILog{}
 	if err != nil {
 		log.APIError = err.Error()
 	}
-	log.APIResponse = &compatibilitytestingframework.APIResponse{
+	log.APIResponse = &compatibilitytestingcore.APIResponse{
 		ResponseBody: "",
-		ResponseType: compatibilitytestingframework.StringResponse,
+		ResponseType: compatibilitytestingcore.StringResponse,
 	}
 	return log
 }

@@ -4,13 +4,13 @@
 package cmd
 
 import (
-	compatibilitytestingtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
+	compatibilitytestingcore "github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 )
 
 // triggerAPIs trigger all runtime apis and construct logs as per specified array of apis
-func triggerAPIs(apis []compatibilitytestingtypes.API) map[compatibilitytestingtypes.RuntimeAPIName][]compatibilitytestingtypes.APILog {
+func triggerAPIs(apis []compatibilitytestingcore.API) map[compatibilitytestingcore.RuntimeAPIName][]compatibilitytestingcore.APILog {
 	// Variable used to store all the logging related to runtime api responses
-	logs := make(map[compatibilitytestingtypes.RuntimeAPIName][]compatibilitytestingtypes.APILog)
+	logs := make(map[compatibilitytestingcore.RuntimeAPIName][]compatibilitytestingcore.APILog)
 
 	// Loop through array of commands
 	for index := range apis {

@@ -13,9 +13,9 @@ func triggerAPIs(apis []compatibilitytestingtypes.API) map[compatibilitytestingt
 	logs := make(map[compatibilitytestingtypes.RuntimeAPIName][]compatibilitytestingtypes.APILog)
 
 	// Loop through array of commands
-	for _, api := range apis {
+	for index := range apis {
 		// Route to runtime API method call based on passed command value
-		triggerServerAPIs(&api, logs)
+		triggerServerAPIs(&apis[index], logs)
 	}
 	return logs
 }

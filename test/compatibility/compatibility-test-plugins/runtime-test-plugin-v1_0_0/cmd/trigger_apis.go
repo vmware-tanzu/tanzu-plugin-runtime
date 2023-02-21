@@ -13,9 +13,9 @@ func triggerAPIs(apis []core.API) map[core.RuntimeAPIName][]core.APILog {
 	logs := make(map[core.RuntimeAPIName][]core.APILog)
 
 	// Loop through array of commands
-	for _, api := range apis {
+	for index := range apis {
 		// Route to runtime API method call based on passed command value
-		triggerContextAPIs(&api, logs)
+		triggerContextAPIs(&apis[index], logs)
 	}
 
 	return logs

@@ -2,9 +2,10 @@ module github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/tests
 
 go 1.18
 
-replace github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core => ../core
-
-replace github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework => ../framework
+replace (
+	github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core => ../core
+	github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework => ../framework
+)
 
 require (
 	github.com/onsi/ginkgo v1.16.5

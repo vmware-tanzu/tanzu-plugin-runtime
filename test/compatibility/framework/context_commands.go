@@ -13,7 +13,7 @@ import (
 // NewSetContextCommand constructs a command to make a call to specific runtime version SetContext API
 // Input Parameter setContextInputOptions has all input parameters which are required for Runtime SetContextAPIName API
 // Input Parameter: setContextOutputOptions has details about expected output from Runtime SetContextAPIName API call
-// Return:  command to execute or error if any validations fails for SetContextInputOptions or SetContextOutputOptions
+// Return: command to execute or error if any validations fails for SetContextInputOptions or SetContextOutputOptions
 // This method does validate the input parameters  SetContextInputOptions/SetContextOutputOptions based on Runtime API Version
 // For more details about supported parameters refer to SetContextInputOptions/SetContextOutputOptions definition(and CtxOptions struct, which is embedded)
 func NewSetContextCommand(setContextInputOptions *SetContextInputOptions, setContextOutputOptions *SetContextOutputOptions) (*core.Command, error) {

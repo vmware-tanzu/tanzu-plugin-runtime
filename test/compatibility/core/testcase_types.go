@@ -56,7 +56,10 @@ func NewTestCase() *TestCase {
 
 // Add series of commands to test case to be executed in sequence
 func (t *TestCase) Add(command ...*Command) *TestCase {
-	t.Commands = append(t.Commands, command...)
+	if command != nil {
+		t.Commands = append(t.Commands, command...)
+		return t
+	}
 	return t
 }
 

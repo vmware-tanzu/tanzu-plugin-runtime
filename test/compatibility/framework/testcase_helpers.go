@@ -10,8 +10,9 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 	"gopkg.in/yaml.v3"
+
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 )
 
 const (

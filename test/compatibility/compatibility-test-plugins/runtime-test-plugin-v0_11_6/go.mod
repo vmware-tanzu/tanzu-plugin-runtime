@@ -1,4 +1,4 @@
-module runtime-test-plugin-v0_11_6
+module github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/compatibility-test-plugins/runtime-test-plugin-v0_11_6
 
 go 1.16
 

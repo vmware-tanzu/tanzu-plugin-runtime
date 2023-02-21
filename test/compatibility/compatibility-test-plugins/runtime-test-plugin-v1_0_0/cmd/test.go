@@ -7,8 +7,9 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	compatibilitytestingcore "github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 	"gopkg.in/yaml.v3"
+
+	compatibilitytestingcore "github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 )
 
 // testCmd represents the test command

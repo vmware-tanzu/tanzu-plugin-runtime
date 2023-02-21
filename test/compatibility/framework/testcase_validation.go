@@ -8,8 +8,9 @@ import (
 	"reflect"
 
 	. "github.com/onsi/gomega"
-	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 	"gopkg.in/yaml.v3"
+
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 )
 
 // ValidateAPIsOutput validate all the api expected output with actual output logs

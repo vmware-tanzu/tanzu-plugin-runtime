@@ -6,10 +6,11 @@ package cmd
 import (
 	"fmt"
 
+	"gopkg.in/yaml.v3"
+
 	configlib "github.com/vmware-tanzu/tanzu-plugin-runtime/config"
 	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 	compatibilitytestingcore "github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
-	"gopkg.in/yaml.v3"
 )
 
 // triggerContextAPIs trigger context related runtime apis and construct logs

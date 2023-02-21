@@ -4,10 +4,10 @@
 package framework
 
 import (
-	. "github.com/onsi/gomega"
 	"github.com/pkg/errors"
-	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 	"gopkg.in/yaml.v3"
+
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 )
 
 // NewSetContextCommand constructs a command to make a call to specific runtime version SetContext API
@@ -27,11 +27,15 @@ func NewSetContextCommand(setContextInputOptions *SetContextInputOptions, setCon
 
 	// Validate the SetContext Input Options
 	_, err := ValidateSetContextInputOptionsAsPerRuntimeVersion(setContextInputOptions)
-	Expect(err).To(BeNil())
+	if err != nil {
+		return nil, err
+	}
 
 	// Construct the set context api arguments and output
 	bytes, err := yaml.Marshal(setContextInputOptions.ContextOpts)
-	Expect(err).To(BeNil())
+	if err != nil {
+		return nil, err
+	}
 
 	// Construct the setCurrent Argument
 	var setCurrent bool
@@ -94,11 +98,15 @@ func NewGetContextCommand(getContextInputOptions *GetContextInputOptions, getCon
 	if getContextOutputOptions.ContextOpts != nil {
 		// Validate the Output Options
 		_, err := ValidateGetContextOutputOptionsAsPerRuntimeVersion(getContextOutputOptions)
-		Expect(err).To(BeNil())
+		if err != nil {
+			return nil, err
+		}
 
 		// Construct get context output context opts
 		bytes, err := yaml.Marshal(getContextOutputOptions.ContextOpts)
-		Expect(err).To(BeNil())
+		if err != nil {
+			return nil, err
+		}
 
 		content = string(bytes)
 		res = core.Success

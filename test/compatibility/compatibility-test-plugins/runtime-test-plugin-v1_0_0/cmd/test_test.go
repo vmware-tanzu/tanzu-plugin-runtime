@@ -6,14 +6,15 @@ package cmd
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+
 	compatibilitytestingcore "github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 )
 
 var _ = Describe("Test Root method", func() {
 
-	BeforeEach(func() {
-		compatibilitytestingcore.SetupTempCfgFiles()
-	})
+	//BeforeEach(func() {
+	//	compatibilitytestingcore.SetupTempCfgFiles()
+	//})
 
 	Context("Test runAPIs", func() {
 

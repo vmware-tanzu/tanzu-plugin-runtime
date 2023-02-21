@@ -11,6 +11,7 @@ GOOS ?= $(shell go env GOOS)
 GOARCH ?= $(shell go env GOARCH)
 GOHOSTOS ?= $(shell go env GOHOSTOS)
 GOHOSTARCH ?= $(shell go env GOHOSTARCH)
+GOTEST_VERBOSE ?= -v
 
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
 ifeq (,$(shell go env GOBIN))
@@ -54,6 +55,10 @@ all: modules test lint ## ## Run all major targets (lint, test, modules)
 test: fmt ## Run Tests
 	make -C test/plugins all
 	${GO} test ./... -timeout 60m -race -coverprofile coverage.txt -v
+
+.PHONY: compatibility-tests
+compatibility-tests: ## Run Compatibility tests
+	${GO} test ./test/compatibility/tests/... -timeout 60m -race -coverprofile compatibility-coverage.txt ${GOTEST_VERBOSE} ; \
 
 .PHONY: fmt
 fmt: $(GOIMPORTS) ## Run goimports
@@ -118,14 +123,9 @@ clean: ## Remove all generated binaries
 
 GO_MODULES=$(shell find . -path "*/go.mod" | xargs -I _ dirname _)
 
-.PHONY: compatibility
-compatibility: ## Runs go mod to ensure modules are up to date.
-	@for i in $(GO_MODULES); do \
-  		echo "-- Building plugins $$i --"; \
-  		pushd $${i}; \
-  		popd; \
-        $(GO) mod tidy || exit 1; \
-        if [-$$i = "./test/compatibility/compatibility-test-plugins/runtime-test-plugin-v0.11.6"]; then \
-       		echo "-- Building compatibility plugins $$i --"; \
-        fi \
-	done
+.PHONY: build-runtime-compatibility-test-plugin
+build-runtime-compatibility-test-plugin: ## Builds all runtime compatibility test plugins
+	cd ./test/compatibility/compatibility-test-plugins/runtime-test-plugin-v0_11_6 && ${GO} build
+	cd ./test/compatibility/compatibility-test-plugins/runtime-test-plugin-v0_25_4 && ${GO} build
+	cd ./test/compatibility/compatibility-test-plugins/runtime-test-plugin-v0_28_0 && ${GO} build
+	cd ./test/compatibility/compatibility-test-plugins/runtime-test-plugin-v1_0_0 && ${GO} build

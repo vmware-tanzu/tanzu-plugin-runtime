@@ -10,21 +10,21 @@ import (
 	"os/exec"
 	"strings"
 
-	. "github.com/onsi/gomega"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 	"gopkg.in/yaml.v3"
 )
 
 const (
 	pluginRoot = "../compatibility-test-plugins"
 
-	pluginV011 = "runtime-test-plugin-0-11"
-	pluginV025 = "runtime-test-plugin-0-25"
-	pluginV028 = "runtime-test-plugin-0-28"
-	pluginV100 = "runtime-test-plugin-1-00"
+	pluginV0116 = "runtime-test-plugin-v0_11_6"
+	pluginV0254 = "runtime-test-plugin-v0_25_4"
+	pluginV0280 = "runtime-test-plugin-v0_28_0"
+	pluginV100  = "runtime-test-plugin-v1_0_0"
 )
 
-// constructTestPluginCmd constructs the specific runtime test plugin command as per runtime version and apis
-func constructTestPluginCmd(version RuntimeVersion, apis []*API) (string, error) {
+// ConstructTestPluginCmd constructs the specific runtime test plugin command as per runtime version and apis
+func ConstructTestPluginCmd(version core.RuntimeVersion, apis []*core.API) (string, error) {
 
 	// Create root command for the specified runtime version
 	pluginCommand := makeRootCommand(version)
@@ -42,15 +42,15 @@ func constructTestPluginCmd(version RuntimeVersion, apis []*API) (string, error)
 }
 
 // makeRootCommand construct the root runtime test plugin command as per runtime version specified
-func makeRootCommand(version RuntimeVersion) string {
+func makeRootCommand(version core.RuntimeVersion) string {
 	switch version {
-	case Version0116:
-		return pluginRoot + "/" + pluginV011 + "/" + pluginV011 + " test"
-	case Version0254:
-		return pluginRoot + "/" + pluginV025 + "/" + pluginV025 + " test"
-	case Version0280:
-		return pluginRoot + "/" + pluginV028 + "/" + pluginV028 + " test"
-	case Version100:
+	case core.Version0116:
+		return pluginRoot + "/" + pluginV0116 + "/" + pluginV0116 + " test"
+	case core.Version0254:
+		return pluginRoot + "/" + pluginV0254 + "/" + pluginV0254 + " test"
+	case core.Version0280:
+		return pluginRoot + "/" + pluginV0280 + "/" + pluginV0280 + " test"
+	case core.Version100:
 		return pluginRoot + "/" + pluginV100 + "/" + pluginV100 + " test"
 	default:
 		return pluginRoot + "/" + pluginV100 + "/" + pluginV100 + " test"
@@ -58,7 +58,7 @@ func makeRootCommand(version RuntimeVersion) string {
 }
 
 // writeAPIsToTempFile create a temp file with all the api data
-func writeAPIsToTempFile(apis []*API) (string, error) {
+func writeAPIsToTempFile(apis []*core.API) (string, error) {
 	b, err := yaml.Marshal(apis)
 	if err != nil {
 		return "", err
@@ -94,8 +94,8 @@ func Exec(command string) (stdOut, stdErr *bytes.Buffer, err error) {
 	return &stdout, &stderr, nil
 }
 
-// strToMap convert str represented struct data to map
-func strToMap(s string) map[string]interface{} {
+// StrToMap convert str represented struct data to map
+func StrToMap(s string) map[string]interface{} {
 	var mapper map[string]interface{}
 
 	err := yaml.Unmarshal([]byte(s), &mapper)
@@ -103,39 +103,4 @@ func strToMap(s string) map[string]interface{} {
 		fmt.Println(err)
 	}
 	return mapper
-}
-
-// SetupTempCfgFiles mock runtime config files
-func SetupTempCfgFiles() (files []*os.File, cleanup func()) {
-	// Setup config data
-	cfgFile, err := os.CreateTemp("", "tanzu_config")
-
-	err = os.WriteFile(cfgFile.Name(), []byte{}, 0644)
-
-	err = os.Setenv("TANZU_CONFIG", cfgFile.Name())
-
-	cfgNextGenFile, err := os.CreateTemp("", "tanzu_config_ng")
-
-	err = os.WriteFile(cfgNextGenFile.Name(), []byte{}, 0644)
-
-	err = os.Setenv("TANZU_CONFIG_NEXT_GEN", cfgNextGenFile.Name())
-
-	cfgMetadataFile, err := os.CreateTemp("", "tanzu_config_metadata")
-
-	err = os.WriteFile(cfgMetadataFile.Name(), []byte{}, 0644)
-
-	err = os.Setenv("TANZU_CONFIG_METADATA", cfgMetadataFile.Name())
-
-	cleanup = func() {
-		err = os.Remove(cfgFile.Name())
-		Expect(err).To(BeNil())
-
-		err = os.Remove(cfgNextGenFile.Name())
-		Expect(err).To(BeNil())
-
-		err = os.Remove(cfgMetadataFile.Name())
-		Expect(err).To(BeNil())
-	}
-
-	return []*os.File{cfgFile, cfgNextGenFile, cfgMetadataFile}, cleanup
 }

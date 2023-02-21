@@ -101,7 +101,7 @@ func setDiscoverySource(discoverySourcesNode *yaml.Node, discoverySource configt
 		} else if discoverySourceIndexOfAnyType != -1 || discoverySourceIndexOfExactType != -1 {
 			if isSameNameAlreadyExists {
 				exists = true
-				// Since merging discovery sources of different discovery source types we need to replace the nodes of different discovery type
+				// Since merging discovery sources of different discovery source core we need to replace the nodes of different discovery type
 				options := &nodeutils.PatchStrategyOptions{}
 				for _, opt := range patchStrategyOpts {
 					opt(options)

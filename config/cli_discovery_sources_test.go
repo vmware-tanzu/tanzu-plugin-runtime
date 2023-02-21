@@ -658,7 +658,7 @@ func TestSetCLIDiscoverySourceMultiTypes(t *testing.T) {
 	}{
 
 		{
-			name: "success add multiple discovery source types",
+			name: "success add multiple discovery source core",
 			input: []configtypes.PluginDiscovery{
 				{
 					GCP: &configtypes.GCPDiscovery{

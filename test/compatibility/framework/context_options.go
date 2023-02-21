@@ -3,21 +3,25 @@
 
 package framework
 
+import (
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
+)
+
 type GetContextInputOptions struct {
-	*RuntimeAPIVersion        // required
-	ContextName        string // required
+	*core.RuntimeAPIVersion        // required
+	ContextName             string // required
 }
 
 type GetContextOutputOptions struct {
-	*RuntimeAPIVersion        // required
-	*ContextOpts              // For specific version options look into ContextOpts definition
-	Error              string // expected error message could be the sub string of actual error message
+	*core.RuntimeAPIVersion        // required
+	*ContextOpts                   // For specific version options look into ContextOpts definition
+	Error                   string // expected error message could be the sub string of actual error message
 }
 
 type SetContextInputOptions struct {
-	*RuntimeAPIVersion      // required
-	*ContextOpts            // required
-	IsCurrentContext   bool // required
+	*core.RuntimeAPIVersion      // required
+	*ContextOpts                 // required
+	IsCurrentContext        bool // required
 }
 
 type SetContextOutputOptions struct {
@@ -25,8 +29,8 @@ type SetContextOutputOptions struct {
 }
 
 type DeleteContextInputOptions struct {
-	*RuntimeAPIVersion        // required
-	ContextName        string // required
+	*core.RuntimeAPIVersion        // required
+	ContextName             string // required
 }
 
 type DeleteContextOutputOptions struct {

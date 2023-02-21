@@ -5,12 +5,13 @@ package framework
 
 import (
 	. "github.com/onsi/gomega"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 )
 
 // Execute the list of commands from the testcase and validate the expected output with actual output and return err if output doesn't match
-func (t *TestCase) Execute() {
+func Execute(t *core.TestCase) {
 	// Mock the config files CFG, CFG_NG and META
-	_, cleanUp := SetupTempCfgFiles()
+	_, cleanUp := core.SetupTempCfgFiles()
 
 	// Clean up the mock config files after execution is complete
 	defer func() {
@@ -22,7 +23,7 @@ func (t *TestCase) Execute() {
 		for _, api := range cmd.APIs {
 
 			// Construct the runtime-test-plugin-x_xx command to execute
-			pluginCommand, err := constructTestPluginCmd(api.Version, cmd.APIs)
+			pluginCommand, err := ConstructTestPluginCmd(api.Version, cmd.APIs)
 			Expect(err).To(BeNil())
 
 			// Execute the constructed runtime-test-plugin-x_xx command

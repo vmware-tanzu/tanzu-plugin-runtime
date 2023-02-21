@@ -6,6 +6,7 @@ package framework
 import (
 	. "github.com/onsi/gomega"
 	"github.com/pkg/errors"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 	"gopkg.in/yaml.v3"
 )
 
@@ -15,13 +16,13 @@ import (
 // Return:  command to execute or error if any validations fails for SetContextInputOptions or SetContextOutputOptions
 // This method does validate the input parameters  SetContextInputOptions/SetContextOutputOptions based on Runtime API Version
 // For more details about supported parameters refer to SetContextInputOptions/SetContextOutputOptions definition(and CtxOptions struct, which is embedded).
-func NewSetContextCommand(setContextInputOptions *SetContextInputOptions, setContextOutputOptions *SetContextOutputOptions) (*Command, error) {
+func NewSetContextCommand(setContextInputOptions *SetContextInputOptions, setContextOutputOptions *SetContextOutputOptions) (*core.Command, error) {
 	// Init the Command object
-	c := &Command{}
+	c := &core.Command{}
 
 	// Init the API object
-	api := &API{}
-	api.Name = SetContextAPIName
+	api := &core.API{}
+	api.Name = core.SetContextAPIName
 	api.Version = setContextInputOptions.RuntimeVersion
 
 	// Validate the SetContext Input Options
@@ -46,17 +47,17 @@ func NewSetContextCommand(setContextInputOptions *SetContextInputOptions, setCon
 	}
 
 	// Construct Output parameters
-	var res Result
+	var res core.Result
 	var content string
 
 	if setContextOutputOptions != nil && setContextOutputOptions.Error != "" {
-		res = Failed
+		res = core.Failed
 		content = setContextOutputOptions.Error
 	} else {
-		res = Success
+		res = core.Success
 		content = ""
 	}
-	api.Output = &Output{
+	api.Output = &core.Output{
 		Result:  res,
 		Content: content,
 	}
@@ -68,12 +69,12 @@ func NewSetContextCommand(setContextInputOptions *SetContextInputOptions, setCon
 
 // NewGetContextCommand creates a get context command object from inputOptions and outputOptions
 // Creates the context specific command based on runtimeVersion passed in inputOptions also validates if the required input and outputOptions are passed
-func NewGetContextCommand(getContextInputOptions *GetContextInputOptions, getContextOutputOptions *GetContextOutputOptions) (*Command, error) {
+func NewGetContextCommand(getContextInputOptions *GetContextInputOptions, getContextOutputOptions *GetContextOutputOptions) (*core.Command, error) {
 	// Init the Command object
-	c := &Command{}
+	c := &core.Command{}
 	// Init the API object
-	api := &API{}
-	api.Name = GetContextAPIName
+	api := &core.API{}
+	api.Name = core.GetContextAPIName
 	api.Version = getContextInputOptions.RuntimeVersion
 
 	// Validate the Input Options
@@ -87,7 +88,7 @@ func NewGetContextCommand(getContextInputOptions *GetContextInputOptions, getCon
 	}
 
 	// Construct Output parameters
-	var res Result
+	var res core.Result
 	var content string
 
 	if getContextOutputOptions.ContextOpts != nil {
@@ -100,13 +101,13 @@ func NewGetContextCommand(getContextInputOptions *GetContextInputOptions, getCon
 		Expect(err).To(BeNil())
 
 		content = string(bytes)
-		res = Success
+		res = core.Success
 	} else if getContextOutputOptions.Error != "" {
-		res = Failed
+		res = core.Failed
 		content = getContextOutputOptions.Error
 	}
 
-	api.Output = &Output{
+	api.Output = &core.Output{
 		Result:  res,
 		Content: content,
 	}

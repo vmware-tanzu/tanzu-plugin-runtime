@@ -7,20 +7,21 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 )
 
 // ValidateSetContextInputOptionsAsPerRuntimeVersion validate the setContextInputOptions as per runtime version i.e. check whether mandatory fields are set and throw error if missing
 func ValidateSetContextInputOptionsAsPerRuntimeVersion(setContextInputOptions *SetContextInputOptions) (bool, error) {
 	var valid bool
 	switch setContextInputOptions.RuntimeVersion {
-	case Version100, Version0280:
+	case core.Version100, core.Version0280:
 		valid = setContextInputOptions.ValidName() && setContextInputOptions.ValidTarget() && setContextInputOptions.ValidGlobalOptsOrClusterOpts()
 		if valid {
 			return valid, nil
 		}
 		return valid, errors.New(fmt.Sprintf("invalid set context input options for the specified runtime version %v", setContextInputOptions.RuntimeVersion))
 
-	case Version0254:
+	case core.Version0254:
 		valid = setContextInputOptions.ValidName() && setContextInputOptions.ValidContextType() && setContextInputOptions.ValidGlobalOptsOrClusterOpts()
 		if valid {
 			return valid, nil
@@ -35,13 +36,13 @@ func ValidateSetContextInputOptionsAsPerRuntimeVersion(setContextInputOptions *S
 func ValidateGetContextOutputOptionsAsPerRuntimeVersion(getContextOutputOptions *GetContextOutputOptions) (bool, error) {
 	var valid bool
 	switch getContextOutputOptions.RuntimeVersion {
-	case Version100, Version0280:
+	case core.Version100, core.Version0280:
 		valid = getContextOutputOptions.ShouldNotIncludeContextType()
 		if valid {
 			return valid, nil
 		}
 		return valid, errors.New(fmt.Sprintf("invalid get context ouput options for the specified runtime version contextType is not supported %v", getContextOutputOptions.RuntimeVersion))
-	case Version0254:
+	case core.Version0254:
 		valid = getContextOutputOptions.ShouldNotIncludeTarget()
 		if valid {
 			return valid, nil

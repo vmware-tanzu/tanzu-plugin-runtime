@@ -115,3 +115,17 @@ $(TOOLING_BINARIES):
 .PHONY: clean
 clean: ## Remove all generated binaries
 	make -C test/plugins clean
+
+GO_MODULES=$(shell find . -path "*/go.mod" | xargs -I _ dirname _)
+
+.PHONY: compatibility
+compatibility: ## Runs go mod to ensure modules are up to date.
+	@for i in $(GO_MODULES); do \
+  		echo "-- Building plugins $$i --"; \
+  		pushd $${i}; \
+  		popd; \
+        $(GO) mod tidy || exit 1; \
+        if [-$$i = "./test/compatibility/compatibility-test-plugins/runtime-test-plugin-v0.11.6"]; then \
+       		echo "-- Building compatibility plugins $$i --"; \
+        fi \
+	done

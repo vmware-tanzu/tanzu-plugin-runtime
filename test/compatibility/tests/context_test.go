@@ -6,6 +6,7 @@ package tests_test
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework"
 )
 
@@ -15,8 +16,8 @@ var _ = Describe("Context API", func() {
 		It("Runtime V100 SetContext API", func() {
 			// Input Parameters for Runtime SetContext API
 			setContextInputOptions := &framework.SetContextInputOptions{
-				RuntimeAPIVersion: &framework.RuntimeAPIVersion{
-					RuntimeVersion: framework.Version100,
+				RuntimeAPIVersion: &core.RuntimeAPIVersion{
+					RuntimeVersion: core.Version100,
 				},
 				ContextOpts: &framework.ContextOpts{
 					Name:   "context-one",
@@ -35,26 +36,26 @@ var _ = Describe("Context API", func() {
 			Expect(err).To(BeNil())
 
 			// Construct series of commands to execute
-			testCase := framework.NewTestCase().Add(setContextCommand) // re-named from NewTestCommands
+			testCase := core.NewTestCase().Add(setContextCommand) // re-named from NewTestCommands
 
 			// Executes the commands from the list and validates the expected output with actual output and return err if output doesn't match
-			testCase.Execute()
+			framework.Execute(testCase)
 		})
 
 		It("Runtime V0280 GetContext API", func() {
 
 			// Input Parameters for Runtime GetContext API
 			getContextInputOptions := &framework.GetContextInputOptions{
-				RuntimeAPIVersion: &framework.RuntimeAPIVersion{
-					RuntimeVersion: framework.Version0280,
+				RuntimeAPIVersion: &core.RuntimeAPIVersion{
+					RuntimeVersion: core.Version0280,
 				},
 				ContextName: "context-one",
 			}
 
 			// Output Parameters for Runtime GetContext API
 			getContextOutputOptions := &framework.GetContextOutputOptions{
-				RuntimeAPIVersion: &framework.RuntimeAPIVersion{
-					RuntimeVersion: framework.Version0280,
+				RuntimeAPIVersion: &core.RuntimeAPIVersion{
+					RuntimeVersion: core.Version0280,
 				},
 				Error: "context context-one not found",
 			}
@@ -64,17 +65,17 @@ var _ = Describe("Context API", func() {
 			Expect(err).To(BeNil())
 
 			// Construct series of commands to execute
-			testCase := framework.NewTestCase().Add(getContextCommand) // re-named from NewTestCommands
+			testCase := core.NewTestCase().Add(getContextCommand) // re-named from NewTestCommands
 
 			// Executes the commands from the list and validates the expected output with actual output and return err if output doesn't match
-			testCase.Execute()
+			framework.Execute(testCase)
 		})
 
 		It("SetContext v0.28.0 SetContext v0.28.0(Unsetting ClusterOpts.Endpoint) GetContext v0.28.0", func() {
 			// Input Parameters for Runtime SetContext API V0.28.0
 			setContextInputOptions := &framework.SetContextInputOptions{
-				RuntimeAPIVersion: &framework.RuntimeAPIVersion{
-					RuntimeVersion: framework.Version0280,
+				RuntimeAPIVersion: &core.RuntimeAPIVersion{
+					RuntimeVersion: core.Version0280,
 				},
 				ContextOpts: &framework.ContextOpts{
 					Name:   "context-one",
@@ -88,8 +89,8 @@ var _ = Describe("Context API", func() {
 
 			// Input Parameters for Runtime SetContext API V0.28.0 With ClusterOpts.Endpoint unset
 			setContextInputOptionsWithEndpointUnset := &framework.SetContextInputOptions{
-				RuntimeAPIVersion: &framework.RuntimeAPIVersion{
-					RuntimeVersion: framework.Version0280,
+				RuntimeAPIVersion: &core.RuntimeAPIVersion{
+					RuntimeVersion: core.Version0280,
 				},
 				ContextOpts: &framework.ContextOpts{
 					Name:   "context-one",
@@ -111,16 +112,16 @@ var _ = Describe("Context API", func() {
 
 			// Input Parameters for Runtime GetContext API
 			getContextInputOptions := &framework.GetContextInputOptions{
-				RuntimeAPIVersion: &framework.RuntimeAPIVersion{
-					RuntimeVersion: framework.Version0280,
+				RuntimeAPIVersion: &core.RuntimeAPIVersion{
+					RuntimeVersion: core.Version0280,
 				},
 				ContextName: "context-one",
 			}
 
 			// Output Parameters for Runtime GetContext API
 			getContextOutputOptions := &framework.GetContextOutputOptions{
-				RuntimeAPIVersion: &framework.RuntimeAPIVersion{
-					RuntimeVersion: framework.Version0280,
+				RuntimeAPIVersion: &core.RuntimeAPIVersion{
+					RuntimeVersion: core.Version0280,
 				},
 				ContextOpts: &framework.ContextOpts{
 					Name:   "context-one",
@@ -133,8 +134,8 @@ var _ = Describe("Context API", func() {
 			}
 
 			getContextOutputOptionsWithEndpointNotExpected := &framework.GetContextOutputOptions{
-				RuntimeAPIVersion: &framework.RuntimeAPIVersion{
-					RuntimeVersion: framework.Version0280,
+				RuntimeAPIVersion: &core.RuntimeAPIVersion{
+					RuntimeVersion: core.Version0280,
 				},
 				ContextOpts: &framework.ContextOpts{
 					Name:   "context-one",
@@ -154,21 +155,21 @@ var _ = Describe("Context API", func() {
 			Expect(err).To(BeNil())
 
 			// Construct series of commands to execute
-			testCase1 := framework.NewTestCase().Add(setContextCommand).Add(setContextCommandWithEndpointUnset).Add(getContextCommand)
+			testCase1 := core.NewTestCase().Add(setContextCommand).Add(setContextCommandWithEndpointUnset).Add(getContextCommand)
 			// Executes the commands from the list and validates the expected output with actual output
-			testCase1.Execute() // This execution fails since ClusterOpts.Endpoint is unset in setContextCommandWithEndpointUnset but expected in getContextCommand
+			framework.Execute(testCase1) // This execution fails since ClusterOpts.Endpoint is unset in setContextCommandWithEndpointUnset but expected in getContextCommand
 
-			testCase2 := framework.NewTestCase().Add(setContextCommand).Add(setContextCommandWithEndpointUnset).Add(getContextCommandWithEndpointNotExpected)
+			testCase2 := core.NewTestCase().Add(setContextCommand).Add(setContextCommandWithEndpointUnset).Add(getContextCommandWithEndpointNotExpected)
 			// Executes the commands from the list and validates the expected output with actual output
-			testCase2.Execute() // This execution succeeds since ClusterOpts.Endpoint is unset in setContextCommandWithEndpointUnset and not expected in getContextCommandWithEndpointNotExpected
+			framework.Execute(testCase2) // This execution succeeds since ClusterOpts.Endpoint is unset in setContextCommandWithEndpointUnset and not expected in getContextCommandWithEndpointNotExpected
 
 		})
 
 		It("Run Runtime V100 SetContext API and Runtime V0280 GetContext API", func() {
 			// Input Parameters for Runtime SetContext API
 			setContextInputOptions := &framework.SetContextInputOptions{
-				RuntimeAPIVersion: &framework.RuntimeAPIVersion{
-					RuntimeVersion: framework.Version100,
+				RuntimeAPIVersion: &core.RuntimeAPIVersion{
+					RuntimeVersion: core.Version100,
 				},
 				ContextOpts: &framework.ContextOpts{
 					Name:   "context-one",
@@ -184,8 +185,8 @@ var _ = Describe("Context API", func() {
 
 			// Input Parameters for Runtime GetContext API
 			getContextInputOptions := &framework.GetContextInputOptions{
-				RuntimeAPIVersion: &framework.RuntimeAPIVersion{
-					RuntimeVersion: framework.Version100,
+				RuntimeAPIVersion: &core.RuntimeAPIVersion{
+					RuntimeVersion: core.Version100,
 				},
 				ContextName: "context-one",
 			}
@@ -211,18 +212,18 @@ var _ = Describe("Context API", func() {
 
 			// Construct series of commands to execute
 
-			testCase := framework.NewTestCase().Add(setContextCommand).Add(getContextCommand) // re-named from NewTestCommands
+			testCase := core.NewTestCase().Add(setContextCommand).Add(getContextCommand) // re-named from NewTestCommands
 
 			// Executes the commands from the list and validates the expected output with actual output and return err if output doesn't match
-			testCase.Execute()
+			framework.Execute(testCase)
 		})
 
 		It("SetContext v1.0.0 then GetContext v0.28.0", func() {
 
 			// Input Parameters for Runtime SetContextAPIName API
 			setContextInputOptions := &framework.SetContextInputOptions{
-				RuntimeAPIVersion: &framework.RuntimeAPIVersion{
-					RuntimeVersion: framework.Version100,
+				RuntimeAPIVersion: &core.RuntimeAPIVersion{
+					RuntimeVersion: core.Version100,
 				},
 				ContextOpts: &framework.ContextOpts{
 					Name:   "context-one",
@@ -238,16 +239,16 @@ var _ = Describe("Context API", func() {
 
 			// Input Parameters for Runtime GetContextAPIName API
 			getContextInputOptions := &framework.GetContextInputOptions{
-				RuntimeAPIVersion: &framework.RuntimeAPIVersion{
-					RuntimeVersion: framework.Version0280,
+				RuntimeAPIVersion: &core.RuntimeAPIVersion{
+					RuntimeVersion: core.Version0280,
 				},
 				ContextName: "context-one",
 			}
 
 			// Output Parameters for Runtime GetContextAPIName API
 			getContextOutputOptions := &framework.GetContextOutputOptions{
-				RuntimeAPIVersion: &framework.RuntimeAPIVersion{
-					RuntimeVersion: framework.Version0280,
+				RuntimeAPIVersion: &core.RuntimeAPIVersion{
+					RuntimeVersion: core.Version0280,
 				},
 				ContextOpts: &framework.ContextOpts{
 					Name:   "context-one",
@@ -267,18 +268,18 @@ var _ = Describe("Context API", func() {
 			Expect(err).To(BeNil())
 
 			// Construct series of commands to execute
-			testCase := framework.NewTestCase().Add(setContextCommand).Add(getContextCommand) // re-named from NewTestCommands
+			testCase := core.NewTestCase().Add(setContextCommand).Add(getContextCommand) // re-named from NewTestCommands
 
 			// Executes the commands from the list and validates the expected output with actual output
-			testCase.Execute()
+			framework.Execute(testCase)
 		})
 
 		It("SetContextAPIName v0.25.4 then GetContextAPIName v0.28.0", func() {
 
 			// Input Parameters for Runtime SetContextAPIName API
 			setContextInputOptions := &framework.SetContextInputOptions{
-				RuntimeAPIVersion: &framework.RuntimeAPIVersion{
-					RuntimeVersion: framework.Version0254,
+				RuntimeAPIVersion: &core.RuntimeAPIVersion{
+					RuntimeVersion: core.Version0254,
 				},
 				ContextOpts: &framework.ContextOpts{
 					Name: "context-one",
@@ -295,8 +296,8 @@ var _ = Describe("Context API", func() {
 
 			// Input Parameters for Runtime GetContextAPIName API
 			getContextInputOptions := &framework.GetContextInputOptions{
-				RuntimeAPIVersion: &framework.RuntimeAPIVersion{
-					RuntimeVersion: framework.Version0280,
+				RuntimeAPIVersion: &core.RuntimeAPIVersion{
+					RuntimeVersion: core.Version0280,
 				},
 				ContextName: "context-one",
 			}
@@ -321,10 +322,10 @@ var _ = Describe("Context API", func() {
 			Expect(err).To(BeNil())
 
 			// Construct series of commands to execute
-			testCase := framework.NewTestCase().Add(setContextCommand).Add(getContextCommand) // re-named from NewTestCommands
+			testCase := core.NewTestCase().Add(setContextCommand).Add(getContextCommand) // re-named from NewTestCommands
 
 			// Executes the commands from the list and validates the expected output with actual output
-			testCase.Execute()
+			framework.Execute(testCase)
 		})
 	})
 })

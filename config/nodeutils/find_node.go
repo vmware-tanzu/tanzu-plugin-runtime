@@ -43,7 +43,7 @@ func getNode(node *yaml.Node, key string) *yaml.Node {
 	return foundNode
 }
 
-// GetNodeIndex retrieves node index of specific node object value; yaml nodes are stored in arrays for all value types.
+// GetNodeIndex retrieves node index of specific node object value; yaml nodes are stored in arrays for all value core.
 // Ex: refer https://pkg.go.dev/gopkg.in/yaml.v3#pkg-overview
 func GetNodeIndex(node []*yaml.Node, key string) int {
 	appIdx := -1

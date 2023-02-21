@@ -8,25 +8,26 @@ import (
 	"reflect"
 
 	. "github.com/onsi/gomega"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 	"gopkg.in/yaml.v3"
 )
 
 // ValidateAPIsOutput validate all the api expected output with actual output logs
-func ValidateAPIsOutput(apis []*API, stdout string) {
+func ValidateAPIsOutput(apis []*core.API, stdout string) {
 	// Construct logs
 	logs := unmarshallStdout(stdout)
 	for _, api := range apis {
 		for _, log := range logs[api.Name] {
-			if log.APIResponse.ResponseType == StringResponse {
+			if log.APIResponse.ResponseType == core.StringResponse {
 				actual := fmt.Sprintf("%v", log.APIResponse.ResponseBody)
 				expected := api.Output.Content
 				Expect(actual).To(Equal(expected))
-			} else if log.APIResponse.ResponseType == MapResponse {
+			} else if log.APIResponse.ResponseType == core.MapResponse {
 				actual := log.APIResponse.ResponseBody
-				expected := strToMap(api.Output.Content)
+				expected := StrToMap(api.Output.Content)
 				Expect(actual).To(Equal(expected))
 				Expect(reflect.DeepEqual(actual, expected)).To(Equal(true))
-			} else if log.APIResponse.ResponseType == ErrorResponse {
+			} else if log.APIResponse.ResponseType == core.ErrorResponse {
 				//Check for errors
 				actual := log.APIError
 				expected := api.Output.Content
@@ -37,8 +38,8 @@ func ValidateAPIsOutput(apis []*API, stdout string) {
 }
 
 // unmarshallStdout convert the string represented std out log into map structure
-func unmarshallStdout(s string) map[RuntimeAPIName][]APILog {
-	var logs map[RuntimeAPIName][]APILog
+func unmarshallStdout(s string) map[core.RuntimeAPIName][]core.APILog {
+	var logs map[core.RuntimeAPIName][]core.APILog
 
 	err := yaml.Unmarshal([]byte(s), &logs)
 	Expect(err).To(BeNil())

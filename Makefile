@@ -132,8 +132,8 @@ build-compatibility-test-plugins: ## Builds all runtime compatibility test plugi
 
 .PHONY: compatibility-tests
 compatibility-tests: ## Run Compatibility tests
-	cd ./test/compatibility/compatibility-tests && ${GO} test -timeout 60m -race -coverprofile compatibility-coverage.txt ${GOTEST_VERBOSE} ; \
+	cd ./test/compatibility/compatibility-tests && ${GO} test -timeout 60m -race ${GOTEST_VERBOSE} ; \
 
 .PHONY: build-run-compatibility-tests
 build-run-compatibility-tests: build-compatibility-test-plugins ## Build and Run Compatibility tests
-	cd ./test/compatibility/compatibility-tests && ${GO} test -timeout 60m -race -coverprofile compatibility-coverage.txt ${GOTEST_VERBOSE} ; \
+	cd ./test/compatibility/compatibility-tests && ${GO} test -timeout 60m -race ${GOTEST_VERBOSE} ; \

@@ -26,8 +26,14 @@ func ValidateAPIsOutput(apis []*core.API, stdout string) {
 			} else if log.APIResponse.ResponseType == core.MapResponse {
 				actual := log.APIResponse.ResponseBody
 				expected := StrToMap(api.Output.Content)
-				Expect(actual).To(Equal(expected))
-				Expect(reflect.DeepEqual(actual, expected)).To(Equal(true))
+
+				if api.Output.ValidationMatcher == core.ValidationMatcherStrict {
+					Expect(actual).To(Equal(expected))
+					// Expect(reflect.DeepEqual(actual, expected)).To(Equal(true))
+				} else {
+					Expect(validateMaps(actual.(map[string]interface{}), expected)).To(Equal(true))
+				}
+
 			} else if log.APIResponse.ResponseType == core.ErrorResponse {
 				//Check for errors
 				actual := log.APIError
@@ -46,4 +52,15 @@ func unmarshallStdout(s string) map[core.RuntimeAPIName][]core.APILog {
 	Expect(err).To(BeNil())
 
 	return logs
+}
+
+func validateMaps(actual, expected map[string]interface{}) bool {
+	for k, v := range expected {
+		if reflect.ValueOf(v).Kind() == reflect.Map {
+			validateMaps(actual[k].(map[string]interface{}), v.(map[string]interface{}))
+		} else if !reflect.DeepEqual(actual[k], v) {
+			return false
+		}
+	}
+	return true
 }

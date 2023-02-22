@@ -56,10 +56,6 @@ test: fmt ## Run Tests
 	make -C test/plugins all
 	${GO} test ./... -timeout 60m -race -coverprofile coverage.txt -v
 
-.PHONY: compatibility-tests
-compatibility-tests: ## Run Compatibility tests
-	${GO} test ./test/compatibility/tests/... -timeout 60m -race -coverprofile compatibility-coverage.txt ${GOTEST_VERBOSE} ; \
-
 .PHONY: fmt
 fmt: $(GOIMPORTS) ## Run goimports
 	$(GOIMPORTS) -w -local github.com/vmware-tanzu ./
@@ -123,9 +119,21 @@ clean: ## Remove all generated binaries
 
 GO_MODULES=$(shell find . -path "*/go.mod" | xargs -I _ dirname _)
 
-.PHONY: build-runtime-compatibility-test-plugin
-build-runtime-compatibility-test-plugin: ## Builds all runtime compatibility test plugins
+## --------------------------------------
+## Compatibility Testing
+## --------------------------------------
+
+.PHONY: build-compatibility-test-plugins
+build-compatibility-test-plugins: ## Builds all runtime compatibility test plugins
 	cd ./test/compatibility/compatibility-test-plugins/runtime-test-plugin-v0_11_6 && ${GO} build
 	cd ./test/compatibility/compatibility-test-plugins/runtime-test-plugin-v0_25_4 && ${GO} build
 	cd ./test/compatibility/compatibility-test-plugins/runtime-test-plugin-v0_28_0 && ${GO} build
 	cd ./test/compatibility/compatibility-test-plugins/runtime-test-plugin-v1_0_0 && ${GO} build
+
+.PHONY: compatibility-tests
+compatibility-tests: ## Run Compatibility tests
+	${GO} test ./test/compatibility/compatibility-tests/... -timeout 60m -race -coverprofile compatibility-coverage.txt ${GOTEST_VERBOSE} ; \
+
+.PHONY: build-and-run-compatibility-tests
+build-and-run-compatibility-tests: build-compatibility-test-plugins ## Build and Run Compatibility tests
+	${GO} test ./test/compatibility/compatibility-tests/... -timeout 60m -race -coverprofile compatibility-coverage.txt ${GOTEST_VERBOSE} ; \

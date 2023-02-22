@@ -38,7 +38,6 @@ func ConstructTestPluginCmd(version core.RuntimeVersion, apis []*core.API) (stri
 
 	pluginCommand += " --file " + fileName
 
-	fmt.Println("Generated  cmd", pluginCommand)
 	return pluginCommand, nil
 }
 

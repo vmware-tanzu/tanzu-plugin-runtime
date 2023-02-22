@@ -23,10 +23,17 @@ func NewSetContextCommand(setContextInputOptions *SetContextInputOptions, setCon
 	// Init the API object
 	api := &core.API{}
 	api.Name = core.SetContextAPIName
+
+	// Run Core Validators
+	_, err := core.ValidateRuntimeVersion(setContextInputOptions.RuntimeAPIVersion)
+	if err != nil {
+		return nil, err
+	}
+
 	api.Version = setContextInputOptions.RuntimeVersion
 
 	// Validate the SetContext Input Options
-	_, err := ValidateSetContextInputOptionsAsPerRuntimeVersion(setContextInputOptions)
+	_, err = ValidateSetContextInputOptionsAsPerRuntimeVersion(setContextInputOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -79,6 +86,13 @@ func NewGetContextCommand(getContextInputOptions *GetContextInputOptions, getCon
 	// Init the API object
 	api := &core.API{}
 	api.Name = core.GetContextAPIName
+
+	// Run Core Validators
+	_, err := core.ValidateRuntimeVersion(getContextInputOptions.RuntimeAPIVersion)
+	if err != nil {
+		return nil, err
+	}
+
 	api.Version = getContextInputOptions.RuntimeVersion
 
 	// Validate the Input Options
@@ -96,6 +110,13 @@ func NewGetContextCommand(getContextInputOptions *GetContextInputOptions, getCon
 	var content string
 
 	if getContextOutputOptions.ContextOpts != nil {
+
+		// Run Core Validators
+		_, err = core.ValidateRuntimeVersion(getContextOutputOptions.RuntimeAPIVersion)
+		if err != nil {
+			return nil, err
+		}
+
 		// Validate the Output Options
 		_, err := ValidateGetContextOutputOptionsAsPerRuntimeVersion(getContextOutputOptions)
 		if err != nil {
@@ -118,6 +139,10 @@ func NewGetContextCommand(getContextInputOptions *GetContextInputOptions, getCon
 	api.Output = &core.Output{
 		Result:  res,
 		Content: content,
+	}
+
+	if getContextOutputOptions.ValidationMatcher != "" {
+		api.Output.ValidationMatcher = getContextOutputOptions.ValidationMatcher
 	}
 
 	c.APIs = append(c.APIs, api)

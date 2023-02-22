@@ -25,11 +25,7 @@ var (
 				fmt.Println(err)
 			}
 
-			// mock config files
-			_, cleanUp := compatibilitytestingcore.SetupTempCfgFiles()
-			defer func() {
-				cleanUp()
-			}()
+			// Trigger Runtime APIs
 			runAPIs(apis)
 		},
 	}

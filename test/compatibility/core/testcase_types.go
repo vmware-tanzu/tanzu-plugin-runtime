@@ -23,8 +23,9 @@ type API struct {
 
 // Output represents the runtime api expected output for validation
 type Output struct {
-	Result  Result `json:"result" yaml:"result"`
-	Content string `json:"content" yaml:"content"`
+	ValidationMatcher ValidationMatcher `json:"validationmatcher" yaml:"validationmatcher"`
+	Result            Result            `json:"result" yaml:"result"`
+	Content           string            `json:"content" yaml:"content"`
 }
 
 type Result string
@@ -33,6 +34,10 @@ const (
 	Success Result = "success"
 	Failed  Result = "failed"
 )
+
+type ValidationMatcher string
+
+const ValidationMatcherStrict ValidationMatcher = "strict"
 
 // RuntimeAPIVersion represents the runtime library version
 type RuntimeAPIVersion struct {
@@ -48,6 +53,13 @@ const (
 	Version0280 RuntimeVersion = "v0.28.0"
 	Version100  RuntimeVersion = "v1.0.0"
 )
+
+var SupportedRuntimeVersions = []RuntimeVersion{
+	Version0116,
+	Version0254,
+	Version0280,
+	Version100,
+}
 
 // NewTestCase creates an instance of TestCase
 func NewTestCase() *TestCase {

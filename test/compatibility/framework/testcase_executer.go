@@ -1,6 +1,7 @@
 // Copyright 2023 VMware, Inc. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
+// Package framework Package provides all the helper methods to write cross-version API compatibility tests
 package framework
 
 import (

@@ -4,22 +4,22 @@
 package compatibility_tests_test
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"github.com/onsi/ginkgo"
+	"github.com/onsi/gomega"
 
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework"
 )
 
-var _ = Describe("Context API", func() {
+var _ = ginkgo.Describe("Context API", func() {
 
-	BeforeEach(func() {
+	ginkgo.BeforeEach(func() {
 		core.SetupTempCfgFiles()
 	})
 
-	Context("Runtime Context API Set and Get", func() {
+	ginkgo.Context("Runtime Context API Set and Get", func() {
 
-		It("Run Runtime v1.0.0 SetContext API", func() {
+		ginkgo.It("Run Runtime v1.0.0 SetContext API", func() {
 			// Input Parameters for Runtime SetContext API
 			setContextInputOptions := &framework.SetContextInputOptions{
 				RuntimeAPIVersion: &core.RuntimeAPIVersion{
@@ -39,7 +39,7 @@ var _ = Describe("Context API", func() {
 
 			// Create SetContext Command
 			setContextCommand, err := framework.NewSetContextCommand(setContextInputOptions, &setContextOutputOptions)
-			Expect(err).To(BeNil())
+			gomega.Expect(err).To(gomega.BeNil())
 
 			// Construct series of commands to execute
 			testCase := core.NewTestCase().Add(setContextCommand) // re-named from NewTestCommands
@@ -48,7 +48,7 @@ var _ = Describe("Context API", func() {
 			framework.Execute(testCase)
 		})
 
-		It("Run Runtime v0.28.0 GetContext API", func() {
+		ginkgo.It("Run Runtime v0.28.0 GetContext API", func() {
 			// Input Parameters for Runtime GetContext API
 			getContextInputOptions := &framework.GetContextInputOptions{
 				RuntimeAPIVersion: &core.RuntimeAPIVersion{
@@ -67,7 +67,7 @@ var _ = Describe("Context API", func() {
 
 			// Create GetContext Command
 			getContextCommand, err := framework.NewGetContextCommand(getContextInputOptions, getContextOutputOptions)
-			Expect(err).To(BeNil())
+			gomega.Expect(err).To(gomega.BeNil())
 
 			// Construct series of commands to execute
 			testCase := core.NewTestCase().Add(getContextCommand) // re-named from NewTestCommands
@@ -76,7 +76,7 @@ var _ = Describe("Context API", func() {
 			framework.Execute(testCase)
 		})
 
-		It("Run Runtime v1.0.0 SetContext API then Runtime v0.28.0 GetContext", func() {
+		ginkgo.It("Run Runtime v1.0.0 SetContext API then Runtime v0.28.0 GetContext", func() {
 			// Input Parameters for Runtime SetContextAPIName API
 			setContextInputOptions := &framework.SetContextInputOptions{
 				RuntimeAPIVersion: &core.RuntimeAPIVersion{
@@ -118,11 +118,11 @@ var _ = Describe("Context API", func() {
 
 			// Create SetContextAPIName Command
 			setContextCommand, err := framework.NewSetContextCommand(setContextInputOptions, setContextOutputOptions)
-			Expect(err).To(BeNil())
+			gomega.Expect(err).To(gomega.BeNil())
 
 			// Create GetContextAPIName Command
 			getContextCommand, err := framework.NewGetContextCommand(getContextInputOptions, getContextOutputOptions)
-			Expect(err).To(BeNil())
+			gomega.Expect(err).To(gomega.BeNil())
 
 			// Construct series of commands to execute
 			testCase := core.NewTestCase().Add(setContextCommand).Add(getContextCommand) // re-named from NewTestCommands
@@ -131,7 +131,7 @@ var _ = Describe("Context API", func() {
 			framework.Execute(testCase)
 		})
 
-		It("Run Runtime v0.25.4 SetContext API then Runtime v0.28.0 GetContext API", func() {
+		ginkgo.It("Run Runtime v0.25.4 SetContext API then Runtime v0.28.0 GetContext API", func() {
 			// Input Parameters for Runtime SetContextAPIName API
 			setContextInputOptions := &framework.SetContextInputOptions{
 				RuntimeAPIVersion: &core.RuntimeAPIVersion{
@@ -189,13 +189,13 @@ var _ = Describe("Context API", func() {
 
 			// Create SetContext API Command
 			setContextCommand, err := framework.NewSetContextCommand(setContextInputOptions, setContextOutputOptions)
-			Expect(err).To(BeNil())
+			gomega.Expect(err).To(gomega.BeNil())
 
 			// Create GetContext API Command
 			getContextCommandForVersion0280, err := framework.NewGetContextCommand(getContextInputOptionsForVersion0280, getContextOutputOptionsForVersion0280)
-			Expect(err).To(BeNil())
+			gomega.Expect(err).To(gomega.BeNil())
 			getContextCommandForVersion0254, err := framework.NewGetContextCommand(getContextInputOptionsForVersion0254, getContextOutputOptionsForVersion0254)
-			Expect(err).To(BeNil())
+			gomega.Expect(err).To(gomega.BeNil())
 
 			// Construct series of commands to execute
 			testCase := core.NewTestCase().Add(setContextCommand).Add(getContextCommandForVersion0280).Add(getContextCommandForVersion0254) // re-named from NewTestCommands
@@ -204,106 +204,6 @@ var _ = Describe("Context API", func() {
 			framework.Execute(testCase)
 		})
 
-		//// Sample Test Failure test case
-		//It("SetContext v0.28.0 SetContext v0.28.0(Unsetting ClusterOpts.Endpoint) GetContext v0.28.0", func() {
-		//	// Input Parameters for Runtime SetContext API V0.28.0
-		//	setContextInputOptions := &framework.SetContextInputOptions{
-		//		RuntimeAPIVersion: &core.RuntimeAPIVersion{
-		//			RuntimeVersion: core.Version0280,
-		//		},
-		//		ContextOpts: &framework.ContextOpts{
-		//			Name:   "context-one",
-		//			Target: framework.TargetTMC,
-		//			ClusterOpts: &framework.ClusterServerOpts{
-		//				Endpoint: "test-endpoint",
-		//				Path:     "test-path",
-		//			},
-		//		},
-		//	}
-		//
-		//	// Input Parameters for Runtime SetContext API V0.28.0 With ClusterOpts.Endpoint unset
-		//	setContextInputOptionsWithEndpointUnset := &framework.SetContextInputOptions{
-		//		RuntimeAPIVersion: &core.RuntimeAPIVersion{
-		//			RuntimeVersion: core.Version0280,
-		//		},
-		//		ContextOpts: &framework.ContextOpts{
-		//			Name:   "context-one",
-		//			Target: framework.TargetTMC,
-		//			ClusterOpts: &framework.ClusterServerOpts{
-		//				Endpoint: "",
-		//				Path:     "test-path",
-		//			},
-		//		},
-		//	}
-		//	// Output Parameters for Runtime SetContext API
-		//	var setContextOutputOptions framework.SetContextOutputOptions
-		//
-		//	// Create SetContext Command 1
-		//	setContextCommand, err := framework.NewSetContextCommand(setContextInputOptions, &setContextOutputOptions)
-		//	Expect(err).To(BeNil())
-		//	Expect(setContextCommand).NotTo(BeNil())
-		//
-		//	// Create SetContext Command WithEndpointUnset
-		//	setContextCommandWithEndpointUnset, err := framework.NewSetContextCommand(setContextInputOptionsWithEndpointUnset, &setContextOutputOptions)
-		//	Expect(err.Error()).To(Equal("invalid set context input options for the specified runtime version v0.28.0"))
-		//	Expect(setContextCommandWithEndpointUnset).NotTo(BeNil())
-		//
-		//	// Input Parameters for Runtime GetContext API
-		//	getContextInputOptions := &framework.GetContextInputOptions{
-		//		RuntimeAPIVersion: &core.RuntimeAPIVersion{
-		//			RuntimeVersion: core.Version0280,
-		//		},
-		//		ContextName: "context-one",
-		//	}
-		//
-		//	// Output Parameters for Runtime GetContext API
-		//	getContextOutputOptions := &framework.GetContextOutputOptions{
-		//		RuntimeAPIVersion: &core.RuntimeAPIVersion{
-		//			RuntimeVersion: core.Version0280,
-		//		},
-		//		ContextOpts: &framework.ContextOpts{
-		//			Name:   "context-one",
-		//			Target: framework.TargetTMC,
-		//			ClusterOpts: &framework.ClusterServerOpts{
-		//				Endpoint: "test-endpoint",
-		//				Path:     "test-path",
-		//			},
-		//		},
-		//	}
-		//
-		//	getContextOutputOptionsWithEndpointNotExpected := &framework.GetContextOutputOptions{
-		//		RuntimeAPIVersion: &core.RuntimeAPIVersion{
-		//			RuntimeVersion: core.Version0280,
-		//		},
-		//		ContextOpts: &framework.ContextOpts{
-		//			Name:   "context-one",
-		//			Target: framework.TargetTMC,
-		//			ClusterOpts: &framework.ClusterServerOpts{
-		//				Path: "test-path",
-		//			},
-		//		},
-		//	}
-		//
-		//	// Create GetContextAPIName Command
-		//	getContextCommand, err := framework.NewGetContextCommand(getContextInputOptions, getContextOutputOptions)
-		//	Expect(err).To(BeNil())
-		//	Expect(getContextCommand).NotTo(BeNil())
-		//
-		//	// Create GetContextAPIName Command WithEndpointNotExpected
-		//	getContextCommandWithEndpointNotExpected, err := framework.NewGetContextCommand(getContextInputOptions, getContextOutputOptionsWithEndpointNotExpected)
-		//	Expect(err).To(BeNil())
-		//	Expect(getContextCommandWithEndpointNotExpected).NotTo(BeNil())
-		//
-		//	// Construct series of commands to execute
-		//	testCase1 := core.NewTestCase().Add(setContextCommand).Add(setContextCommandWithEndpointUnset).Add(getContextCommand)
-		//	// Executes the commands from the list and validates the expected output with actual output
-		//	framework.Execute(testCase1) // This execution fails since ClusterOpts.Endpoint is unset in setContextCommandWithEndpointUnset but expected in getContextCommand
-		//
-		//	testCase2 := core.NewTestCase().Add(setContextCommand).Add(setContextCommandWithEndpointUnset).Add(getContextCommandWithEndpointNotExpected)
-		//	// Executes the commands from the list and validates the expected output with actual output
-		//	framework.Execute(testCase2) // This execution succeeds since ClusterOpts.Endpoint is unset in setContextCommandWithEndpointUnset and not expected in getContextCommandWithEndpointNotExpected
-		//
-		//})
-
 	})
+
 })

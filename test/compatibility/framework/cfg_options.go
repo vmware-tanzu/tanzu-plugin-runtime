@@ -50,10 +50,14 @@ type Target string
 const (
 	// TargetK8s is a kubernetes target of the CLI
 	TargetK8s Target = "kubernetes"
+
+	//nolint: deadcode, unused, varcheck
 	targetK8s Target = "k8s"
 
 	// TargetTMC is a Tanzu Mission Control target of the CLI
 	TargetTMC Target = "mission-control"
+
+	//nolint: deadcode, unused, varcheck
 	targetTMC Target = "tmc"
 
 	// TargetNone is used for plugins that are not associated with any target

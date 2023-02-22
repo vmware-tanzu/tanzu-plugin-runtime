@@ -35,7 +35,7 @@ func triggerGetContextAPI(api *compatibilitytestingcore.API) compatibilitytestin
 		fmt.Println("triggerGetContextAPI1", err)
 	}
 
-	//Call runtime GetContext() API function
+	// Call runtime GetContext() API function
 	ctx, err := configlib.GetContext(ctxName)
 
 	// Construct logging

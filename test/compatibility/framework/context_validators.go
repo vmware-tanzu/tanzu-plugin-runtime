@@ -20,14 +20,14 @@ func ValidateSetContextInputOptionsAsPerRuntimeVersion(setContextInputOptions *S
 		if valid {
 			return valid, nil
 		}
-		return valid, errors.New(fmt.Sprintf("invalid set context input options for the specified runtime version %v", setContextInputOptions.RuntimeVersion))
+		return valid, fmt.Errorf("invalid set context input options for the specified runtime version %v", setContextInputOptions.RuntimeVersion)
 
 	case core.Version0254:
 		valid = setContextInputOptions.ValidName() && setContextInputOptions.ValidContextType() && setContextInputOptions.ValidGlobalOptsOrClusterOpts()
 		if valid {
 			return valid, nil
 		}
-		return valid, errors.New(fmt.Sprintf("invalid set context input options for the specified runtime version %v", setContextInputOptions.RuntimeVersion))
+		return valid, fmt.Errorf("invalid set context input options for the specified runtime version %v", setContextInputOptions.RuntimeVersion)
 	default:
 		return false, errors.New("SetContext API is not supported for the specified runtime version")
 	}
@@ -42,16 +42,15 @@ func ValidateGetContextOutputOptionsAsPerRuntimeVersion(getContextOutputOptions 
 		if valid {
 			return valid, nil
 		}
-		return valid, errors.New(fmt.Sprintf("invalid get context ouput options for the specified runtime version contextType is not supported %v", getContextOutputOptions.RuntimeVersion))
+		return valid, fmt.Errorf("invalid get context output options for the specified runtime version contextType is not supported %v", getContextOutputOptions.RuntimeVersion)
 	case core.Version0254:
 		valid = getContextOutputOptions.ShouldNotIncludeTarget()
 		if valid {
 			return valid, nil
 		}
-		return valid, errors.New(fmt.Sprintf("invalid get context ouput options for the specified runtime version Target is not supported %v", getContextOutputOptions.RuntimeVersion))
+		return valid, fmt.Errorf("invalid get context output options for the specified runtime version Target is not supported %v", getContextOutputOptions.RuntimeVersion)
 
 	default:
 		return false, errors.New("GetContext API is not supported for the specified runtime version")
 	}
-
 }

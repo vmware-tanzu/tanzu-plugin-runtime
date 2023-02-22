@@ -26,7 +26,6 @@ const (
 
 // ConstructTestPluginCmd constructs the specific runtime test plugin command as per runtime version and apis
 func ConstructTestPluginCmd(version core.RuntimeVersion, apis []*core.API) (string, error) {
-
 	// Create root command for the specified runtime version
 	pluginCommand := makeRootCommand(version)
 

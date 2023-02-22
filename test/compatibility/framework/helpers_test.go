@@ -13,7 +13,6 @@ import (
 )
 
 func TestGetTestData(t *testing.T) {
-
 	apiYaml := `- name: SetContextAPIName
   version: v1.0.0
   arguments:

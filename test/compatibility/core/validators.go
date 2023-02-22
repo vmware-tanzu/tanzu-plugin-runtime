@@ -5,19 +5,15 @@ package core
 
 import (
 	"fmt"
-
-	"github.com/pkg/errors"
 )
 
 func ValidateRuntimeVersion(version *RuntimeAPIVersion) (bool, error) {
-
 	if version == nil || version.RuntimeVersion == "" {
-		return false, errors.New(fmt.Sprintf("runtime version is mandatory"))
+		return false, fmt.Errorf("runtime version is mandatory")
 	}
 
 	if !isRuntimeVersionSupported(version.RuntimeVersion) {
-		return false, errors.New(fmt.Sprintf("runtime version %v is not supported", version))
-
+		return false, fmt.Errorf("runtime version %v is not supported", version)
 	}
 	return true, nil
 }

@@ -4,25 +4,25 @@
 package cmd
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"github.com/onsi/ginkgo"
+	"github.com/onsi/gomega"
 
 	compatibilitytestingcore "github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 )
 
-var _ = Describe("Test Root method", func() {
+var _ = ginkgo.Describe("Test Root method", func() {
 
 	//BeforeEach(func() {
 	//	compatibilitytestingcore.SetupTempCfgFiles()
 	//})
 
-	Context("Test runAPIs", func() {
+	ginkgo.Context("Test runAPIs", func() {
 
-		It("runAPIs with SetContext api data", func() {
+		ginkgo.It("runAPIs with SetContext api data", func() {
 
 			apis, err := compatibilitytestingcore.ParseRuntimeAPIsFromFile("/var/folders/gw/3kzrkntn5rzbs4xhktdvdfjr0000gq/T/runtime_compatibility_testing4086182328")
 
-			Expect(err).To(BeNil())
+			gomega.Expect(err).To(gomega.BeNil())
 
 			runAPIs(apis)
 		})

@@ -33,7 +33,7 @@ func triggerGetContextAPI(api *compatibilitytestingcore.API) compatibilitytestin
 		fmt.Println(err)
 	}
 
-	//Call runtime GetContext API function
+	// Call runtime GetContext API function
 	ctx, err := configlib.GetContext(ctxName)
 
 	// Construct logging

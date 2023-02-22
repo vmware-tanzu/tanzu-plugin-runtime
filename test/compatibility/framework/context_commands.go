@@ -110,7 +110,6 @@ func NewGetContextCommand(getContextInputOptions *GetContextInputOptions, getCon
 	var content string
 
 	if getContextOutputOptions.ContextOpts != nil {
-
 		// Run Core Validators
 		_, err = core.ValidateRuntimeVersion(getContextOutputOptions.RuntimeAPIVersion)
 		if err != nil {

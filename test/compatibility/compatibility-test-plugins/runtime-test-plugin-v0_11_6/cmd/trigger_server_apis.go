@@ -4,7 +4,7 @@
 package cmd
 
 import (
-	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega"
 	"gopkg.in/yaml.v3"
 
 	configtypes "github.com/vmware-tanzu/tanzu-framework/apis/config/v1alpha1"
@@ -28,8 +28,8 @@ func triggerServerAPIs(api *compatibilitytestingcore.API, logs map[compatibility
 func triggerGetServerAPI(api *compatibilitytestingcore.API) compatibilitytestingcore.APILog {
 	// Parse arguments needed to trigger the runtime api
 	serverName, err := compatibilitytestingcore.ParseStr(api.Arguments["serverName"])
-	Expect(err).To(BeNil())
-	//Call runtime GetServer API
+	gomega.Expect(err).To(gomega.BeNil())
+	// Call runtime GetServer API
 	server, err := configlib.GetServer(serverName)
 
 	// Construct logging
@@ -48,7 +48,7 @@ func triggerGetServerAPI(api *compatibilitytestingcore.API) compatibilitytesting
 func triggerAddServerAPI(api *compatibilitytestingcore.API) compatibilitytestingcore.APILog {
 	// Parse arguments needed to trigger the runtime api
 	server, err := parseServer(api.Arguments["server"].(string))
-	Expect(err).To(BeNil())
+	gomega.Expect(err).To(gomega.BeNil())
 	isCurrent := api.Arguments["isCurrent"].(bool)
 
 	// Call the runtime SetServer API

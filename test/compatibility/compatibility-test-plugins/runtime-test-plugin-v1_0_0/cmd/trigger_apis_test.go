@@ -4,20 +4,20 @@
 package cmd
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"github.com/onsi/ginkgo"
+	"github.com/onsi/gomega"
 
 	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 	compatibilitytestingcore "github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 )
 
-var _ = Describe("Test RunAPIs method", func() {
+var _ = ginkgo.Describe("Test RunAPIs method", func() {
 
-	BeforeEach(func() {
+	ginkgo.BeforeEach(func() {
 		compatibilitytestingcore.SetupTempCfgFiles()
 	})
 
-	Context("Test TriggerAPIs", func() {
+	ginkgo.Context("Test TriggerAPIs", func() {
 
 		var tests = []struct {
 			apis         []compatibilitytestingcore.API
@@ -87,12 +87,12 @@ globalOpts:
 			},
 		}
 
-		It("using SetContextAPIName and GetContextAPIName", func() {
+		ginkgo.It("using SetContextAPIName and GetContextAPIName", func() {
 			for _, tt := range tests {
 				actualLogs := triggerAPIs(tt.apis)
 
-				Expect(tt.expectedLogs[compatibilitytestingcore.SetContextAPIName]).To(Equal(actualLogs[compatibilitytestingcore.SetContextAPIName]))
-				Expect(tt.expectedLogs[compatibilitytestingcore.GetContextAPIName]).To(Equal(actualLogs[compatibilitytestingcore.GetContextAPIName]))
+				gomega.Expect(tt.expectedLogs[compatibilitytestingcore.SetContextAPIName]).To(gomega.Equal(actualLogs[compatibilitytestingcore.SetContextAPIName]))
+				gomega.Expect(tt.expectedLogs[compatibilitytestingcore.GetContextAPIName]).To(gomega.Equal(actualLogs[compatibilitytestingcore.GetContextAPIName]))
 
 			}
 		})

@@ -1,15 +1,13 @@
-# Backward Compatibility Testing documentation
+# Cross-Version API Compatibility Testing documentation
 
 ## Summary
 
-Compatibility Test Framework provides test helper functions to write compatibility test cases.
+Cross-Version API Compatibility Test Framework provides test helper functions to write compatibility test cases.
 
 Test writer is responsible for writing the go tests using the framework provided helper methods.
+
 As a test writer you should be knowledgeable on specific APIs and specific Runtime libraries i.e. what arguments each API takes and what it returns.
-Test writers should also be familiar with how to write combination tests with multiple APIs i.e. when testing mutators and reader APIs together.
-
-For Example:-  Running SetContext alone in the test will not be a good test as it does not validate the actual context that is set in the config yaml file. But when SetContext is combined with GetContext/ GetCurrentContext making the tests more solid.
-
+Test writers should also be familiar with how to write combination tests with multiple APIs i.e. when testing mutators(Set***, Delete*** APIs) and reader(Get*** APIs) together.
 When writing a test involving two versions of Runtime library APIs a test writer should be aware of what specific fields are added or removed from the API method for those 2 versions and design tests accordingly.
 
 ### Commands
@@ -17,7 +15,7 @@ When writing a test involving two versions of Runtime library APIs a test writer
 Run all `****_test.go` files from `compatibility-tests` directory.
 
 ``` shell
-make backward-compatibility-tests
+make compatibility-tests
 ```
 
 ### How are the Tests being run ?
@@ -25,10 +23,8 @@ make backward-compatibility-tests
 The tests are executed as a GitHub runner CI pipeline that executes the below command.
 
 ``` shell
-make backward-compatibility-tests
+make compatibility-tests
 ```
-
-A successful CI runner ensures that the apis are backward compatible with the specified runtime versions.
 
 ### What will the tests cover ?
 
@@ -121,16 +117,16 @@ type DeleteContextOutputOptions struct{
 
 ### xxxOptions structs
 
-- These structs are super set of parameters for respective configs like Context, Server, DiscoverySources etc. for all Runtime Versions.
+- Each of these struct represents the super set of all fields for their respective config types (e.g .Context, Server, DiscoverySource) across for all Runtime versions in which the types are defined.
 - Based on the Runtime Version xxxOptions attributes may change(mandatory/optional/Not applicable).
 - It is meant to be used as both inputOptions and outputOptions.
 - Command Creation Helper functions (i.e. NewSetContextCommand) validate the supplied inputOptions as per RuntimeVersion and make sure all required attributes are set. If not Command Creation Helper functions will throw error and Test fails.
 - The validation of “Input and expect output” happens in  Set/Get/DeleteXXXCommand creation (within framework.NewTestCase), so it's not part of test case execution. so its kind of test case setup.
-- Input struct: Framework validates only Input data (eg: GetContextInputOptions/SetContextInputOptions/DeleteContextInputOptions) as its required to make runtime api call,
+- Input struct: Framework validates the supplied Input data (eg: GetContextInputOptions/SetContextInputOptions/DeleteContextInputOptions) as per specified runtime version supported fields.
 - Output struct: Framework validates the supplied outputOptions as per specified runtime version whether certain fields are supported for the runtime version used and compares the supplied data with what is returned from API method i.e. every non-null field in output struct will be checked for equality with returned result.
   (Eg: GetContextOutputOptions/SetContextOutputOptions/DeleteContextOutputOptions) as its test writer responsibility, the Output data is depends on the Input data (eg: if input is not valid, runtime api may return error) OR the sequence of calls made before the current call (eg: NewGetContextCommand() output depends on the previous SetContext** calls).
   If test writer is not passing valid expected output data, then it fails during the TEST CASE EXECUTION as test case fail.
-- Test framework does validate the Output struct’s null and non-null values with runtime api response.
+- Test framework does validate the expected Output struct’s field values with runtime api response to its entirety.
 - Test writer does not have to explicitly specify to check whether an attribute value is nil as all fields default values are nil or “”.
 - Test writer will need to specify what exact object attribute values he expects out of GetXX api method (framework perform a full equality check and not partial equality, means if api returns attribute which not specified by test writer then test case will fail).
 - So for the output struct, all filed are optional, there are NO MANDATORY fields!!! its test writer responsibility to identify the expected data!!
@@ -377,4 +373,4 @@ setContextInputOptions := &framework.SetContextInputOptions{
 
 ```
 
-For more details on framework go to [Backward Compatibility Framework](./BACKWARD_COMPATIBILITY_FRAMEWORK.md)
+For more details on framework go to [Cross_Version_API Compatibility Framework](./CROSS_VERSION_API_COMPATIBILITY_FRAMEWORK.md)

@@ -1,15 +1,15 @@
-# Backward Compatibility
+# Cross Version API Compatibility Framework
+
+## Summary
+
+This section describes on how to write a go test for cross version API compatibility and how the test case is processed by the framework to then invoke various Runtime APIs and perform validations.
+Each test case command is transformed and written into temporary files which is consumed by the `runtime-test-plugins-vX.XX.X` binaries build with specific versions of the runtime.
 
 ## Framework
-
-### How to write a test?
 
 Each Test is of below type
 
 ``` go
-// Copyright 2023 VMware, Inc. All Rights Reserved.
-// SPDX-License-Identifier: Apache-2.0
-
 package framework
 
 // TestCase represents the list of commands to execute as part of test case
@@ -69,13 +69,13 @@ func (t *TestCase) Add(command ...*Command) *TestCase {
    return t
 }
 
-// APILog represents the logs/output/errors returned from runtime apis
+// APILog represents the logs/output/errors returned from runtime test plugin binaries
 type APILog struct {
    APIResponse *APIResponse `json:"apiResponse" yaml:"apiResponse"`
    APIError    string       `json:"error" yaml:"error"`
 }
 
-// APIResponse represents the output response returned from runtime apis
+// APIResponse represents the output response returned from runtime test plugin binaries
 type APIResponse struct {
    ResponseType ResponseType `json:"responseType" yaml:"responseType"`
    ResponseBody interface{}  `json:"responseBody" yaml:"responseBody"`
@@ -109,7 +109,9 @@ Each Test Case accepts
 
 Running the  *testcase_1*, the framework generates below commands internally to trigger specific runtime version libraries.
 
-#### Below command is generated to run Runtime lib v1.0.0 SetContext API method as per testcase-1
+## Internal Implementation
+
+### Below command is generated to run Runtime lib v1.0.0 SetContext API method as per testcase-1
 
 ```shell
 stdout, _, err := Exec("./runtime-test-plugin-1-00/runtime-test-plugin-1-00 test --test-file temp-tests-100.yaml")
@@ -136,7 +138,7 @@ stdout, _, err := Exec("./runtime-test-plugin-1-00/runtime-test-plugin-1-00 test
            content: ""
 ```
 
-#### Below command is generated to run Runtime lib v0.28.0 GetContext API method as per testcase-1
+### Below command is generated to run Runtime lib v0.28.0 GetContext API method as per testcase-1
 
 ```shell
 stdout, _, err := Exec("./runtime-test-plugin-0-28/runtime-test-plugin-0-28 test --test-file temp-tests-028.yaml")
@@ -189,9 +191,11 @@ actualCtx := GetContext(ctxName) //i.e. test-bc
 
 ### Combination / Co - Existence Testing
 
-|  X  |  V  | ALL | ALL | ALL | ALL |
+Below table describes all possible combination tests for all supported Runtime APIs.
+
+|  _  |  V  | ALL | ALL | ALL | ALL |
 |:---:|:---:|:---:|:---:|:---:|:---:|
-|  V  |  X  | V1  | V28 | V25 | V11 |
+|  V  |  _  | V1  | V28 | V25 | V11 |
 | ALL | V1  |  Y  |  Y  |  Y  |  Y  |
 |  ^  | V28 |  Y  |  Y  |  Y  |  Y  |
 |  ^  | V25 |  Y  |  Y  |  Y  |  Y  |
@@ -202,6 +206,6 @@ actualCtx := GetContext(ctxName) //i.e. test-bc
 | V      | Runtime Library Version                                                                                                                                                                                                                                                                                                                                                                                                            |
 | V1     | Runtime Library Version v1.0.0                                                                                                                                                                                                                                                                                                                                                                                                     |
 | V28    | Runtime Library Version v0.28.0                                                                                                                                                                                                                                                                                                                                                                                                    |
-| V25    | Runtime Library Version v0.25.0                                                                                                                                                                                                                                                                                                                                                                                                    |
-| V11    | Runtime Library Version v0.11.0                                                                                                                                                                                                                                                                                                                                                                                                    |
+| V25    | Runtime Library Version v0.25.4                                                                                                                                                                                                                                                                                                                                                                                                    |
+| V11    | Runtime Library Version v0.11.6                                                                                                                                                                                                                                                                                                                                                                                                    |
 | ALL    | SetContext, GetContext, DeleteContext, GetCurrentContext, SetCurrentContext, DeleteCurrentContext, GetServer, SetServer, DeleteServer, GetCurrentServer, SetCurrentServer, DeleteCurrentServer, IsFeatureEnabled, DeleteFeature, SetFeature, ConfigureDefaultFeatureFlagsIfMissing, GetEnv, SetEnv, DeleteEnv, GetCLIPluginDiscoverySources, SetCLIPluginDiscoverySources, DeleteCLIPluginDiscoverySources, GetEdition, SetEdition |

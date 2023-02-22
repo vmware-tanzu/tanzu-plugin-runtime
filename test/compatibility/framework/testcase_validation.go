@@ -27,14 +27,14 @@ func ValidateAPIsOutput(apis []*core.API, stdout string) {
 				actual := log.APIResponse.ResponseBody
 				expected := StrToMap(api.Output.Content)
 
-				if api.Output.ValidationMatcher == core.ValidationMatcherStrict {
+				if api.Output.ValidationStrategy == core.ValidationStrategyStrict {
 					gomega.Expect(actual).To(gomega.Equal(expected))
 				} else {
 					gomega.Expect(validateMaps(actual.(map[string]interface{}), expected)).To(gomega.Equal(true))
 				}
 			} else if log.APIResponse.ResponseType == core.ErrorResponse {
 				// Check for errors
-				actual := log.APIError
+				actual := log.APIResponse.ResponseBody
 				expected := api.Output.Content
 				gomega.Expect(actual).To(gomega.Equal(expected))
 			}

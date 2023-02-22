@@ -6,7 +6,7 @@ replace github.com/vmware-tanzu/tanzu-plugin-runtime => ./../../../../../tanzu-p
 
 replace github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core => ../../core
 
-replace github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework => ../../framework
+// replace github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework => ../../framework
 
 require (
 	github.com/onsi/ginkgo v1.16.5
@@ -31,7 +31,7 @@ require (
 	github.com/nxadm/tail v1.4.8 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	golang.org/x/net v0.6.0 // indirect
+	golang.org/x/net v0.7.0 // indirect
 	golang.org/x/sys v0.5.0 // indirect
 	golang.org/x/text v0.7.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect

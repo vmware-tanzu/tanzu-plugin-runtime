@@ -10,76 +10,74 @@ import (
 
 	configtypes "github.com/vmware-tanzu/tanzu-framework/cli/runtime/apis/config/v1alpha1"
 	configlib "github.com/vmware-tanzu/tanzu-framework/cli/runtime/config"
-	compatibilitytestingcore "github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 )
 
 // triggerContextAPIs trigger context related runtime apis and construct logs
-func triggerContextAPIs(api *compatibilitytestingcore.API, logs map[compatibilitytestingcore.RuntimeAPIName][]compatibilitytestingcore.APILog) {
-	if api.Name == compatibilitytestingcore.SetContextAPIName {
+func triggerContextAPIs(api *core.API, logs map[core.RuntimeAPIName][]core.APILog) {
+	if api.Name == core.SetContextAPIName {
 		log := triggerSetContextAPI(api)
-		logs[compatibilitytestingcore.SetContextAPIName] = append(logs[compatibilitytestingcore.SetContextAPIName], log)
+		logs[core.SetContextAPIName] = append(logs[core.SetContextAPIName], log)
 	}
-	if api.Name == compatibilitytestingcore.GetContextAPIName {
+	if api.Name == core.GetContextAPIName {
 		log := triggerGetContextAPI(api)
-		logs[compatibilitytestingcore.GetContextAPIName] = append(logs[compatibilitytestingcore.GetContextAPIName], log)
+		logs[core.GetContextAPIName] = append(logs[core.GetContextAPIName], log)
 	}
 }
 
 // triggerGetContextAPI trigger get context runtime api
-func triggerGetContextAPI(api *compatibilitytestingcore.API) compatibilitytestingcore.APILog {
+func triggerGetContextAPI(api *core.API) core.APILog {
 	// Parse arguments needed to trigger the runtime api
-	ctxName, err := compatibilitytestingcore.ParseStr(api.Arguments["contextName"])
+	ctxName, err := core.ParseStr(api.Arguments[core.ContextName])
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	// Call runtime GetContext API function
+	// Call runtime GetContext API
 	ctx, err := configlib.GetContext(ctxName)
 
 	// Construct logging
-	log := compatibilitytestingcore.APILog{}
+	log := core.APILog{}
 	if err != nil {
-		log.APIError = err.Error()
-		log.APIResponse = &compatibilitytestingcore.APIResponse{
-			ResponseType: compatibilitytestingcore.ErrorResponse,
+		log.APIResponse = &core.APIResponse{
+			ResponseType: core.ErrorResponse,
 			ResponseBody: err.Error(),
 		}
 	}
 
 	if ctx != nil {
-		log.APIResponse = &compatibilitytestingcore.APIResponse{
+		log.APIResponse = &core.APIResponse{
 			ResponseBody: ctx,
-			ResponseType: compatibilitytestingcore.MapResponse,
+			ResponseType: core.MapResponse,
 		}
 	}
 	return log
 }
 
 // triggerSetContextAPI trigger set context runtime api
-func triggerSetContextAPI(api *compatibilitytestingcore.API) compatibilitytestingcore.APILog {
+func triggerSetContextAPI(api *core.API) core.APILog {
 	// Parse arguments needed to trigger the runtime api
-	ctx, err := parseContext(api.Arguments["context"].(string))
+	ctx, err := parseContext(api.Arguments[core.Context].(string))
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	isCurrent := api.Arguments["isCurrent"].(bool)
+	setCurrent := api.Arguments[core.SetCurrent].(bool)
 
-	// Call the runtime SetContextAPIName API function
-	err = configlib.SetContext(ctx, isCurrent)
+	// Call runtime SetContext API
+	err = configlib.SetContext(ctx, setCurrent)
 
 	// Construct logging
-	log := compatibilitytestingcore.APILog{}
+	log := core.APILog{}
 	if err != nil {
-		log.APIError = err.Error()
-		log.APIResponse = &compatibilitytestingcore.APIResponse{
-			ResponseType: compatibilitytestingcore.ErrorResponse,
+		log.APIResponse = &core.APIResponse{
+			ResponseType: core.ErrorResponse,
 			ResponseBody: err.Error(),
 		}
 	} else {
-		log.APIResponse = &compatibilitytestingcore.APIResponse{
+		log.APIResponse = &core.APIResponse{
 			ResponseBody: "",
-			ResponseType: compatibilitytestingcore.StringResponse,
+			ResponseType: core.StringResponse,
 		}
 	}
 

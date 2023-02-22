@@ -15,50 +15,22 @@ type Command struct {
 
 // API represents the runtime api to execute
 type API struct {
-	Name      RuntimeAPIName         `json:"name" yaml:"name"`
-	Version   RuntimeVersion         `json:"version" yaml:"version"`
-	Arguments map[string]interface{} `json:"arguments" yaml:"arguments"`
-	Output    *Output                `json:"output" yaml:"output"`
+	Name      RuntimeAPIName                  `json:"name" yaml:"name"`
+	Version   RuntimeVersion                  `json:"version" yaml:"version"`
+	Arguments map[APIArgumentType]interface{} `json:"arguments" yaml:"arguments"`
+	Output    *Output                         `json:"output" yaml:"output"`
 }
 
 // Output represents the runtime api expected output for validation
 type Output struct {
-	ValidationMatcher ValidationMatcher `json:"validationmatcher" yaml:"validationmatcher"`
-	Result            Result            `json:"result" yaml:"result"`
-	Content           string            `json:"content" yaml:"content"`
+	ValidationStrategy ValidationStrategy `json:"validationstrategy" yaml:"validationstrategy"`
+	Result             Result             `json:"result" yaml:"result"`
+	Content            string             `json:"content" yaml:"content"`
 }
 
-type Result string
-
-const (
-	Success Result = "success"
-	Failed  Result = "failed"
-)
-
-type ValidationMatcher string
-
-const ValidationMatcherStrict ValidationMatcher = "strict"
-
-// RuntimeAPIVersion represents the runtime library version
+// RuntimeAPIVersion represents the runtime library versions used in XXXOpts structs
 type RuntimeAPIVersion struct {
 	RuntimeVersion RuntimeVersion `json:"runtimeVersion,omitempty" yaml:"runtimeVersion,omitempty"`
-}
-
-// RuntimeVersion Runtime library versions
-type RuntimeVersion string
-
-const (
-	Version0116 RuntimeVersion = "v0.11.6"
-	Version0254 RuntimeVersion = "v0.25.4"
-	Version0280 RuntimeVersion = "v0.28.0"
-	Version100  RuntimeVersion = "v1.0.0"
-)
-
-var SupportedRuntimeVersions = []RuntimeVersion{
-	Version0116,
-	Version0254,
-	Version0280,
-	Version100,
 }
 
 // NewTestCase creates an instance of TestCase
@@ -75,10 +47,9 @@ func (t *TestCase) Add(command ...*Command) *TestCase {
 	return t
 }
 
-// APILog represents the logs/output/errors returned from runtime apis
+// APILog represents the logs/output/errors returned from runtime apis in test plugins
 type APILog struct {
 	APIResponse *APIResponse `json:"apiResponse" yaml:"apiResponse"`
-	APIError    string       `json:"error" yaml:"error"`
 }
 
 // APIResponse represents the output response returned from runtime apis
@@ -86,13 +57,3 @@ type APIResponse struct {
 	ResponseType ResponseType `json:"responseType" yaml:"responseType"`
 	ResponseBody interface{}  `json:"responseBody" yaml:"responseBody"`
 }
-
-type ResponseType string
-
-const (
-	MapResponse     ResponseType = "map"
-	BooleanResponse ResponseType = "bool"
-	StringResponse  ResponseType = "str"
-	IntegerResponse ResponseType = "int"
-	ErrorResponse   ResponseType = "err"
-)

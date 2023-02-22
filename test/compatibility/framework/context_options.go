@@ -13,16 +13,16 @@ type GetContextInputOptions struct {
 }
 
 type GetContextOutputOptions struct {
-	*core.RuntimeAPIVersion                        // required
-	*ContextOpts                                   // For specific version options look into ContextOpts definition
-	ValidationMatcher       core.ValidationMatcher // Type of validation to be performed i.e. exact or partial. default is partial
-	Error                   string                 // expected error message could be the sub string of actual error message
+	*core.RuntimeAPIVersion                         // required
+	*ContextOpts                                    // For specific version options look into ContextOpts definition
+	ValidationStrategy      core.ValidationStrategy // Type of validation to be performed i.e. exact or partial. default is partial
+	Error                   string                  // expected error message could be the sub string of actual error message
 }
 
 type SetContextInputOptions struct {
 	*core.RuntimeAPIVersion      // required
 	*ContextOpts                 // required
-	IsCurrentContext        bool // required
+	SetCurrentContext       bool // required
 }
 
 type SetContextOutputOptions struct {

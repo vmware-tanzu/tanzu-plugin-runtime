@@ -8,27 +8,27 @@ import (
 	"github.com/onsi/gomega"
 
 	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
-	compatibilitytestingcore "github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 )
 
 var _ = ginkgo.Describe("Test RunAPIs method", func() {
 
 	ginkgo.BeforeEach(func() {
-		compatibilitytestingcore.SetupTempCfgFiles()
+		core.SetupTempCfgFiles()
 	})
 
 	ginkgo.Context("Test TriggerAPIs", func() {
 
 		var tests = []struct {
-			apis         []compatibilitytestingcore.API
-			expectedLogs map[compatibilitytestingcore.RuntimeAPIName][]compatibilitytestingcore.APILog
+			apis         []core.API
+			expectedLogs map[core.RuntimeAPIName][]core.APILog
 		}{
 			{
-				apis: []compatibilitytestingcore.API{
+				apis: []core.API{
 					{
-						Name:    compatibilitytestingcore.SetContextAPIName,
-						Version: compatibilitytestingcore.Version100,
-						Arguments: map[string]interface{}{
+						Name:    core.SetContextAPIName,
+						Version: core.Version100,
+						Arguments: map[core.APIArgumentType]interface{}{
 							"context": `name: context-one
 target: kubernetes
 globalOpts:
@@ -36,18 +36,18 @@ globalOpts:
 `,
 							"isCurrent": false,
 						},
-						Output: &compatibilitytestingcore.Output{
+						Output: &core.Output{
 							Result:  "success",
 							Content: "",
 						},
 					},
 					{
-						Name:    compatibilitytestingcore.GetContextAPIName,
-						Version: compatibilitytestingcore.Version100,
-						Arguments: map[string]interface{}{
+						Name:    core.GetContextAPIName,
+						Version: core.Version100,
+						Arguments: map[core.APIArgumentType]interface{}{
 							"contextName": "context-one",
 						},
-						Output: &compatibilitytestingcore.Output{
+						Output: &core.Output{
 							Result: "success",
 							Content: `name: context-one
 target: kubernetes
@@ -58,19 +58,18 @@ globalOpts:
 					},
 				},
 
-				expectedLogs: map[compatibilitytestingcore.RuntimeAPIName][]compatibilitytestingcore.APILog{
-					compatibilitytestingcore.SetContextAPIName: {
+				expectedLogs: map[core.RuntimeAPIName][]core.APILog{
+					core.SetContextAPIName: {
 						{
-							APIResponse: &compatibilitytestingcore.APIResponse{
+							APIResponse: &core.APIResponse{
 								ResponseBody: "",
-								ResponseType: compatibilitytestingcore.StringResponse,
+								ResponseType: core.StringResponse,
 							},
-							APIError: "",
 						},
 					},
-					compatibilitytestingcore.GetContextAPIName: {
+					core.GetContextAPIName: {
 						{
-							APIResponse: &compatibilitytestingcore.APIResponse{
+							APIResponse: &core.APIResponse{
 								ResponseBody: &configtypes.Context{
 									Name:   "context-one",
 									Target: "kubernetes",
@@ -78,9 +77,8 @@ globalOpts:
 										Endpoint: "test-endpoint",
 									},
 								},
-								ResponseType: compatibilitytestingcore.MapResponse,
+								ResponseType: core.MapResponse,
 							},
-							APIError: "",
 						},
 					},
 				},
@@ -91,8 +89,8 @@ globalOpts:
 			for _, tt := range tests {
 				actualLogs := triggerAPIs(tt.apis)
 
-				gomega.Expect(tt.expectedLogs[compatibilitytestingcore.SetContextAPIName]).To(gomega.Equal(actualLogs[compatibilitytestingcore.SetContextAPIName]))
-				gomega.Expect(tt.expectedLogs[compatibilitytestingcore.GetContextAPIName]).To(gomega.Equal(actualLogs[compatibilitytestingcore.GetContextAPIName]))
+				gomega.Expect(tt.expectedLogs[core.SetContextAPIName]).To(gomega.Equal(actualLogs[core.SetContextAPIName]))
+				gomega.Expect(tt.expectedLogs[core.GetContextAPIName]).To(gomega.Equal(actualLogs[core.GetContextAPIName]))
 
 			}
 		})

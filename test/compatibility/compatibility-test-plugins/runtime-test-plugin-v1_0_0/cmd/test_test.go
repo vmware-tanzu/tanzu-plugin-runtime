@@ -7,23 +7,19 @@ import (
 	"github.com/onsi/ginkgo"
 	"github.com/onsi/gomega"
 
-	compatibilitytestingcore "github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 )
 
 var _ = ginkgo.Describe("Test Root method", func() {
 
-	//BeforeEach(func() {
-	//	compatibilitytestingcore.SetupTempCfgFiles()
-	//})
+	ginkgo.BeforeEach(func() {
+		core.SetupTempCfgFiles()
+	})
 
 	ginkgo.Context("Test runAPIs", func() {
-
 		ginkgo.It("runAPIs with SetContext api data", func() {
-
-			apis, err := compatibilitytestingcore.ParseRuntimeAPIsFromFile("/var/folders/gw/3kzrkntn5rzbs4xhktdvdfjr0000gq/T/runtime_compatibility_testing4086182328")
-
+			apis, err := core.ParseRuntimeAPIsFromFile("/var/folders/gw/3kzrkntn5rzbs4xhktdvdfjr0000gq/T/runtime_compatibility_testing4086182328")
 			gomega.Expect(err).To(gomega.BeNil())
-
 			runAPIs(apis)
 		})
 	})

@@ -7,6 +7,7 @@ import (
 	"fmt"
 )
 
+// ValidateRuntimeVersion validated the whether passed version is valid and supported
 func ValidateRuntimeVersion(version *RuntimeAPIVersion) (bool, error) {
 	if version == nil || version.RuntimeVersion == "" {
 		return false, fmt.Errorf("runtime version is mandatory")

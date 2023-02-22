@@ -1,15 +1,13 @@
 // Copyright 2023 VMware, Inc. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-package framework
+package core
 
 import (
 	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-
-	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 )
 
 func TestGetTestData(t *testing.T) {
@@ -21,7 +19,7 @@ func TestGetTestData(t *testing.T) {
         target: kubernetes
         globalOpts:
           endpoint: test-endpoint
-    isCurrent: false
+    setCurrent: false
   output:
     result: success
     content: ""
@@ -32,23 +30,23 @@ func TestGetTestData(t *testing.T) {
 
 	err = os.WriteFile(temp.Name(), []byte(apiYaml), 0644)
 	assert.Nil(t, err)
-	apis, err := core.ParseRuntimeAPIsFromFile(temp.Name())
+	apis, err := ParseRuntimeAPIsFromFile(temp.Name())
 	assert.Nil(t, err)
 
-	expectedAPIs := []core.API{
+	expectedAPIs := []API{
 		{
-			Name:    core.SetContextAPIName,
-			Version: core.Version100,
-			Arguments: map[string]interface{}{
-				"context": `name: context-one
+			Name:    SetContextAPIName,
+			Version: Version100,
+			Arguments: map[APIArgumentType]interface{}{
+				Context: `name: context-one
 target: kubernetes
 globalOpts:
   endpoint: test-endpoint
 `,
-				"isCurrent": false,
+				SetCurrent: false,
 			},
-			Output: &core.Output{
-				Result:  core.Success,
+			Output: &Output{
+				Result:  Success,
 				Content: "",
 			},
 		},

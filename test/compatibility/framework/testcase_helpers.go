@@ -24,6 +24,10 @@ const (
 	pluginV100  = "runtime-test-plugin-v1_0_0"
 )
 
+const (
+	testPluginFilePathArgument = " --file "
+)
+
 // ConstructTestPluginCmd constructs the specific runtime test plugin command as per runtime version and apis
 func ConstructTestPluginCmd(version core.RuntimeVersion, apis []*core.API) (string, error) {
 	// Create root command for the specified runtime version
@@ -35,7 +39,7 @@ func ConstructTestPluginCmd(version core.RuntimeVersion, apis []*core.API) (stri
 		return "", err
 	}
 
-	pluginCommand += " --file " + fileName
+	pluginCommand += testPluginFilePathArgument + fileName
 
 	return pluginCommand, nil
 }
@@ -56,7 +60,7 @@ func makeRootCommand(version core.RuntimeVersion) string {
 	}
 }
 
-// writeAPIsToTempFile create a temp file with all the api data
+// writeAPIsToTempFile create a temp file with all the api data that is sent to runtime-test-plugins-vX.XX.XX binaries
 func writeAPIsToTempFile(apis []*core.API) (string, error) {
 	b, err := yaml.Marshal(apis)
 	if err != nil {

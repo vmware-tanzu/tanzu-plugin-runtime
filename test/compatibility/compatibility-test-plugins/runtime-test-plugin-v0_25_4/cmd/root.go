@@ -13,8 +13,8 @@ import (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "runtime-test-plugin-v0_25_4",
-	Short: "runtime backward compatibility test plugin",
-	Long:  `A test plugin with runtime lib v0.25.4 used for backward compatibility testing of runtime config apis`,
+	Short: "runtime cross-version api compatibility test plugin",
+	Long:  `A test plugin with runtime lib v0.25.4 used for cross-version api compatibility testing of runtime config apis`,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.

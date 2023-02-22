@@ -46,15 +46,15 @@ func NewSetContextCommand(setContextInputOptions *SetContextInputOptions, setCon
 
 	// Construct the setCurrent Argument
 	var setCurrent bool
-	if setContextInputOptions.IsCurrentContext {
+	if setContextInputOptions.SetCurrentContext {
 		setCurrent = true
 	} else {
 		setCurrent = false
 	}
 
-	api.Arguments = map[string]interface{}{
-		"context":   string(bytes),
-		"isCurrent": setCurrent,
+	api.Arguments = map[core.APIArgumentType]interface{}{
+		core.Context:    string(bytes),
+		core.SetCurrent: setCurrent,
 	}
 
 	// Construct Output parameters
@@ -101,8 +101,8 @@ func NewGetContextCommand(getContextInputOptions *GetContextInputOptions, getCon
 	}
 
 	// Construct the context api arguments and output
-	api.Arguments = map[string]interface{}{
-		"contextName": getContextInputOptions.ContextName,
+	api.Arguments = map[core.APIArgumentType]interface{}{
+		core.ContextName: getContextInputOptions.ContextName,
 	}
 
 	// Construct Output parameters
@@ -140,8 +140,8 @@ func NewGetContextCommand(getContextInputOptions *GetContextInputOptions, getCon
 		Content: content,
 	}
 
-	if getContextOutputOptions.ValidationMatcher != "" {
-		api.Output.ValidationMatcher = getContextOutputOptions.ValidationMatcher
+	if getContextOutputOptions.ValidationStrategy != "" {
+		api.Output.ValidationStrategy = getContextOutputOptions.ValidationStrategy
 	}
 
 	c.APIs = append(c.APIs, api)

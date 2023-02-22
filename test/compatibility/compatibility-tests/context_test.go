@@ -144,7 +144,7 @@ var _ = ginkgo.Describe("Context API", func() {
 						Endpoint: "test-endpoint",
 					},
 				},
-				IsCurrentContext: false,
+				SetCurrentContext: false,
 			}
 
 			// Output Parameters for Runtime SetContextAPIName API

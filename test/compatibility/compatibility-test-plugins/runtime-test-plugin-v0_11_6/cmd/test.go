@@ -9,17 +9,18 @@ import (
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 
-	compatibilitytestingcore "github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 )
 
 // testCmd represents the test command
 var (
-	file    string
-	testCmd = &cobra.Command{
+	// filepath a temporary file path that includes the api commands to be executed
+	filepath string
+	testCmd  = &cobra.Command{
 		Use:   "test",
 		Short: "A test command that parse the apis file and trigger the runtime library apis",
 		Run: func(cmd *cobra.Command, args []string) {
-			apis, err := compatibilitytestingcore.ParseRuntimeAPIsFromFile(file)
+			apis, err := core.ParseRuntimeAPIsFromFile(filepath)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -30,14 +31,14 @@ var (
 
 func init() {
 	rootCmd.AddCommand(testCmd)
-	testCmd.Flags().StringVarP(&file, "file", "f", "", "test file path")
+	testCmd.Flags().StringVarP(&filepath, "file", "f", "", "temporary test file path")
 }
 
 // runAPIs loop through the apis and trigger the runtime api methods and print logs to stdout
-func runAPIs(apis []compatibilitytestingcore.API) {
+func runAPIs(apis []core.API) {
 	logs := triggerAPIs(apis)
 
-	// Log the output to stdout
+	// Log the apis output to stdout
 	bytes, err := yaml.Marshal(logs)
 	if err != nil {
 		fmt.Println("runAPIs", err)

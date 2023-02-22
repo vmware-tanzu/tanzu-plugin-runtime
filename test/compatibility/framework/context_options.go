@@ -26,7 +26,8 @@ type SetContextInputOptions struct {
 }
 
 type SetContextOutputOptions struct {
-	Error string // expected error message could be the sub string of actual error message
+	ValidationStrategy core.ValidationStrategy // Type of validation to be performed i.e. exact or partial. default is partial
+	Error              string                  // expected error message could be the sub string of actual error message
 }
 
 type DeleteContextInputOptions struct {
@@ -35,7 +36,8 @@ type DeleteContextInputOptions struct {
 }
 
 type DeleteContextOutputOptions struct {
-	Error string // expected error message could be the sub string of actual error message
+	ValidationStrategy core.ValidationStrategy // Type of validation to be performed i.e. exact or partial. default is partial
+	Error              string                  // expected error message could be the sub string of actual error message
 }
 
 func (s *GetContextOutputOptions) ShouldNotIncludeTarget() bool {

@@ -16,11 +16,11 @@ func Execute(t *core.TestCase) {
 	for _, cmd := range t.Commands {
 		for _, api := range cmd.APIs {
 			// Construct the runtime-test-plugin-x_xx_xx command to execute
-			pluginCommand, err := ConstructTestPluginCmd(api.Version, cmd.APIs)
+			pluginCommand, err := core.ConstructTestPluginCmd(api.Version, cmd.APIs)
 			gomega.Expect(err).To(gomega.BeNil())
 
 			// Execute the constructed runtime-test-plugin-x_xx_xx command
-			stdout, stderr, err := Exec(pluginCommand)
+			stdout, stderr, err := core.Exec(pluginCommand)
 
 			if stderr != nil && stderr.String() != "" {
 				gomega.Expect(stderr.String()).To(gomega.BeNil())

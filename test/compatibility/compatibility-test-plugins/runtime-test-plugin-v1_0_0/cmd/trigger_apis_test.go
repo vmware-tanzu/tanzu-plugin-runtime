@@ -29,12 +29,12 @@ var _ = ginkgo.Describe("Test RunAPIs method", func() {
 						Name:    core.SetContextAPIName,
 						Version: core.Version100,
 						Arguments: map[core.APIArgumentType]interface{}{
-							"context": `name: context-one
+							core.Context: `name: context-one
 target: kubernetes
 globalOpts:
   endpoint: test-endpoint
 `,
-							"isCurrent": false,
+							core.SetCurrent: false,
 						},
 						Output: &core.Output{
 							Result:  "success",
@@ -45,7 +45,7 @@ globalOpts:
 						Name:    core.GetContextAPIName,
 						Version: core.Version100,
 						Arguments: map[core.APIArgumentType]interface{}{
-							"contextName": "context-one",
+							core.ContextName: "context-one",
 						},
 						Output: &core.Output{
 							Result: "success",
@@ -85,7 +85,7 @@ globalOpts:
 			},
 		}
 
-		ginkgo.It("using SetContextAPIName and GetContextAPIName", func() {
+		ginkgo.It("using SetContext and GetContext APIs", func() {
 			for _, tt := range tests {
 				actualLogs := triggerAPIs(tt.apis)
 

@@ -203,7 +203,5 @@ var _ = ginkgo.Describe("Context API", func() {
 			// Executes the commands from the list and validates the expected output with actual output
 			framework.Execute(testCase)
 		})
-
 	})
-
 })

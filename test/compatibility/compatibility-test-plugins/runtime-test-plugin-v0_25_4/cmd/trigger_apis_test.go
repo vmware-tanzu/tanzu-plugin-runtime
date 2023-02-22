@@ -18,70 +18,79 @@ var _ = ginkgo.Describe("Test RunAPIs method", func() {
 	})
 
 	ginkgo.Context("Test TriggerAPIs", func() {
-		ginkgo.It("using SetContextAPIName and GetContextAPIName", func() {
-			apis := []core.API{
-				{
-					Name:    core.SetContextAPIName,
-					Version: core.Version100,
-					Arguments: map[core.APIArgumentType]interface{}{
-						"context": `name: context-one
-target: kubernetes
-globalOpts:
-  endpoint: test-endpoint
-`,
-						"isCurrent": false,
-					},
-					Output: &core.Output{
-						Result:  core.Success,
-						Content: "",
-					},
-				},
-				{
-					Name:    core.GetContextAPIName,
-					Version: core.Version100,
-					Arguments: map[core.APIArgumentType]interface{}{
-						"contextName": "context-one",
-					},
-					Output: &core.Output{
-						Result: core.Success,
-						Content: `name: context-one
-target: kubernetes
-globalOpts:
-  endpoint: test-endpoint
-`,
-					},
-				},
-			}
+		ginkgo.It("using SetContext and GetContext APIs", func() {
 
-			expectedLogs := map[core.RuntimeAPIName][]core.APILog{
-				"SetContextAPIName": {
-					{
-						APIResponse: &core.APIResponse{
-							ResponseBody: "",
-							ResponseType: core.StringResponse,
+			var tests = []struct {
+				apis         []core.API
+				expectedLogs map[core.RuntimeAPIName][]core.APILog
+			}{
+				{
+					[]core.API{
+						{
+							Name:    core.SetContextAPIName,
+							Version: core.Version100,
+							Arguments: map[core.APIArgumentType]interface{}{
+								core.Context: `name: context-one
+target: kubernetes
+globalOpts:
+  endpoint: test-endpoint
+`,
+								core.SetCurrent: false,
+							},
+							Output: &core.Output{
+								Result:  core.Success,
+								Content: "",
+							},
+						},
+						{
+							Name:    core.GetContextAPIName,
+							Version: core.Version100,
+							Arguments: map[core.APIArgumentType]interface{}{
+								core.ContextName: "context-one",
+							},
+							Output: &core.Output{
+								Result: core.Success,
+								Content: `name: context-one
+target: kubernetes
+globalOpts:
+  endpoint: test-endpoint
+`,
+							},
 						},
 					},
-				},
-				"GetContextAPIName": {
-					{
-						APIResponse: &core.APIResponse{
-							ResponseBody: &configapi.Context{
-								Name: "context-one",
-								Type: configapi.CtxTypeK8s,
-								GlobalOpts: &configapi.GlobalServer{
-									Endpoint: "test-endpoint",
+					map[core.RuntimeAPIName][]core.APILog{
+						core.SetContextAPIName: {
+							{
+								APIResponse: &core.APIResponse{
+									ResponseBody: "",
+									ResponseType: core.StringResponse,
 								},
 							},
-							ResponseType: core.MapResponse,
+						},
+						core.GetContextAPIName: {
+							{
+								APIResponse: &core.APIResponse{
+									ResponseBody: &configapi.Context{
+										Name: "context-one",
+										Type: configapi.CtxTypeK8s,
+										GlobalOpts: &configapi.GlobalServer{
+											Endpoint: "test-endpoint",
+										},
+									},
+									ResponseType: core.MapResponse,
+								},
+							},
 						},
 					},
 				},
 			}
 
-			logs := triggerAPIs(apis)
+			for _, tt := range tests {
+				logs := triggerAPIs(tt.apis)
+				gomega.Expect(tt.expectedLogs[core.SetContextAPIName]).To(gomega.Equal(logs[core.SetContextAPIName]))
+				gomega.Expect(tt.expectedLogs[core.GetContextAPIName]).To(gomega.Equal(logs[core.GetContextAPIName]))
+			}
 
-			gomega.Expect(expectedLogs[core.SetContextAPIName]).To(gomega.Equal(logs[core.SetContextAPIName]))
-			gomega.Expect(expectedLogs[core.GetContextAPIName]).To(gomega.Equal(logs[core.GetContextAPIName]))
 		})
 	})
 })

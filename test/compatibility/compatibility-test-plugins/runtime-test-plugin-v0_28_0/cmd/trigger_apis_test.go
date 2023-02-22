@@ -7,7 +7,7 @@ import (
 	"github.com/onsi/ginkgo"
 	"github.com/onsi/gomega"
 
-	configtypes "github.com/vmware-tanzu/tanzu-framework/cli/runtime/apis/config/v1alpha1"
+	configapi "github.com/vmware-tanzu/tanzu-framework/cli/runtime/apis/config/v1alpha1"
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 )
 
@@ -19,71 +19,79 @@ var _ = ginkgo.Describe("Test RunAPIs method", func() {
 
 	ginkgo.Context("Test TriggerAPIs", func() {
 
-		ginkgo.It("using SetContextAPIName and GetContextAPIName", func() {
-
-			apis := []core.API{
-				{
-					Name:    core.SetContextAPIName,
-					Version: core.Version100,
-					Arguments: map[core.APIArgumentType]interface{}{
-						"context": `name: context-one
-target: kubernetes
-globalOpts:
-  endpoint: test-endpoint
-`,
-						"isCurrent": false,
-					},
-					Output: &core.Output{
-						Result:  "success",
-						Content: "",
-					},
-				},
-				{
-					Name:    core.GetContextAPIName,
-					Version: core.Version100,
-					Arguments: map[core.APIArgumentType]interface{}{
-						"contextName": "context-one",
-					},
-					Output: &core.Output{
-						Result: "success",
-						Content: `name: context-one
-target: kubernetes
-globalOpts:
-  endpoint: test-endpoint
-`,
-					},
-				},
-			}
-
-			expectedLogs := map[core.RuntimeAPIName][]core.APILog{
-				"SetContextAPIName": {
+		var tests = []struct {
+			apis         []core.API
+			expectedLogs map[core.RuntimeAPIName][]core.APILog
+		}{
+			{
+				[]core.API{
 					{
-						APIResponse: &core.APIResponse{
-							ResponseBody: "",
-							ResponseType: core.StringResponse,
+						Name:    core.SetContextAPIName,
+						Version: core.Version100,
+						Arguments: map[core.APIArgumentType]interface{}{
+							core.Context: `name: context-one
+target: kubernetes
+globalOpts:
+  endpoint: test-endpoint
+`,
+							core.SetCurrent: false,
+						},
+						Output: &core.Output{
+							Result:  "success",
+							Content: "",
+						},
+					},
+					{
+						Name:    core.GetContextAPIName,
+						Version: core.Version100,
+						Arguments: map[core.APIArgumentType]interface{}{
+							core.ContextName: "context-one",
+						},
+						Output: &core.Output{
+							Result: "success",
+							Content: `name: context-one
+target: kubernetes
+globalOpts:
+  endpoint: test-endpoint
+`,
 						},
 					},
 				},
-				"GetContextAPIName": {
-					{
-						APIResponse: &core.APIResponse{
-							ResponseBody: &configtypes.Context{
-								Name:   "context-one",
-								Target: "kubernetes",
-								GlobalOpts: &configtypes.GlobalServer{
-									Endpoint: "test-endpoint",
-								},
+				map[core.RuntimeAPIName][]core.APILog{
+					core.SetContextAPIName: {
+						{
+							APIResponse: &core.APIResponse{
+								ResponseBody: "",
+								ResponseType: core.StringResponse,
 							},
-							ResponseType: core.MapResponse,
+						},
+					},
+					core.GetContextAPIName: {
+						{
+							APIResponse: &core.APIResponse{
+								ResponseBody: &configapi.Context{
+									Name:   "context-one",
+									Target: "kubernetes",
+									GlobalOpts: &configapi.GlobalServer{
+										Endpoint: "test-endpoint",
+									},
+								},
+								ResponseType: core.MapResponse,
+							},
 						},
 					},
 				},
+			},
+		}
+
+		ginkgo.It("using SetContext and GetContext APIs", func() {
+			for _, tt := range tests {
+				actualLogs := triggerAPIs(tt.apis)
+
+				gomega.Expect(tt.expectedLogs[core.SetContextAPIName]).To(gomega.Equal(actualLogs[core.SetContextAPIName]))
+				gomega.Expect(tt.expectedLogs[core.GetContextAPIName]).To(gomega.Equal(actualLogs[core.GetContextAPIName]))
+
 			}
-
-			logs := triggerAPIs(apis)
-
-			gomega.Expect(expectedLogs[core.SetContextAPIName]).To(gomega.Equal(logs[core.SetContextAPIName]))
-			gomega.Expect(expectedLogs[core.GetContextAPIName]).To(gomega.Equal(logs[core.GetContextAPIName]))
 		})
 	})
 })

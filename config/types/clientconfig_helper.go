@@ -9,16 +9,22 @@ func StringToTarget(target string) Target {
 		return TargetK8s
 	} else if target == string(targetTMC) || target == string(TargetTMC) {
 		return TargetTMC
-	} else if target == string(TargetNone) {
-		return TargetNone
+	} else if target == string(TargetGlobal) {
+		return TargetGlobal
+	} else if target == string(TargetUnknown) {
+		return TargetUnknown
 	}
-	return TargetNone
+	return TargetUnknown
 }
 
-func IsValidTarget(target string) bool {
+// IsValidTarget validates the target string specified is valid or not
+// TargetGlobal and TargetUnknown are special targets and hence this function
+// provide flexibility additional arguments to allow them based on the requirement
+func IsValidTarget(target string, allowGlobal, allowUnknown bool) bool {
 	return target == string(targetK8s) ||
 		target == string(TargetK8s) ||
 		target == string(targetTMC) ||
 		target == string(TargetTMC) ||
-		target == string(TargetNone)
+		(allowGlobal && target == string(TargetGlobal)) ||
+		(allowUnknown && target == string(TargetUnknown))
 }

@@ -8,13 +8,39 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
+
+func TestValidatePlugin(t *testing.T) {
+	assert := assert.New(t)
+
+	descriptor := PluginDescriptor{
+		Name:            "Test Plugin",
+		DocURL:          "https://docs.example.com",
+		Hidden:          false,
+		PostInstallHook: func() error { return nil },
+	}
+
+	err := ValidatePlugin(&descriptor)
+	assert.ErrorContains(err, "target is not valid")
+	assert.ErrorContains(err, "version cannot be empty")
+	assert.ErrorContains(err, "description cannot be empty")
+	assert.ErrorContains(err, "group cannot be empty")
+
+	descriptor.Name = ""
+	descriptor.Version = "non-semver"
+	err = ValidatePlugin(&descriptor)
+	assert.ErrorContains(err, "plugin name cannot be empty")
+	assert.ErrorContains(err, "is not a valid semantic version")
+}
 
 func TestNewPlugin(t *testing.T) {
 	assert := assert.New(t)
 
 	descriptor := PluginDescriptor{
 		Name:            "Test Plugin",
+		Target:          types.TargetGlobal,
 		Description:     "Description of the plugin",
 		Version:         "v1.2.3",
 		BuildSHA:        "cafecafe",
@@ -37,6 +63,7 @@ func TestAddCommands(t *testing.T) {
 
 	descriptor := PluginDescriptor{
 		Name:        "Test Plugin",
+		Target:      types.TargetGlobal,
 		Description: "Description of the plugin",
 		Version:     "v1.2.3",
 		BuildSHA:    "cafecafe",
@@ -65,6 +92,7 @@ func TestExecute(t *testing.T) {
 
 	descriptor := PluginDescriptor{
 		Name:        "Test Plugin",
+		Target:      types.TargetGlobal,
 		Description: "Description of the plugin",
 		Version:     "v1.2.3",
 		BuildSHA:    "cafecafe",

@@ -12,6 +12,15 @@ Developers can use the `Builder` admin plugin to bootstrap a new plugin which ca
 
 ## Config API
 
-Tanzu Plugin Runtime provides various config api methods to perform CRUD operations on Contexts, Servers, DiscoverySources, Features, Envs etc.
+Tanzu Plugin Runtime provides various config API methods to perform CRUD operations on Contexts, Servers, DiscoverySources, Features, Envs etc.
 
-For more details about the design and apis go to [Config API](docs/config.md)
+For more details about the design and APIs go to [Config API](docs/config.md)
+
+## Cross Version API Compatibility Testing
+
+### Overview
+
+Cross Version API Compatibility testing ensures that [Config APIs](docs/config.md) of different Tanzu Plugin Runtime versions work as expected as long as those Tanzu Plugin Runtime versions are supported.
+Cross Version API Compatibility testing simulates the interaction of APIs provided by different versions of plugin runtimes to ensure that they can interoperate with one another.
+
+For more details go to [Cross-version API Compatibility](./test/cross-version-api-compatibility.md)

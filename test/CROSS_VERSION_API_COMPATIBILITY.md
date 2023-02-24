@@ -38,7 +38,7 @@ GitHub CI runner pipeline include Logs with details on test cases from test-case
 
 ### Test Suite API
 
-Framework has `framework.NewTestCase` to write a specific test case, each test case consist sequence of commands, each command is specific to a runtime api call.
+Framework has `framework.NewTestCase` to write a specific test case, each test case consists of a sequence of commands, with each command corresponding to an invocatino of a API from a specific version of runtime.
 We need to use the above high level APIs to construct specific test command, the input data for each high level apis changes based on runtime version's its being tested, for more details look into the input parameter's type definition.
 
 ``` go

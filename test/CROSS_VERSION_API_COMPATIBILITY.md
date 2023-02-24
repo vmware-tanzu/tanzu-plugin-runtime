@@ -121,7 +121,7 @@ type DeleteContextOutputOptions struct{
 - Based on the Runtime Version xxxOptions attributes may change(mandatory/optional/Not applicable).
 - It is meant to be used as both inputOptions and outputOptions.
 - Command Creation Helper functions (i.e. NewSetContextCommand) validate the supplied inputOptions as per RuntimeVersion and make sure all required attributes are set. If not Command Creation Helper functions will throw error and Test fails.
-- The validation of “Input and expect output” happens in  Set/Get/DeleteXXXCommand creation (within framework.NewTestCase), so it's not part of test case execution. so its kind of test case setup.
+- The validation of “Input and expect output” happens in Set/Get/DeleteXXXCommand creation (within framework.NewTestCase), so it's not part of test case execution. so its kind of test case setup.
 - Input struct: Framework validates the supplied Input data (eg: GetContextInputOptions/SetContextInputOptions/DeleteContextInputOptions) as per specified runtime version supported fields.
 - Output struct: Framework validates the supplied outputOptions as per specified runtime version whether certain fields are supported for the runtime version used and compares the supplied data with what is returned from API method i.e. every non-null field in output struct will be checked for equality with returned result.
   (Eg: GetContextOutputOptions/SetContextOutputOptions/DeleteContextOutputOptions) as its test writer responsibility, the Output data is depends on the Input data (eg: if input is not valid, runtime api may return error) OR the sequence of calls made before the current call (eg: NewGetContextCommand() output depends on the previous SetContext** calls).

@@ -13,26 +13,17 @@ import (
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 )
 
-// triggerContextAPIs trigger context related runtime apis and construct logs
-func triggerContextAPIs(api *core.API, logs map[core.RuntimeAPIName][]core.APILog) {
-	// If API name is SetContext then trigger SetContext() API
-	if api.Name == core.SetContextAPIName {
-		log := triggerSetContextAPI(api)
-		logs[core.SetContextAPIName] = append(logs[core.SetContextAPIName], log)
-	}
-	// If API name is GetContext then trigger GetContext() API
-	if api.Name == core.GetContextAPIName {
-		log := triggerGetContextAPI(api)
-		logs[core.GetContextAPIName] = append(logs[core.GetContextAPIName], log)
-	}
-}
-
 // triggerGetContextAPI trigger get context runtime api
 func triggerGetContextAPI(api *core.API) core.APILog {
 	// Parse arguments needed to trigger the runtime api
 	ctxName, err := core.ParseStr(api.Arguments[core.ContextName])
 	if err != nil {
-		fmt.Println(err)
+		log := core.APILog{}
+		log.APIResponse = &core.APIResponse{
+			ResponseType: core.ErrorResponse,
+			ResponseBody: fmt.Errorf("failed to parse string from argument %v with error %v ", core.ContextName, err.Error()),
+		}
+		return log
 	}
 
 	// Call runtime GetContext API
@@ -61,7 +52,12 @@ func triggerSetContextAPI(api *core.API) core.APILog {
 	// Parse arguments needed to trigger the runtime api
 	ctx, err := parseContext(api.Arguments[core.Context].(string))
 	if err != nil {
-		fmt.Println(err)
+		log := core.APILog{}
+		log.APIResponse = &core.APIResponse{
+			ResponseType: core.ErrorResponse,
+			ResponseBody: fmt.Errorf("failed to parse context from argument %v with error %v ", core.Context, err.Error()),
+		}
+		return log
 	}
 	setCurrent := api.Arguments[core.SetCurrent].(bool)
 
@@ -82,6 +78,138 @@ func triggerSetContextAPI(api *core.API) core.APILog {
 		}
 	}
 
+	return log
+}
+
+// triggerDeleteContextAPI trigger remove context runtime api
+func triggerDeleteContextAPI(api *core.API) core.APILog {
+	// Parse arguments needed to trigger the runtime api
+	ctxName, err := core.ParseStr(api.Arguments[core.ContextName])
+	if err != nil {
+		log := core.APILog{}
+		log.APIResponse = &core.APIResponse{
+			ResponseType: core.ErrorResponse,
+			ResponseBody: fmt.Errorf("failed to parse string from argument %v with error %v ", core.ContextName, err.Error()),
+		}
+		return log
+	}
+
+	// Call runtime DeleteContext API
+	err = configlib.DeleteContext(ctxName)
+
+	// Construct logging
+	log := core.APILog{}
+	if err != nil {
+		log.APIResponse = &core.APIResponse{
+			ResponseType: core.ErrorResponse,
+			ResponseBody: err.Error(),
+		}
+	} else {
+		log.APIResponse = &core.APIResponse{
+			ResponseBody: "",
+			ResponseType: core.StringResponse,
+		}
+	}
+
+	return log
+}
+
+// triggerSetCurrentContextAPI trigger remove context runtime api
+func triggerSetCurrentContextAPI(api *core.API) core.APILog {
+	// Parse arguments needed to trigger the runtime api
+	ctxName, err := core.ParseStr(api.Arguments[core.ContextName])
+	if err != nil {
+		log := core.APILog{}
+		log.APIResponse = &core.APIResponse{
+			ResponseType: core.ErrorResponse,
+			ResponseBody: fmt.Errorf("failed to parse string from argument %v with error %v ", core.ContextName, err.Error()),
+		}
+		return log
+	}
+
+	// Call runtime AddContext API
+	err = configlib.SetCurrentContext(ctxName)
+
+	// Construct logging
+	log := core.APILog{}
+	if err != nil {
+		log.APIResponse = &core.APIResponse{
+			ResponseType: core.ErrorResponse,
+			ResponseBody: err.Error(),
+		}
+	} else {
+		log.APIResponse = &core.APIResponse{
+			ResponseBody: "",
+			ResponseType: core.StringResponse,
+		}
+	}
+
+	return log
+}
+
+// triggerGetCurrentContextAPI trigger remove context runtime api
+func triggerGetCurrentContextAPI(api *core.API) core.APILog {
+	// Parse arguments needed to trigger the runtime api
+	target, err := core.ParseStr(api.Arguments[core.Target])
+	if err != nil {
+		log := core.APILog{}
+		log.APIResponse = &core.APIResponse{
+			ResponseType: core.ErrorResponse,
+			ResponseBody: fmt.Errorf("failed to parse string from argument %v with error %v ", core.Target, err.Error()),
+		}
+		return log
+	}
+
+	// Call runtime AddContext API
+	ctx, err := configlib.GetCurrentContext(configtypes.Target(target))
+
+	// Construct logging
+	log := core.APILog{}
+	if err != nil {
+		log.APIResponse = &core.APIResponse{
+			ResponseType: core.ErrorResponse,
+			ResponseBody: err.Error(),
+		}
+	}
+
+	if ctx != nil {
+		log.APIResponse = &core.APIResponse{
+			ResponseBody: ctx,
+			ResponseType: core.MapResponse,
+		}
+	}
+	return log
+}
+
+// triggerRemoveCurrentContextAPI trigger remove context runtime api
+func triggerRemoveCurrentContextAPI(api *core.API) core.APILog {
+	// Parse arguments needed to trigger the runtime api
+	target, err := core.ParseStr(api.Arguments[core.Target])
+	if err != nil {
+		log := core.APILog{}
+		log.APIResponse = &core.APIResponse{
+			ResponseType: core.ErrorResponse,
+			ResponseBody: fmt.Errorf("failed to parse string from argument %v with error %v ", core.Target, err.Error()),
+		}
+		return log
+	}
+
+	// Call runtime AddContext API
+	err = configlib.RemoveCurrentContext(configtypes.Target(target))
+
+	// Construct logging
+	log := core.APILog{}
+	if err != nil {
+		log.APIResponse = &core.APIResponse{
+			ResponseType: core.ErrorResponse,
+			ResponseBody: err.Error(),
+		}
+	} else {
+		log.APIResponse = &core.APIResponse{
+			ResponseBody: "",
+			ResponseType: core.StringResponse,
+		}
+	}
 	return log
 }
 

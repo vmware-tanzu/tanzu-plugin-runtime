@@ -41,10 +41,14 @@ func triggerGetServerAPI(api *core.API) core.APILog {
 			ResponseBody: err.Error(),
 		}
 	}
-	log.APIResponse = &core.APIResponse{
-		ResponseBody: server,
-		ResponseType: core.MapResponse,
+
+	if server != nil {
+		log.APIResponse = &core.APIResponse{
+			ResponseBody: server,
+			ResponseType: core.MapResponse,
+		}
 	}
+
 	return log
 }
 
@@ -65,10 +69,11 @@ func triggerAddServerAPI(api *core.API) core.APILog {
 			ResponseType: core.ErrorResponse,
 			ResponseBody: err.Error(),
 		}
-	}
-	log.APIResponse = &core.APIResponse{
-		ResponseBody: "",
-		ResponseType: core.StringResponse,
+	} else {
+		log.APIResponse = &core.APIResponse{
+			ResponseBody: "",
+			ResponseType: core.StringResponse,
+		}
 	}
 	return log
 }

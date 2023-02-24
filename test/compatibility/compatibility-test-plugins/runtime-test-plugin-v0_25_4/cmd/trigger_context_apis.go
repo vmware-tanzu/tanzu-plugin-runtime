@@ -13,18 +13,6 @@ import (
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 )
 
-// triggerContextAPIs trigger context related runtime apis and construct logs
-func triggerContextAPIs(api *core.API, logs map[core.RuntimeAPIName][]core.APILog) {
-	if api.Name == core.SetContextAPIName {
-		log := triggerSetContextAPI(api)
-		logs[core.SetContextAPIName] = append(logs[core.SetContextAPIName], log)
-	}
-	if api.Name == core.GetContextAPIName {
-		log := triggerGetContextAPI(api)
-		logs[core.GetContextAPIName] = append(logs[core.GetContextAPIName], log)
-	}
-}
-
 // triggerGetContextAPI trigger get context runtime api
 func triggerGetContextAPI(api *core.API) core.APILog {
 	// Parse arguments needed to trigger the runtime api
@@ -44,10 +32,13 @@ func triggerGetContextAPI(api *core.API) core.APILog {
 			ResponseBody: err.Error(),
 		}
 	}
-	log.APIResponse = &core.APIResponse{
-		ResponseBody: ctx,
-		ResponseType: core.MapResponse,
+	if ctx != nil {
+		log.APIResponse = &core.APIResponse{
+			ResponseBody: ctx,
+			ResponseType: core.MapResponse,
+		}
 	}
+
 	return log
 }
 
@@ -70,10 +61,94 @@ func triggerSetContextAPI(api *core.API) core.APILog {
 			ResponseType: core.ErrorResponse,
 			ResponseBody: err.Error(),
 		}
+	} else {
+		log.APIResponse = &core.APIResponse{
+			ResponseBody: "",
+			ResponseType: core.StringResponse,
+		}
 	}
-	log.APIResponse = &core.APIResponse{
-		ResponseBody: "",
-		ResponseType: core.StringResponse,
+	return log
+}
+
+// triggerRemoveContextAPI trigger remove context runtime api
+func triggerRemoveContextAPI(api *core.API) core.APILog {
+	// Parse arguments needed to trigger the runtime api
+	ctxName, err := core.ParseStr(api.Arguments[core.ContextName])
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	// Call runtime AddContext API
+	err = configlib.RemoveContext(ctxName)
+
+	// Construct logging
+	log := core.APILog{}
+	if err != nil {
+		log.APIResponse = &core.APIResponse{
+			ResponseType: core.ErrorResponse,
+			ResponseBody: err.Error(),
+		}
+	} else {
+		log.APIResponse = &core.APIResponse{
+			ResponseBody: "",
+			ResponseType: core.StringResponse,
+		}
+	}
+	return log
+}
+
+// triggerSetCurrentContextAPI trigger remove context runtime api
+func triggerSetCurrentContextAPI(api *core.API) core.APILog {
+	// Parse arguments needed to trigger the runtime api
+	ctxName, err := core.ParseStr(api.Arguments[core.ContextName])
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	// Call runtime AddContext API
+	err = configlib.SetCurrentContext(ctxName)
+
+	// Construct logging
+	log := core.APILog{}
+	if err != nil {
+		log.APIResponse = &core.APIResponse{
+			ResponseType: core.ErrorResponse,
+			ResponseBody: err.Error(),
+		}
+	} else {
+		log.APIResponse = &core.APIResponse{
+			ResponseBody: "",
+			ResponseType: core.StringResponse,
+		}
+	}
+	return log
+}
+
+// triggerGetCurrentContextAPI trigger remove context runtime api
+func triggerGetCurrentContextAPI(api *core.API) core.APILog {
+	// Parse arguments needed to trigger the runtime api
+	target, err := core.ParseStr(api.Arguments[core.ContextType])
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	// Call runtime AddContext API
+	ctx, err := configlib.GetCurrentContext(configapi.ContextType(target))
+
+	// Construct logging
+	log := core.APILog{}
+	if err != nil {
+		log.APIResponse = &core.APIResponse{
+			ResponseType: core.ErrorResponse,
+			ResponseBody: err.Error(),
+		}
+	}
+
+	if ctx != nil {
+		log.APIResponse = &core.APIResponse{
+			ResponseBody: ctx,
+			ResponseType: core.MapResponse,
+		}
 	}
 	return log
 }

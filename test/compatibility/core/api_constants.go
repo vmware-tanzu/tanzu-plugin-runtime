@@ -8,10 +8,16 @@ package core
 type RuntimeAPIName string
 
 const (
-	SetContextAPIName RuntimeAPIName = "SetContext"
-	GetContextAPIName RuntimeAPIName = "GetContext"
-	AddServerAPIName  RuntimeAPIName = "AddServer"
-	GetServerAPIName  RuntimeAPIName = "GetServer"
+	SetContextAPIName           RuntimeAPIName = "SetContext"
+	GetContextAPIName           RuntimeAPIName = "GetContext"
+	DeleteContextAPIName        RuntimeAPIName = "DeleteContext"
+	RemoveContextAPIName        RuntimeAPIName = "RemoveContext"
+	SetCurrentContextAPIName    RuntimeAPIName = "SetCurrentContext"
+	GetCurrentContextAPIName    RuntimeAPIName = "GetCurrentContext"
+	RemoveCurrentContextAPIName RuntimeAPIName = "RemoveCurrentContext"
+
+	AddServerAPIName RuntimeAPIName = "AddServer"
+	GetServerAPIName RuntimeAPIName = "GetServer"
 )
 
 // APIArgumentType describes all the arguments types for runtime api functions
@@ -23,6 +29,9 @@ const (
 	SetCurrent  APIArgumentType = "setCurrent"
 	Server      APIArgumentType = "server"
 	ServerName  APIArgumentType = "serverName"
+	Name        APIArgumentType = "name"
+	Target      APIArgumentType = "target"
+	ContextType APIArgumentType = "contextType"
 )
 
 type Result string

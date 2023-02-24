@@ -189,7 +189,7 @@ actualCtx := GetContext(ctxName) //i.e. test-bc
 // Print the log to stdout
 ```
 
-### Combination / Co - Existence Testing
+### Combination / Co-existence Testing
 
 Below table describes all possible combination tests for all supported Runtime APIs.
 

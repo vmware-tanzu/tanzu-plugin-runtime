@@ -246,13 +246,18 @@ func NewGetCurrentContextCommand(getCurrentContextInputOptions *GetCurrentContex
 	api.Version = getCurrentContextInputOptions.RuntimeVersion
 
 	// Validate the Input Options
-	if getCurrentContextInputOptions.Target == "" {
-		return nil, errors.New("context target is required")
+	_, err = ValidateGetCurrentContextOutputOptionsAsPerRuntimeVersion(getCurrentContextInputOptions)
+	if err != nil {
+		return nil, err
 	}
 
 	// Construct the context api arguments and output
-	api.Arguments = map[core.APIArgumentType]interface{}{
-		core.Target: getCurrentContextInputOptions.Target,
+	api.Arguments = make(map[core.APIArgumentType]interface{})
+
+	if getCurrentContextInputOptions.Target != "" {
+		api.Arguments[core.Target] = getCurrentContextInputOptions.Target
+	} else if getCurrentContextInputOptions.ContextType != "" {
+		api.Arguments[core.ContextType] = getCurrentContextInputOptions.ContextType
 	}
 
 	// Construct Output parameters

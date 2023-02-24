@@ -54,8 +54,9 @@ type SetCurrentContextOutputOptions struct {
 }
 
 type GetCurrentContextInputOptions struct {
-	*core.RuntimeAPIVersion        // required
-	Target                  Target // required
+	*core.RuntimeAPIVersion             // required
+	Target                  Target      // required for v1.0.0 - v0.28.0
+	ContextType             ContextType // required for v0.25.4
 }
 
 type GetCurrentContextOutputOptions struct {
@@ -81,6 +82,14 @@ func (s *ContextOpts) ShouldNotIncludeTarget() bool {
 
 func (s *ContextOpts) ShouldNotIncludeContextType() bool {
 	return s.Type == ""
+}
+
+func (s *GetCurrentContextInputOptions) ShouldNotIncludeTarget() bool {
+	return s.Target == ""
+}
+
+func (s *GetCurrentContextInputOptions) ShouldNotIncludeContextType() bool {
+	return s.ContextType == ""
 }
 
 func (s *SetContextInputOptions) ValidName() bool {

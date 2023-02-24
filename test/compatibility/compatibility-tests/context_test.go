@@ -23,14 +23,15 @@ var _ = ginkgo.Describe("Context API Tests", func() {
 	})
 
 	ginkgo.Context("Test SetContext with all versions of GetContext", func() {
-		ginkgo.It("SetContext v1.0.0 then GetContext v0.11.6, v0.25.4, v0.28.0, v1.0.0", func() {
+
+		ginkgo.It("SetContext, SetCurrentContext v1.0.0  then GetContext, GetCurrentContext v0.25.4, v0.28.0, v1.0.0", func() {
 			// Input Parameters for SetContext v1.0.0
 			setContextInputOptions := &framework.SetContextInputOptions{
 				RuntimeAPIVersion: &core.RuntimeAPIVersion{
 					RuntimeVersion: core.Version100,
 				},
 				ContextOpts: &framework.ContextOpts{
-					Name:   "compatibility-one",
+					Name:   framework.CtxCompatibilityOne,
 					Target: framework.TargetK8s,
 					GlobalOpts: &framework.GlobalServerOpts{
 						Endpoint: "test-endpoint",
@@ -38,7 +39,81 @@ var _ = ginkgo.Describe("Context API Tests", func() {
 				},
 			}
 
-			// Input and Output Params for GetContext v1.0.0
+			// Input Parameters for SetCurrentContext v1.0.0
+			setCurrentContextInputOptions := framework.MakeSetCurrentContextInputOptions(core.Version100, framework.CtxCompatibilityOne)
+
+			// Input Parameters for GetCurrentContext
+			V100GetCurrentContextInputOptions := &framework.GetCurrentContextInputOptions{
+				RuntimeAPIVersion: &core.RuntimeAPIVersion{
+					RuntimeVersion: core.Version100,
+				},
+				Target: framework.TargetK8s,
+			}
+
+			V0280GetCurrentContextInputOptions := &framework.GetCurrentContextInputOptions{
+				RuntimeAPIVersion: &core.RuntimeAPIVersion{
+					RuntimeVersion: core.Version0280,
+				},
+				Target: framework.TargetK8s,
+			}
+
+			V0254GetCurrentContextInputOptions := &framework.GetCurrentContextInputOptions{
+				RuntimeAPIVersion: &core.RuntimeAPIVersion{
+					RuntimeVersion: core.Version0254,
+				},
+				ContextType: framework.CtxTypeK8s,
+			}
+
+			// Output Params for GetCurrentContext
+			ctxV100GetCurrentContextOutputOptions := &framework.GetCurrentContextOutputOptions{
+				RuntimeAPIVersion: &core.RuntimeAPIVersion{
+					RuntimeVersion: core.Version100,
+				},
+				ContextOpts: &framework.ContextOpts{
+					Name:   framework.CtxCompatibilityOne,
+					Target: framework.TargetK8s,
+					GlobalOpts: &framework.GlobalServerOpts{
+						Endpoint: "test-endpoint",
+					},
+				},
+				ValidationStrategy: core.ValidationStrategyStrict,
+			}
+
+			ctxV0280GetCurrentContextOutputOptions := &framework.GetCurrentContextOutputOptions{
+				RuntimeAPIVersion: &core.RuntimeAPIVersion{
+					RuntimeVersion: core.Version0280,
+				},
+				ContextOpts: &framework.ContextOpts{
+					Name:   framework.CtxCompatibilityOne,
+					Target: framework.TargetK8s,
+					GlobalOpts: &framework.GlobalServerOpts{
+						Endpoint: "test-endpoint",
+					},
+				},
+				ValidationStrategy: core.ValidationStrategyStrict,
+			}
+
+			ctxV0254GetCurrentContextOutputOptions := &framework.GetCurrentContextOutputOptions{
+				RuntimeAPIVersion: &core.RuntimeAPIVersion{
+					RuntimeVersion: core.Version0254,
+				},
+				ContextOpts: &framework.ContextOpts{
+					Name: framework.CtxCompatibilityOne,
+					Type: framework.CtxTypeK8s,
+					GlobalOpts: &framework.GlobalServerOpts{
+						Endpoint: "test-endpoint",
+					},
+				},
+			}
+
+			//noContextGetCurrentContextOutputOptions := &framework.GetCurrentContextOutputOptions{
+			//	RuntimeAPIVersion: &core.RuntimeAPIVersion{
+			//		RuntimeVersion: core.Version100,
+			//	},
+			//	Error: "no current context set for target \"kubernetes\"",
+			//}
+
+			// Input and Output Params for GetContext
 			ctxV100GetContextInputOptions := framework.MakeGetContextInputOptions(core.Version100, framework.CtxCompatibilityOne)
 			ctxV0280GetContextInputOptions := framework.MakeGetContextInputOptions(core.Version0280, framework.CtxCompatibilityOne)
 			ctxV0254GetContextInputOptions := framework.MakeGetContextInputOptions(core.Version0254, framework.CtxCompatibilityOne)
@@ -48,7 +123,7 @@ var _ = ginkgo.Describe("Context API Tests", func() {
 					RuntimeVersion: core.Version100,
 				},
 				ContextOpts: &framework.ContextOpts{
-					Name:   "compatibility-one",
+					Name:   framework.CtxCompatibilityOne,
 					Target: framework.TargetK8s,
 					GlobalOpts: &framework.GlobalServerOpts{
 						Endpoint: "test-endpoint",
@@ -62,7 +137,7 @@ var _ = ginkgo.Describe("Context API Tests", func() {
 					RuntimeVersion: core.Version0280,
 				},
 				ContextOpts: &framework.ContextOpts{
-					Name:   "compatibility-one",
+					Name:   framework.CtxCompatibilityOne,
 					Target: framework.TargetK8s,
 					GlobalOpts: &framework.GlobalServerOpts{
 						Endpoint: "test-endpoint",
@@ -76,7 +151,7 @@ var _ = ginkgo.Describe("Context API Tests", func() {
 					RuntimeVersion: core.Version0254,
 				},
 				ContextOpts: &framework.ContextOpts{
-					Name: "compatibility-one",
+					Name: framework.CtxCompatibilityOne,
 					Type: framework.CtxTypeK8s,
 					GlobalOpts: &framework.GlobalServerOpts{
 						Endpoint: "test-endpoint",
@@ -86,6 +161,10 @@ var _ = ginkgo.Describe("Context API Tests", func() {
 
 			// Create SetContext Command with input and output options
 			setContextCommand, err := framework.NewSetContextCommand(setContextInputOptions, nil)
+			gomega.Expect(err).To(gomega.BeNil())
+
+			// Create SetCurrentContext Command with input and output options
+			setCurrentContextCommand, err := framework.NewSetCurrentContextCommand(setCurrentContextInputOptions, nil)
 			gomega.Expect(err).To(gomega.BeNil())
 
 			// Create GetContext Commands with input and output options
@@ -98,11 +177,29 @@ var _ = ginkgo.Describe("Context API Tests", func() {
 			ctxV0254GetContextCmd, err := framework.NewGetContextCommand(ctxV0254GetContextInputOptions, ctxV0254GetContextOutputOptions)
 			gomega.Expect(err).To(gomega.BeNil())
 
-			setContextWithGetContextOnAllVersionsTest := core.NewTestCase().Add(setContextCommand).Add(ctxV100GetContextCmd).Add(ctxV0280GetContextCmd).Add(ctxV0254GetContextCmd)
+			ctxV100GetCurrentContextCmd, err := framework.NewGetCurrentContextCommand(V100GetCurrentContextInputOptions, ctxV100GetCurrentContextOutputOptions)
+			gomega.Expect(err).To(gomega.BeNil())
 
-			framework.Execute(setContextWithGetContextOnAllVersionsTest)
+			ctxV0280GetCurrentContextCmd, err := framework.NewGetCurrentContextCommand(V0280GetCurrentContextInputOptions, ctxV0280GetCurrentContextOutputOptions)
+			gomega.Expect(err).To(gomega.BeNil())
+
+			ctxV0254GetCurrentContextCmd, err := framework.NewGetCurrentContextCommand(V0254GetCurrentContextInputOptions, ctxV0254GetCurrentContextOutputOptions)
+			gomega.Expect(err).To(gomega.BeNil())
+
+			// Add SetContext and SetCurrentContext Commands
+			testCase := core.NewTestCase().Add(setContextCommand).Add(setCurrentContextCommand)
+
+			// Add GetContext v1.0.0, v0.28.0, v0.25.4 Commands
+			testCase.Add(ctxV100GetContextCmd).Add(ctxV0280GetContextCmd).Add(ctxV0254GetContextCmd)
+
+			// Add GetCurrentContext v1.0.0, v0.28.0, v0.25.4 Commands
+			testCase.Add(ctxV100GetCurrentContextCmd).Add(ctxV0280GetCurrentContextCmd).Add(ctxV0254GetCurrentContextCmd)
+
+			// Run all the commands
+			framework.Execute(testCase)
 		})
-		ginkgo.It("SetContext v0.28.0 then GetContext v0.11.6, v0.25.4, v0.28.0, v1.0.0", func() {
+
+		ginkgo.It("SetContext, SetCurrentContext v0.28.0 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v1.0.0", func() {
 			// Input Parameters for SetContext v0.28.0
 			setContextInputOptions := &framework.SetContextInputOptions{
 				RuntimeAPIVersion: &core.RuntimeAPIVersion{
@@ -181,7 +278,8 @@ var _ = ginkgo.Describe("Context API Tests", func() {
 
 			framework.Execute(setContextWithGetContextOnAllVersionsTest)
 		})
-		ginkgo.It("SetContext v0.25.4 then GetContext v0.11.6, v0.25.4, v0.28.0, v1.0.0", func() {
+
+		ginkgo.It("SetContext, SetCurrentContext v0.25.4 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v1.0.0", func() {
 			// Input Parameters for SetContext v0.25.4
 			setContextInputOptions := &framework.SetContextInputOptions{
 				RuntimeAPIVersion: &core.RuntimeAPIVersion{
@@ -248,134 +346,8 @@ var _ = ginkgo.Describe("Context API Tests", func() {
 		})
 	})
 
-	ginkgo.Context("Sample Tests Runtime Context API Set and Get", func() {
-
-		ginkgo.It("Run SetContext API of Runtime Library v1.0.0 then GetContext API of Runtime Library v0.28.0", func() {
-			ginkgo.By("Construct Input and Output parameters for SetContext API of Runtime Library v1.0.0")
-			setContextInputOptions := &framework.SetContextInputOptions{
-				RuntimeAPIVersion: &core.RuntimeAPIVersion{
-					RuntimeVersion: core.Version100,
-				},
-				ContextOpts: &framework.ContextOpts{
-					Name:   "context-one",
-					Target: framework.TargetK8s,
-					GlobalOpts: &framework.GlobalServerOpts{
-						Endpoint: "test-endpoint",
-					},
-				},
-			}
-
-			var setContextOutputOptions *framework.SetContextOutputOptions
-
-			ginkgo.By("Construct Input and Output parameters for GetContext API of Runtime Library v0.28.0")
-			getContextInputOptions := &framework.GetContextInputOptions{
-				RuntimeAPIVersion: &core.RuntimeAPIVersion{
-					RuntimeVersion: core.Version0280,
-				},
-				ContextName: "context-one",
-			}
-
-			getContextOutputOptions := &framework.GetContextOutputOptions{
-				RuntimeAPIVersion: &core.RuntimeAPIVersion{
-					RuntimeVersion: core.Version0280,
-				},
-				ContextOpts: &framework.ContextOpts{
-					Name:   "context-one",
-					Target: framework.TargetK8s,
-					GlobalOpts: &framework.GlobalServerOpts{
-						Endpoint: "test-endpoint",
-					},
-				},
-			}
-			ginkgo.By("Create SetContext API Command with Input and Output Parameters")
-			setContextCommand, err := framework.NewSetContextCommand(setContextInputOptions, setContextOutputOptions)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			ginkgo.By("Create GetContext API Command with Input and Output Parameters")
-			getContextCommand, err := framework.NewGetContextCommand(getContextInputOptions, getContextOutputOptions)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			ginkgo.By("Build TestCase to run SetContext API Command of Runtime Library v1.0.0 then GetContext API Command of Runtime Library v0.28.0 then GetContext API Command of Runtime Library v0.25.4")
-			testCase := core.NewTestCase().Add(setContextCommand).Add(getContextCommand)
-
-			ginkgo.By("Execute and validate the TestCase")
-			framework.Execute(testCase)
-		})
-
-		ginkgo.It("Run SetContext API of Runtime Library v0.25.4 then GetContext API of Runtime Library v0.28.0", func() {
-			ginkgo.By("Construct Input and Output parameters for SetContext API of Runtime Library v0.25.4")
-			setContextInputOptions := &framework.SetContextInputOptions{
-				RuntimeAPIVersion: &core.RuntimeAPIVersion{
-					RuntimeVersion: core.Version0254,
-				},
-				ContextOpts: &framework.ContextOpts{
-					Name: "context-one",
-					Type: framework.CtxTypeK8s,
-					GlobalOpts: &framework.GlobalServerOpts{
-						Endpoint: "test-endpoint",
-					},
-				},
-				SetCurrentContext: false,
-			}
-
-			var setContextOutputOptions *framework.SetContextOutputOptions
-
-			ginkgo.By("Construct Input and Output parameters for GetContext API of Runtime Library v0.28.0")
-			getContextInputOptionsForVersion0280 := &framework.GetContextInputOptions{
-				RuntimeAPIVersion: &core.RuntimeAPIVersion{
-					RuntimeVersion: core.Version0280,
-				},
-				ContextName: "context-one",
-			}
-			getContextOutputOptionsForVersion0280 := &framework.GetContextOutputOptions{
-				RuntimeAPIVersion: &core.RuntimeAPIVersion{
-					RuntimeVersion: core.Version0280,
-				},
-				Error: "context context-one not found",
-			}
-
-			ginkgo.By("Construct Input and Output parameters for GetContext API of Runtime Library v0.25.4")
-			getContextInputOptionsForVersion0254 := &framework.GetContextInputOptions{
-				RuntimeAPIVersion: &core.RuntimeAPIVersion{
-					RuntimeVersion: core.Version0254,
-				},
-				ContextName: "context-one",
-			}
-			getContextOutputOptionsForVersion0254 := &framework.GetContextOutputOptions{
-				RuntimeAPIVersion: &core.RuntimeAPIVersion{
-					RuntimeVersion: core.Version0254,
-				},
-
-				ContextOpts: &framework.ContextOpts{
-					Name: "context-one",
-					Type: framework.CtxTypeK8s,
-					GlobalOpts: &framework.GlobalServerOpts{
-						Endpoint: "test-endpoint",
-					},
-				},
-			}
-
-			ginkgo.By("Create SetContext API Command of Runtime Library v0.25.4 with Input and Output Parameters")
-			setContextCommand, err := framework.NewSetContextCommand(setContextInputOptions, setContextOutputOptions)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			ginkgo.By("Create GetContext API Command of Runtime Library v0.28.0 with Input and Output Parameters")
-			getContextCommandForVersion0280, err := framework.NewGetContextCommand(getContextInputOptionsForVersion0280, getContextOutputOptionsForVersion0280)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			ginkgo.By("Create GetContext API Command of Runtime Library v0.25.4 with Input and Output Parameters")
-			getContextCommandForVersion0254, err := framework.NewGetContextCommand(getContextInputOptionsForVersion0254, getContextOutputOptionsForVersion0254)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			ginkgo.By("Build TestCase to run SetContext API Command of Runtime v0.25.4 then GetContext API Command of Runtime v0.28.0 and then GetContext API Command of Runtime v0.25.4")
-			testCase := core.NewTestCase().Add(setContextCommand).Add(getContextCommandForVersion0280).Add(getContextCommandForVersion0254) // re-named from NewTestCommands
-
-			ginkgo.By("Executes the commands from the list and validates the expected output with actual output")
-			framework.Execute(testCase)
-		})
-	})
-
 	ginkgo.Context("Cross-version Context API tests for v1.0.0 and v0.28.0", func() {
+
 		ginkgo.It("SetContext v0.28.0, GetContext v1.0.0, SetContext 2 v0.28.0, SetCurrentContext 2 v0.28.0, GetCurrentContext 2 v1.0.0, DeleteCurrentContext 2 v0.28.0, DeleteContext 2 v0.28.0, GetContext v0.28.0, GetContext 2 v0.28.0, GetCurrentContext v0.28.0, GetCurrentContext 2 v0.28.0", func() {
 			// Input Parameters for Runtime SetContext v0.28.0 API
 			contextOneSetContextInputOptions := &framework.SetContextInputOptions{

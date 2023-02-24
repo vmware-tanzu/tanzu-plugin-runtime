@@ -5,6 +5,7 @@ package framework
 
 import (
 	"fmt"
+	"reflect"
 
 	"github.com/onsi/gomega"
 
@@ -30,7 +31,7 @@ func ValidateAPIsOutput(apis []*core.API, stdout string) {
 				if api.Output.ValidationStrategy == core.ValidationStrategyStrict {
 					gomega.Expect(actual).To(gomega.Equal(expected))
 				} else {
-					gomega.Expect(core.ValidateMaps(actual.(map[string]interface{}), expected)).To(gomega.Equal(true))
+					gomega.Expect(ValidateMaps(actual.(map[string]interface{}), expected)).To(gomega.Equal(true))
 				}
 			} else if log.APIResponse.ResponseType == core.ErrorResponse {
 				// Check for errors
@@ -40,4 +41,17 @@ func ValidateAPIsOutput(apis []*core.API, stdout string) {
 			}
 		}
 	}
+}
+
+// ValidateMaps recursive equality check on map structs
+func ValidateMaps(actual, expected map[string]interface{}) bool {
+	for k, v := range expected {
+		if reflect.ValueOf(v).Kind() == reflect.Map {
+			ValidateMaps(actual[k].(map[string]interface{}), v.(map[string]interface{}))
+		} else if !reflect.DeepEqual(actual[k], v) {
+			gomega.Expect(actual[k]).To(gomega.Equal(v))
+			return false
+		}
+	}
+	return true
 }

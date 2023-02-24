@@ -58,3 +58,21 @@ func ValidateGetContextOutputOptionsAsPerRuntimeVersion(getContextOutputOptions 
 		return false, errors.New("GetContext API is not supported for the specified runtime version")
 	}
 }
+
+// ValidateGetCurrentContextOutputOptionsAsPerRuntimeVersion validate the getContextOutputOptions as per runtime version i.e. check whether the expected fields are supported for the runtime version specified
+func ValidateGetCurrentContextOutputOptionsAsPerRuntimeVersion(getCurrentContextInputOptions *GetCurrentContextInputOptions) (bool, error) {
+	switch getCurrentContextInputOptions.RuntimeVersion {
+	case core.Version100, core.Version0280:
+		if !getCurrentContextInputOptions.ShouldNotIncludeContextType() {
+			return false, fmt.Errorf("invalid get current context input options for the specified runtime version contextType is not supported %v", getCurrentContextInputOptions.RuntimeVersion)
+		}
+		return true, nil
+	case core.Version0254:
+		if !getCurrentContextInputOptions.ShouldNotIncludeTarget() {
+			return false, fmt.Errorf("invalid get current context input options for the specified runtime version Target is not supported %v", getCurrentContextInputOptions.RuntimeVersion)
+		}
+		return true, nil
+	default:
+		return false, errors.New("GetCurrentContext API is not supported for the specified runtime version")
+	}
+}

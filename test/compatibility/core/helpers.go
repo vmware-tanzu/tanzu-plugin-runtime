@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"reflect"
 	"strings"
 
 	"gopkg.in/yaml.v3"
@@ -197,18 +196,6 @@ func ParseStr(val interface{}) (string, error) {
 	}
 
 	return value, nil
-}
-
-// ValidateMaps recursive equality check on map structs
-func ValidateMaps(actual, expected map[string]interface{}) bool {
-	for k, v := range expected {
-		if reflect.ValueOf(v).Kind() == reflect.Map {
-			ValidateMaps(actual[k].(map[string]interface{}), v.(map[string]interface{}))
-		} else if !reflect.DeepEqual(actual[k], v) {
-			return false
-		}
-	}
-	return true
 }
 
 // ParseStdout convert the string represented std out log into map structure

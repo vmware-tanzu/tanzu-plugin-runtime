@@ -158,7 +158,7 @@ Below Error is thrown when the test case with above command input options is run
     to be nil
 ```
 
-Example 2  Explains on how framework validates the null fields and What is expected of Test Writer
+Example 2  How framework validates the null fields and what is expected of test writer
 
 SetContext V0.28.0 with ClusterOpts.Endpoint value set
 then SetContext v0.28.0 with ClusterOpts.Endpoint value unset

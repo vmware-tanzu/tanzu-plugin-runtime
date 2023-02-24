@@ -22,7 +22,7 @@ type Command struct {
    APIs []*API `json:"apis" yaml:"apis"`
 }
 
-// API represents the runtime api to execute
+// API represents the runtime API to execute
 type API struct {
    Name      RuntimeAPIName         `json:"name" yaml:"name"`
    Version   RuntimeVersion         `json:"version" yaml:"version"`
@@ -30,7 +30,7 @@ type API struct {
    Output    *Output                `json:"output" yaml:"output"`
 }
 
-// Output represents the runtime api expected output for validation
+// Output represents the runtime API expected output for validation
 type Output struct {
    Result  Result `json:"result" yaml:"result"`
    Content string `json:"content" yaml:"content"`
@@ -188,24 +188,3 @@ actualCtx := GetContext(ctxName) //i.e. test-bc
 
 // Print the log to stdout
 ```
-
-### Combination / Co-existence Testing
-
-Below table describes all possible combination tests for all supported Runtime APIs.
-
-|  _  |  V  | ALL | ALL | ALL | ALL |
-|:---:|:---:|:---:|:---:|:---:|:---:|
-|  V  |  _  | V1  | V28 | V25 | V11 |
-| ALL | V1  |  Y  |  Y  |  Y  |  Y  |
-|  ^  | V28 |  Y  |  Y  |  Y  |  Y  |
-|  ^  | V25 |  Y  |  Y  |  Y  |  Y  |
-|  ^  | V11 |  Y  |  Y  |  Y  |  Y  |
-
-| Symbol | Description                                                                                                                                                                                                                                                                                                                                                                                                                        |
-|--------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| V      | Runtime Library Version                                                                                                                                                                                                                                                                                                                                                                                                            |
-| V1     | Runtime Library Version v1.0.0                                                                                                                                                                                                                                                                                                                                                                                                     |
-| V28    | Runtime Library Version v0.28.0                                                                                                                                                                                                                                                                                                                                                                                                    |
-| V25    | Runtime Library Version v0.25.4                                                                                                                                                                                                                                                                                                                                                                                                    |
-| V11    | Runtime Library Version v0.11.6                                                                                                                                                                                                                                                                                                                                                                                                    |
-| ALL    | SetContext, GetContext, DeleteContext, GetCurrentContext, SetCurrentContext, DeleteCurrentContext, GetServer, SetServer, DeleteServer, GetCurrentServer, SetCurrentServer, DeleteCurrentServer, IsFeatureEnabled, DeleteFeature, SetFeature, ConfigureDefaultFeatureFlagsIfMissing, GetEnv, SetEnv, DeleteEnv, GetCLIPluginDiscoverySources, SetCLIPluginDiscoverySources, DeleteCLIPluginDiscoverySources, GetEdition, SetEdition |

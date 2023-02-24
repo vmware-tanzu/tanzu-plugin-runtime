@@ -39,7 +39,6 @@ GitHub CI runner pipeline include Logs with details on test cases from test-case
 ### Test Suite API
 
 Framework has `framework.NewTestCase` to write a specific test case, each test case consists of a sequence of commands, with each command corresponding to an invocatino of a API from a specific version of runtime.
-We need to use the above high level APIs to construct specific test command, the input data for each high level apis changes based on runtime version's its being tested, for more details look into the input parameter's type definition.
 
 ``` go
 // Construct series of commands to execute
@@ -48,7 +47,8 @@ We need to use the above high level APIs to construct specific test command, the
 
 ### High-level test API
 
-To write compatibility test cases, the test writer should be aware of below high level framework Test APIs, each below api helps to test specific runtime api by constructing test command:
+To write compatibility test cases, the test writer should be aware of below high level framework Test APIs, each below API helps to test specific runtime API by constructing test command:
+We need to use the below test helper functions to construct specific test command, the input data for each high level apis changes based on runtime version's its being tested, for more details look into the input parameter's type definition.
 
 ``` go
 func NewSetXXXCommand(setXXXInputOptions SetXXXInputOptions, setXXXOutputOptions SetXXXOutputOptions) (*Command, error)
@@ -60,7 +60,7 @@ func NewGetXXXCommand(getXXXInputOptions GetXXXInputOptions, getXXXOutputOptions
 // NewSetContextCommand contructs a command to make a call to specific runtime version SetContext API.
 // Input Parameter: setContextInputOptions has all input parameters which are required for Runtime SetContext API.
 // Input Parameter: setContextOutputOptions has details about expected output from Runtime SetContext API call.
-// Return: command to execute or error if any validations fails for SetContextInputOptions or SetContextOutputOptions
+// Return: A command to execute or error if any validations fails for SetContextInputOptions or SetContextOutputOptions
 // This method does validates the input parameters  SetContextInputOptions/SetContextOutputOptions based on Runtime API Version
 // For more details about supported parameters refer to SetContextInputOptions/SetContextOutputOptions definition(and CtxOptions struct, which is embedded).
 func NewSetContextCommand(setContextInputOptions SetContextInputOptions, setContextOutputOptions SetContextOutputOptions) (*Command, error)
@@ -70,7 +70,7 @@ func NewGetContextCommand(getContextInputOptions GetContextInputOptions, getCont
 func NewDeleteContextCommand(delContextInputOptions DeleteContextInputOptions, deleteContextOutputOptions DeleteContextOutputOptions) (*Command, error)
 ```
 
-More details about input parameters for above high level api:
+More details about input parameters for above high level API:
 
 ``` go
 const (
@@ -118,17 +118,16 @@ type DeleteContextOutputOptions struct{
 ### xxxOptions structs
 
 - Each of these struct represents the super set of all fields for their respective config types (e.g .Context, Server, DiscoverySource) across for all Runtime versions in which the types are defined.
-- Based on the Runtime Version xxxOptions attributes may change(mandatory/optional/Not applicable).
-- It is meant to be used as both inputOptions and outputOptions.
+- The xxxOptions structs are used as inputs to the API invocation as well as data to verify against the output of the invocation.The implications of setting or not setting certain attributes changes depend on which scenario under which it is being used.
 - Command Creation Helper functions (i.e. NewSetContextCommand) validate the supplied inputOptions as per RuntimeVersion and make sure all required attributes are set. If not Command Creation Helper functions will throw error and Test fails.
 - The validation of “Input and expect output” happens in Set/Get/DeleteXXXCommand creation (within framework.NewTestCase), so it's not part of test case execution. so its kind of test case setup.
 - Input struct: Framework validates the supplied Input data (eg: GetContextInputOptions/SetContextInputOptions/DeleteContextInputOptions) as per specified runtime version supported fields.
 - Output struct: Framework validates the supplied outputOptions as per specified runtime version whether certain fields are supported for the runtime version used and compares the supplied data with what is returned from API method i.e. every non-null field in output struct will be checked for equality with returned result.
-  (Eg: GetContextOutputOptions/SetContextOutputOptions/DeleteContextOutputOptions) as its test writer responsibility, the Output data is depends on the Input data (eg: if input is not valid, runtime api may return error) OR the sequence of calls made before the current call (eg: NewGetContextCommand() output depends on the previous SetContext** calls).
+  (Eg: GetContextOutputOptions/SetContextOutputOptions/DeleteContextOutputOptions) as its test writer responsibility, the Output data is depends on the Input data (eg: if input is not valid, runtime API may return error) OR the sequence of calls made before the current call (eg: NewGetContextCommand() output depends on the previous SetContext** calls).
   If test writer is not passing valid expected output data, then it fails during the TEST CASE EXECUTION as test case fail.
-- Test framework does validate the expected Output struct’s field values with runtime api response to its entirety.
+- Test framework does validate the expected Output struct’s field values with runtime API response to its entirety.
 - Test writer does not have to explicitly specify to check whether an attribute value is nil as all fields default values are nil or “”.
-- Test writer will need to specify what exact object attribute values he expects out of GetXX api method (framework perform a full equality check and not partial equality, means if api returns attribute which not specified by test writer then test case will fail).
+- Test writer will need to specify what exact object attribute values he expects out of GetXX API method (framework perform a full equality check and not partial equality, means if API returns attribute which not specified by test writer then test case will fail).
 - So for the output struct, all filed are optional, there are NO MANDATORY fields!!! its test writer responsibility to identify the expected data!!
 
 Example 1: For the Below NewSetContextCommand if the context arguments are passed incorrect
@@ -373,4 +372,4 @@ setContextInputOptions := &framework.SetContextInputOptions{
 
 ```
 
-For more details on framework go to [Cross_Version_API Compatibility Framework](./CROSS_VERSION_API_COMPATIBILITY_FRAMEWORK.md)
+For more details on framework go to [Cross_Version_API Compatibility Framework](./cross-version-api-compatibility-framework.md)

@@ -23,4 +23,4 @@ For more details about the design and APIs go to [Config API](docs/config.md)
 Cross Version API Compatibility testing ensures that [Config APIs](docs/config.md) of different Tanzu Plugin Runtime versions work as expected as long as those Tanzu Plugin Runtime versions are supported.
 Cross Version API Compatibility testing simulates the interaction of APIs provided by different versions of plugin runtimes to ensure that they can interoperate with one another.
 
-For more details go to [Cross_Version_API Compatibility](./test/CROSS_VERSION_API_COMPATIBILITY.md)
+For more details go to [Cross-version API Compatibility](./test/cross-version-api-compatibility.md)

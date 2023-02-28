@@ -140,5 +140,4 @@ debug-compatibility-tests: ## Run Compatibility tests
 	cd ./test/compatibility/compatibility-tests &&  ginkgo --keep-going --fail-fast --race -r --randomize-all -vv --trace; \
 
 .PHONY: build-run-compatibility-tests
-build-run-compatibility-tests: build-compatibility-test-plugins ## Build and Run Compatibility tests
-	cd ./test/compatibility/compatibility-tests && ${GO} test -timeout 60m -race ${GOTEST_VERBOSE} ; \
+build-run-compatibility-tests: build-compatibility-test-plugins compatibility-tests ## Build and Run Compatibility tests

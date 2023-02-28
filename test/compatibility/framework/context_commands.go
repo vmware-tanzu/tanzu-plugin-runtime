@@ -303,6 +303,7 @@ func NewGetCurrentContextCommand(getCurrentContextInputOptions *GetCurrentContex
 	return c, nil
 }
 
+//nolint: dupl
 func NewRemoveCurrentContextCommand(removeCurrentContextInputOptions *RemoveCurrentContextInputOptions, removeCurrentContextOutputOptions *RemoveCurrentContextOutputOptions) (*core.Command, error) {
 	// Init the Command object
 	c := &core.Command{}

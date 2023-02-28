@@ -10,21 +10,44 @@ As a test writer you should be knowledgeable on specific APIs and specific Runti
 Test writers should also be familiar with how to write combination tests with multiple APIs i.e. when testing mutators(Set***, Delete*** APIs) and reader(Get*** APIs) together.
 When writing a test involving two versions of Runtime library APIs a test writer should be aware of what specific fields are added or removed from the API method for those 2 versions and design tests accordingly.
 
+### Directory Structure
+
+``` shell
+├── compatibility-test-plugins
+│   ├── bin # Generated test plugin binaries
+│   ├── runtime-test-plugin-v0_11_6 # Specific Runtime version Test Plugin to trigger APIs
+│   ├── runtime-test-plugin-v0_25_4
+│   ├── runtime-test-plugin-v0_28_0
+│   └── runtime-test-plugin-v1_0_0
+├── compatibility-tests # Test Suites to run
+├── core # compatibility core module contains types and helpers methods
+├── docs # compatibility testing docs on how to write a test and framework details
+└── framework # compatibility framework contains helper methods to contruct API Commands, Test Case builder, executer, validator
+```
+
 ### Commands
 
-Run all `****_test.go` files from `compatibility-tests` directory.
+Build all the runtime specific version test plugins
+
+``` shell
+make build-compatibility-test-plugins
+```
+
+Run all compatibility tests
 
 ``` shell
 make compatibility-tests
+```
+
+Build and Run compatibility tests
+
+```shell
+make build-run-compatibility-tests
 ```
 
 ### How are the Tests being run ?
 
-The tests are executed as a GitHub runner CI pipeline that executes the below command.
-
-``` shell
-make compatibility-tests
-```
+The tests are executed as a GitHub runner CI pipeline `Tanzu Plugin Runtime Compatibility Tests`
 
 ### What will the tests cover ?
 
@@ -38,7 +61,7 @@ GitHub CI runner pipeline include Logs with details on test cases from test-case
 
 ### Test Suite API
 
-Framework has `framework.NewTestCase` to write a specific test case, each test case consists of a sequence of commands, with each command corresponding to an invocatino of a API from a specific version of runtime.
+Framework has `framework.NewTestCase` to write a specific test case, each test case consists of a sequence of commands, with each command corresponding to an invocation of a API from a specific version of runtime.
 
 ``` go
 // Construct series of commands to execute
@@ -87,38 +110,43 @@ type RuntimeAPIVersion struct{
 }
 
 type GetContextInputOptions struct {
- RuntimeAPIVersion // required
- ContextName string // required
+ *core.RuntimeAPIVersion        // required
+ ContextName             string // required
 }
 
-type GetContextOutputOptions struct{
- RuntimeAPIVersion // required
- CtxOptions // For specific version options look into CtxOptions definition
+type GetContextOutputOptions struct {
+ *core.RuntimeAPIVersion                         // required
+ *ContextOpts                                    // For specific version options look into ContextOpts definition
+ ValidationStrategy      core.ValidationStrategy // Type of validation to be performed i.e. exact or partial. default is partial
+ Error                   string                  // expected error message could be the sub string of actual error message
 }
 
-type SetContextInputOptions struct{
- RuntimeAPIVersion // required
- CtxOptions // required
+type SetContextInputOptions struct {
+ *core.RuntimeAPIVersion      // required
+ *ContextOpts                 // required
+ SetCurrentContext       bool // required
 }
 
-type SetContextOutputOptions struct{
- error string // expected error message could be the sub string of actual error message
+type SetContextOutputOptions struct {
+ ValidationStrategy core.ValidationStrategy // Type of validation to be performed i.e. exact or partial. default is partial
+ Error              string                  // expected error message could be the sub string of actual error message
 }
 
-type DeleteContextInputOptions struct{
- RuntimeAPIVersion // required
- ContextName string // required
+type DeleteContextInputOptions struct {
+ *core.RuntimeAPIVersion        // required
+ ContextName             string // required
 }
 
-type DeleteContextOutputOptions struct{
- error string // expected error message could be the sub string of actual error message
+type DeleteContextOutputOptions struct {
+ ValidationStrategy core.ValidationStrategy // Type of validation to be performed i.e. exact or partial. default is partial
+ Error              string                  // expected error message could be the sub string of actual error message
 }
 ```
 
-### xxxOptions structs
+### xxxOpts structs
 
 - Each of these struct represents the super set of all fields for their respective config types (e.g .Context, Server, DiscoverySource) across for all Runtime versions in which the types are defined.
-- The xxxOptions structs are used as inputs to the API invocation as well as data to verify against the output of the invocation.The implications of setting or not setting certain attributes changes depend on which scenario under which it is being used.
+- The xxxOpts structs are used as inputs to the API invocation as well as data to verify against the output of the invocation.The implications of setting or not setting certain attributes changes depend on which scenario under which it is being used.
 - Command Creation Helper functions (i.e. NewSetContextCommand) validate the supplied inputOptions as per RuntimeVersion and make sure all required attributes are set. If not Command Creation Helper functions will throw error and Test fails.
 - The validation of “Input and expect output” happens in Set/Get/DeleteXXXCommand creation (within framework.NewTestCase), so it's not part of test case execution. so its kind of test case setup.
 - Input struct: Framework validates the supplied Input data (eg: GetContextInputOptions/SetContextInputOptions/DeleteContextInputOptions) as per specified runtime version supported fields.
@@ -135,7 +163,9 @@ Example 1: For the Below NewSetContextCommand if the context arguments are passe
 ``` go
 // Input Parameters for Runtime SetContext API
    setContextInputOptions := SetContextInputOptions{
-       RuntimeVersion: framework.Version0280,
+        RuntimeAPIVersion: &core.RuntimeAPIVersion{
+          RuntimeVersion: core.Version0280,
+        },
        CtxOptions: CtxOptions{
            Name: "context-one",
            Type: framework.CtxTypeK8s, // Invalid attribute since Type is not supported in v0.28.0
@@ -258,11 +288,11 @@ It("SetContext v0.28.0 SetContext v0.28.0(Unsetting ClusterOpts.Endpoint) GetCon
 })
 ```
 
-#### xxxOptions struct example below for Context config
+#### xxxOpts struct example below for Context config
 
-### CtxOptions struct
+### ContextOpts struct
 
-CtxOptions is the super set of parameters for Context, for all Runtime Versions. Based on the Runtime Version CtxOptions attributes may change(mandatory/optional/Not applicable).
+ContextOpts is the super set of parameters for Context, for all Runtime Versions. Based on the Runtime Version CtxOptions attributes may change(mandatory/optional/Not applicable).
 Command Helper functions (i.e. NewSetContextCommand) validate the supplied inputOptions as per RuntimeVersion and make sure all required attributes are set.
 If not Command Helper functions will throw error and Test fails.
 
@@ -290,7 +320,7 @@ Below table explains about each attribute of CtxOptions requirement based on Run
 
 ``` go
 // Look below for each attribute documentation for which version its been supported/mandatory/optional.
-type CtxOptions struct {
+type ContextOpts struct {
  // Name of the context.
  // required for all runtime versions till v0.28.0
  Name string `json:"name,omitempty" yaml:"name,omitempty"`
@@ -372,4 +402,4 @@ setContextInputOptions := &framework.SetContextInputOptions{
 
 ```
 
-For more details on framework go to [Cross_Version_API Compatibility Framework](./cross-version-api-compatibility-framework.md)
+For more details on framework go to [Cross_Version_API Compatibility Framework](cross-version-api-compatibility-framework.md)

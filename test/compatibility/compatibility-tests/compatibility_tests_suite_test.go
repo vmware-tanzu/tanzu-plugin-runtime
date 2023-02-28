@@ -6,11 +6,11 @@ package compatibility_tests_test
 import (
 	"testing"
 
-	"github.com/onsi/ginkgo"
+	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
 )
 
 func TestCompatibilityTests(t *testing.T) {
 	gomega.RegisterFailHandler(ginkgo.Fail)
-	ginkgo.RunSpecs(t, "CompatibilityTests Suite")
+	ginkgo.RunSpecs(t, "Runtime Library Config APIs CompatibilityTests Suite")
 }

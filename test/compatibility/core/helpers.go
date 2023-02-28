@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	pluginRoot = "../compatibility-test-plugins/bins"
+	pluginRoot = "../compatibility-test-plugins/bin"
 
 	pluginV0116 = "runtime-test-plugin-v0_11_6"
 	pluginV0254 = "runtime-test-plugin-v0_25_4"

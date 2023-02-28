@@ -125,10 +125,10 @@ GO_MODULES=$(shell find . -path "*/go.mod" | xargs -I _ dirname _)
 
 .PHONY: build-compatibility-test-plugins
 build-compatibility-test-plugins: ## Builds all runtime compatibility test plugins
-	cd ./test/compatibility/compatibility-test-plugins/runtime-test-plugin-v0_11_6 && ${GO} mod tidy && ${GO} build
-	cd ./test/compatibility/compatibility-test-plugins/runtime-test-plugin-v0_25_4 && ${GO} mod tidy && ${GO} build
-	cd ./test/compatibility/compatibility-test-plugins/runtime-test-plugin-v0_28_0 && ${GO} mod tidy && ${GO} build
-	cd ./test/compatibility/compatibility-test-plugins/runtime-test-plugin-v1_0_0 && ${GO} mod tidy && ${GO} build
+	cd ./test/compatibility/compatibility-test-plugins/runtime-test-plugin-v0_11_6 && ${GO} mod tidy && ${GO} build -o ../bins/
+	cd ./test/compatibility/compatibility-test-plugins/runtime-test-plugin-v0_25_4 && ${GO} mod tidy && ${GO} build -o ../bins/
+	cd ./test/compatibility/compatibility-test-plugins/runtime-test-plugin-v0_28_0 && ${GO} mod tidy && ${GO} build -o ../bins/
+	cd ./test/compatibility/compatibility-test-plugins/runtime-test-plugin-v1_0_0 && ${GO} mod tidy && ${GO} build -o ../bins/
 
 .PHONY: compatibility-tests
 compatibility-tests: ## Run Compatibility tests

@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	pluginRoot = "../compatibility-test-plugins"
+	pluginRoot = "../compatibility-test-plugins/bins"
 
 	pluginV0116 = "runtime-test-plugin-v0_11_6"
 	pluginV0254 = "runtime-test-plugin-v0_25_4"
@@ -47,15 +47,15 @@ func ConstructTestPluginCmd(version RuntimeVersion, apis []*API) (string, error)
 func makeRootCommand(version RuntimeVersion) string {
 	switch version {
 	case Version0116:
-		return pluginRoot + "/" + pluginV0116 + "/" + pluginV0116 + " test"
+		return pluginRoot + "/" + pluginV0116 + " test"
 	case Version0254:
-		return pluginRoot + "/" + pluginV0254 + "/" + pluginV0254 + " test"
+		return pluginRoot + "/" + pluginV0254 + " test"
 	case Version0280:
-		return pluginRoot + "/" + pluginV0280 + "/" + pluginV0280 + " test"
+		return pluginRoot + "/" + pluginV0280 + " test"
 	case Version100:
-		return pluginRoot + "/" + pluginV100 + "/" + pluginV100 + " test"
+		return pluginRoot + "/" + pluginV100 + " test"
 	default:
-		return pluginRoot + "/" + pluginV100 + "/" + pluginV100 + " test"
+		return pluginRoot + "/" + pluginV100 + " test"
 	}
 }
 

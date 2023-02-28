@@ -6,9 +6,12 @@ package plugin
 import (
 	"fmt"
 
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"go.uber.org/multierr"
 	"golang.org/x/mod/semver"
+
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
 
 // Plugin is a Tanzu CLI plugin.
@@ -21,7 +24,7 @@ func NewPlugin(descriptor *PluginDescriptor) (*Plugin, error) {
 	ApplyDefaultConfig(descriptor)
 	err := ValidatePlugin(descriptor)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "invalid PluginDescriptor specified")
 	}
 	p := &Plugin{
 		Cmd: newRootCmd(descriptor),
@@ -58,19 +61,22 @@ func ValidatePlugin(p *PluginDescriptor) (err error) {
 		return nil
 	}
 	if p.Name == "" {
-		err = multierr.Append(err, fmt.Errorf("plugin %q name cannot be empty", p.Name))
+		err = multierr.Append(err, fmt.Errorf("plugin name cannot be empty"))
+	}
+	if !types.IsValidTarget(string(p.Target), true, false) {
+		err = multierr.Append(err, fmt.Errorf("plugin %q: target is not valid", p.Name))
 	}
 	if p.Version == "" {
-		err = multierr.Append(err, fmt.Errorf("plugin %q version cannot be empty", p.Name))
+		err = multierr.Append(err, fmt.Errorf("plugin %q: version cannot be empty", p.Name))
 	}
 	if !semver.IsValid(p.Version) && p.Version != "dev" {
-		err = multierr.Append(err, fmt.Errorf("version %q %q is not a valid semantic version", p.Name, p.Version))
+		err = multierr.Append(err, fmt.Errorf("plugin %q: version %q is not a valid semantic version", p.Name, p.Version))
 	}
 	if p.Description == "" {
-		err = multierr.Append(err, fmt.Errorf("plugin %q description cannot be empty", p.Name))
+		err = multierr.Append(err, fmt.Errorf("plugin %q: description cannot be empty", p.Name))
 	}
 	if p.Group == "" {
-		err = multierr.Append(err, fmt.Errorf("plugin %q group cannot be empty", p.Name))
+		err = multierr.Append(err, fmt.Errorf("plugin %q: group cannot be empty", p.Name))
 	}
 	return
 }

@@ -15,15 +15,20 @@ type Target string
 
 const (
 	// TargetK8s is a kubernetes target of the CLI
+	// This target applies if the plugin is interacting with a Kubernetes cluster
 	TargetK8s Target = "kubernetes"
 	targetK8s Target = "k8s"
 
 	// TargetTMC is a Tanzu Mission Control target of the CLI
+	// This target applies if the plugin is interacting with a Tanzu Mission Control endpoint
 	TargetTMC Target = "mission-control"
 	targetTMC Target = "tmc"
 
-	// TargetNone is used for plugins that are not associated with any target
-	TargetNone Target = ""
+	// TargetGlobal is used for plugins that are not associated with any target
+	TargetGlobal Target = "global"
+
+	// TargetUnknown specifies that the target is not currently known
+	TargetUnknown Target = ""
 )
 
 var (

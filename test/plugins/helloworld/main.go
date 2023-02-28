@@ -8,12 +8,14 @@ import (
 
 	"github.com/aunum/log"
 
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/plugin"
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/plugin/buildinfo"
 )
 
 var descriptor = plugin.PluginDescriptor{
 	Name:            "helloworld-test",
+	Target:          types.TargetGlobal,
 	Description:     "Hello world test plugin",
 	Group:           plugin.AdminCmdGroup,
 	Version:         "v0.0.1",

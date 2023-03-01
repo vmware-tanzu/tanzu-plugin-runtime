@@ -23,7 +23,8 @@ jobs:
       - name: Install Tools
         run: |
           pushd "$(mktemp -d)"
-          go get github.com/onsi/ginkgo/ginkgo github.com/onsi/gomega/...
+          go install github.com/onsi/ginkgo/v2/ginkgo
+          go get github.com/onsi/gomega/...
           popd
 
       - name: go cache

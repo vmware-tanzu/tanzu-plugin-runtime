@@ -9,8 +9,9 @@ import (
 	"io"
 	"os"
 
-	"github.com/aunum/log"
 	"github.com/pkg/errors"
+
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/log"
 )
 
 const (
@@ -33,7 +34,7 @@ func readFromFile(filePath string) ([]byte, error) {
 	}
 	defer func() {
 		if err = inputFile.Close(); err != nil {
-			log.Fatal(err)
+			log.Fatal(err, "")
 		}
 	}()
 
@@ -42,7 +43,7 @@ func readFromFile(filePath string) ([]byte, error) {
 	if err != nil {
 		return nil, errors.WithMessage(err, fmt.Sprintf("error reading from input file %s", filePath))
 	}
-	log.Debugf("read object --> \n---\n%s\n---\n", buf.String())
+	log.Infof("read object --> \n---\n%s\n---\n", buf.String())
 	return buf.Bytes(), nil
 }
 

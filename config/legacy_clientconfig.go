@@ -6,9 +6,10 @@ package config
 import (
 	"os"
 
-	"github.com/aunum/log"
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v3"
+
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/log"
 )
 
 // CopyLegacyConfigDir copies configuration files from legacy config dir to the new location. This is a no-op if the legacy dir

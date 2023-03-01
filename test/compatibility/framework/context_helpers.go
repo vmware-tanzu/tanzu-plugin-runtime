@@ -4,8 +4,57 @@
 package framework
 
 import (
+	"fmt"
+
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 )
+
+func MakeSetContextInputOptions(version core.RuntimeVersion, contextName string) (*SetContextInputOptions, error) {
+	switch version {
+	case core.Version100:
+		return &SetContextInputOptions{
+			RuntimeAPIVersion: &core.RuntimeAPIVersion{
+				RuntimeVersion: core.Version100,
+			},
+			ContextOpts: &ContextOpts{
+				Name:   contextName,
+				Target: TargetK8s,
+				GlobalOpts: &GlobalServerOpts{
+					Endpoint: "test-endpoint",
+				},
+			},
+		}, nil
+	case core.Version0280:
+		return &SetContextInputOptions{
+			RuntimeAPIVersion: &core.RuntimeAPIVersion{
+				RuntimeVersion: core.Version0280,
+			},
+			ContextOpts: &ContextOpts{
+				Name:   contextName,
+				Target: TargetK8s,
+				GlobalOpts: &GlobalServerOpts{
+					Endpoint: "test-endpoint",
+				},
+			},
+		}, nil
+	case core.Version0254:
+		return &SetContextInputOptions{
+			RuntimeAPIVersion: &core.RuntimeAPIVersion{
+				RuntimeVersion: core.Version0254,
+			},
+			ContextOpts: &ContextOpts{
+				Name: contextName,
+				Type: CtxTypeK8s,
+				GlobalOpts: &GlobalServerOpts{
+					Endpoint: "test-endpoint",
+				},
+			},
+		}, nil
+	default:
+		return nil, fmt.Errorf("context for runtime version %v is not supported", version)
+	}
+
+}
 
 func MakeGetContextInputOptions(version core.RuntimeVersion, contextName string) *GetContextInputOptions {
 	return &GetContextInputOptions{

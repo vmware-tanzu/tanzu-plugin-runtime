@@ -20,8 +20,11 @@ jobs:
           go-version: 1.19
         id: go
 
-      - name: Get dependencies
-        run: go mod download
+      - name: Install Tools
+        run: |
+          pushd "$(mktemp -d)"
+          go get github.com/onsi/ginkgo/ginkgo github.com/onsi/gomega/...
+          popd
 
       - name: go cache
         uses: actions/cache@v3

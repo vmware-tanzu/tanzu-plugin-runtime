@@ -14,7 +14,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-const nanoSecondsPerMicroSecond = 1000
+var defaultLogThreshold int32 = 3
 
 // logEntry defines the information that can be used for composing a log line.
 type logEntry struct {
@@ -30,16 +30,19 @@ type logEntry struct {
 
 // NewLogger returns a new instance of the clusterctl.
 func NewLogger() LoggerImpl {
-	return &logger{}
+	return &logger{
+		threshold: &defaultLogThreshold,
+	}
 }
 
 // logger defines a clusterctl friendly logr.Logger
 type logger struct {
-	threshold *int32
-	level     int32
-	prefix    string
-	values    []interface{}
-	callDepth int
+	threshold  *int32
+	level      int32
+	prefix     string
+	values     []interface{}
+	callDepth  int
+	showCaller bool
 }
 
 var _ LoggerImpl = &logger{}
@@ -147,11 +150,12 @@ func (l *logger) WithValues(kvList ...interface{}) LoggerImpl {
 
 func (l *logger) clone() *logger {
 	return &logger{
-		threshold: l.threshold,
-		level:     l.level,
-		prefix:    l.prefix,
-		values:    copySlice(l.values),
-		callDepth: l.callDepth,
+		threshold:  l.threshold,
+		level:      l.level,
+		prefix:     l.prefix,
+		values:     copySlice(l.values),
+		callDepth:  l.callDepth,
+		showCaller: l.showCaller,
 	}
 }
 
@@ -161,16 +165,17 @@ func (l *logger) Clone() LoggerImpl {
 
 func (l *logger) CloneWithLevel(level int) LoggerImpl {
 	return &logger{
-		threshold: l.threshold,
-		level:     int32(level),
-		prefix:    l.prefix,
-		values:    copySlice(l.values),
-		callDepth: l.callDepth,
+		threshold:  l.threshold,
+		level:      int32(level),
+		prefix:     l.prefix,
+		values:     copySlice(l.values),
+		callDepth:  l.callDepth,
+		showCaller: l.showCaller,
 	}
 }
 
 func (l *logger) Print(msg string, err error, logType string, kvs ...interface{}) {
-	msg = fmt.Sprintf("[%s] %s", l.getLogTypeIndicator(logType), msg)
+	msg = fmt.Sprintf("%s%s", l.getLogTypeIndicator(logType), msg)
 	values := copySlice(l.values)
 	values = append(values, kvs...)
 	values = append(values, "msg", msg)
@@ -198,13 +203,13 @@ func (l *logger) getLogString(values []interface{}) string {
 func (l *logger) getLogTypeIndicator(logType string) string {
 	switch logType {
 	case logTypeINFO:
-		return "ℹ"
+		return "[i] "
 	case logTypeWARN:
-		return "!!"
+		return "[!] "
 	case logTypeERROR:
-		return "✖"
+		return "[x] "
 	case logTypeSUCCESS:
-		return "✔"
+		return "[ok] "
 	case logTypeOUTPUT:
 	}
 	return ""
@@ -301,11 +306,10 @@ func (l *logger) header(logType string, depth int) string {
 		path := file
 		file = path[slash+1:]
 	}
-
-	now := time.Now()
-	_, month, day := now.Date()
-	hour, minute, second := now.Clock()
-
-	// mmdd hh:mm:ss.uuuuuu file:line]
-	return fmt.Sprintf("%02d%02d %02d:%02d:%02d.%06d %s:%d] ", int(month), day, hour, minute, second, now.Nanosecond()/nanoSecondsPerMicroSecond, file, line)
+	rfct := time.Now().Format(time.RFC3339)
+	header := fmt.Sprintf("%s ", rfct)
+	if l.showCaller {
+		header = fmt.Sprintf("%s[%s:%d] ", header, file, line)
+	}
+	return header
 }

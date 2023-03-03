@@ -6,6 +6,7 @@ package log
 
 import (
 	"fmt"
+	"io"
 	"os"
 )
 
@@ -126,7 +127,7 @@ func Successf(format string, args ...interface{}) {
 	l.Print(msg, nil, logTypeSUCCESS)
 }
 
-// Fatal logs a fatal message with the given key/value pairs as context and returns with os.Exit(255)
+// Fatal logs a fatal message with the given key/value pairs as context and returns with os.Exit(1)
 func Fatal(err error, msg string, kvs ...interface{}) {
 	l.Print(msg, err, logTypeERROR, kvs...)
 	os.Exit(1)
@@ -174,13 +175,23 @@ func QuietMode(quiet bool) {
 	logWriter.QuietMode(quiet)
 }
 
-// ShowHeader sets the logging mode to log message with header which include timestamp
-func ShowHeader(show bool) {
-	logWriter.ShowHeader(show)
+// ShowTimestamp shows timestamp along with log
+func ShowTimestamp(show bool) {
+	logWriter.ShowTimestamp(show)
 }
 
 // SetVerbosity sets verbosity level and also updates default verbosity level
 func SetVerbosity(verbosity int32) {
 	l.SetThreshold(&verbosity)
 	logWriter.SetVerbosity(verbosity)
+}
+
+// SetStdout overrides stdout
+func SetStdout(writer io.Writer) {
+	logWriter.SetStdout(writer)
+}
+
+// SetStderr overrides stderr
+func SetStderr(writer io.Writer) {
+	logWriter.SetStderr(writer)
 }

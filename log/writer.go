@@ -4,7 +4,7 @@
 package log
 
 import (
-	"log"
+	"io"
 	"os"
 	"path"
 )
@@ -34,31 +34,34 @@ type Writer interface {
 	// If this mode is set, writer will not write anything to stderr
 	QuietMode(quiet bool)
 
-	// ShowHeader shows header along with log which include timestamp
-	ShowHeader(show bool)
+	// ShowTimestamp shows timestamp along with log
+	ShowTimestamp(show bool)
 
 	// SetVerbosity sets verbosity level and also updates default verbosity level
 	SetVerbosity(verbosity int32)
-}
 
-var (
-	originalStdout *os.File
-	originalStderr *os.File
-)
+	// SetStdout overrides stdout
+	SetStdout(w io.Writer)
+
+	// SetStderr overrides stderr
+	SetStderr(w io.Writer)
+}
 
 var defaultVerbosity int32 = 4
 
-// NewWriter returns new custom writter for tkg-cli
+// NewWriter returns new custom writer
 func NewWriter() Writer {
 	return &writer{}
 }
 
 type writer struct {
-	logFile    string
-	verbosity  int32
-	quiet      bool
-	auditFile  string
-	showHeader bool
+	logFile       string
+	verbosity     int32
+	quiet         bool
+	auditFile     string
+	showTimestamp bool
+	stdout        io.Writer
+	stderr        io.Writer
 }
 
 // SetFile sets the logFile to writer
@@ -88,9 +91,19 @@ func (w *writer) SetVerbosity(verbosity int32) {
 	}
 }
 
-// ShowHeader shows header along with log which include timestamp
-func (w *writer) ShowHeader(show bool) {
-	w.showHeader = show
+// ShowTimestamp shows timestamp along with log
+func (w *writer) ShowTimestamp(show bool) {
+	w.showTimestamp = show
+}
+
+// SetStdout overrides stdout
+func (w *writer) SetStdout(writer io.Writer) {
+	w.stdout = writer
+}
+
+// SetStderr overrides stderr
+func (w *writer) SetStderr(writer io.Writer) {
+	w.stderr = writer
 }
 
 // Write writes message to stdout/stderr, logfile
@@ -105,92 +118,71 @@ func (w *writer) Write(header, msg []byte, logEnabled bool, logVerbosity int32, 
 
 	// Always write to the audit log so it captures everything
 	if w.auditFile != "" {
-		fileWriter(w.auditFile, fullMsg)
+		w.fileWriter(w.auditFile, fullMsg)
 	}
 
 	// write to logfile only if verbosityLevel is <= default VerbosityLevel
 	if logVerbosity <= defaultVerbosity {
 		if w.logFile != "" {
-			fileWriter(w.logFile, fullMsg)
+			w.fileWriter(w.logFile, fullMsg)
 		}
 	}
 
-	// If showHeader is set to true, log fullMsg with header
-	// If log type if OUTPUT skip the header
-	if w.showHeader && logType != logTypeOUTPUT {
+	// If showTimestamp is set to true, log fullMsg with header
+	// If log type is OUTPUT skip the header
+	if w.showTimestamp && logType != logTypeOUTPUT {
 		msg = fullMsg
 	}
 
 	// write to stdout/stderr if quiet mode is not set and logEnabled is true
 	if !w.quiet && logEnabled {
 		if logType == logTypeOUTPUT {
-			stdoutWriter(msg)
+			w.stdoutWriter(msg)
 		} else {
-			stderrWriter(msg)
+			w.stderrWriter(msg)
 		}
 	}
 
 	return len(msg), nil
 }
 
-// UnsetStdoutStderr intercept the actual stdout and stderr
-// this will ensure no other external library prints to stdout/stderr
-// and use actual stdout/stderr through tkg writer only
-// Note: Should not use this functions for normal cli commands like
-//
-//	tkg get regions, tkg set regions
-//
-// As it will stop any libraries like table.pretty to print on stdout
-func UnsetStdoutStderr() {
-	originalStdout = os.Stdout
-	originalStderr = os.Stderr
-	os.Stdout = nil
-	os.Stderr = nil
-	log.SetOutput(nil)
+func (w *writer) stdoutWriter(msg []byte) {
+	if w.stdout != nil {
+		_, _ = w.stdout.Write(msg)
+	} else {
+		_, _ = os.Stdout.Write(msg)
+	}
 }
 
-func fileWriter(logFileName string, msg []byte) {
+func (w *writer) stderrWriter(msg []byte) {
+	if w.stderr != nil {
+		_, _ = w.stderr.Write(msg)
+	} else {
+		_, _ = os.Stderr.Write(msg)
+	}
+}
+
+func (w *writer) fileWriter(logFileName string, msg []byte) {
 	basePath := path.Dir(logFileName)
 	filePath := path.Base(logFileName)
 
 	if os.MkdirAll(basePath, 0o600) != nil {
 		msg := "Unable to create log directory: " + basePath
-		stderrWriter([]byte(msg))
+		w.stderrWriter([]byte(msg))
 		os.Exit(1)
 	}
 
 	logFileName = path.Join(basePath, filePath)
 	file, err := os.OpenFile(logFileName, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0o600)
 	if err != nil {
-		stderrWriter([]byte(err.Error()))
+		w.stderrWriter([]byte(err.Error()))
 		os.Exit(1)
 	}
 	defer file.Close()
 
 	_, fileWriteErr := file.Write(msg)
 	if fileWriteErr != nil {
-		stderrWriter([]byte(fileWriteErr.Error()))
+		w.stderrWriter([]byte(fileWriteErr.Error()))
 		os.Exit(1) //nolint:gocritic
 	}
-}
-
-func stdoutWriter(msg []byte) {
-	if originalStdout != nil {
-		_, _ = originalStdout.Write(msg)
-	} else {
-		_, _ = os.Stdout.Write(msg)
-	}
-}
-
-func stderrWriter(msg []byte) {
-	if originalStderr != nil {
-		_, _ = originalStderr.Write(msg)
-	} else {
-		_, _ = os.Stderr.Write(msg)
-	}
-}
-
-// ForceWriteToStdErr writes to stdErr
-func ForceWriteToStdErr(msg []byte) {
-	stderrWriter(msg)
 }

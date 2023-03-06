@@ -4,11 +4,11 @@
 package config
 
 import (
-	"github.com/aunum/log"
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v3"
 
 	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/log"
 )
 
 // PopulateContexts converts the known servers that are missing in contexts.

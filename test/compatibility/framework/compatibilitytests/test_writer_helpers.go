@@ -77,7 +77,7 @@ func DefaultGetContextInputOptions(version core.RuntimeVersion, contextName stri
 }
 
 // DefaultGetContextOutputOptions helper method to construct GetContext API output options
-//nolint: dupl
+// nolint: dupl
 func DefaultGetContextOutputOptions(version core.RuntimeVersion, contextName string) *framework.GetContextOutputOptions {
 	switch version {
 	case core.VersionLatest:
@@ -126,7 +126,7 @@ func DefaultGetContextOutputOptions(version core.RuntimeVersion, contextName str
 }
 
 // DefaultGetContextOutputOptionsWithError helper method to construct GetContext API output options with error
-//nolint: dupl
+// nolint: dupl
 func DefaultGetContextOutputOptionsWithError(version core.RuntimeVersion, contextName string) *framework.GetContextOutputOptions {
 	switch version {
 	case core.VersionLatest:
@@ -193,7 +193,7 @@ func DefaultGetCurrentContextInputOptions(version core.RuntimeVersion) *framewor
 }
 
 // DefaultGetCurrentContextOutputOptions helper method to construct GetCurrentContext API output options
-//nolint: dupl
+// nolint: dupl
 func DefaultGetCurrentContextOutputOptions(version core.RuntimeVersion, contextName string) *framework.GetCurrentContextOutputOptions {
 	switch version {
 	case core.VersionLatest:
@@ -242,7 +242,7 @@ func DefaultGetCurrentContextOutputOptions(version core.RuntimeVersion, contextN
 }
 
 // DefaultGetCurrentContextOutputOptionsWithError helper method to construct GetCurrentContext API output options with error
-//nolint: dupl
+// nolint: dupl
 func DefaultGetCurrentContextOutputOptionsWithError(version core.RuntimeVersion) *framework.GetCurrentContextOutputOptions {
 	switch version {
 	case core.VersionLatest:
@@ -293,7 +293,7 @@ func DefaultRemoveCurrentContextInputOptions(version core.RuntimeVersion) *frame
 }
 
 // DefaultRemoveCurrentContextOutputOptionsWithError helper method to construct RemoveCurrentContext API output option
-//nolint: dupl
+// nolint: dupl
 func DefaultRemoveCurrentContextOutputOptionsWithError(version core.RuntimeVersion) *framework.RemoveCurrentContextOutputOptions {
 	switch version {
 	case core.VersionLatest:
@@ -333,7 +333,7 @@ func DefaultDeleteContextInputOptions(version core.RuntimeVersion, contextName s
 }
 
 // DefaultDeleteContextOutputOptionsWithError helper method to construct DeleteContext API output options
-//nolint: dupl
+// nolint: dupl
 func DefaultDeleteContextOutputOptionsWithError(version core.RuntimeVersion, contextName string) *framework.DeleteContextOutputOptions {
 	switch version {
 	case core.VersionLatest:

@@ -2,10 +2,14 @@ name: Publish Tanzu Plugin Runtime Cross-version API Compatibility Test Results
 
 on:
   workflow_run:
-    workflows: [Tanzu Plugin Runtime Cross-version API Compatibility Tests]
+    workflows: ["Tanzu Plugin Runtime Cross-version API Compatibility Tests"]
     types:
       - completed
-
+    branches:
+      - all
+      - mpanchajanya:compatibility_tests_results
+      - main
+      - release-*
     permissions:
       checks: write
 

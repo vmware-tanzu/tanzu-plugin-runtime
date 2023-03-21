@@ -127,6 +127,28 @@ issues:
         - revive
       text: "it will be inferred from"
 
+    # Ignore the deprecated function use (staticcheck, SA1019) for the below files
+    - path: (.+)_test.go
+      linters:
+        - staticcheck
+      text: "SA1019:"
+    - path: config/cli_repositories.go
+      linters:
+        - staticcheck
+      text: "SA1019:"
+    - path: config/conversion.go
+      linters:
+        - staticcheck
+      text: "SA1019:"
+    - path: config/legacy_clientconfig_factory.go
+      linters:
+        - staticcheck
+      text: "SA1019:"
+    - path: config/servers.go
+      linters:
+        - staticcheck
+      text: "SA1019:"
+
   include:
     - EXC0011 # disable excluding of issues about missing package comments from stylecheck
 

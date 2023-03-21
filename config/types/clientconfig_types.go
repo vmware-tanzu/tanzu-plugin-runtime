@@ -12,21 +12,25 @@ import (
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
 // ServerType is the type of server.
-// Deprecation targeted for a future version. Superseded by Target.
+//
+// Deprecated: This API is deprecated. Superseded by Target.
 type ServerType string
 
 const (
 	// ManagementClusterServerType is a management cluster server.
-	// Deprecation targeted for a future version. Superseded by TargetK8s.
+	//
+	// Deprecated: This variable is deprecated. Use TargetK8s instead.
 	ManagementClusterServerType ServerType = "managementcluster"
 
 	// GlobalServerType is a global control plane server.
-	// Deprecation targeted for a future version. Superseded by TargetTMC.
+	//
+	// Deprecated: This variable is deprecated. Use TargetTMC instead.
 	GlobalServerType ServerType = "global"
 )
 
 // Server connection.
-// Deprecation targeted for a future version. Superseded by Context.
+//
+// Deprecated: This struct is deprecated. Use Context instead.
 type Server struct {
 	// Name of the server.
 	Name string `json:"name,omitempty" yaml:"name,omitempty"`
@@ -67,7 +71,8 @@ type Context struct {
 }
 
 // ManagementClusterServer is the configuration for a management cluster kubeconfig.
-// Deprecation targeted for a future version. Superseded by ClusterServer.
+//
+// Deprecated: This struct is deprecated. Use ClusterServer instead.
 type ManagementClusterServer struct {
 	// Endpoint for the login.
 	Endpoint string `json:"endpoint,omitempty" yaml:"endpoint,omitempty"`
@@ -147,21 +152,28 @@ type EnvMap map[string]string
 // CLIOptions are options for the CLI.
 type CLIOptions struct {
 	// Repositories are the plugin repositories.
+	//
+	// Deprecated: Repositories has been deprecated and will be removed from future version
 	Repositories []PluginRepository `json:"repositories,omitempty" yaml:"repositories,omitempty"`
 	// DiscoverySources determines from where to discover stand-alone plugins
 	DiscoverySources []PluginDiscovery `json:"discoverySources,omitempty" yaml:"discoverySources,omitempty"`
 	// UnstableVersionSelector determined which version tags are allowed
+	//
+	// Deprecated: UnstableVersionSelector has been deprecated and will be removed from future version
 	UnstableVersionSelector VersionSelectorLevel `json:"unstableVersionSelector,omitempty" yaml:"unstableVersionSelector,omitempty"`
-	// Deprecated: Edition has been deprecated and will be removed from future version
 	// Edition
+	//
+	// Deprecated: Edition has been deprecated and will be removed from future version
 	Edition EditionSelector `json:"edition,omitempty" yaml:"edition,omitempty"`
-	// Deprecated: BOMRepo has been deprecated and will be removed from future version
 	// BOMRepo is the root repository URL used to resolve the compatibiilty file
 	// and bill of materials. An example URL is projects.registry.vmware.com/tkg.
+	//
+	// Deprecated: BOMRepo has been deprecated and will be removed from future version
 	BOMRepo string `json:"bomRepo,omitempty" yaml:"bomRepo,omitempty"`
-	// Deprecated: CompatibilityFilePath has been deprecated and will be removed from future version
 	// CompatibilityFilePath is the path, from the BOM repo, to download and access the compatibility file.
 	// the compatibility file is used for resolving the bill of materials for creating clusters.
+	//
+	// Deprecated: CompatibilityFilePath has been deprecated and will be removed from future version
 	CompatibilityFilePath string `json:"compatibilityFilePath,omitempty" yaml:"compatibilityFilePath,omitempty"`
 }
 
@@ -169,6 +181,8 @@ type CLIOptions struct {
 // configs must be set.
 type PluginDiscovery struct {
 	// GCPStorage is set if the plugins are to be discovered via Google Cloud Storage.
+	//
+	// Deprecated: GCP has been deprecated and will be removed from future version
 	GCP *GCPDiscovery `json:"gcp,omitempty" yaml:"gcp,omitempty"`
 	// OCIDiscovery is set if the plugins are to be discovered via an OCI Image Registry.
 	OCI *OCIDiscovery `json:"oci,omitempty" yaml:"oci,omitempty"`
@@ -182,6 +196,8 @@ type PluginDiscovery struct {
 
 // GCPDiscovery provides a plugin discovery mechanism via a Google Cloud Storage
 // bucket with a manifest.yaml file.
+//
+// Deprecated: GCPDiscovery has been deprecated and will be removed from future version
 type GCPDiscovery struct {
 	// Name is a name of the discovery
 	Name string `json:"name,omitempty" yaml:"name,omitempty"`
@@ -244,12 +260,16 @@ type LocalDiscovery struct {
 }
 
 // PluginRepository is a CLI plugin repository
+//
+// Deprecated: PluginRepository has been deprecated and will be removed from future version
 type PluginRepository struct {
 	// GCPPluginRepository is a plugin repository that utilizes GCP cloud storage.
 	GCPPluginRepository *GCPPluginRepository `json:"gcpPluginRepository,omitempty" yaml:"gcpPluginRepository,omitempty"`
 }
 
 // GCPPluginRepository is a plugin repository that utilizes GCP cloud storage.
+//
+// Deprecated: GCPPluginRepository has been deprecated and will be removed from future version
 type GCPPluginRepository struct {
 	// Name of the repository.
 	Name string `json:"name,omitempty" yaml:"name,omitempty"`
@@ -264,11 +284,13 @@ type GCPPluginRepository struct {
 // ClientConfig is the Schema for the configs API
 type ClientConfig struct {
 	// KnownServers available.
-	// Deprecation targeted for a future version. Superseded by KnownContexts.
+	//
+	// Deprecated: This field is deprecated. Use KnownContexts instead.
 	KnownServers []*Server `json:"servers,omitempty" yaml:"servers,omitempty"`
 
 	// CurrentServer in use.
-	// Deprecation targeted for a future version. Superseded by CurrentContext.
+	//
+	// Deprecated: This field is deprecated. Use CurrentContext instead.
 	CurrentServer string `json:"current,omitempty" yaml:"current,omitempty"`
 
 	// KnownContexts available.

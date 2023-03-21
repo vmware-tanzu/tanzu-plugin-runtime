@@ -64,19 +64,22 @@ type EditionSelector string
 type VersionSelectorLevel string
 
 // IsGlobal tells if the server is global.
-// Deprecation targeted for a future version. Use Context.Target instead.
+//
+// Deprecated: This API is deprecated. Use Context.Target instead.
 func (s *Server) IsGlobal() bool {
 	return s.Type == GlobalServerType
 }
 
 // IsManagementCluster tells if the server is a management cluster.
-// Deprecation targeted for a future version. Use Context.Target instead.
+//
+// Deprecated: This API is deprecated. Use context.IsManagementCluster instead.
 func (s *Server) IsManagementCluster() bool {
 	return s.Type == ManagementClusterServerType
 }
 
 // GetCurrentServer returns the current server.
-// Deprecation targeted for a future version. Use GetCurrentContext() instead.
+//
+// Deprecated: This API is deprecated. Use GetCurrentContext() instead.
 func (c *ClientConfig) GetCurrentServer() (*Server, error) {
 	for _, server := range c.KnownServers {
 		if server.Name == c.CurrentServer {
@@ -179,6 +182,8 @@ func (c *Context) IsManagementCluster() bool {
 // alpha: only versions tagged with -alpha
 // experimental: all pre-release versions without +build semver data
 // all: return all unstable versions.
+//
+// Deprecated: This API is deprecated.
 func (c *ClientConfig) SetUnstableVersionSelector(f VersionSelectorLevel) {
 	if c.ClientOptions == nil {
 		c.ClientOptions = &ClientOptions{}
@@ -246,6 +251,8 @@ func (c *ClientConfig) SplitFeaturePath(featurePath string) (string, string, err
 // SetEditionSelector indicates the edition of tanzu to be run
 // EditionStandard is the default, EditionCommunity is also available.
 // These values affect branding and cluster creation
+//
+// Deprecated: This API is deprecated.
 func (c *ClientConfig) SetEditionSelector(edition EditionSelector) {
 	if c.ClientOptions == nil {
 		c.ClientOptions = &ClientOptions{}

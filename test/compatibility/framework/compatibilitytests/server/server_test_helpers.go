@@ -46,7 +46,6 @@ func DefaultGetServerInputOptions(version core.RuntimeVersion, serverName string
 }
 
 // DefaultGetServerOutputOptions helper method to construct GetServer API output options
-//nolint: dupl
 func DefaultGetServerOutputOptions(version core.RuntimeVersion, serverName string) *framework.GetServerOutputOptions {
 	switch version {
 	case core.VersionLatest, core.Version0280:
@@ -81,7 +80,6 @@ func DefaultGetServerOutputOptions(version core.RuntimeVersion, serverName strin
 }
 
 // DefaultGetServerOutputOptionsWithError helper method to construct GetServer API output options with error
-//nolint: dupl
 func DefaultGetServerOutputOptionsWithError(version core.RuntimeVersion, serverName string) *framework.GetServerOutputOptions {
 	switch version {
 	case core.VersionLatest, core.Version0280, core.Version0254, core.Version0116:
@@ -119,7 +117,6 @@ func DefaultGetCurrentServerInputOptions(version core.RuntimeVersion) *framework
 }
 
 // DefaultGetCurrentServerOutputOptions helper method to construct GetCurrentServer API output options
-//nolint: dupl
 func DefaultGetCurrentServerOutputOptions(version core.RuntimeVersion, serverName string) *framework.GetCurrentServerOutputOptions {
 	switch version {
 	case core.VersionLatest, core.Version0254, core.Version0116:
@@ -207,7 +204,6 @@ func DefaultDeleteServerInputOptions(version core.RuntimeVersion, serverName str
 }
 
 // DefaultDeleteServerOutputOptionsWithError helper method to construct DeleteServer API output options
-//nolint: dupl
 func DefaultDeleteServerOutputOptionsWithError(version core.RuntimeVersion, serverName string) *framework.DeleteServerOutputOptions {
 	switch version {
 	case core.VersionLatest, core.Version0280, core.Version0254, core.Version0116:

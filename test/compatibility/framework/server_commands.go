@@ -105,24 +105,26 @@ func NewGetServerCommand(inputOpts *GetServerInputOptions, outputOpts *GetServer
 	var res = core.Success
 	var content = ""
 
-	if outputOpts.Error != "" {
-		res = core.Failed
-		content = outputOpts.Error
-	} else if outputOpts.ServerOpts != nil {
-		// Validate the Output Options
-		_, err = outputOpts.Validate()
-		if err != nil {
-			return nil, err
-		}
+	if outputOpts != nil {
+		if outputOpts.ServerOpts != nil {
+			// Validate the Output Options
+			_, err = outputOpts.Validate()
+			if err != nil {
+				return nil, err
+			}
 
-		// Construct get server output server opts
-		bytes, err := yaml.Marshal(outputOpts.ServerOpts)
-		if err != nil {
-			return nil, err
-		}
+			// Construct get server output server opts
+			bytes, err := yaml.Marshal(outputOpts.ServerOpts)
+			if err != nil {
+				return nil, err
+			}
 
-		content = string(bytes)
-		res = core.Success
+			content = string(bytes)
+			res = core.Success
+		} else if outputOpts.Error != "" {
+			res = core.Failed
+			content = outputOpts.Error
+		}
 	}
 
 	api.Output = &core.Output{

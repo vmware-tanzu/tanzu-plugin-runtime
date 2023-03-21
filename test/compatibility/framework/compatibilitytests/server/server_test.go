@@ -27,478 +27,473 @@ var _ = ginkgo.Describe("Cross-version Server APIs Compatibility Tests for suppo
 		ginkgo.DeferCleanup(func() {
 			cleanup()
 		})
+
+	})
+	// Input and Output Options for Server APIs
+	var setServerInputOptionsForRuntime0116 *framework.SetServerInputOptions
+	var setServerInputOptionsForRuntime0254 *framework.SetServerInputOptions
+	var setServerInputOptionsForRuntime0280 *framework.SetServerInputOptions
+	var setServerInputOptionsForRuntimeLatest *framework.SetServerInputOptions
+
+	var setServerTwoInputOptionsForRuntime0116 *framework.SetServerInputOptions
+	var setServerTwoInputOptionsForRuntime0254 *framework.SetServerInputOptions
+	var setServerTwoInputOptionsForRuntime0280 *framework.SetServerInputOptions
+	var setServerTwoInputOptionsForRuntimeLatest *framework.SetServerInputOptions
+
+	var setCurrentServerInputOptionsForRuntime0116 *framework.SetCurrentServerInputOptions
+	var setCurrentServerInputOptionsForRuntime0254 *framework.SetCurrentServerInputOptions
+	var setCurrentServerInputOptionsForRuntime0280 *framework.SetCurrentServerInputOptions
+	var setCurrentServerInputOptionsForRuntimeLatest *framework.SetCurrentServerInputOptions
+
+	var getServerInputOptionsForRuntimeLatest *framework.GetServerInputOptions
+	var getServerInputOptionsForRuntime0280 *framework.GetServerInputOptions
+	var getServerInputOptionsForRuntime0254 *framework.GetServerInputOptions
+	var getServerInputOptionsForRuntime0116 *framework.GetServerInputOptions
+
+	var getServerTwoInputOptionsForRuntimeLatest *framework.GetServerInputOptions
+	var getServerTwoInputOptionsForRuntime0280 *framework.GetServerInputOptions
+	var getServerTwoInputOptionsForRuntime0254 *framework.GetServerInputOptions
+	var getServerTwoInputOptionsForRuntime0116 *framework.GetServerInputOptions
+
+	var getServerOutputOptionsForRuntime0116 *framework.GetServerOutputOptions
+	var getServerOutputOptionsForRuntime0254 *framework.GetServerOutputOptions
+	var getServerOutputOptionsForRuntime0280 *framework.GetServerOutputOptions
+	var getServerOutputOptionsForRuntimeLatest *framework.GetServerOutputOptions
+
+	var getServerTwoOutputOptionsForRuntime0116 *framework.GetServerOutputOptions
+	var getServerTwoOutputOptionsForRuntime0254 *framework.GetServerOutputOptions
+	var getServerTwoOutputOptionsForRuntime0280 *framework.GetServerOutputOptions
+	var getServerTwoOutputOptionsForRuntimeLatest *framework.GetServerOutputOptions
+
+	var getServerOutputOptionsForRuntimeLatestWithError *framework.GetServerOutputOptions
+	var getServerOutputOptionsForRuntime0280WithError *framework.GetServerOutputOptions
+	var getServerOutputOptionsForRuntime0254WithError *framework.GetServerOutputOptions
+	var getServerOutputOptionsForRuntime0116WithError *framework.GetServerOutputOptions
+
+	var getCurrentServerInputOptionsForRuntime0116 *framework.GetCurrentServerInputOptions
+	var getCurrentServerInputOptionsForRuntime0254 *framework.GetCurrentServerInputOptions
+	var getCurrentServerInputOptionsForRuntime0280 *framework.GetCurrentServerInputOptions
+	var getCurrentServerInputOptionsForRuntimeLatest *framework.GetCurrentServerInputOptions
+
+	var getCurrentServerOutputOptionsForRuntime0116 *framework.GetCurrentServerOutputOptions
+	var getCurrentServerOutputOptionsForRuntime0254 *framework.GetCurrentServerOutputOptions
+	var getCurrentServerOutputOptionsForRuntime0280 *framework.GetCurrentServerOutputOptions
+	var getCurrentServerOutputOptionsForRuntimeLatest *framework.GetCurrentServerOutputOptions
+
+	var getCurrentServerOutputOptionsForRuntimeLatestWithError *framework.GetCurrentServerOutputOptions
+	var getCurrentServerOutputOptionsForRuntime0280WithError *framework.GetCurrentServerOutputOptions
+	var getCurrentServerOutputOptionsForRuntime0254WithError *framework.GetCurrentServerOutputOptions
+	var getCurrentServerOutputOptionsForRuntime0116WithError *framework.GetCurrentServerOutputOptions
+
+	var deleteServerInputOptionsForRuntime0254 *framework.DeleteServerInputOptions
+	var deleteServerInputOptionsForRuntime0280 *framework.DeleteServerInputOptions
+	var deleteServerInputOptionsForRuntimeLatest *framework.DeleteServerInputOptions
+	var deleteServerInputOptionsForRuntime0116 *framework.DeleteServerInputOptions
+
+	var deleteServerOutputOptionsForRuntime0280WithError *framework.DeleteServerOutputOptions
+	var deleteServerOutputOptionsForRuntimeLatestWithError *framework.DeleteServerOutputOptions
+
+	var removeCurrentServerInputOptionsForRuntime0280 *framework.RemoveCurrentServerInputOptions
+	var removeCurrentServerOutputOptionsForRuntime0280WithError *framework.RemoveCurrentServerOutputOptions
+
+	// Server API Commands
+	var setServerCmdForRuntimeLatest *core.Command
+	var setServerCmdForRuntime0280 *core.Command
+	var setServerCmdForRuntime0254 *core.Command
+	var setServerCmdForRuntime0116 *core.Command
+
+	var setServerTwoCmdForRuntimeLatest *core.Command
+	var setServerTwoCmdForRuntime0280 *core.Command
+	var setServerTwoCmdForRuntime0254 *core.Command
+	var setServerTwoCmdForRuntime0116 *core.Command
+
+	var setCurrentServerCmdForRuntime0116 *core.Command
+	var setCurrentServerCmdForRuntime0254 *core.Command
+	var setCurrentServerCmdForRuntime0280 *core.Command
+	var setCurrentServerCmdForRuntimeLatest *core.Command
+
+	var getServerCmdForRuntimeLatest *core.Command
+	var getServerCmdForRuntime0280 *core.Command
+	var getServerCmdForRuntime0254 *core.Command
+	var getServerCmdForRuntime0116 *core.Command
+
+	var getServerTwoCmdForRuntimeLatest *core.Command
+	var getServerTwoCmdForRuntime0280 *core.Command
+	var getServerTwoCmdForRuntime0254 *core.Command
+	var getServerTwoCmdForRuntime0116 *core.Command
+
+	var getServerCmdForRuntimeLatestWithError *core.Command
+	var getServerCmdForRuntime0280WithError *core.Command
+	var getServerCmdForRuntime0254WithError *core.Command
+	var getServerCmdForRuntime0116WithError *core.Command
+
+	var getCurrentServerCmdForRuntimeLatest *core.Command
+	var getCurrentServerCmdForRuntime0280 *core.Command
+	var getCurrentServerCmdForRuntime0254 *core.Command
+	var getCurrentServerCmdForRuntime0116 *core.Command
+
+	var getCurrentServerCmdForRuntimeLatestWithError *core.Command
+	var getCurrentServerCmdForRuntime0280WithError *core.Command
+	var getCurrentServerCmdForRuntime0254WithError *core.Command
+	var getCurrentServerCmdForRuntime0116WithError *core.Command
+
+	var deleteServerCmdForRuntime0280 *core.Command
+	var deleteServerCmdForRuntime0116 *core.Command
+	var deleteServerCmdForRuntime0254 *core.Command
+
+	var deleteServerCmdForRuntime0280WithError *core.Command
+	var deleteServerCmdForRuntimeLatestWithError *core.Command
+
+	var removeCurrentServerCmdForRuntime0280 *core.Command
+	var removeCurrentServerCmdForRuntime0280WithError *core.Command
+
+	var err error
+	ginkgo.BeforeEach(func() {
+		ginkgo.By("Setup Input and Output Options for Servers APIs")
+
+		// Input and Output Parameters for SetServer
+		setServerInputOptionsForRuntimeLatest = server.DefaultSetServerInputOptions(core.VersionLatest, common.CtxCompatibilityOne)
+		setServerInputOptionsForRuntime0280 = server.DefaultSetServerInputOptions(core.Version0280, common.CtxCompatibilityOne)
+		setServerInputOptionsForRuntime0254 = server.DefaultSetServerInputOptions(core.Version0254, common.CtxCompatibilityOne)
+		setServerInputOptionsForRuntime0116 = server.DefaultSetServerInputOptions(core.Version0116, common.CtxCompatibilityOne)
+
+		setServerTwoInputOptionsForRuntimeLatest = server.DefaultSetServerInputOptions(core.VersionLatest, common.CtxCompatibilityTwo)
+		setServerTwoInputOptionsForRuntime0280 = server.DefaultSetServerInputOptions(core.Version0280, common.CtxCompatibilityTwo)
+		setServerTwoInputOptionsForRuntime0254 = server.DefaultSetServerInputOptions(core.Version0254, common.CtxCompatibilityTwo)
+		setServerTwoInputOptionsForRuntime0116 = server.DefaultSetServerInputOptions(core.Version0116, common.CtxCompatibilityTwo)
+
+		// Input and Output Parameters for SetCurrentServer
+		setCurrentServerInputOptionsForRuntimeLatest = server.DefaultSetCurrentServerInputOptions(core.VersionLatest, common.CtxCompatibilityOne)
+		setCurrentServerInputOptionsForRuntime0280 = server.DefaultSetCurrentServerInputOptions(core.Version0280, common.CtxCompatibilityOne)
+		setCurrentServerInputOptionsForRuntime0254 = server.DefaultSetCurrentServerInputOptions(core.Version0254, common.CtxCompatibilityOne)
+		setCurrentServerInputOptionsForRuntime0116 = server.DefaultSetCurrentServerInputOptions(core.Version0116, common.CtxCompatibilityOne)
+
+		// Input and Output Parameters for GetCurrentServer
+		getCurrentServerInputOptionsForRuntimeLatest = server.DefaultGetCurrentServerInputOptions(core.VersionLatest)
+		getCurrentServerInputOptionsForRuntime0280 = server.DefaultGetCurrentServerInputOptions(core.Version0280)
+		getCurrentServerInputOptionsForRuntime0254 = server.DefaultGetCurrentServerInputOptions(core.Version0254)
+		getCurrentServerInputOptionsForRuntime0116 = server.DefaultGetCurrentServerInputOptions(core.Version0116)
+
+		getCurrentServerOutputOptionsForRuntime0280 = server.DefaultGetCurrentServerOutputOptions(core.Version0280, common.CtxCompatibilityOne)
+		getCurrentServerOutputOptionsForRuntime0254 = server.DefaultGetCurrentServerOutputOptions(core.Version0254, common.CtxCompatibilityOne)
+		getCurrentServerOutputOptionsForRuntime0116 = server.DefaultGetCurrentServerOutputOptions(core.Version0116, common.CtxCompatibilityOne)
+		getCurrentServerOutputOptionsForRuntimeLatest = server.DefaultGetCurrentServerOutputOptions(core.VersionLatest, common.CtxCompatibilityOne)
+
+		getCurrentServerOutputOptionsForRuntimeLatestWithError = server.DefaultGetCurrentServerOutputOptionsWithError(core.VersionLatest)
+		getCurrentServerOutputOptionsForRuntime0280WithError = server.DefaultGetCurrentServerOutputOptionsWithError(core.Version0280)
+		getCurrentServerOutputOptionsForRuntime0254WithError = server.DefaultGetCurrentServerOutputOptionsWithError(core.Version0254)
+		getCurrentServerOutputOptionsForRuntime0116WithError = server.DefaultGetCurrentServerOutputOptionsWithError(core.Version0116)
+
+		// Input and Output params for GetServer
+		getServerInputOptionsForRuntimeLatest = server.DefaultGetServerInputOptions(core.VersionLatest, common.CtxCompatibilityOne)
+		getServerInputOptionsForRuntime0280 = server.DefaultGetServerInputOptions(core.Version0280, common.CtxCompatibilityOne)
+		getServerInputOptionsForRuntime0254 = server.DefaultGetServerInputOptions(core.Version0254, common.CtxCompatibilityOne)
+		getServerInputOptionsForRuntime0116 = server.DefaultGetServerInputOptions(core.Version0116, common.CtxCompatibilityOne)
+
+		getServerTwoInputOptionsForRuntimeLatest = server.DefaultGetServerInputOptions(core.VersionLatest, common.CtxCompatibilityTwo)
+		getServerTwoInputOptionsForRuntime0280 = server.DefaultGetServerInputOptions(core.Version0280, common.CtxCompatibilityTwo)
+		getServerTwoInputOptionsForRuntime0254 = server.DefaultGetServerInputOptions(core.Version0254, common.CtxCompatibilityTwo)
+		getServerTwoInputOptionsForRuntime0116 = server.DefaultGetServerInputOptions(core.Version0116, common.CtxCompatibilityTwo)
+
+		getServerTwoOutputOptionsForRuntimeLatest = server.DefaultGetServerOutputOptions(core.VersionLatest, common.CtxCompatibilityTwo)
+		getServerTwoOutputOptionsForRuntime0280 = server.DefaultGetServerOutputOptions(core.Version0280, common.CtxCompatibilityTwo)
+		getServerTwoOutputOptionsForRuntime0254 = server.DefaultGetServerOutputOptions(core.Version0254, common.CtxCompatibilityTwo)
+		getServerTwoOutputOptionsForRuntime0116 = server.DefaultGetServerOutputOptions(core.Version0116, common.CtxCompatibilityTwo)
+
+		getServerOutputOptionsForRuntime0280 = server.DefaultGetServerOutputOptions(core.Version0280, common.CtxCompatibilityOne)
+		getServerOutputOptionsForRuntime0254 = server.DefaultGetServerOutputOptions(core.Version0254, common.CtxCompatibilityOne)
+		getServerOutputOptionsForRuntime0116 = server.DefaultGetServerOutputOptions(core.Version0116, common.CtxCompatibilityOne)
+		getServerOutputOptionsForRuntimeLatest = server.DefaultGetServerOutputOptions(core.VersionLatest, common.CtxCompatibilityOne)
+
+		getServerOutputOptionsForRuntimeLatestWithError = server.DefaultGetServerOutputOptionsWithError(core.VersionLatest, common.CtxCompatibilityOne)
+		getServerOutputOptionsForRuntime0280WithError = server.DefaultGetServerOutputOptionsWithError(core.Version0280, common.CtxCompatibilityOne)
+		getServerOutputOptionsForRuntime0254WithError = server.DefaultGetServerOutputOptionsWithError(core.Version0254, common.CtxCompatibilityOne)
+		getServerOutputOptionsForRuntime0116WithError = server.DefaultGetServerOutputOptionsWithError(core.Version0116, common.CtxCompatibilityOne)
+
+		// Input and Output Options for DeleteServer
+		deleteServerInputOptionsForRuntime0280 = server.DefaultDeleteServerInputOptions(core.Version0280, common.CtxCompatibilityOne)
+		deleteServerInputOptionsForRuntime0254 = server.DefaultDeleteServerInputOptions(core.Version0254, common.CtxCompatibilityOne)
+		deleteServerInputOptionsForRuntime0116 = server.DefaultDeleteServerInputOptions(core.Version0116, common.CtxCompatibilityOne)
+		deleteServerInputOptionsForRuntimeLatest = server.DefaultDeleteServerInputOptions(core.VersionLatest, common.CtxCompatibilityOne)
+
+		deleteServerOutputOptionsForRuntime0280WithError = server.DefaultDeleteServerOutputOptionsWithError(core.Version0280, common.CtxCompatibilityOne)
+		deleteServerOutputOptionsForRuntimeLatestWithError = server.DefaultDeleteServerOutputOptionsWithError(core.VersionLatest, common.CtxCompatibilityOne)
+
+		// Input and Output Options for RemoveCurrentServer
+		removeCurrentServerInputOptionsForRuntime0280 = server.DefaultRemoveCurrentServerInputOptions(core.Version0280)
+
+		removeCurrentServerOutputOptionsForRuntime0280WithError = server.DefaultRemoveCurrentServerOutputOptionsWithError(core.Version0280, common.CtxCompatibilityOne)
+
+		ginkgo.By("Setup Server API commands")
+
+		// Create SetServer Commands with input and output options
+		setServerCmdForRuntimeLatest, err = framework.NewSetServerCommand(setServerInputOptionsForRuntimeLatest, nil)
+		gomega.Expect(err).To(gomega.BeNil())
+		setServerCmdForRuntime0254, err = framework.NewSetServerCommand(setServerInputOptionsForRuntime0254, nil)
+		gomega.Expect(err).To(gomega.BeNil())
+		setServerCmdForRuntime0280, err = framework.NewSetServerCommand(setServerInputOptionsForRuntime0280, nil)
+		gomega.Expect(err).To(gomega.BeNil())
+		setServerCmdForRuntime0116, err = framework.NewSetServerCommand(setServerInputOptionsForRuntime0116, nil)
+		gomega.Expect(err).To(gomega.BeNil())
+
+		setServerTwoCmdForRuntimeLatest, err = framework.NewSetServerCommand(setServerTwoInputOptionsForRuntimeLatest, nil)
+		gomega.Expect(err).To(gomega.BeNil())
+		setServerTwoCmdForRuntime0254, err = framework.NewSetServerCommand(setServerTwoInputOptionsForRuntime0254, nil)
+		gomega.Expect(err).To(gomega.BeNil())
+		setServerTwoCmdForRuntime0280, err = framework.NewSetServerCommand(setServerTwoInputOptionsForRuntime0280, nil)
+		gomega.Expect(err).To(gomega.BeNil())
+		setServerTwoCmdForRuntime0116, err = framework.NewSetServerCommand(setServerTwoInputOptionsForRuntime0116, nil)
+		gomega.Expect(err).To(gomega.BeNil())
+
+		// Create SetCurrentServer Commands with input and output options
+		setCurrentServerCmdForRuntimeLatest, err = framework.NewSetCurrentServerCommand(setCurrentServerInputOptionsForRuntimeLatest, nil)
+		gomega.Expect(err).To(gomega.BeNil())
+		setCurrentServerCmdForRuntime0280, err = framework.NewSetCurrentServerCommand(setCurrentServerInputOptionsForRuntime0280, nil)
+		gomega.Expect(err).To(gomega.BeNil())
+		setCurrentServerCmdForRuntime0254, err = framework.NewSetCurrentServerCommand(setCurrentServerInputOptionsForRuntime0254, nil)
+		gomega.Expect(err).To(gomega.BeNil())
+		setCurrentServerCmdForRuntime0116, err = framework.NewSetCurrentServerCommand(setCurrentServerInputOptionsForRuntime0116, nil)
+		gomega.Expect(err).To(gomega.BeNil())
+
+		// Create GetServer Commands with input and output options
+		getServerCmdForRuntimeLatest, err = framework.NewGetServerCommand(getServerInputOptionsForRuntimeLatest, getServerOutputOptionsForRuntimeLatest)
+		gomega.Expect(err).To(gomega.BeNil())
+		getServerCmdForRuntime0280, err = framework.NewGetServerCommand(getServerInputOptionsForRuntime0280, getServerOutputOptionsForRuntime0280)
+		gomega.Expect(err).To(gomega.BeNil())
+		getServerCmdForRuntime0254, err = framework.NewGetServerCommand(getServerInputOptionsForRuntime0254, getServerOutputOptionsForRuntime0254)
+		gomega.Expect(err).To(gomega.BeNil())
+		getServerCmdForRuntime0116, err = framework.NewGetServerCommand(getServerInputOptionsForRuntime0116, getServerOutputOptionsForRuntime0116)
+		gomega.Expect(err).To(gomega.BeNil())
+
+		getServerTwoCmdForRuntimeLatest, err = framework.NewGetServerCommand(getServerTwoInputOptionsForRuntimeLatest, getServerTwoOutputOptionsForRuntimeLatest)
+		gomega.Expect(err).To(gomega.BeNil())
+		getServerTwoCmdForRuntime0280, err = framework.NewGetServerCommand(getServerTwoInputOptionsForRuntime0280, getServerTwoOutputOptionsForRuntime0280)
+		gomega.Expect(err).To(gomega.BeNil())
+		getServerTwoCmdForRuntime0254, err = framework.NewGetServerCommand(getServerTwoInputOptionsForRuntime0254, getServerTwoOutputOptionsForRuntime0254)
+		gomega.Expect(err).To(gomega.BeNil())
+		getServerTwoCmdForRuntime0116, err = framework.NewGetServerCommand(getServerTwoInputOptionsForRuntime0116, getServerTwoOutputOptionsForRuntime0116)
+		gomega.Expect(err).To(gomega.BeNil())
+
+		getServerCmdForRuntimeLatestWithError, err = framework.NewGetServerCommand(getServerInputOptionsForRuntimeLatest, getServerOutputOptionsForRuntimeLatestWithError)
+		gomega.Expect(err).To(gomega.BeNil())
+		getServerCmdForRuntime0280WithError, err = framework.NewGetServerCommand(getServerInputOptionsForRuntime0280, getServerOutputOptionsForRuntime0280WithError)
+		gomega.Expect(err).To(gomega.BeNil())
+		getServerCmdForRuntime0254WithError, err = framework.NewGetServerCommand(getServerInputOptionsForRuntime0254, getServerOutputOptionsForRuntime0254WithError)
+		gomega.Expect(err).To(gomega.BeNil())
+		getServerCmdForRuntime0116WithError, err = framework.NewGetServerCommand(getServerInputOptionsForRuntime0116, getServerOutputOptionsForRuntime0116WithError)
+		gomega.Expect(err).To(gomega.BeNil())
+
+		// Create GetCurrentServer Commands with input and output options
+		getCurrentServerCmdForRuntimeLatest, err = framework.NewGetCurrentServerCommand(getCurrentServerInputOptionsForRuntimeLatest, getCurrentServerOutputOptionsForRuntimeLatest)
+		gomega.Expect(err).To(gomega.BeNil())
+		getCurrentServerCmdForRuntime0280, err = framework.NewGetCurrentServerCommand(getCurrentServerInputOptionsForRuntime0280, getCurrentServerOutputOptionsForRuntime0280)
+		gomega.Expect(err).To(gomega.BeNil())
+		getCurrentServerCmdForRuntime0254, err = framework.NewGetCurrentServerCommand(getCurrentServerInputOptionsForRuntime0254, getCurrentServerOutputOptionsForRuntime0254)
+		gomega.Expect(err).To(gomega.BeNil())
+		getCurrentServerCmdForRuntime0116, err = framework.NewGetCurrentServerCommand(getCurrentServerInputOptionsForRuntime0116, getCurrentServerOutputOptionsForRuntime0116)
+		gomega.Expect(err).To(gomega.BeNil())
+		getCurrentServerCmdForRuntimeLatestWithError, err = framework.NewGetCurrentServerCommand(getCurrentServerInputOptionsForRuntimeLatest, getCurrentServerOutputOptionsForRuntimeLatestWithError)
+		gomega.Expect(err).To(gomega.BeNil())
+		getCurrentServerCmdForRuntime0280WithError, err = framework.NewGetCurrentServerCommand(getCurrentServerInputOptionsForRuntime0280, getCurrentServerOutputOptionsForRuntime0280WithError)
+		gomega.Expect(err).To(gomega.BeNil())
+		getCurrentServerCmdForRuntime0254WithError, err = framework.NewGetCurrentServerCommand(getCurrentServerInputOptionsForRuntime0254, getCurrentServerOutputOptionsForRuntime0254WithError)
+		gomega.Expect(err).To(gomega.BeNil())
+		getCurrentServerCmdForRuntime0116WithError, err = framework.NewGetCurrentServerCommand(getCurrentServerInputOptionsForRuntime0116, getCurrentServerOutputOptionsForRuntime0116WithError)
+		gomega.Expect(err).To(gomega.BeNil())
+
+		// Create DeleteServer Commands with input and output options
+		deleteServerCmdForRuntime0280, err = framework.NewDeleteServerCommand(deleteServerInputOptionsForRuntime0280, nil)
+		gomega.Expect(err).To(gomega.BeNil())
+		deleteServerCmdForRuntime0254, err = framework.NewDeleteServerCommand(deleteServerInputOptionsForRuntime0254, nil)
+		gomega.Expect(err).To(gomega.BeNil())
+		deleteServerCmdForRuntime0116, err = framework.NewDeleteServerCommand(deleteServerInputOptionsForRuntime0116, nil)
+		gomega.Expect(err).To(gomega.BeNil())
+		deleteServerCmdForRuntime0280WithError, err = framework.NewDeleteServerCommand(deleteServerInputOptionsForRuntime0280, deleteServerOutputOptionsForRuntime0280WithError)
+		gomega.Expect(err).To(gomega.BeNil())
+		deleteServerCmdForRuntimeLatestWithError, err = framework.NewDeleteServerCommand(deleteServerInputOptionsForRuntimeLatest, deleteServerOutputOptionsForRuntimeLatestWithError)
+		gomega.Expect(err).To(gomega.BeNil())
+
+		// Create RemoveCurrentServer Commands with input and output options
+		removeCurrentServerCmdForRuntime0280, err = framework.NewRemoveCurrentServerCommand(removeCurrentServerInputOptionsForRuntime0280, nil)
+		gomega.Expect(err).To(gomega.BeNil())
+		removeCurrentServerCmdForRuntime0280WithError, err = framework.NewRemoveCurrentServerCommand(removeCurrentServerInputOptionsForRuntime0280, removeCurrentServerOutputOptionsForRuntime0280WithError)
+		gomega.Expect(err).To(gomega.BeNil())
 	})
 
 	ginkgo.Context("using single server", func() {
 
-		ginkgo.It("SetServer, SetCurrentServer latest then GetServer, GetCurrentServer v0.25.4, v0.28.0, latest then DeleteServer, RemoveCurrentServer v0.28.0 then GetServer, GetCurrentServer v0.25.4, v0.28.0, latest", func() {
-			ginkgo.By("Setting up the input and output parameters data for various APIs")
-			// Input and Output Parameters for SetServer latest
-			setServerInputOptions := server.DefaultSetServerInputOptions(core.VersionLatest, common.CtxCompatibilityOne)
+		ginkgo.It("Trigger SetServer and SetCurrentServer of Runtime Latest version then GetServer, GetCurrentServer on all supported Runtime versions then DeleteServer, RemoveCurrentServer of Runtime v0.28.0 then GetServer, GetCurrentServer on all supported Runtime versions", func() {
+			// Add SetServer and SetCurrentServer Commands of Runtime Latest version
+			testCase := core.NewTestCase().Add(setServerCmdForRuntimeLatest).Add(setCurrentServerCmdForRuntimeLatest)
 
-			// Input and Output Parameters for SetCurrentServer latest
-			setCurrentServerInputOptions := server.DefaultSetCurrentServerInputOptions(core.VersionLatest, common.CtxCompatibilityOne)
+			// Add GetServer Commands on all supported Runtime library versions
+			testCase.Add(getServerCmdForRuntimeLatest).Add(getServerCmdForRuntime0280).Add(getServerCmdForRuntime0254).Add(getServerCmdForRuntime0116)
 
-			// Input and Output Parameters for GetCurrentServer
-			getCurrentServerInputOptionsForRuntimeLatest := server.DefaultGetCurrentServerInputOptions(core.VersionLatest)
-			getCurrentServerOutputOptionsForRuntimeLatest := server.DefaultGetCurrentServerOutputOptions(core.VersionLatest, common.CtxCompatibilityOne)
-			getCurrentServerOutputOptionsForRuntimeLatestWithError := server.DefaultGetCurrentServerOutputOptionsWithError(core.VersionLatest)
-
-			getCurrentServerInputOptionsForRuntime0280 := server.DefaultGetCurrentServerInputOptions(core.Version0280)
-			getCurrentServerOutputOptionsForRuntime0280 := server.DefaultGetCurrentServerOutputOptions(core.Version0280, common.CtxCompatibilityOne)
-			getCurrentServerOutputOptionsForRuntime0280WithError := server.DefaultGetCurrentServerOutputOptionsWithError(core.VersionLatest)
-
-			getCurrentServerInputOptionsForRuntime0254 := server.DefaultGetCurrentServerInputOptions(core.Version0254)
-			getCurrentServerOutputOptionsForRuntime0254 := server.DefaultGetCurrentServerOutputOptions(core.Version0254, common.CtxCompatibilityOne)
-			getCurrentServerOutputOptionsForRuntime0254WithError := server.DefaultGetCurrentServerOutputOptionsWithError(core.Version0254)
-
-			// Input and Output params for GetServer
-			getServerInputOptionsForRuntimeLatest := server.DefaultGetServerInputOptions(core.VersionLatest, common.CtxCompatibilityOne)
-			getServerOutputOptionsForRuntimeLatest := server.DefaultGetServerOutputOptions(core.VersionLatest, common.CtxCompatibilityOne)
-			getServerOutputOptionsForRuntimeLatestWithError := server.DefaultGetServerOutputOptionsWithError(core.VersionLatest, common.CtxCompatibilityOne)
-
-			getServerInputOptionsForRuntime0280 := server.DefaultGetServerInputOptions(core.Version0280, common.CtxCompatibilityOne)
-			getServerOutputOptionsForRuntime0280 := server.DefaultGetServerOutputOptions(core.Version0280, common.CtxCompatibilityOne)
-			getServerOutputOptionsForRuntime0280WithError := server.DefaultGetServerOutputOptionsWithError(core.Version0280, common.CtxCompatibilityOne)
-
-			getServerInputOptionsForRuntime0254 := server.DefaultGetServerInputOptions(core.Version0254, common.CtxCompatibilityOne)
-			getServerOutputOptionsForRuntime0254 := server.DefaultGetServerOutputOptions(core.Version0254, common.CtxCompatibilityOne)
-			getServerOutputOptionsForRuntime0254WithError := server.DefaultGetServerOutputOptionsWithError(core.Version0254, common.CtxCompatibilityOne)
-
-			// Input params for DeleteServer v0.28.0
-			deleteServerInputOptions := server.DefaultDeleteServerInputOptions(core.Version0280, common.CtxCompatibilityOne)
-
-			// Input params for RemoveCurrentServer v0.28.0
-			removeCurrentServerInputOptions := server.DefaultRemoveCurrentServerInputOptions(core.Version0280)
-
-			ginkgo.By("Creating Commands to trigger Runtime APIs")
-
-			// Create SetServer latest Command with input and output options
-			setServerCmd, err := framework.NewSetServerCommand(setServerInputOptions, nil)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			// Create SetCurrentServer latest Command with input and output options
-			setCurrentServerCmd, err := framework.NewSetCurrentServerCommand(setCurrentServerInputOptions, nil)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			// Create GetServer Commands with input and output options
-			getServerCmdForRuntimeLatest, err := framework.NewGetServerCommand(getServerInputOptionsForRuntimeLatest, getServerOutputOptionsForRuntimeLatest)
-			gomega.Expect(err).To(gomega.BeNil())
-			getServerCmdForRuntime0280, err := framework.NewGetServerCommand(getServerInputOptionsForRuntime0280, getServerOutputOptionsForRuntime0280)
-			gomega.Expect(err).To(gomega.BeNil())
-			getServerCmdForRuntime0254, err := framework.NewGetServerCommand(getServerInputOptionsForRuntime0254, getServerOutputOptionsForRuntime0254)
-			gomega.Expect(err).To(gomega.BeNil())
-			getServerCmdForRuntimeLatestWithError, err := framework.NewGetServerCommand(getServerInputOptionsForRuntimeLatest, getServerOutputOptionsForRuntimeLatestWithError)
-			gomega.Expect(err).To(gomega.BeNil())
-			getServerCmdForRuntime0280WithError, err := framework.NewGetServerCommand(getServerInputOptionsForRuntime0280, getServerOutputOptionsForRuntime0280WithError)
-			gomega.Expect(err).To(gomega.BeNil())
-			getServerCmdForRuntime0254WithError, err := framework.NewGetServerCommand(getServerInputOptionsForRuntime0254, getServerOutputOptionsForRuntime0254WithError)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			// Create GetCurrentServer Commands
-			getCurrentServerCmdForRuntimeLatest, err := framework.NewGetCurrentServerCommand(getCurrentServerInputOptionsForRuntimeLatest, getCurrentServerOutputOptionsForRuntimeLatest)
-			gomega.Expect(err).To(gomega.BeNil())
-			getCurrentServerCmdForRuntime0280, err := framework.NewGetCurrentServerCommand(getCurrentServerInputOptionsForRuntime0280, getCurrentServerOutputOptionsForRuntime0280)
-			gomega.Expect(err).To(gomega.BeNil())
-			getCurrentServerCmdForRuntime0254, err := framework.NewGetCurrentServerCommand(getCurrentServerInputOptionsForRuntime0254, getCurrentServerOutputOptionsForRuntime0254)
-			gomega.Expect(err).To(gomega.BeNil())
-			getCurrentServerCmdForRuntimeLatestWithError, err := framework.NewGetCurrentServerCommand(getCurrentServerInputOptionsForRuntimeLatest, getCurrentServerOutputOptionsForRuntimeLatestWithError)
-			gomega.Expect(err).To(gomega.BeNil())
-			getCurrentServerCmdForRuntime0280WithError, err := framework.NewGetCurrentServerCommand(getCurrentServerInputOptionsForRuntime0280, getCurrentServerOutputOptionsForRuntime0280WithError)
-			gomega.Expect(err).To(gomega.BeNil())
-			getCurrentServerCmdForRuntime0254WithError, err := framework.NewGetCurrentServerCommand(getCurrentServerInputOptionsForRuntime0254, getCurrentServerOutputOptionsForRuntime0254WithError)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			// Create DeleteServer Command
-			deleteCtxCmd, err := framework.NewDeleteServerCommand(deleteServerInputOptions, nil)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			// Create RemoveCurrentServer Command
-			removeCurrentCtxCmd, err := framework.NewRemoveCurrentServerCommand(removeCurrentServerInputOptions, nil)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			ginkgo.By("Build test case with commands")
-
-			// Add SetServer and SetCurrentServer Commands
-			testCase := core.NewTestCase().Add(setServerCmd).Add(setCurrentServerCmd)
-
-			// Add GetServer latest, v0.28.0, v0.25.4 Commands
-			testCase.Add(getServerCmdForRuntimeLatest).Add(getServerCmdForRuntime0280).Add(getServerCmdForRuntime0254)
-
-			// Add GetCurrentServer latest, v0.28.0, v0.25.4 Commands
-			testCase.Add(getCurrentServerCmdForRuntimeLatest).Add(getCurrentServerCmdForRuntime0280).Add(getCurrentServerCmdForRuntime0254)
+			// Add GetCurrentServer Commands on all supported Runtime library versions
+			testCase.Add(getCurrentServerCmdForRuntimeLatest).Add(getCurrentServerCmdForRuntime0280).Add(getCurrentServerCmdForRuntime0254).Add(getCurrentServerCmdForRuntime0116)
 
 			// Add RemoveCurrentServer v0.28.0 Command
-			testCase.Add(removeCurrentCtxCmd)
+			testCase.Add(removeCurrentServerCmdForRuntime0280)
 
 			// Add DeleteServer v0.28.0 Command
-			testCase.Add(deleteCtxCmd)
+			testCase.Add(deleteServerCmdForRuntime0280)
 
-			// Add GetServer latest, v0.28.0, v0.25.4 Commands
-			testCase.Add(getServerCmdForRuntimeLatestWithError).Add(getServerCmdForRuntime0280WithError).Add(getServerCmdForRuntime0254WithError)
+			// Add GetServer Commands on all supported Runtime library versions
+			testCase.Add(getServerCmdForRuntimeLatestWithError).Add(getServerCmdForRuntime0280WithError).Add(getServerCmdForRuntime0254WithError).Add(getServerCmdForRuntime0116WithError)
 
-			// Add GetCurrentServer latest, v0.28.0, v0.25.4 Commands
-			testCase.Add(getCurrentServerCmdForRuntimeLatestWithError).Add(getCurrentServerCmdForRuntime0280WithError).Add(getCurrentServerCmdForRuntime0254WithError)
-
-			ginkgo.By("Execute the testcase")
+			// Add GetCurrentServer Commands on all supported Runtime library versions
+			testCase.Add(getCurrentServerCmdForRuntimeLatestWithError).Add(getCurrentServerCmdForRuntime0280WithError).Add(getCurrentServerCmdForRuntime0254WithError).Add(getCurrentServerCmdForRuntime0116WithError)
 
 			// Run all the commands
 			executer.Execute(testCase)
 		})
-		ginkgo.It("SetServer, SetCurrentServer v0.25.4 then GetServer, GetCurrentServer v0.25.4, v0.28.0, latest then DeleteServer, RemoveCurrentServer v0.28.0 then GetServer, GetCurrentServer v0.25.4, v0.28.0, latest", func() {
-			ginkgo.By("Setting up the input and output parameters data for various APIs")
-			// Input and Output Parameters for SetServer v0.25.4
-			setServerInputOptions := server.DefaultSetServerInputOptions(core.Version0254, common.CtxCompatibilityOne)
 
-			// Input Parameters for SetCurrentServer v0.25.4
-			setCurrentServerInputOptions := server.DefaultSetCurrentServerInputOptions(core.Version0254, common.CtxCompatibilityOne)
+		ginkgo.It("SetServer, SetCurrentServer latest then GetServer, GetCurrentServer v0.11.6, v0.25.4, v0.28.0, latest then DeleteServer v0.11.6 then GetServer, GetCurrentServer v0.11.6, v0.25.4, v0.28.0, latest", func() {
+			// Add SetServer and SetCurrentServer Commands of Runtime Latest version
+			testCase := core.NewTestCase().Add(setServerCmdForRuntimeLatest).Add(setCurrentServerCmdForRuntimeLatest)
 
-			// Input and Output Parameters for GetCurrentServer
-			getCurrentServerInputOptionsForRuntimeLatest := server.DefaultGetCurrentServerInputOptions(core.VersionLatest)
-			getCurrentServerInputOptionsForRuntime0280 := server.DefaultGetCurrentServerInputOptions(core.Version0280)
-			getCurrentServerInputOptionsForRuntime0254 := server.DefaultGetCurrentServerInputOptions(core.Version0254)
+			// Add GetServer Commands on all supported Runtime library versions
+			testCase.Add(getServerCmdForRuntimeLatest).Add(getServerCmdForRuntime0280).Add(getServerCmdForRuntime0254).Add(getServerCmdForRuntime0116)
 
-			getCurrentServerOutputOptionsForRuntimeLatest := server.DefaultGetCurrentServerOutputOptions(core.VersionLatest, common.CtxCompatibilityOne)
-			getCurrentServerOutputOptionsForRuntime0280 := server.DefaultGetCurrentServerOutputOptions(core.Version0280, common.CtxCompatibilityOne)
-			getCurrentServerOutputOptionsForRuntime0254 := server.DefaultGetCurrentServerOutputOptions(core.Version0254, common.CtxCompatibilityOne)
+			// Add GetCurrentServer Commands on all supported Runtime library versions
+			testCase.Add(getCurrentServerCmdForRuntimeLatest).Add(getCurrentServerCmdForRuntime0280).Add(getCurrentServerCmdForRuntime0254).Add(getCurrentServerCmdForRuntime0116)
 
-			//getCurrentServerOutputOptionsForRuntimeLatestWithError := server.DefaultGetCurrentServerOutputOptionsWithError(core.VersionLatest)
-			//getCurrentServerOutputOptionsForRuntime0280WithError := server.DefaultGetCurrentServerOutputOptionsWithError(core.VersionLatest)
+			// Add DeleteServer v0.11.6 Command
+			testCase.Add(deleteServerCmdForRuntime0116)
 
-			// Input and Output params for GetServer
-			getServerInputOptionsForRuntimeLatest := server.DefaultGetServerInputOptions(core.VersionLatest, common.CtxCompatibilityOne)
-			getServerInputOptionsForRuntime0280 := server.DefaultGetServerInputOptions(core.Version0280, common.CtxCompatibilityOne)
-			getServerInputOptionsForRuntime0254 := server.DefaultGetServerInputOptions(core.Version0254, common.CtxCompatibilityOne)
+			// Add GetServer Commands on all supported Runtime library versions
+			testCase.Add(getServerCmdForRuntimeLatestWithError).Add(getServerCmdForRuntime0280WithError).Add(getServerCmdForRuntime0254WithError).Add(getServerCmdForRuntime0116WithError)
 
-			getServerOutputOptionsForRuntimeLatest := server.DefaultGetServerOutputOptions(core.VersionLatest, common.CtxCompatibilityOne)
-			getServerOutputOptionsForRuntime0280 := server.DefaultGetServerOutputOptions(core.Version0280, common.CtxCompatibilityOne)
-			getServerOutputOptionsForRuntime0254 := server.DefaultGetServerOutputOptions(core.Version0254, common.CtxCompatibilityOne)
+			// Add GetCurrentServer Commands on all supported Runtime library versions
+			testCase.Add(getCurrentServerCmdForRuntimeLatestWithError).Add(getCurrentServerCmdForRuntime0280WithError).Add(getCurrentServerCmdForRuntime0254WithError).Add(getCurrentServerCmdForRuntime0116WithError)
 
-			//getServerOutputOptionsForRuntimeLatestWithError := server.DefaultGetServerOutputOptionsWithError(core.VersionLatest, common.CtxCompatibilityOne)
-			//getServerOutputOptionsForRuntime0280WithError := server.DefaultGetServerOutputOptionsWithError(core.Version0280, common.CtxCompatibilityOne)
-
-			// Input and Output params for RemoveCurrentServer v0.28.0
-			removeCurrentServerInputOptions := server.DefaultRemoveCurrentServerInputOptions(core.Version0280)
-			removeCurrentServerOutputOptionsWithError := server.DefaultRemoveCurrentServerOutputOptionsWithError(core.Version0280, common.CtxCompatibilityOne)
-
-			// Input and Output params for DeleteServer v0.28.0
-			deleteServerInputOptions := server.DefaultDeleteServerInputOptions(core.Version0280, common.CtxCompatibilityOne)
-			deleteServerOutputOptionsWithError := server.DefaultDeleteServerOutputOptionsWithError(core.Version0280, common.CtxCompatibilityOne)
-
-			ginkgo.By("Creating Commands to trigger Runtime APIs")
-
-			// Create SetServer latest Command with input and output options
-			setServerCmd, err := framework.NewSetServerCommand(setServerInputOptions, nil)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			// Create SetCurrentServer latest Command with input and output options
-			setCurrentServerCmd, err := framework.NewSetCurrentServerCommand(setCurrentServerInputOptions, nil)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			// Create GetServer Commands with input and output options
-			getServerCmdForRuntimeLatest, err := framework.NewGetServerCommand(getServerInputOptionsForRuntimeLatest, getServerOutputOptionsForRuntimeLatest)
-			gomega.Expect(err).To(gomega.BeNil())
-			getServerCmdForRuntime0280, err := framework.NewGetServerCommand(getServerInputOptionsForRuntime0280, getServerOutputOptionsForRuntime0280)
-			gomega.Expect(err).To(gomega.BeNil())
-			getServerCmdForRuntime0254, err := framework.NewGetServerCommand(getServerInputOptionsForRuntime0254, getServerOutputOptionsForRuntime0254)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			//getServerCmdForRuntimeLatestWithError, err := framework.NewGetServerCommand(getServerInputOptionsForRuntimeLatest, getServerOutputOptionsForRuntimeLatestWithError)
-			//gomega.Expect(err).To(gomega.BeNil())
-			//getServerCmdForRuntime0280WithError, err := framework.NewGetServerCommand(getServerInputOptionsForRuntime0280, getServerOutputOptionsForRuntime0280WithError)
-			//gomega.Expect(err).To(gomega.BeNil())
-
-			// Create GetCurrentServer Commands
-			getCurrentServerCmdForRuntimeLatest, err := framework.NewGetCurrentServerCommand(getCurrentServerInputOptionsForRuntimeLatest, getCurrentServerOutputOptionsForRuntimeLatest)
-			gomega.Expect(err).To(gomega.BeNil())
-			getCurrentServerCmdForRuntime0280, err := framework.NewGetCurrentServerCommand(getCurrentServerInputOptionsForRuntime0280, getCurrentServerOutputOptionsForRuntime0280)
-			gomega.Expect(err).To(gomega.BeNil())
-			getCurrentServerCmdForRuntime0254, err := framework.NewGetCurrentServerCommand(getCurrentServerInputOptionsForRuntime0254, getCurrentServerOutputOptionsForRuntime0254)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			//getCurrentServerCmdForRuntimeLatestWithError, err := framework.NewGetCurrentServerCommand(getCurrentServerInputOptionsForRuntimeLatest, getCurrentServerOutputOptionsForRuntimeLatestWithError)
-			//gomega.Expect(err).To(gomega.BeNil())
-			//getCurrentServerCmdForRuntime0280WithError, err := framework.NewGetCurrentServerCommand(getCurrentServerInputOptionsForRuntime0280, getCurrentServerOutputOptionsForRuntime0280WithError)
-			//gomega.Expect(err).To(gomega.BeNil())
-
-			// Create DeleteServer Command
-			deleteCtxCmd, err := framework.NewDeleteServerCommand(deleteServerInputOptions, deleteServerOutputOptionsWithError)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			// Create RemoveCurrentServer Command
-			removeCurrentCtxCmd, err := framework.NewRemoveCurrentServerCommand(removeCurrentServerInputOptions, removeCurrentServerOutputOptionsWithError)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			ginkgo.By("Build test case with commands")
-
-			// Add SetServer and SetCurrentServer Commands
-			testCase := core.NewTestCase().Add(setServerCmd).Add(setCurrentServerCmd)
-
-			// Add GetServer latest, v0.28.0, v0.25.4 Commands
-			testCase.Add(getServerCmdForRuntimeLatest).Add(getServerCmdForRuntime0280).Add(getServerCmdForRuntime0254)
-
-			// Add GetCurrentServer latest, v0.28.0, v0.25.4 Commands
-			testCase.Add(getCurrentServerCmdForRuntimeLatest).Add(getCurrentServerCmdForRuntime0280).Add(getCurrentServerCmdForRuntime0254)
-
-			// Add RemoveCurrentServer v0.28.0 Command
-			testCase.Add(removeCurrentCtxCmd)
-
-			// Add DeleteServer v0.28.0 Command
-			testCase.Add(deleteCtxCmd)
-
-			// Add GetServer latest, v0.28.0, v0.25.4 Commands
-			testCase.Add(getServerCmdForRuntimeLatest).Add(getServerCmdForRuntime0280).Add(getServerCmdForRuntime0254)
-
-			// Add GetCurrentServer latest, v0.28.0, v0.25.4 Commands
-			testCase.Add(getCurrentServerCmdForRuntimeLatest).Add(getCurrentServerCmdForRuntime0280).Add(getCurrentServerCmdForRuntime0254)
-
-			ginkgo.By("Execute the test case")
 			// Run all the commands
 			executer.Execute(testCase)
 		})
+
 		ginkgo.It("SetServer, SetCurrentServer v0.28.0 then GetServer, GetCurrentServer v0.25.4, v0.28.0, latest then DeleteServer v0.25.4 then GetServer, GetCurrentServer v0.25.4, v0.28.0, latest", func() {
-			ginkgo.By("Setting up the input and output parameters data for various APIs")
+			// Add SetServer and SetCurrentServer Commands of Runtime v0.28.0
+			testCase := core.NewTestCase().Add(setServerCmdForRuntime0280).Add(setCurrentServerCmdForRuntime0280)
 
-			// Input Parameters for SetServer v0.28.0
-			setServerInputOptions := server.DefaultSetServerInputOptions(core.Version0280, common.CtxCompatibilityOne)
+			// Add GetServer Commands on all supported Runtime library versions
+			testCase.Add(getServerCmdForRuntimeLatest).Add(getServerCmdForRuntime0280).Add(getServerCmdForRuntime0254).Add(getServerCmdForRuntime0116)
 
-			// Input Parameters for SetCurrentServer v0.28.0
-			setCurrentServerInputOptions := server.DefaultSetCurrentServerInputOptions(core.Version0280, common.CtxCompatibilityOne)
-
-			// Input and Output Parameters for GetCurrentServer
-			getCurrentServerInputOptionsForRuntimeLatest := server.DefaultGetCurrentServerInputOptions(core.VersionLatest)
-			getCurrentServerOutputOptionsForRuntimeLatest := server.DefaultGetCurrentServerOutputOptions(core.VersionLatest, common.CtxCompatibilityOne)
-			getCurrentServerOutputOptionsForRuntimeLatestWithError := server.DefaultGetCurrentServerOutputOptionsWithError(core.VersionLatest)
-
-			getCurrentServerInputOptionsForRuntime0280 := server.DefaultGetCurrentServerInputOptions(core.Version0280)
-			getCurrentServerOutputOptionsForRuntime0280 := server.DefaultGetCurrentServerOutputOptions(core.Version0280, common.CtxCompatibilityOne)
-			getCurrentServerOutputOptionsForRuntime0280WithError := server.DefaultGetCurrentServerOutputOptionsWithError(core.VersionLatest)
-
-			getCurrentServerInputOptionsForRuntime0254 := server.DefaultGetCurrentServerInputOptions(core.Version0254)
-			getCurrentServerOutputOptionsForRuntime0254 := server.DefaultGetCurrentServerOutputOptions(core.Version0254, common.CtxCompatibilityOne)
-			getCurrentServerOutputOptionsForRuntime0254WithError := server.DefaultGetCurrentServerOutputOptionsWithError(core.Version0254)
-
-			// Input and Output params for GetServer
-			getServerInputOptionsForRuntimeLatest := server.DefaultGetServerInputOptions(core.VersionLatest, common.CtxCompatibilityOne)
-			getServerInputOptionsForRuntime0280 := server.DefaultGetServerInputOptions(core.Version0280, common.CtxCompatibilityOne)
-			getServerInputOptionsForRuntime0254 := server.DefaultGetServerInputOptions(core.Version0254, common.CtxCompatibilityOne)
-
-			getServerOutputOptionsForRuntimeLatest := server.DefaultGetServerOutputOptions(core.VersionLatest, common.CtxCompatibilityOne)
-			getServerOutputOptionsForRuntimeLatestWithError := server.DefaultGetServerOutputOptionsWithError(core.VersionLatest, common.CtxCompatibilityOne)
-			getServerOutputOptionsForRuntime0280 := server.DefaultGetServerOutputOptions(core.Version0280, common.CtxCompatibilityOne)
-			getServerOutputOptionsForRuntime0280WithError := server.DefaultGetServerOutputOptionsWithError(core.Version0280, common.CtxCompatibilityOne)
-
-			getServerOutputOptionsForRuntime0254 := server.DefaultGetServerOutputOptions(core.Version0254, common.CtxCompatibilityOne)
-			getServerOutputOptionsForRuntime0254WithError := server.DefaultGetServerOutputOptionsWithError(core.Version0254, common.CtxCompatibilityOne)
-
-			// Input params for DeleteServer v0.25.4
-			deleteServerInputOptions := server.DefaultDeleteServerInputOptions(core.Version0254, common.CtxCompatibilityOne)
-
-			ginkgo.By("Creating Commands to trigger Runtime APIs")
-
-			// Create SetServer v0.28.0 Command with input and output options
-			setServerCmd, err := framework.NewSetServerCommand(setServerInputOptions, nil)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			// Create SetCurrentServer v0.28.0 Command with input and output options
-			setCurrentServerCmd, err := framework.NewSetCurrentServerCommand(setCurrentServerInputOptions, nil)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			// Create GetServer Commands with input and output options
-			getServerCmdForRuntimeLatest, err := framework.NewGetServerCommand(getServerInputOptionsForRuntimeLatest, getServerOutputOptionsForRuntimeLatest)
-			gomega.Expect(err).To(gomega.BeNil())
-			getServerCmdForRuntime0280, err := framework.NewGetServerCommand(getServerInputOptionsForRuntime0280, getServerOutputOptionsForRuntime0280)
-			gomega.Expect(err).To(gomega.BeNil())
-			getServerCmdForRuntime0254, err := framework.NewGetServerCommand(getServerInputOptionsForRuntime0254, getServerOutputOptionsForRuntime0254)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			getServerCmdForRuntimeLatestWithError, err := framework.NewGetServerCommand(getServerInputOptionsForRuntimeLatest, getServerOutputOptionsForRuntimeLatestWithError)
-			gomega.Expect(err).To(gomega.BeNil())
-			getServerCmdForRuntime0280WithError, err := framework.NewGetServerCommand(getServerInputOptionsForRuntime0280, getServerOutputOptionsForRuntime0280WithError)
-			gomega.Expect(err).To(gomega.BeNil())
-			getServerCmdForRuntime0254WithError, err := framework.NewGetServerCommand(getServerInputOptionsForRuntime0254, getServerOutputOptionsForRuntime0254WithError)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			// Create GetCurrentServer Commands
-			getCurrentServerCmdForRuntimeLatest, err := framework.NewGetCurrentServerCommand(getCurrentServerInputOptionsForRuntimeLatest, getCurrentServerOutputOptionsForRuntimeLatest)
-			gomega.Expect(err).To(gomega.BeNil())
-			getCurrentServerCmdForRuntime0280, err := framework.NewGetCurrentServerCommand(getCurrentServerInputOptionsForRuntime0280, getCurrentServerOutputOptionsForRuntime0280)
-			gomega.Expect(err).To(gomega.BeNil())
-			getCurrentServerCmdForRuntime0254, err := framework.NewGetCurrentServerCommand(getCurrentServerInputOptionsForRuntime0254, getCurrentServerOutputOptionsForRuntime0254)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			getCurrentServerCmdForRuntimeLatestWithError, err := framework.NewGetCurrentServerCommand(getCurrentServerInputOptionsForRuntimeLatest, getCurrentServerOutputOptionsForRuntimeLatestWithError)
-			gomega.Expect(err).To(gomega.BeNil())
-			getCurrentServerCmdForRuntime0280WithError, err := framework.NewGetCurrentServerCommand(getCurrentServerInputOptionsForRuntime0280, getCurrentServerOutputOptionsForRuntime0280WithError)
-			gomega.Expect(err).To(gomega.BeNil())
-			getCurrentServerCmdForRuntime0254WithError, err := framework.NewGetCurrentServerCommand(getCurrentServerInputOptionsForRuntime0254, getCurrentServerOutputOptionsForRuntime0254WithError)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			// Create DeleteServer v0.25.4 Command
-			deleteCtxCmd, err := framework.NewDeleteServerCommand(deleteServerInputOptions, nil)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			ginkgo.By("Build test case with commands")
-
-			// Add SetServer and SetCurrentServer Commands
-			testCase := core.NewTestCase().Add(setServerCmd).Add(setCurrentServerCmd)
-
-			// Add GetServer latest, v0.28.0, v0.25.4 Commands
-			testCase.Add(getServerCmdForRuntimeLatest).Add(getServerCmdForRuntime0280).Add(getServerCmdForRuntime0254)
-
-			// Add GetCurrentServer latest, v0.28.0, v0.25.4 Commands
-			testCase.Add(getCurrentServerCmdForRuntimeLatest).Add(getCurrentServerCmdForRuntime0280).Add(getCurrentServerCmdForRuntime0254)
+			// Add GetCurrentServer Commands on all supported Runtime library versions
+			testCase.Add(getCurrentServerCmdForRuntimeLatest).Add(getCurrentServerCmdForRuntime0280).Add(getCurrentServerCmdForRuntime0254).Add(getCurrentServerCmdForRuntime0116)
 
 			// Add DeleteServer v0.25.4 Command
-			testCase.Add(deleteCtxCmd)
+			testCase.Add(deleteServerCmdForRuntime0254)
 
-			// Add GetServer latest, v0.28.0, v0.25.4 Commands
-			testCase.Add(getServerCmdForRuntimeLatestWithError).Add(getServerCmdForRuntime0280WithError).Add(getServerCmdForRuntime0254WithError)
+			// Add GetServer Commands on all supported Runtime library versions
+			testCase.Add(getServerCmdForRuntimeLatestWithError).Add(getServerCmdForRuntime0280WithError).Add(getServerCmdForRuntime0254WithError).Add(getServerCmdForRuntime0116WithError)
 
-			// Add GetCurrentServer latest, v0.28.0, v0.25.4 Commands
-			testCase.Add(getCurrentServerCmdForRuntimeLatestWithError).Add(getCurrentServerCmdForRuntime0280WithError).Add(getCurrentServerCmdForRuntime0254WithError)
+			// Add GetCurrentServer Commands on all supported Runtime library versions
+			testCase.Add(getCurrentServerCmdForRuntimeLatestWithError).Add(getCurrentServerCmdForRuntime0280WithError).Add(getCurrentServerCmdForRuntime0254WithError).Add(getCurrentServerCmdForRuntime0116WithError)
 
-			ginkgo.By("Execute the test case")
 			// Run all the commands
 			executer.Execute(testCase)
 		})
 
+		ginkgo.It("SetServer, SetCurrentServer v0.25.4 then GetServer, GetCurrentServer v0.11.6, v0.25.4, v0.28.0, latest then DeleteServer, RemoveCurrentServer v0.28.0 then GetServer, GetCurrentServer v0.11.6, v0.25.4, v0.28.0, latest", func() {
+			// Add SetServer and SetCurrentServer Commands of Runtime v0.25.4
+			testCase := core.NewTestCase().Add(setServerCmdForRuntime0254).Add(setCurrentServerCmdForRuntime0254)
+
+			// Add GetServer Commands on all supported Runtime library versions
+			testCase.Add(getServerCmdForRuntimeLatest).Add(getServerCmdForRuntime0280).Add(getServerCmdForRuntime0254).Add(getServerCmdForRuntime0116)
+
+			// Add GetCurrentServer Commands on all supported Runtime library versions
+			testCase.Add(getCurrentServerCmdForRuntimeLatest).Add(getCurrentServerCmdForRuntime0280).Add(getCurrentServerCmdForRuntime0254).Add(getCurrentServerCmdForRuntime0116)
+
+			// Add RemoveCurrentServer v0.28.0 Command
+			testCase.Add(removeCurrentServerCmdForRuntime0280WithError)
+
+			// Add DeleteServer v0.28.0 Command
+			testCase.Add(deleteServerCmdForRuntime0280WithError)
+
+			// Add GetServer Commands on all supported Runtime library versions
+			testCase.Add(getServerCmdForRuntimeLatest).Add(getServerCmdForRuntime0280).Add(getServerCmdForRuntime0254)
+
+			// Add GetCurrentServer Commands on all supported Runtime library versions
+			testCase.Add(getCurrentServerCmdForRuntimeLatest).Add(getCurrentServerCmdForRuntime0280).Add(getCurrentServerCmdForRuntime0254)
+
+			// Run all the commands
+			executer.Execute(testCase)
+		})
+
+		ginkgo.It("SetServer, SetCurrentServer v0.11.6 then GetServer, GetCurrentServer v0.25.4, v0.28.0, latest, v0.11.6 then DeleteServer 0.25.4 then GetServer, GetCurrentServer v0.25.4, v0.28.0, latest, v0.11.6", func() {
+			// Add SetServer and SetCurrentServer Commands of Runtime v0.11.6
+			testCase := core.NewTestCase().Add(setServerCmdForRuntime0116).Add(setCurrentServerCmdForRuntime0116)
+
+			// Add GetServer Commands on all supported Runtime library versions
+			testCase.Add(getServerCmdForRuntimeLatest).Add(getServerCmdForRuntime0280).Add(getServerCmdForRuntime0254).Add(getServerCmdForRuntime0116)
+
+			// Add GetCurrentServer Commands on all supported Runtime library versions
+			testCase.Add(getCurrentServerCmdForRuntimeLatest).Add(getCurrentServerCmdForRuntime0280).Add(getCurrentServerCmdForRuntime0254).Add(getCurrentServerCmdForRuntime0116)
+
+			// Add DeleteServer v0.25.4 Command
+			testCase.Add(deleteServerCmdForRuntime0254)
+
+			// Add GetServer Commands on all supported Runtime library versions
+			testCase.Add(getServerCmdForRuntimeLatestWithError).Add(getServerCmdForRuntime0280WithError).Add(getServerCmdForRuntime0254WithError).Add(getServerCmdForRuntime0116WithError)
+
+			// Add GetCurrentServer Commands on all supported Runtime library versions
+			testCase.Add(getCurrentServerCmdForRuntimeLatestWithError).Add(getCurrentServerCmdForRuntime0280WithError).Add(getCurrentServerCmdForRuntime0254WithError).Add(getCurrentServerCmdForRuntime0116WithError)
+
+			// Run all the commands
+			executer.Execute(testCase)
+		})
+
+		ginkgo.It("SetServer, SetCurrentServer v0.11.6 then GetServer, GetCurrentServer v0.25.4, v0.28.0, latest, v0.11.6 then DeleteServer latest then GetServer, GetCurrentServer v0.25.4, v0.28.0, latest, v0.11.6", func() {
+			// Add SetServer and SetCurrentServer Commands of Runtime v0.11.6
+			testCase := core.NewTestCase().Add(setServerCmdForRuntime0116).Add(setCurrentServerCmdForRuntime0116)
+
+			// Add GetServer Commands on all supported Runtime library versions
+			testCase.Add(getServerCmdForRuntimeLatest).Add(getServerCmdForRuntime0280).Add(getServerCmdForRuntime0254).Add(getServerCmdForRuntime0116)
+
+			// Add GetCurrentServer Commands on all supported Runtime library versions
+			testCase.Add(getCurrentServerCmdForRuntimeLatest).Add(getCurrentServerCmdForRuntime0280).Add(getCurrentServerCmdForRuntime0254).Add(getCurrentServerCmdForRuntime0116)
+
+			// Add DeleteServer latest Command
+			testCase.Add(deleteServerCmdForRuntimeLatestWithError)
+
+			// Add GetServer Commands on all supported Runtime library versions
+			testCase.Add(getServerCmdForRuntimeLatest).Add(getServerCmdForRuntime0280).Add(getServerCmdForRuntime0254).Add(getServerCmdForRuntime0116)
+
+			// Add GetCurrentServer Commands on all supported Runtime library versions
+			testCase.Add(getCurrentServerCmdForRuntimeLatest).Add(getCurrentServerCmdForRuntime0280).Add(getCurrentServerCmdForRuntime0254).Add(getCurrentServerCmdForRuntime0116)
+
+			// Run all the commands
+			executer.Execute(testCase)
+		})
 	})
 
 	ginkgo.Context("using multiple servers", func() {
 
 		ginkgo.It("Run SetServer, SetCurrentServer on Runtime latest then GetServer, GetCurrentServer v0.25.4, v0.28.0, latest then DeleteServer, RemoveCurrentServer v0.28.0 then GetServer, GetCurrentServer v0.25.4, v0.28.0, latest", func() {
-			// Input and Output Parameters for SetServer latest
-			setServerOneInputOptions := server.DefaultSetServerInputOptions(core.VersionLatest, common.CtxCompatibilityOne)
-			setServerTwoInputOptions := server.DefaultSetServerInputOptions(core.VersionLatest, common.CtxCompatibilityTwo)
+			// Add two SetServer Commands of Runtime Latest
+			testCase := core.NewTestCase().Add(setServerCmdForRuntimeLatest).Add(setServerTwoCmdForRuntimeLatest)
 
-			// Input and Output Parameters for SetCurrentServer latest
-			setCurrentServerInputOptions := server.DefaultSetCurrentServerInputOptions(core.VersionLatest, common.CtxCompatibilityOne)
+			// Add SetCurrentServer Command of Runtime Latest
+			testCase.Add(setCurrentServerCmdForRuntimeLatest)
 
-			// Input and Output Parameters for GetCurrentServer
-			getCurrentServerInputOptionsForRuntimeLatest := server.DefaultGetCurrentServerInputOptions(core.VersionLatest)
+			// Add GetServer Commands on all supported Runtime library versions
+			testCase.Add(getServerCmdForRuntimeLatest).Add(getServerCmdForRuntime0280).Add(getServerCmdForRuntime0254).Add(getServerCmdForRuntime0116)
+			testCase.Add(getServerTwoCmdForRuntimeLatest).Add(getServerTwoCmdForRuntime0280).Add(getServerTwoCmdForRuntime0254).Add(getServerTwoCmdForRuntime0116)
 
-			getCurrentServerOutputOptionsForRuntimeLatest := server.DefaultGetCurrentServerOutputOptions(core.VersionLatest, common.CtxCompatibilityOne)
-
-			getCurrentServerOutputOptionsForRuntimeLatestWithError := server.DefaultGetCurrentServerOutputOptionsWithError(core.VersionLatest)
-
-			getCurrentServerInputOptionsForRuntime0280 := server.DefaultGetCurrentServerInputOptions(core.Version0280)
-
-			getCurrentServerOutputOptionsForRuntime0280 := server.DefaultGetCurrentServerOutputOptions(core.Version0280, common.CtxCompatibilityOne)
-
-			getCurrentServerOutputOptionsForRuntime0280WithError := server.DefaultGetCurrentServerOutputOptionsWithError(core.VersionLatest)
-
-			getCurrentServerInputOptionsForRuntime0254 := server.DefaultGetCurrentServerInputOptions(core.Version0254)
-
-			getCurrentServerOutputOptionsForRuntime0254 := server.DefaultGetCurrentServerOutputOptions(core.Version0254, common.CtxCompatibilityOne)
-
-			getCurrentServerOutputOptionsForRuntime0254WithError := server.DefaultGetCurrentServerOutputOptionsWithError(core.Version0254)
-
-			// Input and Output params for GetServer
-			getServerOneInputOptionsForRuntimeLatest := server.DefaultGetServerInputOptions(core.VersionLatest, common.CtxCompatibilityOne)
-			getServerOneOutputOptionsForRuntimeLatest := server.DefaultGetServerOutputOptions(core.VersionLatest, common.CtxCompatibilityOne)
-			getServerOneOutputOptionsForRuntimeLatestWithError := server.DefaultGetServerOutputOptionsWithError(core.VersionLatest, common.CtxCompatibilityOne)
-
-			getServerTwoInputOptionsForRuntimeLatest := server.DefaultGetServerInputOptions(core.VersionLatest, common.CtxCompatibilityTwo)
-			getServerTwoOutputOptionsForRuntimeLatest := server.DefaultGetServerOutputOptions(core.VersionLatest, common.CtxCompatibilityTwo)
-
-			getServerOneInputOptionsForRuntime0280 := server.DefaultGetServerInputOptions(core.Version0280, common.CtxCompatibilityOne)
-			getServerOneOutputOptionsForRuntime0280 := server.DefaultGetServerOutputOptions(core.Version0280, common.CtxCompatibilityOne)
-			getServerOneOutputOptionsForRuntime0280WithError := server.DefaultGetServerOutputOptionsWithError(core.Version0280, common.CtxCompatibilityOne)
-
-			getServerTwoInputOptionsForRuntime0280 := server.DefaultGetServerInputOptions(core.Version0280, common.CtxCompatibilityTwo)
-			getServerTwoOutputOptionsForRuntime0280 := server.DefaultGetServerOutputOptions(core.Version0280, common.CtxCompatibilityTwo)
-
-			getServerOneInputOptionsForRuntime0254 := server.DefaultGetServerInputOptions(core.Version0254, common.CtxCompatibilityOne)
-			getServerOneOutputOptionsForRuntime0254 := server.DefaultGetServerOutputOptions(core.Version0254, common.CtxCompatibilityOne)
-			getServerOneOutputOptionsForRuntime0254WithError := server.DefaultGetServerOutputOptionsWithError(core.Version0254, common.CtxCompatibilityOne)
-
-			getServerTwoInputOptionsForRuntime0254 := server.DefaultGetServerInputOptions(core.Version0254, common.CtxCompatibilityTwo)
-			getServerTwoOutputOptionsForRuntime0254 := server.DefaultGetServerOutputOptions(core.Version0254, common.CtxCompatibilityTwo)
-
-			// Input params for DeleteServer v0.28.0
-			deleteServerInputOptions := server.DefaultDeleteServerInputOptions(core.Version0280, common.CtxCompatibilityOne)
-
-			// Input params for RemoveCurrentServer v0.28.0
-			removeCurrentServerInputOptions := server.DefaultRemoveCurrentServerInputOptions(core.Version0280)
-
-			// Create SetServer latest Command with input and output options
-			setServerOneCmd, err := framework.NewSetServerCommand(setServerOneInputOptions, nil)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			setServerTwoCmd, err := framework.NewSetServerCommand(setServerTwoInputOptions, nil)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			// Create SetCurrentServer latest Command with input and output options
-			setCurrentServerCmd, err := framework.NewSetCurrentServerCommand(setCurrentServerInputOptions, nil)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			// Create GetServer Commands with input and output options
-			getServerCmdForRuntimeLatest, err := framework.NewGetServerCommand(getServerOneInputOptionsForRuntimeLatest, getServerOneOutputOptionsForRuntimeLatest)
-			gomega.Expect(err).To(gomega.BeNil())
-			getServerCmdForRuntime0280, err := framework.NewGetServerCommand(getServerOneInputOptionsForRuntime0280, getServerOneOutputOptionsForRuntime0280)
-			gomega.Expect(err).To(gomega.BeNil())
-			getServerCmdForRuntime0254, err := framework.NewGetServerCommand(getServerOneInputOptionsForRuntime0254, getServerOneOutputOptionsForRuntime0254)
-			gomega.Expect(err).To(gomega.BeNil())
-			getServerCmdForRuntimeLatestWithError, err := framework.NewGetServerCommand(getServerOneInputOptionsForRuntimeLatest, getServerOneOutputOptionsForRuntimeLatestWithError)
-			gomega.Expect(err).To(gomega.BeNil())
-			getServerCmdForRuntime0280WithError, err := framework.NewGetServerCommand(getServerOneInputOptionsForRuntime0280, getServerOneOutputOptionsForRuntime0280WithError)
-			gomega.Expect(err).To(gomega.BeNil())
-			getServerCmdForRuntime0254WithError, err := framework.NewGetServerCommand(getServerOneInputOptionsForRuntime0254, getServerOneOutputOptionsForRuntime0254WithError)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			getServerTwoCmdForRuntimeLatest, err := framework.NewGetServerCommand(getServerTwoInputOptionsForRuntimeLatest, getServerTwoOutputOptionsForRuntimeLatest)
-			gomega.Expect(err).To(gomega.BeNil())
-			getServerTwoCmdForRuntime0280, err := framework.NewGetServerCommand(getServerTwoInputOptionsForRuntime0280, getServerTwoOutputOptionsForRuntime0280)
-			gomega.Expect(err).To(gomega.BeNil())
-			getServerTwoCmdForRuntime0254, err := framework.NewGetServerCommand(getServerTwoInputOptionsForRuntime0254, getServerTwoOutputOptionsForRuntime0254)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			// Create GetCurrentServer Commands
-			getCurrentServerCmdForRuntimeLatest, err := framework.NewGetCurrentServerCommand(getCurrentServerInputOptionsForRuntimeLatest, getCurrentServerOutputOptionsForRuntimeLatest)
-			gomega.Expect(err).To(gomega.BeNil())
-			getCurrentServerCmdForRuntime0280, err := framework.NewGetCurrentServerCommand(getCurrentServerInputOptionsForRuntime0280, getCurrentServerOutputOptionsForRuntime0280)
-			gomega.Expect(err).To(gomega.BeNil())
-			getCurrentServerCmdForRuntime0254, err := framework.NewGetCurrentServerCommand(getCurrentServerInputOptionsForRuntime0254, getCurrentServerOutputOptionsForRuntime0254)
-			gomega.Expect(err).To(gomega.BeNil())
-			getCurrentServerCmdForRuntimeLatestWithError, err := framework.NewGetCurrentServerCommand(getCurrentServerInputOptionsForRuntimeLatest, getCurrentServerOutputOptionsForRuntimeLatestWithError)
-			gomega.Expect(err).To(gomega.BeNil())
-			getCurrentServerCmdForRuntime0280WithError, err := framework.NewGetCurrentServerCommand(getCurrentServerInputOptionsForRuntime0280, getCurrentServerOutputOptionsForRuntime0280WithError)
-			gomega.Expect(err).To(gomega.BeNil())
-			getCurrentServerCmdForRuntime0254WithError, err := framework.NewGetCurrentServerCommand(getCurrentServerInputOptionsForRuntime0254, getCurrentServerOutputOptionsForRuntime0254WithError)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			// Create DeleteServer Command
-			deleteCtxCmd, err := framework.NewDeleteServerCommand(deleteServerInputOptions, nil)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			// Create RemoveCurrentServer Command
-			removeCurrentCtxCmd, err := framework.NewRemoveCurrentServerCommand(removeCurrentServerInputOptions, nil)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			// Build test case with commands
-
-			// Add SetServer and SetCurrentServer Commands
-			testCase := core.NewTestCase().Add(setServerOneCmd).Add(setServerTwoCmd).Add(setCurrentServerCmd)
-
-			// Add GetServer latest, v0.28.0, v0.25.4 Commands
-			testCase.Add(getServerCmdForRuntimeLatest).Add(getServerCmdForRuntime0280).Add(getServerCmdForRuntime0254)
-			testCase.Add(getServerTwoCmdForRuntimeLatest).Add(getServerTwoCmdForRuntime0280).Add(getServerTwoCmdForRuntime0254)
-
-			// Add GetCurrentServer latest, v0.28.0, v0.25.4 Commands
-			testCase.Add(getCurrentServerCmdForRuntimeLatest).Add(getCurrentServerCmdForRuntime0280).Add(getCurrentServerCmdForRuntime0254)
+			// Add GetCurrentServer Commands on all supported Runtime library versions
+			testCase.Add(getCurrentServerCmdForRuntimeLatest).Add(getCurrentServerCmdForRuntime0280).Add(getCurrentServerCmdForRuntime0254).Add(getCurrentServerCmdForRuntime0116)
 
 			// Add RemoveCurrentServer v0.28.0 Command
-			testCase.Add(removeCurrentCtxCmd)
+			testCase.Add(removeCurrentServerCmdForRuntime0280)
 
 			// Add DeleteServer v0.28.0 Command
-			testCase.Add(deleteCtxCmd)
+			testCase.Add(deleteServerCmdForRuntime0280)
 
-			// Add GetServer latest, v0.28.0, v0.25.4 Commands
-			testCase.Add(getServerCmdForRuntimeLatestWithError).Add(getServerCmdForRuntime0280WithError).Add(getServerCmdForRuntime0254WithError)
-			testCase.Add(getServerTwoCmdForRuntimeLatest).Add(getServerTwoCmdForRuntime0280).Add(getServerTwoCmdForRuntime0254)
+			// Add GetServer Commands on all supported Runtime library versions
+			testCase.Add(getServerCmdForRuntimeLatestWithError).Add(getServerCmdForRuntime0280WithError).Add(getServerCmdForRuntime0254WithError).Add(getServerCmdForRuntime0116WithError)
+			testCase.Add(getServerTwoCmdForRuntimeLatest).Add(getServerTwoCmdForRuntime0280).Add(getServerTwoCmdForRuntime0254).Add(getServerTwoCmdForRuntime0116)
 
-			// Add GetCurrentServer latest, v0.28.0, v0.25.4 Commands
+			// Add GetCurrentServer Commands on all supported Runtime library versions
 			testCase.Add(getCurrentServerCmdForRuntimeLatestWithError).Add(getCurrentServerCmdForRuntime0280WithError).Add(getCurrentServerCmdForRuntime0254WithError)
 
 			// Run all the commands
@@ -506,243 +501,116 @@ var _ = ginkgo.Describe("Cross-version Server APIs Compatibility Tests for suppo
 		})
 
 		ginkgo.It("Run SetServer, SetCurrentServer v0.25.4 then GetServer, GetCurrentServer v0.25.4, v0.28.0, latest then DeleteServer, RemoveCurrentServer v0.28.0 then GetServer, GetCurrentServer v0.25.4, v0.28.0, latest", func() {
-			// Setting up the input and output parameters data for various APIs
-			// Input and Output Parameters for SetServer v0.25.4
-			setServerOneInputOptions := server.DefaultSetServerInputOptions(core.Version0254, common.CtxCompatibilityOne)
-			setServerTwoInputOptions := server.DefaultSetServerInputOptions(core.Version0254, common.CtxCompatibilityTwo)
+			// Add two SetServer Commands of Runtime v0.25.4
+			testCase := core.NewTestCase().Add(setServerCmdForRuntime0254).Add(setServerTwoCmdForRuntime0254)
 
-			// Input Parameters for SetCurrentServer v0.25.4
-			setCurrentServerInputOptions := server.DefaultSetCurrentServerInputOptions(core.Version0254, common.CtxCompatibilityOne)
+			// Add SetCurrentServer Command of Runtime v0.25.4
+			testCase.Add(setCurrentServerCmdForRuntime0254)
 
-			// Input and Output Parameters for GetCurrentServer
-			getCurrentServerInputOptionsForRuntimeLatest := server.DefaultGetCurrentServerInputOptions(core.VersionLatest)
-			getCurrentServerInputOptionsForRuntime0280 := server.DefaultGetCurrentServerInputOptions(core.Version0280)
-			getCurrentServerInputOptionsForRuntime0254 := server.DefaultGetCurrentServerInputOptions(core.Version0254)
+			// Add GetServer Commands on all supported Runtime library versions
+			testCase.Add(getServerCmdForRuntimeLatest).Add(getServerCmdForRuntime0280).Add(getServerCmdForRuntime0254).Add(getServerCmdForRuntime0116)
+			testCase.Add(getServerTwoCmdForRuntimeLatest).Add(getServerTwoCmdForRuntime0280).Add(getServerTwoCmdForRuntime0254).Add(getServerTwoCmdForRuntime0116)
 
-			getCurrentServerOutputOptionsForRuntimeLatest := server.DefaultGetCurrentServerOutputOptions(core.VersionLatest, common.CtxCompatibilityOne)
-			getCurrentServerOutputOptionsForRuntime0280 := server.DefaultGetCurrentServerOutputOptions(core.Version0280, common.CtxCompatibilityOne)
-			getCurrentServerOutputOptionsForRuntime0254 := server.DefaultGetCurrentServerOutputOptions(core.Version0254, common.CtxCompatibilityOne)
-
-			// Input and Output params for GetServer
-			getServerInputOptionsForRuntimeLatest := server.DefaultGetServerInputOptions(core.VersionLatest, common.CtxCompatibilityOne)
-			getServerInputOptionsForRuntime0280 := server.DefaultGetServerInputOptions(core.Version0280, common.CtxCompatibilityOne)
-			getServerInputOptionsForRuntime0254 := server.DefaultGetServerInputOptions(core.Version0254, common.CtxCompatibilityOne)
-
-			getServerOutputOptionsForRuntimeLatest := server.DefaultGetServerOutputOptions(core.VersionLatest, common.CtxCompatibilityOne)
-			getServerOutputOptionsForRuntime0280 := server.DefaultGetServerOutputOptions(core.VersionLatest, common.CtxCompatibilityOne)
-			getServerOutputOptionsForRuntime0254 := server.DefaultGetServerOutputOptions(core.Version0254, common.CtxCompatibilityOne)
-
-			getServerTwoInputOptionsForRuntimeLatest := server.DefaultGetServerInputOptions(core.VersionLatest, common.CtxCompatibilityTwo)
-			getServerTwoInputOptionsForRuntime0280 := server.DefaultGetServerInputOptions(core.Version0280, common.CtxCompatibilityTwo)
-			getServerTwoInputOptionsForRuntime0254 := server.DefaultGetServerInputOptions(core.Version0254, common.CtxCompatibilityTwo)
-
-			getServerTwoOutputOptionsForRuntimeLatest := server.DefaultGetServerOutputOptions(core.VersionLatest, common.CtxCompatibilityTwo)
-			getServerTwoOutputOptionsForRuntime0280 := server.DefaultGetServerOutputOptions(core.Version0280, common.CtxCompatibilityTwo)
-			getServerTwoOutputOptionsForRuntime0254 := server.DefaultGetServerOutputOptions(core.Version0254, common.CtxCompatibilityTwo)
-
-			// Input and Output params for RemoveCurrentServer v0.28.0
-			removeCurrentServerInputOptions := server.DefaultRemoveCurrentServerInputOptions(core.Version0280)
-			removeCurrentServerOutputOptionsWithError := server.DefaultRemoveCurrentServerOutputOptionsWithError(core.Version0280, common.CtxCompatibilityOne)
-
-			// Input and Output params for DeleteServer v0.28.0
-			deleteServerInputOptions := server.DefaultDeleteServerInputOptions(core.Version0280, common.CtxCompatibilityOne)
-			deleteServerOutputOptionsWithError := server.DefaultDeleteServerOutputOptionsWithError(core.Version0280, common.CtxCompatibilityOne)
-
-			// Creating Commands to trigger Runtime APIs
-
-			// Create SetServer latest Command with input and output options
-			setServerOneCmd, err := framework.NewSetServerCommand(setServerOneInputOptions, nil)
-			gomega.Expect(err).To(gomega.BeNil())
-			setServerTwoCmd, err := framework.NewSetServerCommand(setServerTwoInputOptions, nil)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			// Create SetCurrentServer latest Command with input and output options
-			setCurrentServerCmd, err := framework.NewSetCurrentServerCommand(setCurrentServerInputOptions, nil)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			// Create GetServer Commands with input and output options
-			getServerCmdForRuntime0254, err := framework.NewGetServerCommand(getServerInputOptionsForRuntime0254, getServerOutputOptionsForRuntime0254)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			getServerCmdForRuntimeLatest, err := framework.NewGetServerCommand(getServerInputOptionsForRuntimeLatest, getServerOutputOptionsForRuntimeLatest)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			getServerCmdForRuntime0280, err := framework.NewGetServerCommand(getServerInputOptionsForRuntime0280, getServerOutputOptionsForRuntime0280)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			getServerTwoCmdForRuntime0254, err := framework.NewGetServerCommand(getServerTwoInputOptionsForRuntime0254, getServerTwoOutputOptionsForRuntime0254)
-			gomega.Expect(err).To(gomega.BeNil())
-			getServerTwoCmdForRuntimeLatest, err := framework.NewGetServerCommand(getServerTwoInputOptionsForRuntimeLatest, getServerTwoOutputOptionsForRuntimeLatest)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			getServerTwoCmdForRuntime0280, err := framework.NewGetServerCommand(getServerTwoInputOptionsForRuntime0280, getServerTwoOutputOptionsForRuntime0280)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			// Create GetCurrentServer Commands
-			getCurrentServerCmdForRuntime0254, err := framework.NewGetCurrentServerCommand(getCurrentServerInputOptionsForRuntime0254, getCurrentServerOutputOptionsForRuntime0254)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			getCurrentServerCmdForRuntimeLatest, err := framework.NewGetCurrentServerCommand(getCurrentServerInputOptionsForRuntimeLatest, getCurrentServerOutputOptionsForRuntimeLatest)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			getCurrentServerCmdForRuntime0280, err := framework.NewGetCurrentServerCommand(getCurrentServerInputOptionsForRuntime0280, getCurrentServerOutputOptionsForRuntime0280)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			// Create DeleteServer Command
-			deleteCtxCmd, err := framework.NewDeleteServerCommand(deleteServerInputOptions, deleteServerOutputOptionsWithError)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			// Create RemoveCurrentServer Command
-			removeCurrentCtxCmd, err := framework.NewRemoveCurrentServerCommand(removeCurrentServerInputOptions, removeCurrentServerOutputOptionsWithError)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			// Build test case with commands
-
-			// Add SetServer and SetCurrentServer Commands
-			testCase := core.NewTestCase().Add(setServerOneCmd).Add(setServerTwoCmd).Add(setCurrentServerCmd)
-
-			// Add GetServer latest, v0.28.0, v0.25.4 Commands
-			testCase.Add(getServerCmdForRuntimeLatest).Add(getServerCmdForRuntime0280).Add(getServerCmdForRuntime0254)
-
-			// Add GetCurrentServer latest, v0.28.0, v0.25.4 Commands
-			testCase.Add(getCurrentServerCmdForRuntimeLatest).Add(getCurrentServerCmdForRuntime0280).Add(getCurrentServerCmdForRuntime0254)
+			// Add GetCurrentServer Commands on all supported Runtime library versions
+			testCase.Add(getCurrentServerCmdForRuntimeLatest).Add(getCurrentServerCmdForRuntime0280).Add(getCurrentServerCmdForRuntime0254).Add(getCurrentServerCmdForRuntime0116)
 
 			// Add RemoveCurrentServer v0.28.0 Command
-			testCase.Add(removeCurrentCtxCmd)
+			testCase.Add(removeCurrentServerCmdForRuntime0280WithError)
 
 			// Add DeleteServer v0.28.0 Command
-			testCase.Add(deleteCtxCmd)
+			testCase.Add(deleteServerCmdForRuntime0280WithError)
 
-			// Add GetServer latest, v0.28.0, v0.25.4 Commands
-			testCase.Add(getServerCmdForRuntimeLatest).Add(getServerCmdForRuntime0280).Add(getServerCmdForRuntime0254)
-			testCase.Add(getServerTwoCmdForRuntimeLatest).Add(getServerTwoCmdForRuntime0280).Add(getServerTwoCmdForRuntime0254)
+			// Add GetServer Commands on all supported Runtime library versions
+			testCase.Add(getServerCmdForRuntimeLatest).Add(getServerCmdForRuntime0280).Add(getServerCmdForRuntime0254).Add(getServerCmdForRuntime0116)
+			testCase.Add(getServerTwoCmdForRuntimeLatest).Add(getServerTwoCmdForRuntime0280).Add(getServerTwoCmdForRuntime0254).Add(getServerTwoCmdForRuntime0116)
 
-			// Add GetCurrentServer latest, v0.28.0, v0.25.4 Commands
-			testCase.Add(getCurrentServerCmdForRuntimeLatest).Add(getCurrentServerCmdForRuntime0280).Add(getCurrentServerCmdForRuntime0254)
+			// Add GetCurrentServer Commands on all supported Runtime library versions
+			testCase.Add(getCurrentServerCmdForRuntimeLatest).Add(getCurrentServerCmdForRuntime0280).Add(getCurrentServerCmdForRuntime0254).Add(getCurrentServerCmdForRuntime0116)
 
-			// Execute the test case
 			// Run all the commands
 			executer.Execute(testCase)
 		})
 
 		ginkgo.It("Run SetServer, SetCurrentServer v0.28.0 then GetServer, GetCurrentServer v0.25.4, v0.28.0, latest then DeleteServer v0.25.4 then GetServer, GetCurrentServer v0.25.4, v0.28.0, latest", func() {
-			// Setting up the input and output parameters data for various APIs
 
-			// Input Parameters for SetServer v0.28.0
-			setServerOneInputOptions := server.DefaultSetServerInputOptions(core.Version0280, common.CtxCompatibilityOne)
-			setServerTwoInputOptions := server.DefaultSetServerInputOptions(core.Version0280, common.CtxCompatibilityTwo)
+			// Add two SetServer Commands of Runtime v0.28.0
+			testCase := core.NewTestCase().Add(setServerCmdForRuntime0280).Add(setServerTwoCmdForRuntime0280)
 
-			// Input Parameters for SetCurrentServer v0.28.0
-			setCurrentServerInputOptions := server.DefaultSetCurrentServerInputOptions(core.Version0280, common.CtxCompatibilityOne)
+			// Add SetCurrentServer Command of Runtime v0.28.0
+			testCase.Add(setCurrentServerCmdForRuntime0280)
 
-			// Input and Output Parameters for GetCurrentServer
-			getCurrentServerInputOptionsForRuntimeLatest := server.DefaultGetCurrentServerInputOptions(core.VersionLatest)
-			getCurrentServerInputOptionsForRuntime0280 := server.DefaultGetCurrentServerInputOptions(core.Version0280)
-			getCurrentServerInputOptionsForRuntime0254 := server.DefaultGetCurrentServerInputOptions(core.Version0254)
+			// Add GetServer Commands on all supported Runtime library versions
+			testCase.Add(getServerCmdForRuntimeLatest).Add(getServerCmdForRuntime0280).Add(getServerCmdForRuntime0254).Add(getServerCmdForRuntime0116)
+			testCase.Add(getServerTwoCmdForRuntimeLatest).Add(getServerTwoCmdForRuntime0280).Add(getServerTwoCmdForRuntime0254).Add(getServerTwoCmdForRuntime0116)
 
-			getCurrentServerOutputOptionsForRuntimeLatest := server.DefaultGetCurrentServerOutputOptions(core.VersionLatest, common.CtxCompatibilityOne)
-			getCurrentServerOutputOptionsForRuntime0280 := server.DefaultGetCurrentServerOutputOptions(core.Version0280, common.CtxCompatibilityOne)
-			getCurrentServerOutputOptionsForRuntime0254 := server.DefaultGetCurrentServerOutputOptions(core.Version0254, common.CtxCompatibilityOne)
-			getCurrentServerOutputOptionsForRuntime0254WithError := server.DefaultGetCurrentServerOutputOptionsWithError(core.Version0254)
-			getCurrentServerOutputOptionsForRuntimeLatestWithError := server.DefaultGetCurrentServerOutputOptionsWithError(core.VersionLatest)
-			getCurrentServerOutputOptionsForRuntime0280WithError := server.DefaultGetCurrentServerOutputOptionsWithError(core.Version0280)
-
-			// Input and Output params for GetServer
-			getServerInputOptionsForRuntimeLatest := server.DefaultGetServerInputOptions(core.VersionLatest, common.CtxCompatibilityOne)
-			getServerInputOptionsForRuntime0280 := server.DefaultGetServerInputOptions(core.Version0280, common.CtxCompatibilityOne)
-			getServerInputOptionsForRuntime0254 := server.DefaultGetServerInputOptions(core.Version0254, common.CtxCompatibilityOne)
-
-			getServerOutputOptionsForRuntimeLatest := server.DefaultGetServerOutputOptions(core.VersionLatest, common.CtxCompatibilityOne)
-			getServerOutputOptionsForRuntime0280 := server.DefaultGetServerOutputOptions(core.Version0280, common.CtxCompatibilityOne)
-			getServerOutputOptionsForRuntime0254 := server.DefaultGetServerOutputOptions(core.Version0254, common.CtxCompatibilityOne)
-			getServerOutputOptionsForRuntime0254WithError := server.DefaultGetServerOutputOptionsWithError(core.Version0254, common.CtxCompatibilityOne)
-			getServerOutputOptionsForRuntimeLatestWithError := server.DefaultGetServerOutputOptionsWithError(core.VersionLatest, common.CtxCompatibilityOne)
-			getServerOutputOptionsForRuntime0280WithError := server.DefaultGetServerOutputOptionsWithError(core.Version0280, common.CtxCompatibilityOne)
-
-			getServerTwoInputOptionsForRuntimeLatest := server.DefaultGetServerInputOptions(core.VersionLatest, common.CtxCompatibilityTwo)
-			getServerTwoInputOptionsForRuntime0280 := server.DefaultGetServerInputOptions(core.Version0280, common.CtxCompatibilityTwo)
-			getServerTwoInputOptionsForRuntime0254 := server.DefaultGetServerInputOptions(core.Version0254, common.CtxCompatibilityTwo)
-
-			getServerTwoOutputOptionsForRuntimeLatest := server.DefaultGetServerOutputOptions(core.VersionLatest, common.CtxCompatibilityTwo)
-			getServerTwoOutputOptionsForRuntime0280 := server.DefaultGetServerOutputOptions(core.Version0280, common.CtxCompatibilityTwo)
-			getServerTwoOutputOptionsForRuntime0254 := server.DefaultGetServerOutputOptions(core.Version0254, common.CtxCompatibilityTwo)
-
-			// Input params for DeleteServer v0.25.4
-			deleteServerInputOptions := server.DefaultDeleteServerInputOptions(core.Version0254, common.CtxCompatibilityOne)
-
-			// Creating Commands to trigger Runtime APIs
-
-			// Create SetServer v0.28.0 Command with input and output options
-			setServerOneCmd, err := framework.NewSetServerCommand(setServerOneInputOptions, nil)
-			gomega.Expect(err).To(gomega.BeNil())
-			setServerTwoCmd, err := framework.NewSetServerCommand(setServerTwoInputOptions, nil)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			// Create SetCurrentServer v0.28.0 Command with input and output options
-			setCurrentServerCmd, err := framework.NewSetCurrentServerCommand(setCurrentServerInputOptions, nil)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			// Create GetServer Commands with input and output options
-			getServerCmdForRuntimeLatest, err := framework.NewGetServerCommand(getServerInputOptionsForRuntimeLatest, getServerOutputOptionsForRuntimeLatest)
-			gomega.Expect(err).To(gomega.BeNil())
-			getServerCmdForRuntime0280, err := framework.NewGetServerCommand(getServerInputOptionsForRuntime0280, getServerOutputOptionsForRuntime0280)
-			gomega.Expect(err).To(gomega.BeNil())
-			getServerCmdForRuntime0254, err := framework.NewGetServerCommand(getServerInputOptionsForRuntime0254, getServerOutputOptionsForRuntime0254)
-			gomega.Expect(err).To(gomega.BeNil())
-			getServerCmdForRuntime0254WithError, err := framework.NewGetServerCommand(getServerInputOptionsForRuntime0254, getServerOutputOptionsForRuntime0254WithError)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			getServerCmdForRuntimeLatestWithError, err := framework.NewGetServerCommand(getServerInputOptionsForRuntimeLatest, getServerOutputOptionsForRuntimeLatestWithError)
-			gomega.Expect(err).To(gomega.BeNil())
-			getServerCmdForRuntime0280WithError, err := framework.NewGetServerCommand(getServerInputOptionsForRuntime0280, getServerOutputOptionsForRuntime0280WithError)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			getServerTwoCmdForRuntimeLatest, err := framework.NewGetServerCommand(getServerTwoInputOptionsForRuntimeLatest, getServerTwoOutputOptionsForRuntimeLatest)
-			gomega.Expect(err).To(gomega.BeNil())
-			getServerTwoCmdForRuntime0280, err := framework.NewGetServerCommand(getServerTwoInputOptionsForRuntime0280, getServerTwoOutputOptionsForRuntime0280)
-			gomega.Expect(err).To(gomega.BeNil())
-			getServerTwoCmdForRuntime0254, err := framework.NewGetServerCommand(getServerTwoInputOptionsForRuntime0254, getServerTwoOutputOptionsForRuntime0254)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			// Create GetCurrentServer Commands
-			getCurrentServerCmdForRuntimeLatest, err := framework.NewGetCurrentServerCommand(getCurrentServerInputOptionsForRuntimeLatest, getCurrentServerOutputOptionsForRuntimeLatest)
-			gomega.Expect(err).To(gomega.BeNil())
-			getCurrentServerCmdForRuntime0280, err := framework.NewGetCurrentServerCommand(getCurrentServerInputOptionsForRuntime0280, getCurrentServerOutputOptionsForRuntime0280)
-			gomega.Expect(err).To(gomega.BeNil())
-			getCurrentServerCmdForRuntime0254, err := framework.NewGetCurrentServerCommand(getCurrentServerInputOptionsForRuntime0254, getCurrentServerOutputOptionsForRuntime0254)
-			gomega.Expect(err).To(gomega.BeNil())
-			getCurrentServerCmdForRuntime0254WithError, err := framework.NewGetCurrentServerCommand(getCurrentServerInputOptionsForRuntime0254, getCurrentServerOutputOptionsForRuntime0254WithError)
-			gomega.Expect(err).To(gomega.BeNil())
-			getCurrentServerCmdForRuntimeLatestWithError, err := framework.NewGetCurrentServerCommand(getCurrentServerInputOptionsForRuntimeLatest, getCurrentServerOutputOptionsForRuntimeLatestWithError)
-			gomega.Expect(err).To(gomega.BeNil())
-			getCurrentServerCmdForRuntime0280WithError, err := framework.NewGetCurrentServerCommand(getCurrentServerInputOptionsForRuntime0280, getCurrentServerOutputOptionsForRuntime0280WithError)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			// Create DeleteServer v0.25.4 Command
-			deleteServerCmd, err := framework.NewDeleteServerCommand(deleteServerInputOptions, nil)
-			gomega.Expect(err).To(gomega.BeNil())
-
-			// Build test case with commands
-
-			// Add SetServer and SetCurrentServer Commands
-			testCase := core.NewTestCase().Add(setServerOneCmd).Add(setServerTwoCmd).Add(setCurrentServerCmd)
-
-			// Add GetServer latest, v0.28.0, v0.25.4 Commands
-			testCase.Add(getServerCmdForRuntimeLatest).Add(getServerCmdForRuntime0280).Add(getServerCmdForRuntime0254)
-			testCase.Add(getServerTwoCmdForRuntimeLatest).Add(getServerTwoCmdForRuntime0280).Add(getServerTwoCmdForRuntime0254)
-
-			// Add GetCurrentServer latest, v0.28.0, v0.25.4 Commands
-			testCase.Add(getCurrentServerCmdForRuntimeLatest).Add(getCurrentServerCmdForRuntime0280).Add(getCurrentServerCmdForRuntime0254)
+			// Add GetCurrentServer Commands on all supported Runtime library versions
+			testCase.Add(getCurrentServerCmdForRuntimeLatest).Add(getCurrentServerCmdForRuntime0280).Add(getCurrentServerCmdForRuntime0254).Add(getCurrentServerCmdForRuntime0116)
 
 			// Add DeleteServer v0.25.4 Command
-			testCase.Add(deleteServerCmd)
+			testCase.Add(deleteServerCmdForRuntime0254)
 
-			// Add GetServer latest, v0.28.0, v0.25.4 Commands
-			testCase.Add(getServerCmdForRuntimeLatestWithError).Add(getServerCmdForRuntime0280WithError).Add(getServerCmdForRuntime0254WithError)
-			testCase.Add(getServerTwoCmdForRuntimeLatest).Add(getServerTwoCmdForRuntime0280).Add(getServerTwoCmdForRuntime0254)
+			// Add GetServer Commands on all supported Runtime library versions
+			testCase.Add(getServerCmdForRuntimeLatestWithError).Add(getServerCmdForRuntime0280WithError).Add(getServerCmdForRuntime0254WithError).Add(getServerCmdForRuntime0116WithError)
+			testCase.Add(getServerTwoCmdForRuntimeLatest).Add(getServerTwoCmdForRuntime0280).Add(getServerTwoCmdForRuntime0254).Add(getServerTwoCmdForRuntime0116)
 
-			// Add GetCurrentServer latest, v0.28.0, v0.25.4 Commands
-			testCase.Add(getCurrentServerCmdForRuntimeLatestWithError).Add(getCurrentServerCmdForRuntime0280WithError).Add(getCurrentServerCmdForRuntime0254WithError)
+			// Add GetCurrentServer Commands on all supported Runtime library versions
+			testCase.Add(getCurrentServerCmdForRuntimeLatestWithError).Add(getCurrentServerCmdForRuntime0280WithError).Add(getCurrentServerCmdForRuntime0254WithError).Add(getCurrentServerCmdForRuntime0116WithError)
+
+			// Run all the commands
+			executer.Execute(testCase)
+		})
+
+		ginkgo.It("Run SetServer, SetCurrentServer v0.11.6 then GetServer, GetCurrentServer v0.25.4, v0.28.0, latest then DeleteServer latest then GetServer, GetCurrentServer v0.25.4, v0.28.0, latest", func() {
+			// Add two SetServer Commands of Runtime v0.11.6
+			testCase := core.NewTestCase().Add(setServerCmdForRuntime0116).Add(setServerTwoCmdForRuntime0116)
+
+			// Add SetCurrentServer Command of Runtime v0.11.6
+			testCase.Add(setCurrentServerCmdForRuntime0116)
+
+			// Add GetServer Commands on all supported Runtime library versions
+			testCase.Add(getServerCmdForRuntimeLatest).Add(getServerCmdForRuntime0280).Add(getServerCmdForRuntime0254).Add(getServerCmdForRuntime0116)
+			testCase.Add(getServerTwoCmdForRuntimeLatest).Add(getServerTwoCmdForRuntime0280).Add(getServerTwoCmdForRuntime0254).Add(getServerTwoCmdForRuntime0116)
+
+			// Add GetCurrentServer Commands on all supported Runtime library versions
+			testCase.Add(getCurrentServerCmdForRuntimeLatest).Add(getCurrentServerCmdForRuntime0280).Add(getCurrentServerCmdForRuntime0254).Add(getCurrentServerCmdForRuntime0116)
+
+			// Add DeleteServer latest Command
+			testCase.Add(deleteServerCmdForRuntimeLatestWithError)
+
+			// Add GetServer Commands on all supported Runtime library versions
+			testCase.Add(getServerCmdForRuntimeLatest).Add(getServerCmdForRuntime0280).Add(getServerCmdForRuntime0254).Add(getServerCmdForRuntime0116)
+			testCase.Add(getServerTwoCmdForRuntimeLatest).Add(getServerTwoCmdForRuntime0280).Add(getServerTwoCmdForRuntime0254).Add(getServerTwoCmdForRuntime0116)
+
+			// Add GetCurrentServer Commands on all supported Runtime library versions
+			testCase.Add(getCurrentServerCmdForRuntimeLatest).Add(getCurrentServerCmdForRuntime0280).Add(getCurrentServerCmdForRuntime0254).Add(getCurrentServerCmdForRuntime0116)
+
+			// Run all the commands
+			executer.Execute(testCase)
+		})
+
+		ginkgo.It("Run SetServer, SetCurrentServer v0.11.6 then GetServer, GetCurrentServer v0.25.4, v0.28.0, latest then DeleteServer v0.25.4 then GetServer, GetCurrentServer v0.25.4, v0.28.0, latest", func() {
+			// Add two SetServer Commands of Runtime v0.11.6
+			testCase := core.NewTestCase().Add(setServerCmdForRuntime0116).Add(setServerTwoCmdForRuntime0116)
+
+			// Add SetCurrentServer Command of Runtime v0.11.6
+			testCase.Add(setCurrentServerCmdForRuntime0116)
+
+			// Add GetServer Commands on all supported Runtime library versions
+			testCase.Add(getServerCmdForRuntimeLatest).Add(getServerCmdForRuntime0280).Add(getServerCmdForRuntime0254).Add(getServerCmdForRuntime0116)
+			testCase.Add(getServerTwoCmdForRuntimeLatest).Add(getServerTwoCmdForRuntime0280).Add(getServerTwoCmdForRuntime0254).Add(getServerTwoCmdForRuntime0116)
+
+			// Add GetCurrentServer Commands on all supported Runtime library versions
+			testCase.Add(getCurrentServerCmdForRuntimeLatest).Add(getCurrentServerCmdForRuntime0280).Add(getCurrentServerCmdForRuntime0254).Add(getCurrentServerCmdForRuntime0116)
+
+			// Add DeleteServer v0.25.4 Command
+			testCase.Add(deleteServerCmdForRuntime0254)
+
+			// Add GetServer Commands on all supported Runtime library versions
+			testCase.Add(getServerCmdForRuntimeLatestWithError).Add(getServerCmdForRuntime0280WithError).Add(getServerCmdForRuntime0254WithError).Add(getServerCmdForRuntime0116WithError)
+			testCase.Add(getServerTwoCmdForRuntimeLatest).Add(getServerTwoCmdForRuntime0280).Add(getServerTwoCmdForRuntime0254).Add(getServerTwoCmdForRuntime0116)
+
+			// Add GetCurrentServer Commands on all supported Runtime library versions
+			testCase.Add(getCurrentServerCmdForRuntimeLatestWithError).Add(getCurrentServerCmdForRuntime0280WithError).Add(getCurrentServerCmdForRuntime0254WithError).Add(getCurrentServerCmdForRuntime0116WithError)
 
 			// Run all the commands
 			executer.Execute(testCase)

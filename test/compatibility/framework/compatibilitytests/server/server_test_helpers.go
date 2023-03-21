@@ -17,36 +17,10 @@ const ServerNotFound = "current server \"\" not found in tanzu config"
 // DefaultSetServerInputOptions helper method to construct SetServer API input options
 func DefaultSetServerInputOptions(version core.RuntimeVersion, serverName string) *framework.SetServerInputOptions {
 	switch version {
-	case core.VersionLatest:
+	case core.VersionLatest, core.Version0280, core.Version0254, core.Version0116:
 		return &framework.SetServerInputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
-				RuntimeVersion: core.VersionLatest,
-			},
-			ServerOpts: &framework.ServerOpts{
-				Name: serverName,
-				Type: framework.ManagementClusterServerType,
-				GlobalOpts: &framework.GlobalServerOpts{
-					Endpoint: common.DefaultEndpoint,
-				},
-			},
-		}
-	case core.Version0280:
-		return &framework.SetServerInputOptions{
-			RuntimeAPIVersion: &core.RuntimeAPIVersion{
-				RuntimeVersion: core.Version0280,
-			},
-			ServerOpts: &framework.ServerOpts{
-				Name: serverName,
-				Type: framework.ManagementClusterServerType,
-				GlobalOpts: &framework.GlobalServerOpts{
-					Endpoint: common.DefaultEndpoint,
-				},
-			},
-		}
-	case core.Version0254:
-		return &framework.SetServerInputOptions{
-			RuntimeAPIVersion: &core.RuntimeAPIVersion{
-				RuntimeVersion: core.Version0254,
+				RuntimeVersion: version,
 			},
 			ServerOpts: &framework.ServerOpts{
 				Name: serverName,
@@ -57,6 +31,7 @@ func DefaultSetServerInputOptions(version core.RuntimeVersion, serverName string
 			},
 		}
 	}
+
 	return nil
 }
 
@@ -74,10 +49,10 @@ func DefaultGetServerInputOptions(version core.RuntimeVersion, serverName string
 //nolint: dupl
 func DefaultGetServerOutputOptions(version core.RuntimeVersion, serverName string) *framework.GetServerOutputOptions {
 	switch version {
-	case core.VersionLatest:
+	case core.VersionLatest, core.Version0280:
 		return &framework.GetServerOutputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
-				RuntimeVersion: core.VersionLatest,
+				RuntimeVersion: version,
 			},
 			ServerOpts: &framework.ServerOpts{
 				Name: serverName,
@@ -88,24 +63,10 @@ func DefaultGetServerOutputOptions(version core.RuntimeVersion, serverName strin
 			},
 			ValidationStrategy: core.ValidationStrategyStrict,
 		}
-	case core.Version0280:
+	case core.Version0254, core.Version0116:
 		return &framework.GetServerOutputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
-				RuntimeVersion: core.Version0280,
-			},
-			ServerOpts: &framework.ServerOpts{
-				Name: serverName,
-				Type: framework.ManagementClusterServerType,
-				GlobalOpts: &framework.GlobalServerOpts{
-					Endpoint: common.DefaultEndpoint,
-				},
-			},
-			ValidationStrategy: core.ValidationStrategyStrict,
-		}
-	case core.Version0254:
-		return &framework.GetServerOutputOptions{
-			RuntimeAPIVersion: &core.RuntimeAPIVersion{
-				RuntimeVersion: core.Version0254,
+				RuntimeVersion: version,
 			},
 			ServerOpts: &framework.ServerOpts{
 				Name: serverName,
@@ -123,24 +84,10 @@ func DefaultGetServerOutputOptions(version core.RuntimeVersion, serverName strin
 //nolint: dupl
 func DefaultGetServerOutputOptionsWithError(version core.RuntimeVersion, serverName string) *framework.GetServerOutputOptions {
 	switch version {
-	case core.VersionLatest:
+	case core.VersionLatest, core.Version0280, core.Version0254, core.Version0116:
 		return &framework.GetServerOutputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: core.VersionLatest,
-			},
-			Error: fmt.Sprintf("could not find server \"%v\"", serverName),
-		}
-	case core.Version0280:
-		return &framework.GetServerOutputOptions{
-			RuntimeAPIVersion: &core.RuntimeAPIVersion{
-				RuntimeVersion: core.Version0280,
-			},
-			Error: fmt.Sprintf("could not find server \"%v\"", serverName),
-		}
-	case core.Version0254:
-		return &framework.GetServerOutputOptions{
-			RuntimeAPIVersion: &core.RuntimeAPIVersion{
-				RuntimeVersion: core.Version0254,
 			},
 			Error: fmt.Sprintf("could not find server \"%v\"", serverName),
 		}
@@ -161,22 +108,10 @@ func DefaultSetCurrentServerInputOptions(version core.RuntimeVersion, serverName
 // DefaultGetCurrentServerInputOptions helper method to construct GetCurrentServer API input options
 func DefaultGetCurrentServerInputOptions(version core.RuntimeVersion) *framework.GetCurrentServerInputOptions {
 	switch version {
-	case core.VersionLatest:
+	case core.VersionLatest, core.Version0280, core.Version0254, core.Version0116:
 		return &framework.GetCurrentServerInputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: core.VersionLatest,
-			},
-		}
-	case core.Version0280:
-		return &framework.GetCurrentServerInputOptions{
-			RuntimeAPIVersion: &core.RuntimeAPIVersion{
-				RuntimeVersion: core.Version0280,
-			},
-		}
-	case core.Version0254:
-		return &framework.GetCurrentServerInputOptions{
-			RuntimeAPIVersion: &core.RuntimeAPIVersion{
-				RuntimeVersion: core.Version0254,
 			},
 		}
 	}
@@ -187,10 +122,10 @@ func DefaultGetCurrentServerInputOptions(version core.RuntimeVersion) *framework
 //nolint: dupl
 func DefaultGetCurrentServerOutputOptions(version core.RuntimeVersion, serverName string) *framework.GetCurrentServerOutputOptions {
 	switch version {
-	case core.VersionLatest:
+	case core.VersionLatest, core.Version0254, core.Version0116:
 		return &framework.GetCurrentServerOutputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
-				RuntimeVersion: core.VersionLatest,
+				RuntimeVersion: version,
 			},
 			ServerOpts: &framework.ServerOpts{
 				Name: serverName,
@@ -215,19 +150,6 @@ func DefaultGetCurrentServerOutputOptions(version core.RuntimeVersion, serverNam
 			},
 			ValidationStrategy: core.ValidationStrategyStrict,
 		}
-	case core.Version0254:
-		return &framework.GetCurrentServerOutputOptions{
-			RuntimeAPIVersion: &core.RuntimeAPIVersion{
-				RuntimeVersion: core.Version0254,
-			},
-			ServerOpts: &framework.ServerOpts{
-				Name: serverName,
-				Type: framework.ManagementClusterServerType,
-				GlobalOpts: &framework.GlobalServerOpts{
-					Endpoint: common.DefaultEndpoint,
-				},
-			},
-		}
 	}
 	return nil
 }
@@ -235,21 +157,7 @@ func DefaultGetCurrentServerOutputOptions(version core.RuntimeVersion, serverNam
 // DefaultGetCurrentServerOutputOptionsWithError helper method to construct GetCurrentServer API output options with error
 func DefaultGetCurrentServerOutputOptionsWithError(version core.RuntimeVersion) *framework.GetCurrentServerOutputOptions {
 	switch version {
-	case core.VersionLatest:
-		return &framework.GetCurrentServerOutputOptions{
-			RuntimeAPIVersion: &core.RuntimeAPIVersion{
-				RuntimeVersion: version,
-			},
-			Error: ServerNotFound,
-		}
-	case core.Version0280:
-		return &framework.GetCurrentServerOutputOptions{
-			RuntimeAPIVersion: &core.RuntimeAPIVersion{
-				RuntimeVersion: version,
-			},
-			Error: ServerNotFound,
-		}
-	case core.Version0254:
+	case core.VersionLatest, core.Version0280, core.Version0254, core.Version0116:
 		return &framework.GetCurrentServerOutputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: version,
@@ -263,17 +171,10 @@ func DefaultGetCurrentServerOutputOptionsWithError(version core.RuntimeVersion) 
 // DefaultRemoveCurrentServerInputOptions helper method to construct RemoveCurrentServer API input options
 func DefaultRemoveCurrentServerInputOptions(version core.RuntimeVersion) *framework.RemoveCurrentServerInputOptions {
 	switch version {
-	case core.VersionLatest:
+	case core.VersionLatest, core.Version0280:
 		return &framework.RemoveCurrentServerInputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
-				RuntimeVersion: core.VersionLatest,
-			},
-			ServerName: common.CtxCompatibilityOne,
-		}
-	case core.Version0280:
-		return &framework.RemoveCurrentServerInputOptions{
-			RuntimeAPIVersion: &core.RuntimeAPIVersion{
-				RuntimeVersion: core.Version0280,
+				RuntimeVersion: version,
 			},
 			ServerName: common.CtxCompatibilityOne,
 		}
@@ -282,31 +183,16 @@ func DefaultRemoveCurrentServerInputOptions(version core.RuntimeVersion) *framew
 }
 
 // DefaultRemoveCurrentServerOutputOptionsWithError helper method to construct RemoveCurrentServer API output option
-func DefaultRemoveCurrentServerOutputOptionsWithError(version core.RuntimeVersion, contextName string) *framework.RemoveCurrentServerOutputOptions {
+func DefaultRemoveCurrentServerOutputOptionsWithError(version core.RuntimeVersion, serverName string) *framework.RemoveCurrentServerOutputOptions {
 	switch version {
-	case core.VersionLatest:
+	case core.VersionLatest, core.Version0280, core.Version0254, core.Version0116:
 		return &framework.RemoveCurrentServerOutputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: version,
 			},
-			Error: fmt.Sprintf("context %v not found", contextName),
-		}
-	case core.Version0280:
-		return &framework.RemoveCurrentServerOutputOptions{
-			RuntimeAPIVersion: &core.RuntimeAPIVersion{
-				RuntimeVersion: version,
-			},
-			Error: fmt.Sprintf("context %v not found", contextName),
-		}
-	case core.Version0254:
-		return &framework.RemoveCurrentServerOutputOptions{
-			RuntimeAPIVersion: &core.RuntimeAPIVersion{
-				RuntimeVersion: version,
-			},
-			Error: fmt.Sprintf("context %v not found", contextName),
+			Error: fmt.Sprintf("context %v not found", serverName),
 		}
 	}
-
 	return nil
 }
 
@@ -324,24 +210,10 @@ func DefaultDeleteServerInputOptions(version core.RuntimeVersion, serverName str
 //nolint: dupl
 func DefaultDeleteServerOutputOptionsWithError(version core.RuntimeVersion, serverName string) *framework.DeleteServerOutputOptions {
 	switch version {
-	case core.VersionLatest:
+	case core.VersionLatest, core.Version0280, core.Version0254, core.Version0116:
 		return &framework.DeleteServerOutputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
-				RuntimeVersion: core.VersionLatest,
-			},
-			Error: fmt.Sprintf("context %v not found", serverName),
-		}
-	case core.Version0280:
-		return &framework.DeleteServerOutputOptions{
-			RuntimeAPIVersion: &core.RuntimeAPIVersion{
-				RuntimeVersion: core.Version0280,
-			},
-			Error: fmt.Sprintf("context %v not found", serverName),
-		}
-	case core.Version0254:
-		return &framework.DeleteServerOutputOptions{
-			RuntimeAPIVersion: &core.RuntimeAPIVersion{
-				RuntimeVersion: core.Version0254,
+				RuntimeVersion: version,
 			},
 			Error: fmt.Sprintf("context %v not found", serverName),
 		}

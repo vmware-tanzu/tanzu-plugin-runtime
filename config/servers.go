@@ -14,6 +14,8 @@ import (
 )
 
 // GetServer retrieves server by name
+//
+// Deprecated: This API is deprecated. Use GetContext instead.
 func GetServer(name string) (*configtypes.Server, error) {
 	// Retrieve client config node
 	node, err := getClientConfigNode()
@@ -24,12 +26,16 @@ func GetServer(name string) (*configtypes.Server, error) {
 }
 
 // ServerExists checks if server by specified name is present in config
+//
+// Deprecated: This API is deprecated. Use ContextExists instead.
 func ServerExists(name string) (bool, error) {
 	exists, _ := GetServer(name)
 	return exists != nil, nil
 }
 
 // GetCurrentServer retrieves the current server
+//
+// Deprecated: This API is deprecated. Use GetCurrentContext instead.
 func GetCurrentServer() (*configtypes.Server, error) {
 	// Retrieve client config node
 	node, err := getClientConfigNode()
@@ -40,6 +46,8 @@ func GetCurrentServer() (*configtypes.Server, error) {
 }
 
 // SetCurrentServer add or update current server
+//
+// Deprecated: This API is deprecated. Use SetCurrentContext instead.
 func SetCurrentServer(name string) error {
 	// Retrieve client config node
 	AcquireTanzuConfigLock()
@@ -78,6 +86,8 @@ func SetCurrentServer(name string) error {
 }
 
 // RemoveCurrentServer removes the current server if server exists by specified name
+//
+// Deprecated: This API is deprecated. Use RemoveCurrentContext instead.
 func RemoveCurrentServer(name string) error {
 	// Retrieve client config node
 	AcquireTanzuConfigLock()
@@ -108,16 +118,22 @@ func RemoveCurrentServer(name string) error {
 }
 
 // PutServer add or update server and currentServer
+//
+// Deprecated: This API is deprecated. Use AddContext or SetContext instead.
 func PutServer(s *configtypes.Server, setCurrent bool) error {
 	return SetServer(s, setCurrent)
 }
 
 // AddServer add or update server and currentServer
+//
+// Deprecated: This API is deprecated. Use AddContext or SetContext instead.
 func AddServer(s *configtypes.Server, setCurrent bool) error {
 	return SetServer(s, setCurrent)
 }
 
 // SetServer add or update server and currentServer
+//
+// Deprecated: This API is deprecated. Use AddContext or SetContext instead.
 func SetServer(s *configtypes.Server, setCurrent bool) error {
 	// Acquire tanzu config lock
 	AcquireTanzuConfigLock()
@@ -186,11 +202,15 @@ func frontFillContexts(s *configtypes.Server, setCurrent bool, node *yaml.Node) 
 }
 
 // DeleteServer deletes the server specified by name
+//
+// Deprecated: This API is deprecated. Use DeleteContext instead.
 func DeleteServer(name string) error {
 	return RemoveServer(name)
 }
 
 // RemoveServer removed the server by name
+//
+// Deprecated: This API is deprecated. Use DeleteContext instead.
 func RemoveServer(name string) error {
 	AcquireTanzuConfigLock()
 	defer ReleaseTanzuConfigLock()
@@ -385,6 +405,8 @@ func setServer(node *yaml.Node, s *configtypes.Server) (persist bool, err error)
 }
 
 // EndpointFromServer returns the endpoint from server.
+//
+// Deprecated: This API is deprecated. Use EndpointFromContext instead.
 func EndpointFromServer(s *configtypes.Server) (endpoint string, err error) {
 	switch s.Type {
 	case configtypes.ManagementClusterServerType:

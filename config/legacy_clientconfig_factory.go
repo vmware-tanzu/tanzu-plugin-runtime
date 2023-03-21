@@ -112,18 +112,12 @@ func clientConfigSetCLI(cfg *configtypes.ClientConfig, node *yaml.Node) (err err
 		if cfg.ClientOptions.CLI.UnstableVersionSelector != "" {
 			setUnstableVersionSelector(node, string(cfg.ClientOptions.CLI.UnstableVersionSelector))
 		}
-		//nolint:staticcheck
-		// Disable deprecated lint warning
 		if cfg.ClientOptions.CLI.Edition != "" {
 			setEdition(node, string(cfg.ClientOptions.CLI.Edition))
 		}
-		//nolint:staticcheck
-		// Disable deprecated lint warning
 		if cfg.ClientOptions.CLI.BOMRepo != "" {
 			setBomRepo(node, cfg.ClientOptions.CLI.BOMRepo)
 		}
-		//nolint:staticcheck
-		// Disable deprecated lint warning
 		if cfg.ClientOptions.CLI.CompatibilityFilePath != "" {
 			setCompatibilityFilePath(node, cfg.ClientOptions.CLI.CompatibilityFilePath)
 		}

@@ -80,7 +80,7 @@ func SetContext(c *configtypes.Context, setCurrent bool) error {
 	}
 
 	// Set current server
-	if setCurrent && s.Type == configtypes.ManagementClusterServerType {
+	if setCurrent && s.Type == configtypes.ManagementClusterServerType { // nolint:staticcheck
 		persist, err = setCurrentServer(node, s.Name)
 		if err != nil {
 			return err

@@ -1,23 +1,15 @@
 // Copyright 2023 VMware, Inc. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-// Package compatibilitytests contains all the cross version api compatibility tests
-package compatibilitytests
+// Package context contains all the cross version api compatibility tests for context apis
+package context
 
 import (
 	"fmt"
 
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework"
-)
-
-const (
-	DefaultEndpoint = "default-compatibility-test-endpoint"
-)
-
-const (
-	CtxCompatibilityOne string = "compatibility-one"
-	CtxCompatibilityTwo string = "compatibility-two"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/compatibilitytests/common"
 )
 
 // DefaultSetContextInputOptions helper method to construct SetContext API input options
@@ -89,7 +81,7 @@ func DefaultGetContextOutputOptions(version core.RuntimeVersion, contextName str
 				Name:   contextName,
 				Target: framework.TargetK8s,
 				GlobalOpts: &framework.GlobalServerOpts{
-					Endpoint: DefaultEndpoint,
+					Endpoint: common.DefaultEndpoint,
 				},
 			},
 			ValidationStrategy: core.ValidationStrategyStrict,
@@ -103,7 +95,7 @@ func DefaultGetContextOutputOptions(version core.RuntimeVersion, contextName str
 				Name:   contextName,
 				Target: framework.TargetK8s,
 				GlobalOpts: &framework.GlobalServerOpts{
-					Endpoint: DefaultEndpoint,
+					Endpoint: common.DefaultEndpoint,
 				},
 			},
 			ValidationStrategy: core.ValidationStrategyStrict,
@@ -117,7 +109,7 @@ func DefaultGetContextOutputOptions(version core.RuntimeVersion, contextName str
 				Name: contextName,
 				Type: framework.CtxTypeK8s,
 				GlobalOpts: &framework.GlobalServerOpts{
-					Endpoint: DefaultEndpoint,
+					Endpoint: common.DefaultEndpoint,
 				},
 			},
 		}
@@ -205,7 +197,7 @@ func DefaultGetCurrentContextOutputOptions(version core.RuntimeVersion, contextN
 				Name:   contextName,
 				Target: framework.TargetK8s,
 				GlobalOpts: &framework.GlobalServerOpts{
-					Endpoint: DefaultEndpoint,
+					Endpoint: common.DefaultEndpoint,
 				},
 			},
 			ValidationStrategy: core.ValidationStrategyStrict,
@@ -219,7 +211,7 @@ func DefaultGetCurrentContextOutputOptions(version core.RuntimeVersion, contextN
 				Name:   contextName,
 				Target: framework.TargetK8s,
 				GlobalOpts: &framework.GlobalServerOpts{
-					Endpoint: DefaultEndpoint,
+					Endpoint: common.DefaultEndpoint,
 				},
 			},
 			ValidationStrategy: core.ValidationStrategyStrict,
@@ -233,7 +225,7 @@ func DefaultGetCurrentContextOutputOptions(version core.RuntimeVersion, contextN
 				Name: contextName,
 				Type: framework.CtxTypeK8s,
 				GlobalOpts: &framework.GlobalServerOpts{
-					Endpoint: DefaultEndpoint,
+					Endpoint: common.DefaultEndpoint,
 				},
 			},
 		}

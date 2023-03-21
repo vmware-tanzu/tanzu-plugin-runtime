@@ -56,7 +56,7 @@ all: modules test lint ## ## Run all major targets (lint, test, modules)
 .PHONY: test
 test: fmt ## Run Tests
 	make -C test/plugins all
-	${GO} test ./... -timeout 60m -race -coverprofile coverage.txt ## Exclude Compatibility Tests
+	${GO} test ./... -timeout 60m -race -coverprofile coverage.txt
 
 .PHONY: fmt
 fmt: $(GOIMPORTS) ## Run goimports

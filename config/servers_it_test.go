@@ -373,3 +373,69 @@ current: test-mc2
 	assert.Equal(t, err.Error(), "could not find server \"test-mc2\"")
 	assert.Nil(t, s)
 }
+
+func TestSetServerAndDeleteServer(t *testing.T) {
+	// Setup config data
+	_, cleanUp := setupTestConfig(t, &CfgTestData{})
+
+	defer func() {
+		cleanUp()
+	}()
+
+	_, err := GetServer("test-mc")
+	assert.Equal(t, "could not find server \"test-mc\"", err.Error())
+
+	// Add new Server
+	newServer := &configtypes.Server{
+		Name: "test-mc2",
+		Type: "managementcluster",
+		ManagementClusterOpts: &configtypes.ManagementClusterServer{
+			Endpoint: "test-endpoint",
+			Path:     "test-path",
+		},
+		DiscoverySources: []configtypes.PluginDiscovery{
+			{
+				GCP: &configtypes.GCPDiscovery{
+					Name:         "test",
+					Bucket:       "test-bucket",
+					ManifestPath: "test-manifest-path",
+				},
+			},
+		},
+	}
+	err = SetServer(newServer, true)
+	assert.NoError(t, err)
+
+	s, err := GetServer("test-mc2")
+	assert.Nil(t, err)
+	assert.Equal(t, newServer, s)
+
+	// Update existing Server
+	updatedServer := &configtypes.Server{
+		Name: "test-mc2",
+		Type: "managementcluster",
+		ManagementClusterOpts: &configtypes.ManagementClusterServer{
+			Endpoint: "test-endpoint-updated",
+			Path:     "test-path",
+		},
+		DiscoverySources: []configtypes.PluginDiscovery{
+			{
+				GCP: &configtypes.GCPDiscovery{
+					Name:         "test",
+					Bucket:       "test-bucket-updated",
+					ManifestPath: "test-manifest-path",
+				},
+			},
+		},
+	}
+	err = SetServer(updatedServer, true)
+	assert.NoError(t, err)
+	s, err = GetServer("test-mc2")
+	assert.Nil(t, err)
+	assert.Equal(t, updatedServer, s)
+	err = DeleteServer("test-mc2")
+	assert.NoError(t, err)
+	s, err = GetServer("test-mc2")
+	assert.Equal(t, err.Error(), "could not find server \"test-mc2\"")
+	assert.Nil(t, s)
+}

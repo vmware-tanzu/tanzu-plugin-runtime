@@ -6,8 +6,8 @@ package cmd
 import (
 	"fmt"
 
-	configtypes "github.com/vmware-tanzu/tanzu-framework/apis/config/v1alpha1"
-	configlib "github.com/vmware-tanzu/tanzu-framework/pkg/v1/config"
+	configlib "github.com/vmware-tanzu/tanzu-plugin-runtime/config"
+	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 )
 
@@ -69,10 +69,22 @@ func triggerGetCurrentServerAPI(*core.API) *core.APIResponse {
 	return getCurrentServer()
 }
 
+// triggerRemoveCurrentServerAPI trigger remove server runtime api
+func triggerRemoveCurrentServerAPI(api *core.API) *core.APIResponse {
+	// Parse arguments needed to trigger the runtime api
+	serverName, err := core.ParseStr(api.Arguments[core.ServerName])
+	if err != nil {
+		return &core.APIResponse{
+			ResponseType: core.ErrorResponse,
+			ResponseBody: fmt.Errorf("failed to parse string from argument %v with error %v ", core.Target, err.Error()),
+		}
+	}
+	return removeCurrentServer(serverName)
+}
+
 func getServer(serverName string) *core.APIResponse {
 	// Call runtime GetServer API
 	server, err := configlib.GetServer(serverName)
-
 	if err != nil {
 		return &core.APIResponse{
 			ResponseType: core.ErrorResponse,
@@ -154,5 +166,19 @@ func getCurrentServer() *core.APIResponse {
 	return &core.APIResponse{
 		ResponseType: core.MapResponse,
 		ResponseBody: server,
+	}
+}
+
+func removeCurrentServer(serverName string) *core.APIResponse {
+	err := configlib.RemoveCurrentServer(serverName)
+	if err != nil {
+		return &core.APIResponse{
+			ResponseType: core.ErrorResponse,
+			ResponseBody: err.Error(),
+		}
+	}
+	return &core.APIResponse{
+		ResponseBody: "",
+		ResponseType: core.StringResponse,
 	}
 }

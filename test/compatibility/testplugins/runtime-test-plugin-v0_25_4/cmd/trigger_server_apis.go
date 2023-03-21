@@ -6,7 +6,7 @@ package cmd
 import (
 	"fmt"
 
-	configtypes "github.com/vmware-tanzu/tanzu-framework/apis/config/v1alpha1"
+	configapi "github.com/vmware-tanzu/tanzu-framework/apis/config/v1alpha1"
 	configlib "github.com/vmware-tanzu/tanzu-framework/pkg/v1/config"
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 )
@@ -69,29 +69,7 @@ func triggerGetCurrentServerAPI(*core.API) *core.APIResponse {
 	return getCurrentServer()
 }
 
-func getServer(serverName string) *core.APIResponse {
-	// Call runtime GetServer API
-	server, err := configlib.GetServer(serverName)
-
-	if err != nil {
-		return &core.APIResponse{
-			ResponseType: core.ErrorResponse,
-			ResponseBody: err.Error(),
-		}
-	}
-	if server == nil {
-		return &core.APIResponse{
-			ResponseType: core.ErrorResponse,
-			ResponseBody: fmt.Errorf("server %v not found", server),
-		}
-	}
-	return &core.APIResponse{
-		ResponseType: core.MapResponse,
-		ResponseBody: server,
-	}
-}
-
-func setServer(server *configtypes.Server, setCurrent bool) *core.APIResponse {
+func setServer(server *configapi.Server, setCurrent bool) *core.APIResponse {
 	// Call runtime SetServer API
 	err := configlib.AddServer(server, setCurrent)
 	if err != nil {
@@ -122,6 +100,26 @@ func removeServer(serverName string) *core.APIResponse {
 	}
 }
 
+func getCurrentServer() *core.APIResponse {
+	server, err := configlib.GetCurrentServer()
+	if err != nil {
+		return &core.APIResponse{
+			ResponseType: core.ErrorResponse,
+			ResponseBody: err.Error(),
+		}
+	}
+	if server == nil {
+		return &core.APIResponse{
+			ResponseType: core.ErrorResponse,
+			ResponseBody: fmt.Errorf("server not found"),
+		}
+	}
+	return &core.APIResponse{
+		ResponseType: core.MapResponse,
+		ResponseBody: server,
+	}
+}
+
 func setCurrentServer(serverName string) *core.APIResponse {
 	// Call runtime SetCurrentServer API
 	err := configlib.SetCurrentServer(serverName)
@@ -137,8 +135,10 @@ func setCurrentServer(serverName string) *core.APIResponse {
 	}
 }
 
-func getCurrentServer() *core.APIResponse {
-	server, err := configlib.GetCurrentServer()
+func getServer(serverName string) *core.APIResponse {
+	// Call runtime GetServer API
+	server, err := configlib.GetServer(serverName)
+
 	if err != nil {
 		return &core.APIResponse{
 			ResponseType: core.ErrorResponse,
@@ -148,7 +148,7 @@ func getCurrentServer() *core.APIResponse {
 	if server == nil {
 		return &core.APIResponse{
 			ResponseType: core.ErrorResponse,
-			ResponseBody: fmt.Errorf("server not found"),
+			ResponseBody: fmt.Errorf("server %v not found", server),
 		}
 	}
 	return &core.APIResponse{

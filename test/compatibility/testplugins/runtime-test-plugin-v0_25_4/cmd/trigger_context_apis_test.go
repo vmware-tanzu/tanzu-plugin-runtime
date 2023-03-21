@@ -8,7 +8,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	configapi "github.com/vmware-tanzu/tanzu-framework/cli/runtime/apis/config/v1alpha1"
+	configapi "github.com/vmware-tanzu/tanzu-framework/apis/config/v1alpha1"
+
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 )
 
@@ -17,11 +18,13 @@ func TestTriggerAPIs(t *testing.T) {
 	defer func() {
 		cleanup()
 	}()
+
 	ctx := `name: context-one
-target: kubernetes
+type: k8s
 globalOpts:
   endpoint: test-endpoint
 `
+
 	var tests = []struct {
 		name         string
 		apiName      core.RuntimeAPIName
@@ -34,7 +37,7 @@ globalOpts:
 			apis: []core.API{
 				{
 					Name:    core.SetContextAPIName,
-					Version: core.VersionLatest,
+					Version: core.Version0254,
 					Arguments: map[core.APIArgumentType]interface{}{
 						core.Context:    ctx,
 						core.SetCurrent: false,
@@ -64,7 +67,7 @@ globalOpts:
 			apis: []core.API{
 				{
 					Name:    core.SetContextAPIName,
-					Version: core.VersionLatest,
+					Version: core.Version0254,
 					Arguments: map[core.APIArgumentType]interface{}{
 						core.Context:    ctx,
 						core.SetCurrent: false,
@@ -76,7 +79,7 @@ globalOpts:
 				},
 				{
 					Name:    core.GetContextAPIName,
-					Version: core.VersionLatest,
+					Version: core.Version0254,
 					Arguments: map[core.APIArgumentType]interface{}{
 						core.ContextName: "context-one",
 					},
@@ -92,8 +95,8 @@ globalOpts:
 					{
 						APIResponse: &core.APIResponse{
 							ResponseBody: &configapi.Context{
-								Name:   "context-one",
-								Target: "kubernetes",
+								Name: "context-one",
+								Type: "k8s",
 								GlobalOpts: &configapi.GlobalServer{
 									Endpoint: "test-endpoint",
 								},
@@ -111,7 +114,7 @@ globalOpts:
 			apis: []core.API{
 				{
 					Name:    core.SetContextAPIName,
-					Version: core.VersionLatest,
+					Version: core.Version0254,
 					Arguments: map[core.APIArgumentType]interface{}{
 						core.Context:    ctx,
 						core.SetCurrent: false,
@@ -123,7 +126,7 @@ globalOpts:
 				},
 				{
 					Name:    core.RemoveContextAPIName,
-					Version: core.VersionLatest,
+					Version: core.Version0254,
 					Arguments: map[core.APIArgumentType]interface{}{
 						core.ContextName: "context-one",
 					},
@@ -152,7 +155,7 @@ globalOpts:
 			apis: []core.API{
 				{
 					Name:    core.SetContextAPIName,
-					Version: core.VersionLatest,
+					Version: core.Version0254,
 					Arguments: map[core.APIArgumentType]interface{}{
 						core.Context:    ctx,
 						core.SetCurrent: false,
@@ -164,7 +167,7 @@ globalOpts:
 				},
 				{
 					Name:    core.DeleteContextAPIName,
-					Version: core.VersionLatest,
+					Version: core.Version0254,
 					Arguments: map[core.APIArgumentType]interface{}{
 						core.ContextName: "context-one",
 					},
@@ -193,7 +196,7 @@ globalOpts:
 			apis: []core.API{
 				{
 					Name:    core.SetContextAPIName,
-					Version: core.VersionLatest,
+					Version: core.Version0254,
 					Arguments: map[core.APIArgumentType]interface{}{
 						core.Context:    ctx,
 						core.SetCurrent: false,
@@ -205,7 +208,7 @@ globalOpts:
 				},
 				{
 					Name:    core.SetCurrentContextAPIName,
-					Version: core.VersionLatest,
+					Version: core.Version0254,
 					Arguments: map[core.APIArgumentType]interface{}{
 						core.ContextName: "context-one",
 					},
@@ -234,7 +237,7 @@ globalOpts:
 			apis: []core.API{
 				{
 					Name:    core.SetContextAPIName,
-					Version: core.VersionLatest,
+					Version: core.Version0254,
 					Arguments: map[core.APIArgumentType]interface{}{
 						core.Context:    ctx,
 						core.SetCurrent: false,
@@ -246,7 +249,7 @@ globalOpts:
 				},
 				{
 					Name:    core.SetCurrentContextAPIName,
-					Version: core.VersionLatest,
+					Version: core.Version0254,
 					Arguments: map[core.APIArgumentType]interface{}{
 						core.ContextName: "context-one",
 					},
@@ -257,9 +260,9 @@ globalOpts:
 				},
 				{
 					Name:    core.GetCurrentContextAPIName,
-					Version: core.VersionLatest,
+					Version: core.Version0254,
 					Arguments: map[core.APIArgumentType]interface{}{
-						core.Target: "kubernetes",
+						core.ContextType: "k8s",
 					},
 					Output: &core.Output{
 						Result:  "success",
@@ -273,65 +276,13 @@ globalOpts:
 					{
 						APIResponse: &core.APIResponse{
 							ResponseBody: &configapi.Context{
-								Name:   "context-one",
-								Target: "kubernetes",
+								Name: "context-one",
+								Type: "k8s",
 								GlobalOpts: &configapi.GlobalServer{
 									Endpoint: "test-endpoint",
 								},
 							},
 							ResponseType: core.MapResponse,
-						},
-					},
-				},
-			},
-		},
-
-		{
-			name:    "Trigger RemoveCurrentContext API",
-			apiName: core.RemoveCurrentContextAPIName,
-			apis: []core.API{
-				{
-					Name:    core.SetContextAPIName,
-					Version: core.VersionLatest,
-					Arguments: map[core.APIArgumentType]interface{}{
-						core.Context:    ctx,
-						core.SetCurrent: false,
-					},
-					Output: &core.Output{
-						Result:  "success",
-						Content: "",
-					},
-				},
-				{
-					Name:    core.SetCurrentContextAPIName,
-					Version: core.VersionLatest,
-					Arguments: map[core.APIArgumentType]interface{}{
-						core.ContextName: "context-one",
-					},
-					Output: &core.Output{
-						Result:  "success",
-						Content: "",
-					},
-				},
-				{
-					Name:    core.RemoveCurrentContextAPIName,
-					Version: core.VersionLatest,
-					Arguments: map[core.APIArgumentType]interface{}{
-						core.Target: "kubernetes",
-					},
-					Output: &core.Output{
-						Result:  "success",
-						Content: "",
-					},
-				},
-			},
-
-			expectedLogs: map[core.RuntimeAPIName][]core.APILog{
-				core.RemoveCurrentContextAPIName: {
-					{
-						APIResponse: &core.APIResponse{
-							ResponseBody: "",
-							ResponseType: core.StringResponse,
 						},
 					},
 				},

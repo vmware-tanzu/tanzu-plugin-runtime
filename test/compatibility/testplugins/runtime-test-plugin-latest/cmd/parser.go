@@ -18,3 +18,13 @@ func parseContext(context string) (*configtypes.Context, error) {
 	}
 	return &ctx, nil
 }
+
+// parseServer unmarshalls string to Server struct
+func parseServer(server string) (*configtypes.Server, error) {
+	var s configtypes.Server
+	err := yaml.Unmarshal([]byte(server), &s)
+	if err != nil {
+		return nil, err
+	}
+	return &s, nil
+}

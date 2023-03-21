@@ -4,30 +4,51 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 )
 
-// triggerAPIs trigger all runtime apis and construct logs as per specified array of apis
+// Route to runtime API method call based on passed command value
+var apiHandlers = map[core.RuntimeAPIName]func(*core.API) *core.APIResponse{
+	core.SetServerAPIName:        triggerSetServerAPI,
+	core.AddServerAPIName:        triggerSetServerAPI,
+	core.PutServerAPIName:        triggerSetServerAPI,
+	core.GetServerAPIName:        triggerGetServerAPI,
+	core.RemoveServerAPIName:     triggerRemoveServerAPI,
+	core.DeleteServerAPIName:     triggerRemoveServerAPI,
+	core.SetCurrentServerAPIName: triggerSetCurrentServerAPI,
+	core.GetCurrentServerAPIName: triggerGetCurrentServerAPI,
+}
+
+// triggerAPIs trigger runtime apis and construct logs
 func triggerAPIs(apis []core.API) map[core.RuntimeAPIName][]core.APILog {
 	// Variable used to store all the logging related to runtime api responses
 	logs := make(map[core.RuntimeAPIName][]core.APILog)
 
 	// Loop through array of commands
 	for index := range apis {
-		// Route to runtime API method call based on passed command value
-		triggerServerAPIs(&apis[index], logs)
+		api := &apis[index]
+		handler, ok := apiHandlers[api.Name]
+		if !ok {
+			log := core.APILog{
+				APIResponse: &core.APIResponse{
+					ResponseType: core.ErrorResponse,
+					ResponseBody: fmt.Errorf("command %v not found", api.Name),
+				},
+			}
+			logs[api.Name] = append(logs[api.Name], log)
+			continue
+		}
+
+		// Trigger the API handler
+		apiResponse := handler(api)
+
+		// Construct the logs
+		log := core.APILog{
+			APIResponse: apiResponse,
+		}
+		logs[api.Name] = append(logs[api.Name], log)
 	}
 	return logs
-}
-
-// triggerServerAPIs trigger server related runtime apis and construct response logs
-func triggerServerAPIs(api *core.API, logs map[core.RuntimeAPIName][]core.APILog) {
-	if api.Name == core.AddServerAPIName {
-		log := triggerAddServerAPI(api)
-		logs[core.AddServerAPIName] = append(logs[core.AddServerAPIName], log)
-	}
-	if api.Name == core.GetServerAPIName {
-		log := triggerGetServerAPI(api)
-		logs[core.GetServerAPIName] = append(logs[core.GetServerAPIName], log)
-	}
 }

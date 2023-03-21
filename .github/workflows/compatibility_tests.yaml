@@ -7,15 +7,6 @@ on:
       - "*"
 
 jobs:
-  event_file:
-    name: "Event File"
-    runs-on: ubuntu-latest
-    steps:
-      - name: Upload
-        uses: actions/upload-artifact@v2
-        with:
-          name: Event File
-          path: ${{ github.event_path }}
   build:
     name: Tanzu Plugin Runtime Cross-version API Compatibility Tests
     runs-on: ubuntu-latest
@@ -51,10 +42,11 @@ jobs:
       - name: Run Compatibility Tests
         run: make run-compatibility-tests
 
-      - name: Upload Test Results
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
-        uses: actions/upload-artifact@v2
         with:
-          name: Test Results
-          path: |
-            testresults/*.xml
+          files: |
+            testresults/**/*.xml
+            testresults/**/*.trx
+            testresults/**/*.json

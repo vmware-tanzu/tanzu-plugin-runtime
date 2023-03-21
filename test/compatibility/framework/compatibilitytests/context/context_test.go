@@ -330,61 +330,61 @@ var _ = ginkgo.Describe("Cross-version Context APIs compatibility tests", func()
 
 		ginkgo.It("Run SetContext, SetCurrentContext on Runtime latest then GetContext, GetCurrentContext v0.25.4, v0.28.0, latest then DeleteContext, RemoveCurrentContext v0.28.0 then GetContext, GetCurrentContext v0.25.4, v0.28.0, latest", func() {
 			// Input and Output Parameters for SetContext latest
-			setContextOneInputOptions := compatibilitytests.DefaultSetContextInputOptions(core.VersionLatest, compatibilitytests.CtxCompatibilityOne)
-			setContextTwoInputOptions := compatibilitytests.DefaultSetContextInputOptions(core.VersionLatest, compatibilitytests.CtxCompatibilityTwo)
+			setContextOneInputOptions := context.DefaultSetContextInputOptions(core.VersionLatest, common.CtxCompatibilityOne)
+			setContextTwoInputOptions := context.DefaultSetContextInputOptions(core.VersionLatest, common.CtxCompatibilityTwo)
 
 			// Input and Output Parameters for SetCurrentContext latest
-			setCurrentContextInputOptions := compatibilitytests.DefaultSetCurrentContextInputOptions(core.VersionLatest, compatibilitytests.CtxCompatibilityOne)
+			setCurrentContextInputOptions := context.DefaultSetCurrentContextInputOptions(core.VersionLatest, common.CtxCompatibilityOne)
 
 			// Input and Output Parameters for GetCurrentContext
-			getCurrentContextInputOptionsForRuntime100 := compatibilitytests.DefaultGetCurrentContextInputOptions(core.VersionLatest)
+			getCurrentContextInputOptionsForRuntime100 := context.DefaultGetCurrentContextInputOptions(core.VersionLatest)
 
-			getCurrentContextOutputOptionsForRuntime100 := compatibilitytests.DefaultGetCurrentContextOutputOptions(core.VersionLatest, compatibilitytests.CtxCompatibilityOne)
+			getCurrentContextOutputOptionsForRuntime100 := context.DefaultGetCurrentContextOutputOptions(core.VersionLatest, common.CtxCompatibilityOne)
 
-			getCurrentContextOutputOptionsForRuntime100WithError := compatibilitytests.DefaultGetCurrentContextOutputOptionsWithError(core.VersionLatest)
+			getCurrentContextOutputOptionsForRuntime100WithError := context.DefaultGetCurrentContextOutputOptionsWithError(core.VersionLatest)
 
-			getCurrentContextInputOptionsForRuntime0280 := compatibilitytests.DefaultGetCurrentContextInputOptions(core.Version0280)
+			getCurrentContextInputOptionsForRuntime0280 := context.DefaultGetCurrentContextInputOptions(core.Version0280)
 
-			getCurrentContextOutputOptionsForRuntime0280 := compatibilitytests.DefaultGetCurrentContextOutputOptions(core.Version0280, compatibilitytests.CtxCompatibilityOne)
+			getCurrentContextOutputOptionsForRuntime0280 := context.DefaultGetCurrentContextOutputOptions(core.Version0280, common.CtxCompatibilityOne)
 
-			getCurrentContextOutputOptionsForRuntime0280WithError := compatibilitytests.DefaultGetCurrentContextOutputOptionsWithError(core.VersionLatest)
+			getCurrentContextOutputOptionsForRuntime0280WithError := context.DefaultGetCurrentContextOutputOptionsWithError(core.VersionLatest)
 
-			getCurrentContextInputOptionsForRuntime0254 := compatibilitytests.DefaultGetCurrentContextInputOptions(core.Version0254)
+			getCurrentContextInputOptionsForRuntime0254 := context.DefaultGetCurrentContextInputOptions(core.Version0254)
 
-			getCurrentContextOutputOptionsForRuntime0254 := compatibilitytests.DefaultGetCurrentContextOutputOptions(core.Version0254, compatibilitytests.CtxCompatibilityOne)
+			getCurrentContextOutputOptionsForRuntime0254 := context.DefaultGetCurrentContextOutputOptions(core.Version0254, common.CtxCompatibilityOne)
 
-			getCurrentContextOutputOptionsForRuntime0254WithError := compatibilitytests.DefaultGetCurrentContextOutputOptionsWithError(core.Version0254)
+			getCurrentContextOutputOptionsForRuntime0254WithError := context.DefaultGetCurrentContextOutputOptionsWithError(core.Version0254)
 
 			// Input and Output params for GetContext
-			getContextOneInputOptionsForRuntime100 := compatibilitytests.DefaultGetContextInputOptions(core.VersionLatest, compatibilitytests.CtxCompatibilityOne)
-			getContextOneOutputOptionsForRuntime100 := compatibilitytests.DefaultGetContextOutputOptions(core.VersionLatest, compatibilitytests.CtxCompatibilityOne)
-			getContextOneOutputOptionsForRuntime100WithError := compatibilitytests.DefaultGetContextOutputOptionsWithError(core.VersionLatest, compatibilitytests.CtxCompatibilityOne)
+			getContextOneInputOptionsForRuntime100 := context.DefaultGetContextInputOptions(core.VersionLatest, common.CtxCompatibilityOne)
+			getContextOneOutputOptionsForRuntime100 := context.DefaultGetContextOutputOptions(core.VersionLatest, common.CtxCompatibilityOne)
+			getContextOneOutputOptionsForRuntime100WithError := context.DefaultGetContextOutputOptionsWithError(core.VersionLatest, common.CtxCompatibilityOne)
 
-			getContextTwoInputOptionsForRuntime100 := compatibilitytests.DefaultGetContextInputOptions(core.VersionLatest, compatibilitytests.CtxCompatibilityTwo)
-			getContextTwoOutputOptionsForRuntime100 := compatibilitytests.DefaultGetContextOutputOptions(core.VersionLatest, compatibilitytests.CtxCompatibilityTwo)
-			// getContextTwoOutputOptionsForRuntime100WithError := compatibilitytests.DefaultGetContextOutputOptionsWithError(core.VersionLatest, compatibilitytests.CtxCompatibilityTwo)
+			getContextTwoInputOptionsForRuntime100 := context.DefaultGetContextInputOptions(core.VersionLatest, common.CtxCompatibilityTwo)
+			getContextTwoOutputOptionsForRuntime100 := context.DefaultGetContextOutputOptions(core.VersionLatest, common.CtxCompatibilityTwo)
+			// getContextTwoOutputOptionsForRuntime100WithError := context.DefaultGetContextOutputOptionsWithError(core.VersionLatest, common.CtxCompatibilityTwo)
 
-			getContextOneInputOptionsForRuntime0280 := compatibilitytests.DefaultGetContextInputOptions(core.Version0280, compatibilitytests.CtxCompatibilityOne)
-			getContextOneOutputOptionsForRuntime0280 := compatibilitytests.DefaultGetContextOutputOptions(core.Version0280, compatibilitytests.CtxCompatibilityOne)
-			getContextOneOutputOptionsForRuntime0280WithError := compatibilitytests.DefaultGetContextOutputOptionsWithError(core.Version0280, compatibilitytests.CtxCompatibilityOne)
+			getContextOneInputOptionsForRuntime0280 := context.DefaultGetContextInputOptions(core.Version0280, common.CtxCompatibilityOne)
+			getContextOneOutputOptionsForRuntime0280 := context.DefaultGetContextOutputOptions(core.Version0280, common.CtxCompatibilityOne)
+			getContextOneOutputOptionsForRuntime0280WithError := context.DefaultGetContextOutputOptionsWithError(core.Version0280, common.CtxCompatibilityOne)
 
-			getContextTwoInputOptionsForRuntime0280 := compatibilitytests.DefaultGetContextInputOptions(core.Version0280, compatibilitytests.CtxCompatibilityTwo)
-			getContextTwoOutputOptionsForRuntime0280 := compatibilitytests.DefaultGetContextOutputOptions(core.Version0280, compatibilitytests.CtxCompatibilityTwo)
-			// getContextTwoOutputOptionsForRuntime0280WithError := compatibilitytests.DefaultGetContextOutputOptionsWithError(core.Version0280, compatibilitytests.CtxCompatibilityTwo)
+			getContextTwoInputOptionsForRuntime0280 := context.DefaultGetContextInputOptions(core.Version0280, common.CtxCompatibilityTwo)
+			getContextTwoOutputOptionsForRuntime0280 := context.DefaultGetContextOutputOptions(core.Version0280, common.CtxCompatibilityTwo)
+			// getContextTwoOutputOptionsForRuntime0280WithError := context.DefaultGetContextOutputOptionsWithError(core.Version0280, common.CtxCompatibilityTwo)
 
-			getContextOneInputOptionsForRuntime0254 := compatibilitytests.DefaultGetContextInputOptions(core.Version0254, compatibilitytests.CtxCompatibilityOne)
-			getContextOneOutputOptionsForRuntime0254 := compatibilitytests.DefaultGetContextOutputOptions(core.Version0254, compatibilitytests.CtxCompatibilityOne)
-			getContextOneOutputOptionsForRuntime0254WithError := compatibilitytests.DefaultGetContextOutputOptionsWithError(core.Version0254, compatibilitytests.CtxCompatibilityOne)
+			getContextOneInputOptionsForRuntime0254 := context.DefaultGetContextInputOptions(core.Version0254, common.CtxCompatibilityOne)
+			getContextOneOutputOptionsForRuntime0254 := context.DefaultGetContextOutputOptions(core.Version0254, common.CtxCompatibilityOne)
+			getContextOneOutputOptionsForRuntime0254WithError := context.DefaultGetContextOutputOptionsWithError(core.Version0254, common.CtxCompatibilityOne)
 
-			getContextTwoInputOptionsForRuntime0254 := compatibilitytests.DefaultGetContextInputOptions(core.Version0254, compatibilitytests.CtxCompatibilityTwo)
-			getContextTwoOutputOptionsForRuntime0254 := compatibilitytests.DefaultGetContextOutputOptions(core.Version0254, compatibilitytests.CtxCompatibilityTwo)
-			// getContextTwoOutputOptionsForRuntime0254WithError := compatibilitytests.DefaultGetContextOutputOptionsWithError(core.Version0254, compatibilitytests.CtxCompatibilityTwo)
+			getContextTwoInputOptionsForRuntime0254 := context.DefaultGetContextInputOptions(core.Version0254, common.CtxCompatibilityTwo)
+			getContextTwoOutputOptionsForRuntime0254 := context.DefaultGetContextOutputOptions(core.Version0254, common.CtxCompatibilityTwo)
+			// getContextTwoOutputOptionsForRuntime0254WithError := context.DefaultGetContextOutputOptionsWithError(core.Version0254, common.CtxCompatibilityTwo)
 
 			// Input params for DeleteContext v0.28.0
-			deleteContextInputOptions := compatibilitytests.DefaultDeleteContextInputOptions(core.Version0280, compatibilitytests.CtxCompatibilityOne)
+			deleteContextInputOptions := context.DefaultDeleteContextInputOptions(core.Version0280, common.CtxCompatibilityOne)
 
 			// Input params for RemoveCurrentContext v0.28.0
-			removeCurrentContextInputOptions := compatibilitytests.DefaultRemoveCurrentContextInputOptions(core.Version0280)
+			removeCurrentContextInputOptions := context.DefaultRemoveCurrentContextInputOptions(core.Version0280)
 
 			// Create SetContext latest Command with input and output options
 			setContextOneCmd, err := framework.NewSetContextCommand(setContextOneInputOptions, nil)
@@ -478,45 +478,45 @@ var _ = ginkgo.Describe("Cross-version Context APIs compatibility tests", func()
 		ginkgo.It("Run SetContext, SetCurrentContext v0.25.4 then GetContext, GetCurrentContext v0.25.4, v0.28.0, latest then DeleteContext, RemoveCurrentContext v0.28.0 then GetContext, GetCurrentContext v0.25.4, v0.28.0, latest", func() {
 			// Setting up the input and output parameters data for various APIs
 			// Input and Output Parameters for SetContext v0.25.4
-			setContextOneInputOptions := compatibilitytests.DefaultSetContextInputOptions(core.Version0254, compatibilitytests.CtxCompatibilityOne)
-			setContextTwoInputOptions := compatibilitytests.DefaultSetContextInputOptions(core.Version0254, compatibilitytests.CtxCompatibilityTwo)
+			setContextOneInputOptions := context.DefaultSetContextInputOptions(core.Version0254, common.CtxCompatibilityOne)
+			setContextTwoInputOptions := context.DefaultSetContextInputOptions(core.Version0254, common.CtxCompatibilityTwo)
 
 			// Input Parameters for SetCurrentContext v0.25.4
-			setCurrentContextInputOptions := compatibilitytests.DefaultSetCurrentContextInputOptions(core.Version0254, compatibilitytests.CtxCompatibilityOne)
+			setCurrentContextInputOptions := context.DefaultSetCurrentContextInputOptions(core.Version0254, common.CtxCompatibilityOne)
 
 			// Input and Output Parameters for GetCurrentContext
-			getCurrentContextInputOptionsForRuntime100 := compatibilitytests.DefaultGetCurrentContextInputOptions(core.VersionLatest)
-			getCurrentContextInputOptionsForRuntime0280 := compatibilitytests.DefaultGetCurrentContextInputOptions(core.Version0280)
-			getCurrentContextInputOptionsForRuntime0254 := compatibilitytests.DefaultGetCurrentContextInputOptions(core.Version0254)
+			getCurrentContextInputOptionsForRuntime100 := context.DefaultGetCurrentContextInputOptions(core.VersionLatest)
+			getCurrentContextInputOptionsForRuntime0280 := context.DefaultGetCurrentContextInputOptions(core.Version0280)
+			getCurrentContextInputOptionsForRuntime0254 := context.DefaultGetCurrentContextInputOptions(core.Version0254)
 
-			getCurrentContextOutputOptionsForRuntime100WithError := compatibilitytests.DefaultGetCurrentContextOutputOptionsWithError(core.VersionLatest)
-			getCurrentContextOutputOptionsForRuntime0280WithError := compatibilitytests.DefaultGetCurrentContextOutputOptionsWithError(core.VersionLatest)
-			getCurrentContextOutputOptionsForRuntime0254 := compatibilitytests.DefaultGetCurrentContextOutputOptions(core.Version0254, compatibilitytests.CtxCompatibilityOne)
+			getCurrentContextOutputOptionsForRuntime100WithError := context.DefaultGetCurrentContextOutputOptionsWithError(core.VersionLatest)
+			getCurrentContextOutputOptionsForRuntime0280WithError := context.DefaultGetCurrentContextOutputOptionsWithError(core.VersionLatest)
+			getCurrentContextOutputOptionsForRuntime0254 := context.DefaultGetCurrentContextOutputOptions(core.Version0254, common.CtxCompatibilityOne)
 
 			// Input and Output params for GetContext
-			getContextInputOptionsForRuntime100 := compatibilitytests.DefaultGetContextInputOptions(core.VersionLatest, compatibilitytests.CtxCompatibilityOne)
-			getContextInputOptionsForRuntime0280 := compatibilitytests.DefaultGetContextInputOptions(core.Version0280, compatibilitytests.CtxCompatibilityOne)
-			getContextInputOptionsForRuntime0254 := compatibilitytests.DefaultGetContextInputOptions(core.Version0254, compatibilitytests.CtxCompatibilityOne)
+			getContextInputOptionsForRuntime100 := context.DefaultGetContextInputOptions(core.VersionLatest, common.CtxCompatibilityOne)
+			getContextInputOptionsForRuntime0280 := context.DefaultGetContextInputOptions(core.Version0280, common.CtxCompatibilityOne)
+			getContextInputOptionsForRuntime0254 := context.DefaultGetContextInputOptions(core.Version0254, common.CtxCompatibilityOne)
 
-			getContextOutputOptionsForRuntime100WithError := compatibilitytests.DefaultGetContextOutputOptionsWithError(core.VersionLatest, compatibilitytests.CtxCompatibilityOne)
-			getContextOutputOptionsForRuntime0280WithError := compatibilitytests.DefaultGetContextOutputOptionsWithError(core.Version0280, compatibilitytests.CtxCompatibilityOne)
-			getContextOutputOptionsForRuntime0254 := compatibilitytests.DefaultGetContextOutputOptions(core.Version0254, compatibilitytests.CtxCompatibilityOne)
+			getContextOutputOptionsForRuntime100WithError := context.DefaultGetContextOutputOptionsWithError(core.VersionLatest, common.CtxCompatibilityOne)
+			getContextOutputOptionsForRuntime0280WithError := context.DefaultGetContextOutputOptionsWithError(core.Version0280, common.CtxCompatibilityOne)
+			getContextOutputOptionsForRuntime0254 := context.DefaultGetContextOutputOptions(core.Version0254, common.CtxCompatibilityOne)
 
-			getContextTwoInputOptionsForRuntime100 := compatibilitytests.DefaultGetContextInputOptions(core.VersionLatest, compatibilitytests.CtxCompatibilityTwo)
-			getContextTwoInputOptionsForRuntime0280 := compatibilitytests.DefaultGetContextInputOptions(core.Version0280, compatibilitytests.CtxCompatibilityTwo)
-			getContextTwoInputOptionsForRuntime0254 := compatibilitytests.DefaultGetContextInputOptions(core.Version0254, compatibilitytests.CtxCompatibilityTwo)
+			getContextTwoInputOptionsForRuntime100 := context.DefaultGetContextInputOptions(core.VersionLatest, common.CtxCompatibilityTwo)
+			getContextTwoInputOptionsForRuntime0280 := context.DefaultGetContextInputOptions(core.Version0280, common.CtxCompatibilityTwo)
+			getContextTwoInputOptionsForRuntime0254 := context.DefaultGetContextInputOptions(core.Version0254, common.CtxCompatibilityTwo)
 
-			getContextTwoOutputOptionsForRuntime100WithError := compatibilitytests.DefaultGetContextOutputOptionsWithError(core.VersionLatest, compatibilitytests.CtxCompatibilityTwo)
-			getContextTwoOutputOptionsForRuntime0280WithError := compatibilitytests.DefaultGetContextOutputOptionsWithError(core.Version0280, compatibilitytests.CtxCompatibilityTwo)
-			getContextTwoOutputOptionsForRuntime0254 := compatibilitytests.DefaultGetContextOutputOptions(core.Version0254, compatibilitytests.CtxCompatibilityTwo)
+			getContextTwoOutputOptionsForRuntime100WithError := context.DefaultGetContextOutputOptionsWithError(core.VersionLatest, common.CtxCompatibilityTwo)
+			getContextTwoOutputOptionsForRuntime0280WithError := context.DefaultGetContextOutputOptionsWithError(core.Version0280, common.CtxCompatibilityTwo)
+			getContextTwoOutputOptionsForRuntime0254 := context.DefaultGetContextOutputOptions(core.Version0254, common.CtxCompatibilityTwo)
 
 			// Input and Output params for RemoveCurrentContext v0.28.0
-			removeCurrentContextInputOptions := compatibilitytests.DefaultRemoveCurrentContextInputOptions(core.Version0280)
-			removeCurrentContextOutputOptionsWithError := compatibilitytests.DefaultRemoveCurrentContextOutputOptionsWithError(core.Version0280)
+			removeCurrentContextInputOptions := context.DefaultRemoveCurrentContextInputOptions(core.Version0280)
+			removeCurrentContextOutputOptionsWithError := context.DefaultRemoveCurrentContextOutputOptionsWithError(core.Version0280)
 
 			// Input and Output params for DeleteContext v0.28.0
-			deleteContextInputOptions := compatibilitytests.DefaultDeleteContextInputOptions(core.Version0280, compatibilitytests.CtxCompatibilityOne)
-			deleteContextOutputOptionsWithError := compatibilitytests.DefaultDeleteContextOutputOptionsWithError(core.Version0280, compatibilitytests.CtxCompatibilityOne)
+			deleteContextInputOptions := context.DefaultDeleteContextInputOptions(core.Version0280, common.CtxCompatibilityOne)
+			deleteContextOutputOptionsWithError := context.DefaultDeleteContextOutputOptionsWithError(core.Version0280, common.CtxCompatibilityOne)
 
 			// Creating Commands to trigger Runtime APIs
 
@@ -593,43 +593,43 @@ var _ = ginkgo.Describe("Cross-version Context APIs compatibility tests", func()
 			// Setting up the input and output parameters data for various APIs
 
 			// Input Parameters for SetContext v0.28.0
-			setContextOneInputOptions := compatibilitytests.DefaultSetContextInputOptions(core.Version0280, compatibilitytests.CtxCompatibilityOne)
-			setContextTwoInputOptions := compatibilitytests.DefaultSetContextInputOptions(core.Version0280, compatibilitytests.CtxCompatibilityTwo)
+			setContextOneInputOptions := context.DefaultSetContextInputOptions(core.Version0280, common.CtxCompatibilityOne)
+			setContextTwoInputOptions := context.DefaultSetContextInputOptions(core.Version0280, common.CtxCompatibilityTwo)
 
 			// Input Parameters for SetCurrentContext v0.28.0
-			setCurrentContextInputOptions := compatibilitytests.DefaultSetCurrentContextInputOptions(core.Version0280, compatibilitytests.CtxCompatibilityOne)
+			setCurrentContextInputOptions := context.DefaultSetCurrentContextInputOptions(core.Version0280, common.CtxCompatibilityOne)
 
 			// Input and Output Parameters for GetCurrentContext
-			getCurrentContextInputOptionsForRuntime100 := compatibilitytests.DefaultGetCurrentContextInputOptions(core.VersionLatest)
-			getCurrentContextInputOptionsForRuntime0280 := compatibilitytests.DefaultGetCurrentContextInputOptions(core.Version0280)
-			getCurrentContextInputOptionsForRuntime0254 := compatibilitytests.DefaultGetCurrentContextInputOptions(core.Version0254)
+			getCurrentContextInputOptionsForRuntime100 := context.DefaultGetCurrentContextInputOptions(core.VersionLatest)
+			getCurrentContextInputOptionsForRuntime0280 := context.DefaultGetCurrentContextInputOptions(core.Version0280)
+			getCurrentContextInputOptionsForRuntime0254 := context.DefaultGetCurrentContextInputOptions(core.Version0254)
 
-			getCurrentContextOutputOptionsForRuntime100 := compatibilitytests.DefaultGetCurrentContextOutputOptions(core.VersionLatest, compatibilitytests.CtxCompatibilityOne)
-			getCurrentContextOutputOptionsForRuntime0280 := compatibilitytests.DefaultGetCurrentContextOutputOptions(core.Version0280, compatibilitytests.CtxCompatibilityOne)
-			getCurrentContextOutputOptionsForRuntime0254 := compatibilitytests.DefaultGetCurrentContextOutputOptions(core.Version0254, compatibilitytests.CtxCompatibilityOne)
-			getCurrentContextOutputOptionsForRuntime0254WithError := compatibilitytests.DefaultGetCurrentContextOutputOptionsWithError(core.Version0254)
+			getCurrentContextOutputOptionsForRuntime100 := context.DefaultGetCurrentContextOutputOptions(core.VersionLatest, common.CtxCompatibilityOne)
+			getCurrentContextOutputOptionsForRuntime0280 := context.DefaultGetCurrentContextOutputOptions(core.Version0280, common.CtxCompatibilityOne)
+			getCurrentContextOutputOptionsForRuntime0254 := context.DefaultGetCurrentContextOutputOptions(core.Version0254, common.CtxCompatibilityOne)
+			getCurrentContextOutputOptionsForRuntime0254WithError := context.DefaultGetCurrentContextOutputOptionsWithError(core.Version0254)
 
 			// Input and Output params for GetContext
-			getContextInputOptionsForRuntime100 := compatibilitytests.DefaultGetContextInputOptions(core.VersionLatest, compatibilitytests.CtxCompatibilityOne)
-			getContextInputOptionsForRuntime0280 := compatibilitytests.DefaultGetContextInputOptions(core.Version0280, compatibilitytests.CtxCompatibilityOne)
-			getContextInputOptionsForRuntime0254 := compatibilitytests.DefaultGetContextInputOptions(core.Version0254, compatibilitytests.CtxCompatibilityOne)
+			getContextInputOptionsForRuntime100 := context.DefaultGetContextInputOptions(core.VersionLatest, common.CtxCompatibilityOne)
+			getContextInputOptionsForRuntime0280 := context.DefaultGetContextInputOptions(core.Version0280, common.CtxCompatibilityOne)
+			getContextInputOptionsForRuntime0254 := context.DefaultGetContextInputOptions(core.Version0254, common.CtxCompatibilityOne)
 
-			getContextOutputOptionsForRuntime100 := compatibilitytests.DefaultGetContextOutputOptions(core.VersionLatest, compatibilitytests.CtxCompatibilityOne)
-			getContextOutputOptionsForRuntime0280 := compatibilitytests.DefaultGetContextOutputOptions(core.Version0280, compatibilitytests.CtxCompatibilityOne)
-			getContextOutputOptionsForRuntime0254 := compatibilitytests.DefaultGetContextOutputOptions(core.Version0254, compatibilitytests.CtxCompatibilityOne)
-			getContextOutputOptionsForRuntime0254WithError := compatibilitytests.DefaultGetContextOutputOptionsWithError(core.Version0254, compatibilitytests.CtxCompatibilityOne)
+			getContextOutputOptionsForRuntime100 := context.DefaultGetContextOutputOptions(core.VersionLatest, common.CtxCompatibilityOne)
+			getContextOutputOptionsForRuntime0280 := context.DefaultGetContextOutputOptions(core.Version0280, common.CtxCompatibilityOne)
+			getContextOutputOptionsForRuntime0254 := context.DefaultGetContextOutputOptions(core.Version0254, common.CtxCompatibilityOne)
+			getContextOutputOptionsForRuntime0254WithError := context.DefaultGetContextOutputOptionsWithError(core.Version0254, common.CtxCompatibilityOne)
 
-			getContextTwoInputOptionsForRuntime100 := compatibilitytests.DefaultGetContextInputOptions(core.VersionLatest, compatibilitytests.CtxCompatibilityTwo)
-			getContextTwoInputOptionsForRuntime0280 := compatibilitytests.DefaultGetContextInputOptions(core.Version0280, compatibilitytests.CtxCompatibilityTwo)
-			getContextTwoInputOptionsForRuntime0254 := compatibilitytests.DefaultGetContextInputOptions(core.Version0254, compatibilitytests.CtxCompatibilityTwo)
+			getContextTwoInputOptionsForRuntime100 := context.DefaultGetContextInputOptions(core.VersionLatest, common.CtxCompatibilityTwo)
+			getContextTwoInputOptionsForRuntime0280 := context.DefaultGetContextInputOptions(core.Version0280, common.CtxCompatibilityTwo)
+			getContextTwoInputOptionsForRuntime0254 := context.DefaultGetContextInputOptions(core.Version0254, common.CtxCompatibilityTwo)
 
-			getContextTwoOutputOptionsForRuntime100 := compatibilitytests.DefaultGetContextOutputOptions(core.VersionLatest, compatibilitytests.CtxCompatibilityTwo)
-			getContextTwoOutputOptionsForRuntime0280 := compatibilitytests.DefaultGetContextOutputOptions(core.Version0280, compatibilitytests.CtxCompatibilityTwo)
-			getContextTwoOutputOptionsForRuntime0254 := compatibilitytests.DefaultGetContextOutputOptions(core.Version0254, compatibilitytests.CtxCompatibilityTwo)
-			// getContextTwoOutputOptionsForRuntime0254WithError := compatibilitytests.DefaultGetContextOutputOptionsWithError(core.Version0254, compatibilitytests.CtxCompatibilityTwo)
+			getContextTwoOutputOptionsForRuntime100 := context.DefaultGetContextOutputOptions(core.VersionLatest, common.CtxCompatibilityTwo)
+			getContextTwoOutputOptionsForRuntime0280 := context.DefaultGetContextOutputOptions(core.Version0280, common.CtxCompatibilityTwo)
+			getContextTwoOutputOptionsForRuntime0254 := context.DefaultGetContextOutputOptions(core.Version0254, common.CtxCompatibilityTwo)
+			// getContextTwoOutputOptionsForRuntime0254WithError := context.DefaultGetContextOutputOptionsWithError(core.Version0254, common.CtxCompatibilityTwo)
 
 			// Input params for DeleteContext v0.25.4
-			deleteContextInputOptions := compatibilitytests.DefaultDeleteContextInputOptions(core.Version0254, compatibilitytests.CtxCompatibilityOne)
+			deleteContextInputOptions := context.DefaultDeleteContextInputOptions(core.Version0254, common.CtxCompatibilityOne)
 
 			// Creating Commands to trigger Runtime APIs
 

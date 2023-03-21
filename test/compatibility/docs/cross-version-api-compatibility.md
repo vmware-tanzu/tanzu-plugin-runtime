@@ -407,4 +407,29 @@ setContextInputOptions := &framework.SetContextInputOptions{
 
 ```
 
+## Test Results
+
+### Overview
+
+- All the cross-version API compatibility tests reside in `test/compatibility/framework/compatibilitytests`
+- Test Suites are added for each group of APIs.
+ Ex: Context related API tests are added in `test/compatibility/framework/compatibilitytests/context`
+- Compatibility tests are run in GitHub workflow. For the latest test results check the most recent job that is run for the workflow [Tanzu Plugin Runtime Cross-version API Compatibility Tests](https://github.com/vmware-tanzu/tanzu-plugin-runtime/actions/workflows/compatibility_tests.yaml?query=branch%3Amain)
+
+The tests are added for below Runtime APIs
+
+|     Runtime APIs      | latest | v0.28.0 | v0.25.4 | v0.11.6 |
+|:---------------------:|:------:|:-------:|:-------:|:-------:|
+|     Contexts APIs     |   ✅    |    ✅    |    ✅    |   N/A   |
+|     Servers APIs      |  TBA   |   TBA   |   TBA   |   TBA   |
+| DiscoverySources APIs |  TBA   |   TBA   |   TBA   |   TBA   |
+|  Feature Flags APIs   |  TBA   |   TBA   |   TBA   |   TBA   |
+|       Env APIs        |  TBA   |   TBA   |   TBA   |   TBA   |
+| Config Metadata APIs  |  TBA   |   TBA   |   TBA   |   TBA   |
+|  Client Options APIs  |  TBA   |   TBA   |   TBA   |   TBA   |
+|   Repositories APIs   |  TBA   |   TBA   |   TBA   |   TBA   |
+
+*TBA - to be added in future sprints
+*N/A - API not applicable to the specific Runtime Library
+
 For more details on framework go to [Cross_Version_API Compatibility Framework](cross-version-api-compatibility-framework.md)

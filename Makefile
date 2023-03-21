@@ -135,7 +135,11 @@ build-compatibility-test-plugins: ## Builds all runtime compatibility test plugi
 
 .PHONY: run-compatibility-tests
 run-compatibility-tests: ## Run Compatibility tests
-	cd ./test/compatibility/framework/compatibilitytests && ${GINKGO} --keep-going --fail-fast --race -r --randomize-all -v --trace --output-dir ./../../../reports --junit-report compatibility-tests.xml; \
+	cd ./test/compatibility/framework/compatibilitytests && ${GINKGO} --keep-going --fail-fast --race -r --randomize-all --trace --output-dir ./../../../../testresults --junit-report compatibility-tests.xml; \
+
+.PHONY: debug-compatibility-tests
+debug-compatibility-tests: ## Run Compatibility tests
+	cd ./test/compatibility/framework/compatibilitytests && ${GINKGO} --keep-going --fail-fast --race -r --randomize-all -v --trace --output-dir ./../../../../testresults --junit-report compatibility-tests.xml; \
 
 .PHONY: context-api-compatibility-tests
 context-api-compatibility-tests: ## Run Compatibility tests

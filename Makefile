@@ -13,6 +13,9 @@ GOHOSTOS ?= $(shell go env GOHOSTOS)
 GOHOSTARCH ?= $(shell go env GOHOSTARCH)
 GOTEST_VERBOSE ?= -v
 
+# By Default verbose is turned off for compatibility tests; set the value to -v to turn on
+COMPATIBILITY_TEST_VERBOSE ?= # -v
+
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
 ifeq (,$(shell go env GOBIN))
 GOBIN=$(shell go env GOPATH)/bin
@@ -135,11 +138,7 @@ build-compatibility-test-plugins: ## Builds all runtime compatibility test plugi
 
 .PHONY: run-compatibility-tests
 run-compatibility-tests: ## Run Compatibility tests
-	cd ./test/compatibility/framework/compatibilitytests && ${GINKGO} --keep-going --fail-fast --race -r --randomize-all --trace --output-dir ./../../../../testresults --junit-report compatibility-tests.xml; \
-
-.PHONY: debug-compatibility-tests
-debug-compatibility-tests: ## Debug Compatibility tests
-	cd ./test/compatibility/framework/compatibilitytests && ${GINKGO} --keep-going --fail-fast --race -r ${GOTEST_VERBOSE} --randomize-all --trace --output-dir ./../../../../testresults --junit-report compatibility-tests.xml; \
+	cd ./test/compatibility/framework/compatibilitytests && ${GINKGO} --keep-going --fail-fast --race -r ${COMPATIBILITY_TEST_VERBOSE} --randomize-all --trace --output-dir ./../../../../testresults --junit-report compatibility-tests.xml; \
 
 .PHONY: compatibility-tests
 compatibility-tests: tools build-compatibility-test-plugins run-compatibility-tests ## Build and Run Compatibility tests

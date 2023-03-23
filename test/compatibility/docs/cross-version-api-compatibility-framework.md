@@ -118,7 +118,7 @@ Running the  *testcase_1*, the framework generates below commands internally to 
 stdout, _, err := Exec("./runtime-test-plugin-1-00/runtime-test-plugin-1-00 test --test-file temp-tests-100.yaml")
 ```
 
-*Exec() internally uses “os/exec” pkg
+- Exec() internally uses “os/exec” pkg
 
 `temp-tests-100.yaml` will have the []API to run for that specific runtime version
 
@@ -145,7 +145,7 @@ stdout, _, err := Exec("./runtime-test-plugin-1-00/runtime-test-plugin-1-00 test
 stdout, _, err := Exec("./runtime-test-plugin-0-28/runtime-test-plugin-0-28 test --test-file temp-tests-028.yaml")
 ```
 
-*Exec() internally uses “os/exec” pkg
+- Exec() internally uses “os/exec” pkg
 
 `temp-tests-028.yaml` will have the []API to run for that specific runtime version
 

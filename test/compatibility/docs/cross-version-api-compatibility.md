@@ -315,7 +315,7 @@ Below table explains about each attribute of CtxOptions requirement based on Run
 | DiscoverySources |   O    |    O    |    O    |    O    |
 | IsCurrentContext |   O    |    O    |    O    |    O    |
 
-*Either one of GlobalOpts or ServerOpts is required.
+- Either one of GlobalOpts or ServerOpts is required.
 
 - M: Mandatory
 - O: Optional
@@ -433,7 +433,7 @@ Tests involving Context APIs SetContext, GetContext, DeleteContext, GetCurrentCo
 
 - For the latest test results check the most recent job that is run for the workflow [Tanzu Plugin Runtime Cross-version API Compatibility Tests](https://github.com/vmware-tanzu/tanzu-plugin-runtime/actions/workflows/compatibility_tests.yaml?query=branch%3Amain)
 
-*TBA - to be added in future sprints
-*N/A - API not applicable to the specific Runtime Library
+- TBA - to be added in future sprints
+- N/A - API not applicable to the specific Runtime Library
 
 For more details on framework go to [Cross_Version_API Compatibility Framework](cross-version-api-compatibility-framework.md)

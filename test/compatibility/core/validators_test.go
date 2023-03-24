@@ -10,8 +10,8 @@ import (
 )
 
 func TestValidRuntimeVersion(t *testing.T) {
-	version100 := &RuntimeAPIVersion{RuntimeVersion: "v1.0.0"}
-	actual, err := version100.Validate()
+	versionLatest := &RuntimeAPIVersion{RuntimeVersion: "latest"}
+	actual, err := versionLatest.Validate()
 	assert.Nil(t, err)
 	assert.Equal(t, true, actual)
 }

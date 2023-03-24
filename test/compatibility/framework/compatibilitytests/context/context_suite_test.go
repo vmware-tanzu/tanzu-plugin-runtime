@@ -12,5 +12,5 @@ import (
 
 func TestContext(t *testing.T) {
 	gomega.RegisterFailHandler(ginkgo.Fail)
-	ginkgo.RunSpecs(t, "Cross-version Context API Compatibility Test Suite")
+	ginkgo.RunSpecs(t, "Cross-version API Compatibility Test Suite for Context APIs on supported Runtime libraries v0.28.0, v0.25.4 and latest")
 }

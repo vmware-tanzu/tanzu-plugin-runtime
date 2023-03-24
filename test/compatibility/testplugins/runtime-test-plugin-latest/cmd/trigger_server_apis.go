@@ -6,6 +6,8 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/pkg/errors"
+
 	configlib "github.com/vmware-tanzu/tanzu-plugin-runtime/config"
 	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
@@ -84,7 +86,7 @@ func triggerRemoveCurrentServerAPI(api *core.API) *core.APIResponse {
 
 func getServer(serverName string) *core.APIResponse {
 	// Call runtime GetServer API
-	server, err := configlib.GetServer(serverName)
+	server, err := configlib.GetServer(serverName) // nolint:staticcheck // Deprecated
 	if err != nil {
 		return &core.APIResponse{
 			ResponseType: core.ErrorResponse,
@@ -103,13 +105,13 @@ func getServer(serverName string) *core.APIResponse {
 	}
 }
 
-func setServer(server *configtypes.Server, setCurrent bool) *core.APIResponse {
+func setServer(server *configtypes.Server, setCurrent bool) *core.APIResponse { // nolint:staticcheck // Deprecated
 	// Call runtime SetServer API
-	err := configlib.AddServer(server, setCurrent)
+	err := configlib.AddServer(server, setCurrent) // nolint:staticcheck // Deprecated
 	if err != nil {
 		return &core.APIResponse{
 			ResponseType: core.ErrorResponse,
-			ResponseBody: err.Error(),
+			ResponseBody: errors.Wrap(err, "failed"),
 		}
 	}
 	return &core.APIResponse{
@@ -120,7 +122,7 @@ func setServer(server *configtypes.Server, setCurrent bool) *core.APIResponse {
 
 func removeServer(serverName string) *core.APIResponse {
 	// Call runtime RemoveServer API
-	err := configlib.RemoveServer(serverName)
+	err := configlib.RemoveServer(serverName) // nolint:staticcheck // Deprecated
 
 	if err != nil {
 		return &core.APIResponse{
@@ -136,7 +138,7 @@ func removeServer(serverName string) *core.APIResponse {
 
 func setCurrentServer(serverName string) *core.APIResponse {
 	// Call runtime SetCurrentServer API
-	err := configlib.SetCurrentServer(serverName)
+	err := configlib.SetCurrentServer(serverName) // nolint:staticcheck // Deprecated
 	if err != nil {
 		return &core.APIResponse{
 			ResponseType: core.ErrorResponse,
@@ -150,7 +152,7 @@ func setCurrentServer(serverName string) *core.APIResponse {
 }
 
 func getCurrentServer() *core.APIResponse {
-	server, err := configlib.GetCurrentServer()
+	server, err := configlib.GetCurrentServer() // nolint:staticcheck // Deprecated
 	if err != nil {
 		return &core.APIResponse{
 			ResponseType: core.ErrorResponse,
@@ -170,7 +172,7 @@ func getCurrentServer() *core.APIResponse {
 }
 
 func removeCurrentServer(serverName string) *core.APIResponse {
-	err := configlib.RemoveCurrentServer(serverName)
+	err := configlib.RemoveCurrentServer(serverName) // nolint:staticcheck // Deprecated
 	if err != nil {
 		return &core.APIResponse{
 			ResponseType: core.ErrorResponse,

@@ -12,6 +12,8 @@ func newRootCmd(descriptor *PluginDescriptor) *cobra.Command {
 		Use:     descriptor.Name,
 		Short:   descriptor.Description,
 		Aliases: descriptor.Aliases,
+		// Disable footers in docs generated
+		DisableAutoGenTag: true,
 		// Hide the default completion command of the plugin.
 		// Shell completion is enabled using the Tanzu CLI's `completion` command so a plugin
 		// does not need its own `completion` command.  Having such a command is just

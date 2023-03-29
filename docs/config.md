@@ -1,4 +1,4 @@
-# Config API
+# Configuration API
 
 ## Details
 
@@ -19,6 +19,8 @@
 Note: due to the fact that information in the CFG_NG file directly affects the manipulation of the actual configuration files, it is not practical to embed said information in the files being manipulated
 
 ### Runtime Config APIs
+
+VVV Update list, remove references to 'Server'
 
 ``` go
 func GetServer(name string) error
@@ -57,7 +59,7 @@ func DeleteCLIPluginDiscovery(name string) error
 
 - Import the runtime/config package and use the API method as specified below
 
-Ex:- Add new context - The new context will be stored in CFG_NG.
+##### Example: Add new context - The new context will be stored in CFG_NG
 
 ``` go
 import configapi "github.com/vmware-tanzu/tanzu-framework/cli/runtime/apis/config/v1alpha1"
@@ -80,3 +82,18 @@ if err != nil{
  fmt.Println(err.Error())
 }
 ```
+
+##### Example: Retrieve context information for a specific target
+
+If a plugin wants to access the context it should use the
+[context-related APIs](https://github.com/vmware-tanzu/tanzu-plugin-runtime/blob/main/config/contexts.go)
+in the Tanzu Plugin Runtime library to ensure forward compatibility. For
+example, to get the current active context use the below snippet:
+
+```go
+import (
+  config "github.com/vmware-tanzu/tanzu-plugin-runtime/config"
+  cfgtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
+)
+
+ctx, err := config.GetCurrentContext(cfgtypes.TargetK8s)

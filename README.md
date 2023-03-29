@@ -10,23 +10,67 @@ watch this page for further updates.
 
 The Tanzu CLI is based on a plugin architecture. This architecture enables
 teams to build, own, and release their own piece of functionality as well as
-enable external partners to integrate with the system. The Tanzu Plugin Runtime
-provides functionality and helper methods to develop Tanzu CLI plugins.
+enable external partners to integrate with the system.
 
-Developers can use the `Builder` admin plugin to bootstrap a new plugin which
-can then use tooling and functionality available within the plugin runtime to
-implement its own features.
+The Tanzu Plugin Runtime is a library that provides functionality and helper
+methods to develop Tanzu CLI plugins.
 
-## Config API
+Developers begin plugin development by using the `builder` plugin to bootstrap
+a new plugin project. The code generated in the project relies on the runtime
+to provide some functionality common to all plugins. For more information about
+the development process, see the (VVV update link) [Tanzu CLI Plugin Development guide](https://github.com/vuil/tanzu-cli/blob/docs-draft/docs/dev/main.md)
 
-Tanzu Plugin Runtime provides various config API methods to perform CRUD
-operations on Contexts, Servers, DiscoverySources, Features, Envs etc.
+## The library
 
-For more details about the design and APIs go to [Config API](docs/config.md)
+This Tanzu Plugin Runtime broadly consists of:
 
-## Cross Version API Compatibility Testing
+1. CLI UX Component library
+1. Configuration library
+1. Plugin integration
+1. Command helpers
+1. Test helpers
 
-### Overview
+### CLI UX Component Library
+
+This package implements reusable CLI user interface components, including:
+
+- output writers (table, listtable, json, yaml, spinner)
+- prompt
+- selector
+- question
+
+### Configuration Library
+
+This package implements helper functions to read, write and update various
+Tanzu CLI configuration objects like Contexts, DiscoverySources, CLI
+Features and environment settings.
+
+For more details about the design and APIs go to [Configuration API](docs/config.md)
+
+### Plugin integration
+
+This package implements helper functions for new plugin creation. This is one
+of the main packages that each and every plugin will need to import to
+integrate with the Tanzu CLI.
+
+### Command Helpers
+
+This package implements command specific helper functions like command deprecation, etc.
+
+### Test Helpers
+
+This package implements helper functions to develop test plugins.
+
+VVV provide links to more details for these packages.
+
+## Testing
+
+Besides unit and integration tests, the runtime APIs are also being tested
+in the presence of other versions runtime client code. These tests are
+important in ensuring interoperability among runtime clients (and hence
+different generations of CLI plugins)
+
+### Cross Version API Compatibility Testing
 
 Cross Version API Compatibility testing ensures that [Config
 APIs](docs/config.md) of different Tanzu Plugin Runtime versions work as

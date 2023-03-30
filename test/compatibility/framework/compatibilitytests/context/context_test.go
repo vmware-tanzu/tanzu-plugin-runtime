@@ -372,7 +372,7 @@ var _ = ginkgo.Describe("Cross-version Context APIs compatibility tests", func()
 
 		ginkgo.It("Run SetContext, SetCurrentContext v0.25.4 then GetContext, GetCurrentContext v0.25.4, v0.28.0, latest then DeleteContext, RemoveCurrentContext latest then GetContext, GetCurrentContext v0.25.4, v0.28.0, latest", func() {
 			// Add SetContext and SetCurrentContext Commands
-			testCase := core.NewTestCase().Add(setContextCmdForRuntimeLatest).Add(setCurrentContextCmdForRuntime0254)
+			testCase := core.NewTestCase().Add(setContextCmdForRuntime0254).Add(setCurrentContextCmdForRuntime0254)
 
 			// Add GetContext latest, v0.28.0, v0.25.4 Commands
 			testCase.Add(getContextCmdForRuntimeLatestWithError).Add(getContextCmdForRuntime0280WithError).Add(getContextCmdForRuntime0254)

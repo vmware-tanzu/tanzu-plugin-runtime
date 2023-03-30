@@ -24,6 +24,7 @@ For more details about the design and APIs go to [Config API](docs/config.md)
 
 ## Cross Version API Compatibility Testing
 
+[![Tanzu Plugin Runtime Cross-version API Compatibility Tests](https://github.com/vmware-tanzu/tanzu-plugin-runtime/actions/workflows/compatibility_tests.yaml/badge.svg?event=pull_request)](https://github.com/vmware-tanzu/tanzu-plugin-runtime/actions/workflows/compatibility_tests.yaml)
 ### Overview
 
 Cross Version API Compatibility testing ensures that [Config

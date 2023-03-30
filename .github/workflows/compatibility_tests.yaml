@@ -28,19 +28,17 @@ jobs:
           make tools
           echo "${PWD}/hack/tools/bin" >> $GITHUB_PATH
           echo "${PWD}/bin" >> $GITHUB_PATH
-
-      - name: go cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
+          sudo apt-get update
+          sudo apt-get install -y jq curl
 
       - name: Build Runtime Test Plugins
         run: make build-compatibility-test-plugins
 
       - name: Run Compatibility Tests
         run: make run-compatibility-tests
+
+      - name: Tests Results Summary
+        if: always()
+        run: |
+          TEST_RESULTS_MD=$(./hack/scripts/process-ginkgo-test-results.sh testresults/compatibility-tests.json)
+          echo "$TEST_RESULTS_MD" >> $GITHUB_STEP_SUMMARY

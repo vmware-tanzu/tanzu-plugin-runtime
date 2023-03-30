@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
 	executil "github.com/vmware-tanzu/tanzu-plugin-runtime/test/exec"

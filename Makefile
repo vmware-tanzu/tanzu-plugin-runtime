@@ -138,7 +138,7 @@ build-compatibility-test-plugins: ## Builds all runtime compatibility test plugi
 
 .PHONY: run-compatibility-tests
 run-compatibility-tests: ## Run Compatibility tests
-	cd ./test/compatibility/framework/compatibilitytests && ${GINKGO} --keep-going --fail-fast --race -r ${COMPATIBILITY_TEST_VERBOSE} --randomize-all --trace --output-dir ./../../../../testresults --junit-report compatibility-tests.xml; \
+	${GINKGO} --keep-going --output-dir testresults --json-report=compatibility-tests.json --race ${GOTEST_VERBOSE} -r test/compatibility/framework/compatibilitytests  --randomize-all --trace > /tmp/out && { cat /tmp/out | grep -Ev 'STEP:|seconds|.go:'; rm /tmp/out; } || { exit_code=$?; cat /tmp/out | grep -Ev 'STEP:|seconds|.go:'; rm /tmp/out; exit $exit_code; }
 
 .PHONY: compatibility-tests
 compatibility-tests: tools build-compatibility-test-plugins run-compatibility-tests ## Build and Run Compatibility tests

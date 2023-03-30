@@ -281,6 +281,13 @@ type GCPPluginRepository struct {
 	RootPath string `json:"rootPath,omitempty" yaml:"rootPath,omitempty"`
 }
 
+// CoreCliOptions are core CLI specific options that are specific to CLI(not for plugins) like ceipOptIn, etc
+// that goes into nextgen configuration file.
+type CoreCliOptions struct {
+	// CEIPOptIn is the users CEIP opt-in/opt-out status.
+	CEIPOptIn string `json:"ceipOptIn,omitempty" yaml:"ceipOptIn,omitempty"`
+}
+
 // ClientConfig is the Schema for the configs API
 type ClientConfig struct {
 	// KnownServers available.
@@ -301,6 +308,10 @@ type ClientConfig struct {
 
 	// ClientOptions are client specific options like feature flags, environment variables, repositories, discoverySources, etc.
 	ClientOptions *ClientOptions `json:"clientOptions,omitempty" yaml:"clientOptions,omitempty"`
+
+	// CoreCliOptions are core CLI specific options that are specific to CLI(not for plugins) like ceipOptIn, etc
+	// that goes into nextgen configuration file.
+	CoreCliOptions *CoreCliOptions `json:"cli,omitempty" yaml:"cli,omitempty"`
 }
 
 // ClientConfigList contains a list of ClientConfig

@@ -22,4 +22,5 @@ const (
 	KeyAPIVersion              = "apiVersion"
 	KeyBomRepo                 = "bomRepo"
 	KeyCompatibilityFilePath   = "compatibilityFilePath"
+	KeyCEIPOptIn               = "ceipOptIn"
 )

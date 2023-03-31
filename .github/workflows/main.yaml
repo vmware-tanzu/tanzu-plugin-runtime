@@ -2,9 +2,9 @@ name: Main
 
 on:
   pull_request:
-    branches: [ main ]
+    branches: [ main, docs* ]
   push:
-    branches: [ main ]
+    branches: [ main, test*, docs* ]
 
 jobs:
 
@@ -48,6 +48,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
+      - name: Run markdown link check
+        uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with:
+          use-quiet-mode: 'yes'
 
       - name: Set up Go 1.x
         uses: actions/setup-go@v3

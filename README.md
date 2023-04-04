@@ -27,7 +27,6 @@ This Tanzu Plugin Runtime broadly consists of:
 3. Plugin integration
 4. Command helpers
 5. Test helpers
-6. Testing
 
 ### CLI UX Component Library
 
@@ -59,11 +58,7 @@ This package implements command specific helper functions like command deprecati
 
 ### Test Helpers
 
-This package implements helper functions to develop test plugins.
-
-VVV provide links to more details for these packages.
-
-### Testing
+This package implements helper functions to develop test plugins and Cross-version Configuration Library APIs compatibility testing
 
 Besides unit and integration tests, the runtime APIs are also being tested
 in the presence of other versions runtime client code as part of cross-version API compatibility testing.

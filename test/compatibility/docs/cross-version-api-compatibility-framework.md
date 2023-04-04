@@ -56,6 +56,7 @@ const (
    Version0116 RuntimeVersion = "v0.11.6"
    Version0254                = "v0.25.4"
    Version0280                = "v0.28.0"
+   VersionLatest              = "latest"
    Version100                 = "v1.0.0"
 )
 

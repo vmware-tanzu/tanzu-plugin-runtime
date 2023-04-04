@@ -37,6 +37,8 @@ This package implements reusable CLI user interface components, including:
 - selector
 - question
 
+For more details go to [Component Library](component/README.md)
+
 ### Configuration Library
 
 This package implements helper functions to read, write and update various

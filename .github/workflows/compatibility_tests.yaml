@@ -1,4 +1,4 @@
-name: Tanzu Plugin Runtime Cross-version API Compatibility Tests
+name: Cross-version API Compatibility Tests
 
 on:
   pull_request:
@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    name: Tanzu Plugin Runtime Cross-version API Compatibility Tests
+    name: Cross-version API Compatibility Tests
     runs-on: ubuntu-latest
     steps:
       - name: Check out code into the Go module directory

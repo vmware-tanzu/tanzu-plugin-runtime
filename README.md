@@ -18,7 +18,7 @@ methods to develop Tanzu CLI plugins.
 Developers begin plugin development by using the `builder` plugin to bootstrap
 a new plugin project. The code generated in the project relies on the runtime
 to provide some functionality common to all plugins. For more information about
-the development process, see the <!-- (VVV update link) --> [Tanzu CLI Plugin Development guide](https://github.com/vuil/tanzu-cli/blob/docs-draft/docs/dev/main.md)
+the development process, see the <!-- (VVV update link) --> [Tanzu CLI Plugin Development guide](https://github.com/vuil/tanzu-cli/blob/docs-draft/docs/plugindev/main.md)
 
 ## The library
 
@@ -47,7 +47,7 @@ This package implements helper functions to read, write and update various
 Tanzu CLI configuration objects like Contexts, DiscoverySources, CLI
 Features and environment settings.
 
-For more details about the design and APIs go to [Configuration API](docs/config.md)
+For more details about the design and APIs go to [Configuration Library](docs/config.md)
 
 ### Plugin integration
 
@@ -71,8 +71,8 @@ different generations of CLI plugins)
 
 #### Cross Version API Compatibility Testing
 
-Cross Version API Compatibility testing ensures that [Config
-APIs](docs/config.md) of different Tanzu Plugin Runtime versions work as
+Cross Version API Compatibility testing ensures that [Configuration
+Library APIs](docs/config.md) of different Tanzu Plugin Runtime versions work as
 expected as long as those Tanzu Plugin Runtime versions are supported.
 
 Cross Version API Compatibility testing simulates the interaction of Configuration library APIs

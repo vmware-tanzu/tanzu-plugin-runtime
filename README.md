@@ -16,7 +16,8 @@ methods to develop Tanzu CLI plugins.
 Developers begin plugin development by using the `builder` plugin to bootstrap
 a new plugin project. The code generated in the project relies on the runtime
 to provide some functionality common to all plugins. For more information about
-the development process, see the <!-- (VVV update link) --> [Tanzu CLI Plugin Development guide](https://github.com/vuil/tanzu-cli/blob/docs-draft/docs/plugindev/main.md)
+the plugin development process, see the
+[Tanzu CLI Plugin Development guide](https://github.com/vmware-tanzu/tanzu-cli/blob/main/docs/plugindev/README.md)
 
 ## The library
 
@@ -51,8 +52,8 @@ For more details about the design and APIs go to [Configuration Library](docs/co
 
 This package implements helper functions for new plugin creation. This is one
 of the main packages that each and every plugin will need to import to
-integrate with the Tanzu CLI. For more information about
-the development process, see the <!-- (VVV update link) --> [Tanzu CLI Plugin Development guide](https://github.com/vuil/tanzu-cli/blob/docs-draft/docs/dev/main.md)
+integrate with the Tanzu CLI. For more information about usage of this package,
+see the [Tanzu CLI Plugin Development guide](https://github.com/vmware-tanzu/tanzu-cli/blob/main/docs/plugindev/README.md)
 
 ### Command Helpers
 
@@ -60,21 +61,24 @@ This package implements command specific helper functions like command deprecati
 
 ### Test Helpers
 
-This package implements helper functions to develop test plugins and Cross-version Configuration Library APIs compatibility testing
+This package implements helper functions to develop test plugins and
+Cross-version Configuration Library APIs compatibility testing
 
 Besides unit and integration tests, the runtime APIs are also being tested
-in the presence of other versions runtime client code as part of cross-version API compatibility testing.
-These tests are important in ensuring interoperability among runtime clients (and hence
-different generations of CLI plugins)
+in the presence of other versions runtime client code as part of cross-version
+API compatibility testing.  These tests are important in ensuring
+interoperability among runtime clients (and hence different generations of CLI
+plugins)
 
 #### Cross Version API Compatibility Testing
 
-Cross Version API Compatibility testing ensures that [Configuration
-Library APIs](docs/config.md) of different Tanzu Plugin Runtime versions work as
-expected as long as those Tanzu Plugin Runtime versions are supported.
+Cross Version API Compatibility testing ensures that
+[Configuration Library APIs](docs/config.md) of different Tanzu Plugin Runtime
+versions work as expected as long as those Tanzu Plugin Runtime versions are
+supported.
 
-Cross Version API Compatibility testing simulates the interaction of Configuration library APIs
-provided by different versions of plugin runtimes to ensure that they can
-interoperate with one another.
+Cross Version API Compatibility testing simulates the interaction of
+Configuration library APIs provided by different versions of plugin runtimes to
+ensure that they can interoperate with one another.
 
 For more details go to [Cross-version API Compatibility](test/compatibility/docs/cross-version-api-compatibility.md)

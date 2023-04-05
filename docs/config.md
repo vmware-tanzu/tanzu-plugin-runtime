@@ -2,11 +2,21 @@
 
 ## Overview
 
-Config library provides various API methods to store plugin discovery sources, contexts, features and configuration options in Tanzu CLI configuration (stored in $HOME/.config/tanzu/config.yaml and $HOME/.config/tanzu/config-ng.yaml).
+Config library provides various API methods to store plugin discovery sources,
+contexts, features and configuration options in Tanzu CLI configuration (stored
+in $HOME/.config/tanzu/config.yaml and $HOME/.config/tanzu/config-ng.yaml).
 
-To learn more about plugin repository, contexts, features and configuration options, please refer [Tanzu CLI User Guide](https://github.com/vmware-tanzu/tanzu-cli/blob/docs-draft/docs/full/README.md#tanzu-cli-user-guide)
+To learn more about plugin repository, contexts, features and configuration
+options, please refer to the
+[Tanzu CLI User Guide](https://github.com/vmware-tanzu/tanzu-cli/blob/main/docs/full/README.md)
 
-Before tanzu-plugin-runtime version 0.28, CLI has only one configuration file which is CFG. In tanzu-plugin-runtime version 0.28, a new configuration file CFG_NG has been added to accommodate new configuration objects (Ex: context object which was referred as server in older tanzu-plugin-runtime version), and inter-operate with old and new tanzu-plugin-runtime client APIs (through plugin). CLI Runtime library unifies both configuration files for end user interactions.
+Before tanzu-plugin-runtime version 0.28, CLI has only one configuration file
+which is CFG. In tanzu-plugin-runtime version 0.28, a new configuration file
+CFG_NG has been added to accommodate new configuration objects (e.g. context
+object which was referred as server in older tanzu-plugin-runtime version), and
+inter-operate with old and new tanzu-plugin-runtime client APIs (through
+plugin). CLI Runtime library unifies both configuration files for end user
+interactions.
 
 ## Key Terms
 
@@ -20,14 +30,13 @@ CLI User should not manipulate any CLI configuration files directly, should inte
 
 ## Details
 
-- CFG: All existing types are stored in the existing configuration file ( ~/.config/tanzu/config.yaml on most systems, shortened as CFG for the rest of the document) Also we introduce an additional next gen configuration file CFG_NG as well as a CFG Metadata file (shortened as META).
+- CFG: All existing types are stored in the existing configuration file (~/.config/tanzu/config.yaml on most systems, shortened as CFG for the rest of the document) Also we introduce an additional next gen configuration file CFG_NG as well as a CFG Metadata file (shortened as META).
 
 - CFG_NG: Additional configuration file(~/config/tanzu/config_ng.yaml) introduced to store new configuration related types. CFG has to be retained since that is the file that Legacy Plugins rely on today for configuration state.
 
 - In this proposal the overall state of the CLI configuration can conceptually be thought of as the union of two non-intersecting parts (CFG, CFG_NG) of the larger logical config file.
 
-- META: Over time, how the CLI interacts with the configuration can potentially evolve. This evolution will be triggered via a core CLI update, but has to be communicated to the plugins as well. This file, META (config-metadata.yaml a hidden/dot file, ) will serve the role of capturing this information. The file is not expected to be manipulated by the CLI user.
-  Ex: When in the future if configMetadata.settings.useUnifiedConfig is set to true by the future version of cli previously existing clis will read this data to use the new CFG_NG completely for all the data and CFG is no longer used.
+- META: Over time, how the CLI interacts with the configuration can potentially evolve. This evolution will be triggered via a core CLI update, but has to be communicated to the plugins as well. This file, META (config-metadata.yaml a hidden/dot file), will serve the role of capturing this information. The file is not expected to be manipulated by the CLI user. For instance, when in the future if configMetadata.settings.useUnifiedConfig is set to true by the future version of cli previously existing clis will read this data to use the new CFG_NG completely for all the data and CFG is no longer used.
 
 - Aspects of this proposal that plans to leverage META are:
 
@@ -35,7 +44,9 @@ CLI User should not manipulate any CLI configuration files directly, should inte
 
 - Determining when to transition to using a single configuration file (CFG_NG) to persist configuration state
 
-Note: due to the fact that information in the CFG_NG file directly affects the manipulation of the actual configuration files, it is not practical to embed said information in the files being manipulated
+Note: due to the fact that information in the CFG_NG file directly affects the
+manipulation of the actual configuration files, it is not practical to embed
+said information in the files being manipulated.
 
 ### Available Runtime Config APIs
 

@@ -18,7 +18,7 @@ methods to develop Tanzu CLI plugins.
 Developers begin plugin development by using the `builder` plugin to bootstrap
 a new plugin project. The code generated in the project relies on the runtime
 to provide some functionality common to all plugins. For more information about
-the development process, see the (VVV update link) [Tanzu CLI Plugin Development guide](https://github.com/vuil/tanzu-cli/blob/docs-draft/docs/dev/main.md)
+the development process, see the <!-- (VVV update link) --> [Tanzu CLI Plugin Development guide](https://github.com/vuil/tanzu-cli/blob/docs-draft/docs/dev/main.md)
 
 ## The library
 
@@ -54,7 +54,7 @@ For more details about the design and APIs go to [Configuration API](docs/config
 This package implements helper functions for new plugin creation. This is one
 of the main packages that each and every plugin will need to import to
 integrate with the Tanzu CLI. For more information about
-the development process, see the (VVV update link) [Tanzu CLI Plugin Development guide](https://github.com/vuil/tanzu-cli/blob/docs-draft/docs/dev/main.md)
+the development process, see the <!-- (VVV update link) --> [Tanzu CLI Plugin Development guide](https://github.com/vuil/tanzu-cli/blob/docs-draft/docs/dev/main.md)
 
 ### Command Helpers
 

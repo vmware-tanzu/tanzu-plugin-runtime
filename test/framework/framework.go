@@ -20,6 +20,7 @@ import (
 	"github.com/spf13/pflag"
 	"gopkg.in/yaml.v3"
 
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/log"
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/plugin"
 )
@@ -33,6 +34,7 @@ func NewTestFor(pluginName string) *plugin.PluginDescriptor {
 	return &plugin.PluginDescriptor{
 		Name:        fmt.Sprintf("%s-test", pluginName),
 		Description: fmt.Sprintf("test for %s", pluginName),
+		Target:      types.TargetGlobal, // Test plugins are always configured with Global target for testing
 		Version:     "v0.0.1",
 		BuildSHA:    "",
 		Group:       plugin.TestCmdGroup,

@@ -18,7 +18,7 @@ methods to develop Tanzu CLI plugins.
 Developers begin plugin development by using the `builder` plugin to bootstrap
 a new plugin project. The code generated in the project relies on the runtime
 to provide some functionality common to all plugins. For more information about
-the development process, see the <!-- (VVV update link) --> [Tanzu CLI Plugin Development guide](https://github.com/vuil/tanzu-cli/blob/docs-draft/docs/plugindev/main.md)
+the development process, see the [Tanzu CLI Plugin Development guide](https://github.com/vmware-tanzu/tanzu-cli/blob/main/docs/plugindev/README.md)
 
 ## The library
 
@@ -54,7 +54,7 @@ For more details about the design and APIs go to [Configuration Library](docs/co
 This package implements helper functions for new plugin creation. This is one
 of the main packages that each and every plugin will need to import to
 integrate with the Tanzu CLI. For more information about
-the development process, see the <!-- (VVV update link) --> [Tanzu CLI Plugin Development guide](https://github.com/vuil/tanzu-cli/blob/docs-draft/docs/dev/main.md)
+the development process, see the [Tanzu CLI Plugin Development guide](https://github.com/vmware-tanzu/tanzu-cli/blob/main/docs/plugindev/README.md)
 
 ### Command Helpers
 
@@ -80,3 +80,14 @@ provided by different versions of plugin runtimes to ensure that they can
 interoperate with one another.
 
 For more details go to [Cross-version API Compatibility](test/compatibility/docs/cross-version-api-compatibility.md)
+
+## Contributing
+
+Thanks for taking the time to join our community and start contributing! We
+welcome pull requests. Feel free to dig through the
+[issues](https://github.com/vmware-tanzu/tanzu-plugin-runtime/issues) and jump in.
+
+### Before you begin
+
+- Check out the [contribution guidelines](CONTRIBUTING.md) to learn more about how to contribute.
+- Check out the document [here](docs/community/support.md) about the project's support process.

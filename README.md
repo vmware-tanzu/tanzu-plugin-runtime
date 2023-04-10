@@ -2,9 +2,9 @@
 
 [![Cross-version API Compatibility Tests](https://github.com/vmware-tanzu/tanzu-plugin-runtime/actions/workflows/compatibility_tests.yaml/badge.svg?event=push)](https://github.com/vmware-tanzu/tanzu-plugin-runtime/actions/workflows/compatibility_tests.yaml?query=event:push+branch:main)
 
-:warning: NOTE: This repository is still under early development. We plan to
-make releases available for evaluation in the second quarter of 2023.  Please
-watch this page for further updates.
+_NOTE: The first alpha release is available for evaluation. Please watch
+this page for further updates as we work towards our first official release in
+the second quarter of 2023._
 
 ## Overview
 

@@ -159,7 +159,7 @@ const (
   Version0110 RuntimeVersion = "v0.11.0"
   Version0250 RuntimeVersion = "v0.25.0"
   Version0280 RuntimeVersion = "v0.28.0"
-  Version100 RuntimeVersion = "v1.0.0"
+  VersionLatest RuntimeVersion = "latest"
 )
 
 type RuntimeVersion string
@@ -410,7 +410,7 @@ It("Run Runtime V100 SetContext API and Runtime V0280 GetContext API", func() {
 // Input Parameters for Runtime SetContext API
 setContextInputOptions := &framework.SetContextInputOptions{
  RuntimeAPIVersion: &framework.RuntimeAPIVersion{
-   RuntimeVersion: framework.Version100,
+   RuntimeVersion: framework.VersionLatest,
    },
    ContextOpts: &framework.ContextOpts{
     Name:   "context-one",
@@ -427,7 +427,7 @@ setContextInputOptions := &framework.SetContextInputOptions{
       // Input Parameters for Runtime GetContext API
       getContextInputOptions := &framework.GetContextInputOptions{
          RuntimeAPIVersion: &framework.RuntimeAPIVersion{
-            RuntimeVersion: framework.Version100,
+            RuntimeVersion: framework.VersionLatest,
          },
          ContextName: "context-one",
       }

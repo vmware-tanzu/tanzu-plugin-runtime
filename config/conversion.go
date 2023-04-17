@@ -173,78 +173,15 @@ func convertNodeToMetadata(node *yaml.Node) (obj *configtypes.Metadata, err erro
 	return obj, err
 }
 
-// convertClientConfigToNode converts client config type to yaml node
-func convertClientConfigToNode(obj *configtypes.ClientConfig) (*yaml.Node, error) {
-	bytes, err := yaml.Marshal(obj)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to convert obj to node")
-	}
-	var node yaml.Node
-	err = yaml.Unmarshal(bytes, &node)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to unmarshal bytes to node")
-	}
-	return &node, nil
-}
+// convertObjectToNode converts a typed object to yaml node
+func convertObjectToNode[
+	T *configtypes.ClientConfig |
+		*configtypes.Metadata |
+		*configtypes.Server |
+		*configtypes.PluginRepository |
+		*configtypes.Context |
+		*configtypes.PluginDiscovery](obj T) (*yaml.Node, error) {
 
-// convertMetadataToNode converts client config type to yaml node
-func convertMetadataToNode(metadata *configtypes.Metadata) (*yaml.Node, error) {
-	bytes, err := yaml.Marshal(metadata)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to convert metadata obj to node")
-	}
-	var node yaml.Node
-	err = yaml.Unmarshal(bytes, &node)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to unmarshal bytes to node")
-	}
-	return &node, nil
-}
-
-// convertServerToNode converts server to yaml node
-func convertServerToNode(obj *configtypes.Server) (*yaml.Node, error) {
-	bytes, err := yaml.Marshal(obj)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to convert obj to node")
-	}
-	var node yaml.Node
-	err = yaml.Unmarshal(bytes, &node)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to unmarshal bytes to node")
-	}
-	return &node, nil
-}
-
-// convertPluginRepositoryToNode converts PluginRepository to yaml node
-func convertPluginRepositoryToNode(obj *configtypes.PluginRepository) (*yaml.Node, error) {
-	bytes, err := yaml.Marshal(obj)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to convert obj to node")
-	}
-	var node yaml.Node
-	err = yaml.Unmarshal(bytes, &node)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to unmarshal bytes to node")
-	}
-	return &node, nil
-}
-
-// convertContextToNode converts context to yaml node
-func convertContextToNode(obj *configtypes.Context) (*yaml.Node, error) {
-	bytes, err := yaml.Marshal(obj)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to convert obj to node")
-	}
-	var node yaml.Node
-	err = yaml.Unmarshal(bytes, &node)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to unmarshal bytes to node")
-	}
-	return &node, nil
-}
-
-// convertPluginDiscoveryToNode converts PluginDiscovery to yaml node
-func convertPluginDiscoveryToNode(obj *configtypes.PluginDiscovery) (*yaml.Node, error) {
 	bytes, err := yaml.Marshal(obj)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to convert obj to node")

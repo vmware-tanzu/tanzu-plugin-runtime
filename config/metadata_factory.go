@@ -51,7 +51,7 @@ func getMetadataNodeNoLock() (*yaml.Node, error) {
 
 func newMetadataNode() (*yaml.Node, error) {
 	c := &configtypes.Metadata{}
-	node, err := convertMetadataToNode(c)
+	node, err := convertObjectToNode(c)
 	node.Content[0].Style = 0
 	if err != nil {
 		return nil, err

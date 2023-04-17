@@ -175,7 +175,7 @@ func deleteCLIRepository(node *yaml.Node, name string) error {
 }
 
 func setRepository(repositoriesNode *yaml.Node, repository configtypes.PluginRepository, patchStrategyOpts ...nodeutils.PatchStrategyOpts) (persist bool, err error) {
-	newNode, err := convertPluginRepositoryToNode(&repository)
+	newNode, err := convertObjectToNode(&repository)
 	if err != nil {
 		return persist, err
 	}

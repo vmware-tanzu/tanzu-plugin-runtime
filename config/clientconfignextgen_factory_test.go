@@ -28,7 +28,7 @@ func TestGetClientConfigNextGenNode(t *testing.T) {
 	//Assertions
 	assert.NoError(t, err)
 	c := &configtypes.ClientConfig{}
-	expectedNode, err := convertClientConfigToNode(c)
+	expectedNode, err := convertObjectToNode(c)
 	expectedNode.Content[0].Style = 0
 	assert.NoError(t, err)
 	assert.Equal(t, expectedNode, node)

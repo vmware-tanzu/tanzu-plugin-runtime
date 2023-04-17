@@ -135,8 +135,8 @@ func setDiscoverySource(discoverySourcesNode *yaml.Node, discoverySource configt
 }
 
 func getDiscoverySourceTypeAndName(discoverySource configtypes.PluginDiscovery) (string, string) {
-	if discoverySource.GCP != nil && discoverySource.GCP.Name != "" { // nolint:staticcheck
-		return DiscoveryTypeGCP, discoverySource.GCP.Name // nolint:staticcheck
+	if discoverySource.GCP != nil && discoverySource.GCP.Name != "" { //nolint:staticcheck
+		return DiscoveryTypeGCP, discoverySource.GCP.Name //nolint:staticcheck
 	} else if discoverySource.OCI != nil && discoverySource.OCI.Name != "" {
 		return DiscoveryTypeOCI, discoverySource.OCI.Name
 	} else if discoverySource.Local != nil && discoverySource.Local.Name != "" {

@@ -20,7 +20,7 @@ var PrintCmd = &cobra.Command{
 	RunE: printHelloWorld,
 }
 
-func printHelloWorld(cmd *cobra.Command, args []string) error {
+func printHelloWorld(_ *cobra.Command, _ []string) error {
 	fmt.Printf("Hello world from test plugin")
 	return nil
 }

@@ -130,13 +130,13 @@ func NewObjectWriter(output io.Writer, outputFormat string, data interface{}) Ou
 }
 
 // SetKeys sets the values to use as the keys for the output values.
-func (obw *objectwriter) SetKeys(headerKeys ...string) {
+func (obw *objectwriter) SetKeys(_ ...string) {
 	// Object writer does not have the concept of keys
 	fmt.Fprintln(obw.out, "Programming error, attempt to add headers to object output")
 }
 
 // AddRow appends a new row to our table.
-func (obw *objectwriter) AddRow(items ...interface{}) {
+func (obw *objectwriter) AddRow(_ ...interface{}) {
 	// Object writer does not have the concept of keys
 	fmt.Fprintln(obw.out, "Programming error, attempt to add rows to object output")
 }

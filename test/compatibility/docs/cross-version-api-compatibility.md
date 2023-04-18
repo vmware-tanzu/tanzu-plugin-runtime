@@ -38,6 +38,10 @@ When writing a test involving two versions of Runtime library APIs a test writer
 
 Build and Run compatibility tests
 
+This command will build all the runtime specific test plugins and run all the tests available in `/test/framework/compatibilitytests directory`
+
+Internally runs `build-compatibility-test-plugins` and `run-compatibility-tests` commands
+
 ```shell
 make compatibility-tests
 ```
@@ -49,6 +53,8 @@ make build-compatibility-test-plugins
 ```
 
 Run all compatibility tests
+
+Runs all the tests available in `/test/framework/compatibilitytests directory`
 
 ``` shell
 make run-compatibility-tests
@@ -153,7 +159,7 @@ const (
   Version0110 RuntimeVersion = "v0.11.0"
   Version0250 RuntimeVersion = "v0.25.0"
   Version0280 RuntimeVersion = "v0.28.0"
-  Version100 RuntimeVersion = "v1.0.0"
+  VersionLatest RuntimeVersion = "latest"
 )
 
 type RuntimeVersion string
@@ -404,7 +410,7 @@ It("Run Runtime V100 SetContext API and Runtime V0280 GetContext API", func() {
 // Input Parameters for Runtime SetContext API
 setContextInputOptions := &framework.SetContextInputOptions{
  RuntimeAPIVersion: &framework.RuntimeAPIVersion{
-   RuntimeVersion: framework.Version100,
+   RuntimeVersion: framework.VersionLatest,
    },
    ContextOpts: &framework.ContextOpts{
     Name:   "context-one",
@@ -421,7 +427,7 @@ setContextInputOptions := &framework.SetContextInputOptions{
       // Input Parameters for Runtime GetContext API
       getContextInputOptions := &framework.GetContextInputOptions{
          RuntimeAPIVersion: &framework.RuntimeAPIVersion{
-            RuntimeVersion: framework.Version100,
+            RuntimeVersion: framework.VersionLatest,
          },
          ContextName: "context-one",
       }

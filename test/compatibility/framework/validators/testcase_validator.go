@@ -24,11 +24,12 @@ func ValidateAPIsOutput(apis []*core.API, stdout string) {
 
 	for _, api := range apis {
 		for _, log := range logs[api.Name] {
-			if log.APIResponse.ResponseType == core.StringResponse {
+			switch log.APIResponse.ResponseType {
+			case core.StringResponse:
 				actual := fmt.Sprintf("%v", log.APIResponse.ResponseBody)
 				expected := api.Output.Content
 				gomega.Expect(actual).To(gomega.Equal(expected))
-			} else if log.APIResponse.ResponseType == core.MapResponse {
+			case core.MapResponse:
 				actual := log.APIResponse.ResponseBody
 				// Convert string represented struct to map string interface
 				var expected map[string]interface{}
@@ -44,7 +45,7 @@ func ValidateAPIsOutput(apis []*core.API, stdout string) {
 				} else {
 					gomega.Expect(ValidateMaps(actual.(map[string]interface{}), expected)).To(gomega.Equal(true))
 				}
-			} else if log.APIResponse.ResponseType == core.ErrorResponse {
+			case core.ErrorResponse:
 				// Check for errors
 				actual := log.APIResponse.ResponseBody
 				expected := api.Output.Content

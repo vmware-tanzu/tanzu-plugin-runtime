@@ -17,7 +17,8 @@ import (
 // Return: command to execute or error if any validations fails for SetContextInputOptions or SetContextOutputOptions
 // This method does validate the input parameters  SetContextInputOptions or SetContextOutputOptions based on Runtime API Version
 // For more details about supported parameters refer to SetContextInputOptions or SetContextOutputOptions definition(and ContextOpts struct, which is embedded)
-// nolint:dupl
+//
+//nolint:dupl
 func NewSetContextCommand(inputOpts *SetContextInputOptions, outputOpts *SetContextOutputOptions) (*core.Command, error) {
 	// Init the Command object
 	c := &core.Command{}
@@ -146,7 +147,8 @@ func NewGetContextCommand(inputOpts *GetContextInputOptions, outputOpts *GetCont
 // Return: command to execute or error if any validations fails for DeleteContextInputOptions or DeleteContextOutputOptions
 // This method does validate the input parameters  DeleteContextInputOptions or DeleteContextOutputOptions based on Runtime API Version
 // For more details about supported parameters refer to DeleteContextInputOptions or DeleteContextOutputOptions definition(and ContextOpts struct, which is embedded)
-// nolint: dupl
+//
+//nolint:dupl
 func NewDeleteContextCommand(inputOpts *DeleteContextInputOptions, outputOpts *DeleteContextOutputOptions) (*core.Command, error) {
 	// Init the Command object
 	c := &core.Command{}

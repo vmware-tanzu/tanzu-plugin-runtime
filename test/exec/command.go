@@ -73,7 +73,7 @@ func WithEnv(args ...string) Option {
 
 // Run executes the command and returns stdout, stderr and the error if there is any.
 func (c *Command) Run(ctx context.Context) ([]byte, []byte, error) {
-	cmd := exec.CommandContext(ctx, c.Cmd, c.Args...) // nolint:gosec
+	cmd := exec.CommandContext(ctx, c.Cmd, c.Args...) //nolint:gosec
 	if len(c.Env) != 0 {
 		cmd.Env = os.Environ()
 		cmd.Env = append(cmd.Env, c.Env...)
@@ -109,7 +109,7 @@ func (c *Command) Run(ctx context.Context) ([]byte, []byte, error) {
 
 // RunAndRedirectOutput executes command and redirects output
 func (c *Command) RunAndRedirectOutput(ctx context.Context) error {
-	cmd := exec.CommandContext(ctx, c.Cmd, c.Args...) // nolint:gosec
+	cmd := exec.CommandContext(ctx, c.Cmd, c.Args...) //nolint:gosec
 
 	if len(c.Env) != 0 {
 		cmd.Env = os.Environ()

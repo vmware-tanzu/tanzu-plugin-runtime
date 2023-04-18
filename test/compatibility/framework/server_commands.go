@@ -15,7 +15,8 @@ import (
 // Return: command to execute or error if any validations fails for SetServerInputOptions or SetServerOutputOptions
 // This method does validate the input parameters  SetServerInputOptions or SetServerOutputOptions based on Runtime API Version
 // For more details about supported parameters refer to SetServerInputOptions or SetServerOutputOptions definition(and ServerOpts struct, which is embedded)
-// nolint:dupl
+//
+//nolint:dupl
 func NewSetServerCommand(inputOpts *SetServerInputOptions, outputOpts *SetServerOutputOptions) (*core.Command, error) {
 	// Init the Command object
 	c := &core.Command{}
@@ -146,7 +147,8 @@ func NewGetServerCommand(inputOpts *GetServerInputOptions, outputOpts *GetServer
 // Return: command to execute or error if any validations fails for DeleteServerInputOptions or DeleteServerOutputOptions
 // This method does validate the input parameters  DeleteServerInputOptions or DeleteServerOutputOptions based on Runtime API Version
 // For more details about supported parameters refer to DeleteServerInputOptions or DeleteServerOutputOptions definition(and ServerOpts struct, which is embedded)
-// nolint: dupl
+//
+//nolint:dupl
 func NewDeleteServerCommand(inputOpts *DeleteServerInputOptions, outputOpts *DeleteServerOutputOptions) (*core.Command, error) {
 	// Init the Command object
 	c := &core.Command{}

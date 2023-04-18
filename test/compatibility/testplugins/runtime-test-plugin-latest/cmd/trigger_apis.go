@@ -11,6 +11,7 @@ import (
 
 // Route to runtime API method call based on passed command value
 var apiHandlers = map[core.RuntimeAPIName]func(*core.API) *core.APIResponse{
+	// Context APIs
 	core.SetContextAPIName:           triggerSetContextAPI,
 	core.GetContextAPIName:           triggerGetContextAPI,
 	core.RemoveContextAPIName:        triggerDeleteContextAPI,
@@ -18,15 +19,17 @@ var apiHandlers = map[core.RuntimeAPIName]func(*core.API) *core.APIResponse{
 	core.SetCurrentContextAPIName:    triggerSetCurrentContextAPI,
 	core.GetCurrentContextAPIName:    triggerGetCurrentContextAPI,
 	core.RemoveCurrentContextAPIName: triggerRemoveCurrentContextAPI,
-	core.SetServerAPIName:            triggerSetServerAPI,
-	core.AddServerAPIName:            triggerSetServerAPI,
-	core.PutServerAPIName:            triggerSetServerAPI,
-	core.GetServerAPIName:            triggerGetServerAPI,
-	core.RemoveServerAPIName:         triggerRemoveServerAPI,
-	core.DeleteServerAPIName:         triggerRemoveServerAPI,
-	core.SetCurrentServerAPIName:     triggerSetCurrentServerAPI,
-	core.GetCurrentServerAPIName:     triggerGetCurrentServerAPI,
-	core.RemoveCurrentServerAPIName:  triggerRemoveCurrentServerAPI,
+
+	// Server APIs
+	core.SetServerAPIName:           triggerSetServerAPI,
+	core.AddServerAPIName:           triggerSetServerAPI,
+	core.PutServerAPIName:           triggerSetServerAPI,
+	core.GetServerAPIName:           triggerGetServerAPI,
+	core.RemoveServerAPIName:        triggerRemoveServerAPI,
+	core.DeleteServerAPIName:        triggerRemoveServerAPI,
+	core.SetCurrentServerAPIName:    triggerSetCurrentServerAPI,
+	core.GetCurrentServerAPIName:    triggerGetCurrentServerAPI,
+	core.RemoveCurrentServerAPIName: triggerRemoveCurrentServerAPI,
 }
 
 // triggerAPIs trigger runtime apis and construct logs

@@ -4,7 +4,7 @@
 // Package core contains compatibility testing framework core types and functions
 package core
 
-// RuntimeAPIName describes all the runtime api functions
+// RuntimeAPIName describes all the Runtime APIs
 type RuntimeAPIName string
 
 const (
@@ -28,7 +28,7 @@ const (
 	RemoveCurrentServerAPIName RuntimeAPIName = "RemoveCurrentServer"
 )
 
-// APIArgumentType describes all the arguments types for runtime api functions
+// APIArgumentType describes all the arguments types required for Runtime APIs
 type APIArgumentType string
 
 const (
@@ -63,7 +63,6 @@ const (
 	Version0254   RuntimeVersion = "v0.25.4"
 	Version0280   RuntimeVersion = "v0.28.0"
 	VersionLatest RuntimeVersion = "latest"
-	Version100    RuntimeVersion = "v1.0.0"
 )
 
 // SupportedRuntimeVersions Current supported runtime library versions

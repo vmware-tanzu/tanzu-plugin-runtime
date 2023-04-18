@@ -182,7 +182,7 @@ func (l *logger) Print(msg string, err error, logType string, kvs ...interface{}
 	if err != nil {
 		values = append(values, "error", err)
 	}
-	header := []byte(l.header(logType, l.callDepth))
+	header := []byte(l.header(l.callDepth))
 	_, _ = logWriter.Write(header, []byte(l.getLogString(values)), l.Enabled(), l.level, logType)
 }
 
@@ -228,7 +228,7 @@ func copySlice(in []interface{}) []interface{} {
 //   - Variables name are not quoted, eg.
 //     This is a message "Var1"="value" --> This is a message Var1="value"
 //   - Variables are not sorted, thus allowing full control to the developer on the output.
-func flatten(entry logEntry) (string, error) { // nolint:gocyclo
+func flatten(entry logEntry) (string, error) { //nolint:gocyclo
 	var msgValue string
 	var errorValue error
 	if len(entry.Values)%2 == 1 {
@@ -297,7 +297,7 @@ func pretty(value interface{}) (string, error) {
 	return string(jb), nil
 }
 
-func (l *logger) header(logType string, depth int) string {
+func (l *logger) header(depth int) string {
 	_, file, line, ok := runtime.Caller(3 + depth)
 	if !ok {
 		file = "???"

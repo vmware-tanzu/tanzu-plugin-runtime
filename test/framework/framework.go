@@ -387,7 +387,7 @@ func copyAndCapture(w io.Writer, r io.Reader) ([]byte, error) {
 	var out []byte
 	buf := make([]byte, 1024)
 	for {
-		// nolint:gocritic
+		//nolint:gocritic
 		n, err := r.Read(buf[:])
 		if n > 0 {
 			d := buf[:n]

@@ -37,10 +37,7 @@ func copyFile(src, dst string) error {
 	if err != nil {
 		return err
 	}
-	if err := os.Chmod(dst, sf.Mode()); err != nil {
-		return err
-	}
-	return nil
+	return os.Chmod(dst, sf.Mode())
 }
 
 // copyDir copies a directory tree recursively. Source directory must exist and destination directory must *not*

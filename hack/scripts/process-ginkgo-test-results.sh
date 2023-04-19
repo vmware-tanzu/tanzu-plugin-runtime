@@ -17,7 +17,7 @@ fi
 json=$(cat "$1")
 
 # Print the table header
-echo "| :memo: Test Suite Description | Total Tests | :white_check_mark: Passed | Failed |"
+echo "| :memo: Test Suite Description | Total Tests | Passed | Failed |"
 echo "| --- | ---: | ---: | ---: |"
 
 # Counters for total tests
@@ -57,16 +57,16 @@ for suite in $(echo "$json" | jq -r '.[] | @base64'); do
 
   # Print the suite row with color and icon depending on the result
   if [ "$suite_failed" -eq 0 ]; then
-    echo "| $suite_description | $suite_tests | :white_check_mark: $suite_passed | $suite_failed |"
+    echo "| $suite_description | $suite_tests | $suite_passed | $suite_failed |"
   else
-    echo "| $suite_description | $suite_tests | :white_check_mark: $suite_passed | :x: $suite_failed |"
+    echo "| $suite_description | $suite_tests | $suite_passed | :x: $suite_failed |"
   fi
 
 done
 
 # Print the total line with color and icon depending on the result
 if [ "$total_failed" -eq 0 ]; then
-  echo "| **Total** | $total_tests | :white_check_mark: $total_passed | $total_failed |"
+  echo "| **Total** | **$total_tests** | **$total_passed** | **$total_failed** |"
 else
-  echo "| **Total** | $total_tests | :white_check_mark: $total_passed | :x: $total_failed |"
+  echo "| **Total** | **$total_tests** | **$total_passed** | :x: **$total_failed** |"
 fi

@@ -128,6 +128,9 @@ GO_MODULES=$(shell find . -path "*/go.mod" | xargs -I _ dirname _)
 ## Compatibility Testing
 ## --------------------------------------
 
+.PHONY: compatibility-tests
+compatibility-tests: tools build-compatibility-test-plugins run-compatibility-tests ## Build and Run Compatibility tests
+
 .PHONY: build-compatibility-test-plugins
 build-compatibility-test-plugins: ## Builds all runtime compatibility test plugins
 	cd ./test/compatibility/testplugins && mkdir -p bin
@@ -136,9 +139,7 @@ build-compatibility-test-plugins: ## Builds all runtime compatibility test plugi
 	cd ./test/compatibility/testplugins/runtime-test-plugin-v0_28_0 && ${GO} mod tidy && GOOS=$(OS) GOARCH=$(ARCH) ${GO} build -o ../bin
 	cd ./test/compatibility/testplugins/runtime-test-plugin-latest && ${GO} mod tidy && GOOS=$(OS) GOARCH=$(ARCH) ${GO} build -o ../bin
 
+# The below command runs the compatibility tests using ginkgo and filter the logs as per regex and exit code with '0' representing success and non-zero values indicating test failures
 .PHONY: run-compatibility-tests
 run-compatibility-tests: ## Run Compatibility tests
-	cd ./test/compatibility/framework/compatibilitytests && ${GINKGO} --keep-going --fail-fast --race -r ${COMPATIBILITY_TEST_VERBOSE} --randomize-all --trace --output-dir ./../../../../testresults --junit-report compatibility-tests.xml; \
-
-.PHONY: compatibility-tests
-compatibility-tests: tools build-compatibility-test-plugins run-compatibility-tests ## Build and Run Compatibility tests
+	${GINKGO} --keep-going --output-dir testresults --json-report=compatibility-tests.json --race ${GOTEST_VERBOSE} -r test/compatibility/framework/compatibilitytests  --randomize-all --trace > /tmp/out && { cat /tmp/out | grep -Ev 'STEP:|seconds|.go:'; rm /tmp/out; } || { exit_code=$$?; cat /tmp/out | grep -Ev 'STEP:|seconds|.go:'; rm /tmp/out; exit $$exit_code; }

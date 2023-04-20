@@ -352,7 +352,7 @@ func setServer(node *yaml.Node, s *configtypes.Server) (persist bool, err error)
 	var persistDiscoverySources bool
 
 	// convert server to node
-	newServerNode, err := convertServerToNode(s)
+	newServerNode, err := convertObjectToNode(s)
 	if err != nil {
 		return persist, err
 	}

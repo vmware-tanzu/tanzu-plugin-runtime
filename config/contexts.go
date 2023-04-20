@@ -294,7 +294,7 @@ func setContext(node *yaml.Node, ctx *configtypes.Context) (persist bool, err er
 	var persistDiscoverySources bool
 
 	// Convert context to node
-	newContextNode, err := convertContextToNode(ctx)
+	newContextNode, err := convertObjectToNode(ctx)
 	if err != nil {
 		return persist, err
 	}

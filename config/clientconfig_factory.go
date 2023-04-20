@@ -78,7 +78,7 @@ func getClientConfigNoLock() (*yaml.Node, error) {
 // newClientConfigNode create and return new client config node
 func newClientConfigNode() (*yaml.Node, error) {
 	c := &configtypes.ClientConfig{}
-	node, err := convertClientConfigToNode(c)
+	node, err := convertObjectToNode(c)
 	node.Content[0].Style = 0
 	if err != nil {
 		return nil, err

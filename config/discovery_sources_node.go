@@ -55,7 +55,7 @@ func setDiscoverySources(node *yaml.Node, discoverySources []configtypes.PluginD
 //nolint:gocyclo
 func setDiscoverySource(discoverySourcesNode *yaml.Node, discoverySource configtypes.PluginDiscovery, patchStrategyOpts ...nodeutils.PatchStrategyOpts) (persist bool, err error) {
 	// Convert discoverySource change obj to yaml node
-	newNode, err := convertPluginDiscoveryToNode(&discoverySource)
+	newNode, err := convertObjectToNode(&discoverySource)
 	if err != nil {
 		return persist, err
 	}

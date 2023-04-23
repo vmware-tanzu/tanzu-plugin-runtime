@@ -292,6 +292,18 @@ type CoreCliOptions struct {
 	DiscoverySources []PluginDiscovery `json:"discoverySources,omitempty" yaml:"discoverySources,omitempty"`
 }
 
+// Cert provides a certificate configuration for an endpoint
+type Cert struct {
+	// Host is the host name/ip for which the certificate configuration is applicable
+	HostName string `json:"hostName,omitempty" yaml:"hostName,omitempty"`
+	// CACertData is the CA certificate for the host
+	CACertData string `json:"caCertData,omitempty" yaml:"caCertData,omitempty"`
+	// Insecure is to allow insecure connections with host
+	Insecure string `json:"insecure,omitempty" yaml:"insecure,omitempty"`
+	// SkipCertVerify is to skip certificate validation
+	SkipCertVerify string `json:"skipCertVerify,omitempty" yaml:"skipCertVerify,omitempty"`
+}
+
 // ClientConfig is the Schema for the configs API
 type ClientConfig struct {
 	// KnownServers available.
@@ -316,6 +328,9 @@ type ClientConfig struct {
 	// CoreCliOptions are core CLI specific options that are specific to CLI(not for plugins) like ceipOptIn, etc
 	// that goes into nextgen configuration file.
 	CoreCliOptions *CoreCliOptions `json:"cli,omitempty" yaml:"cli,omitempty"`
+
+	// Certs is the collection of hostname, and it's certificate data used to communicate with the host
+	Certs []*Cert `json:"certs,omitempty" yaml:"certs,omitempty"`
 }
 
 // ClientConfigList contains a list of ClientConfig

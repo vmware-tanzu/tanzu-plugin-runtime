@@ -7,47 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-
-	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
-
-func TestGetEdition(t *testing.T) {
-	// Setup config test data
-	_, cleanUp := setupTestConfig(t, &CfgTestData{})
-
-	defer func() {
-		cleanUp()
-	}()
-
-	tests := []struct {
-		name   string
-		in     *configtypes.ClientConfig
-		out    string
-		errStr string
-	}{
-		{
-			name: "success k8s",
-			in: &configtypes.ClientConfig{
-				ClientOptions: &configtypes.ClientOptions{
-					Env: map[string]string{
-						"test": "test",
-					},
-				},
-			},
-			out: "test",
-		},
-	}
-	for _, spec := range tests {
-		t.Run(spec.name, func(t *testing.T) {
-			err := StoreClientConfig(spec.in)
-			assert.NoError(t, err)
-			c, err := GetEnv("test")
-			assert.NoError(t, err)
-			assert.Equal(t, spec.out, c)
-			assert.NoError(t, err)
-		})
-	}
-}
 
 func TestSetEdition(t *testing.T) {
 	// Setup config test data
@@ -58,9 +18,17 @@ func TestSetEdition(t *testing.T) {
 	}()
 
 	tests := []struct {
-		name  string
-		value string
+		name         string
+		value        string
+		errStr       string
+		errStrForGet string
 	}{
+		{
+			name:         "should return error for empty val",
+			value:        "",
+			errStr:       "value cannot be empty",
+			errStrForGet: "edition not found",
+		},
 		{
 			name:  "should persist tanzu when empty client config",
 			value: "tanzu",
@@ -78,10 +46,19 @@ func TestSetEdition(t *testing.T) {
 	for _, spec := range tests {
 		t.Run(spec.name, func(t *testing.T) {
 			err := SetEdition(spec.value)
-			assert.NoError(t, err)
+			if spec.errStr != "" {
+				assert.Equal(t, spec.errStr, err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
+
 			c, err := GetEdition()
-			assert.Equal(t, spec.value, c)
-			assert.NoError(t, err)
+			if spec.errStrForGet != "" {
+				assert.Equal(t, spec.errStrForGet, err.Error())
+			} else {
+				assert.Equal(t, spec.value, c)
+				assert.NoError(t, err)
+			}
 		})
 	}
 }

@@ -272,6 +272,11 @@ func setCurrentServer(node *yaml.Node, name string) (persist bool, err error) {
 }
 
 func getServer(node *yaml.Node, name string) (*configtypes.Server, error) {
+	// check if name is empty
+	if name == "" {
+		return nil, errors.New("name cannot be empty")
+	}
+
 	cfg, err := convertNodeToClientConfig(node)
 	if err != nil {
 		return nil, err
@@ -298,6 +303,11 @@ func getCurrentServer(node *yaml.Node) (s *configtypes.Server, err error) {
 }
 
 func removeCurrentServer(node *yaml.Node, name string) error {
+	// check if name is empty
+	if name == "" {
+		return errors.New("name cannot be empty")
+	}
+
 	// find current server node
 	keys := []nodeutils.Key{
 		{Name: KeyCurrentServer},
@@ -314,6 +324,11 @@ func removeCurrentServer(node *yaml.Node, name string) error {
 
 //nolint:dupl
 func removeServer(node *yaml.Node, name string) error {
+	// check if name is empty
+	if name == "" {
+		return errors.New("name cannot be empty")
+	}
+
 	// find servers node
 	keys := []nodeutils.Key{
 		{Name: KeyServers},
@@ -344,6 +359,11 @@ func setServers(node *yaml.Node, servers []*configtypes.Server) error {
 }
 
 func setServer(node *yaml.Node, s *configtypes.Server) (persist bool, err error) {
+	// check if name is empty
+	if s.Name == "" {
+		return false, errors.New("server name cannot be empty")
+	}
+
 	// Get Patch Strategies
 	patchStrategies, err := GetConfigMetadataPatchStrategy()
 	if err != nil {

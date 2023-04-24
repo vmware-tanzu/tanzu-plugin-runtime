@@ -118,13 +118,21 @@ func getCLIDiscoverySources(node *yaml.Node) ([]configtypes.PluginDiscovery, err
 }
 
 func getCLIDiscoverySource(node *yaml.Node, name string) (*configtypes.PluginDiscovery, error) {
+	// check if context name is empty
+	if name == "" {
+		return nil, errors.New("discovery source name cannot be empty")
+	}
+
 	cfg, err := convertNodeToClientConfig(node)
 	if err != nil {
 		return nil, err
 	}
 	if cfg.CoreCliOptions != nil && cfg.CoreCliOptions.DiscoverySources != nil {
 		for _, discoverySource := range cfg.CoreCliOptions.DiscoverySources {
-			_, discoverySourceName := getDiscoverySourceTypeAndName(discoverySource)
+			_, discoverySourceName, err := getDiscoverySourceTypeAndName(discoverySource)
+			if err != nil {
+				return nil, err
+			}
 			if discoverySourceName == name {
 				return &discoverySource, nil
 			}
@@ -172,7 +180,12 @@ func deleteCLIDiscoverySource(node *yaml.Node, name string) error {
 	if err != nil {
 		return err
 	}
-	discoverySourceType, discoverySourceName := getDiscoverySourceTypeAndName(*discoverySource)
+
+	discoverySourceType, discoverySourceName, err := getDiscoverySourceTypeAndName(*discoverySource)
+	if err != nil {
+		return err
+	}
+
 	var result []*yaml.Node
 	for _, discoverySourceNode := range cliDiscoverySourcesNode.Content {
 		// Find discovery source matched by discoverySourceType

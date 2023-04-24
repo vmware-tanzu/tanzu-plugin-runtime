@@ -178,7 +178,6 @@ func setCert(node *yaml.Node, cert *configtypes.Cert) (persist bool, err error) 
 	return persist, err
 }
 
-//nolint:dupl
 func removeCert(node *yaml.Node, host string) error {
 	// Find the certs node in the yaml node
 	keys := []nodeutils.Key{

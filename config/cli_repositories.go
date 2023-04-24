@@ -159,7 +159,9 @@ func deleteCLIRepository(node *yaml.Node, name string) error {
 	}
 
 	repositoryType, repositoryName := getRepositoryTypeAndName(*repository)
-
+	if repositoryType == "" || repositoryName == "" {
+		return errors.New("not found")
+	}
 	var result []*yaml.Node
 	for _, repositoryNode := range cliRepositoriesNode.Content {
 		if repositoryIndex := nodeutils.GetNodeIndex(repositoryNode.Content, repositoryType); repositoryIndex != -1 {

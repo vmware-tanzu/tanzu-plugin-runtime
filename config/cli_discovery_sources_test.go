@@ -66,22 +66,46 @@ func TestGetCLIDiscoverySource(t *testing.T) {
 	}
 
 	tests := []struct {
-		name    string
-		in, out *configtypes.PluginDiscovery
+		name                string
+		discoverySourceName string
+		in                  *configtypes.PluginDiscovery
+		out                 *configtypes.PluginDiscovery
+		errStr              string
 	}{
 		{
-			name: "success get",
-			in:   discovery,
-			out:  discovery,
+			name:                "success get",
+			in:                  discovery,
+			out:                 discovery,
+			discoverySourceName: "test",
+		},
+		{
+			name: "failed discovery source with empty name",
+			in: &configtypes.PluginDiscovery{
+				GCP: &configtypes.GCPDiscovery{
+					Name:         "",
+					Bucket:       "updated-test-bucket",
+					ManifestPath: "test-manifest-path",
+				},
+			},
+			discoverySourceName: "",
+			errStr:              "discovery source name cannot be empty",
 		},
 	}
 	for _, spec := range tests {
 		t.Run(spec.name, func(t *testing.T) {
 			err := SetCLIDiscoverySource(*spec.in)
-			assert.NoError(t, err)
-			c, err := GetCLIDiscoverySource("test")
-			assert.Equal(t, spec.out, c)
-			assert.NoError(t, err)
+			if spec.errStr != "" {
+				assert.Equal(t, spec.errStr, err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
+			c, err := GetCLIDiscoverySource(spec.discoverySourceName)
+			if spec.errStr != "" {
+				assert.Equal(t, spec.errStr, err.Error())
+			} else {
+				assert.Equal(t, spec.out, c)
+				assert.NoError(t, err)
+			}
 		})
 	}
 }
@@ -95,9 +119,10 @@ func TestSetCLIDiscoverySources(t *testing.T) {
 	}()
 
 	tests := []struct {
-		name  string
-		input []configtypes.PluginDiscovery
-		total int
+		name   string
+		input  []configtypes.PluginDiscovery
+		total  int
+		errStr string
 	}{
 		{
 			name: "success add test",
@@ -213,11 +238,29 @@ func TestSetCLIDiscoverySources(t *testing.T) {
 			},
 			total: 4,
 		},
+		{
+			name: "failed discovery source with empty name",
+			input: []configtypes.PluginDiscovery{
+				{
+					Local: &configtypes.LocalDiscovery{
+						Name: "",
+						Path: "test-path",
+					},
+				},
+			},
+			errStr: "discovery source name cannot be empty",
+			total:  4,
+		},
 	}
 	for _, spec := range tests {
 		t.Run(spec.name, func(t *testing.T) {
 			err := SetCLIDiscoverySources(spec.input)
-			assert.NoError(t, err)
+			if spec.errStr != "" {
+				assert.Equal(t, spec.errStr, err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
+
 			sources, err := GetCLIDiscoverySources()
 			assert.NoError(t, err)
 			assert.Equal(t, spec.total, len(sources))

@@ -108,10 +108,6 @@ currentContext:
             - local:
                 name: admin-local
                 path: admin
-            - gcp:
-                name: test
-                bucket: ctx-test-bucket
-                manifestPath: ctx-test-manifest-path
         repositories:
             - gcpPluginRepository:
                 name: test

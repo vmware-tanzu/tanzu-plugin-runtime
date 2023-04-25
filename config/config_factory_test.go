@@ -193,6 +193,7 @@ contexts:
 currentContext:
     kubernetes: test-mc
 `
+	//nolint:goconst
 	expectedCfgNextGen := `contexts:
     - name: test-mc
       target: kubernetes

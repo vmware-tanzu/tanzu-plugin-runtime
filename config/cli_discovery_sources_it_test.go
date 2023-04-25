@@ -74,7 +74,16 @@ currentContext:
   kubernetes: test-mc
 `
 
-	CFG2 := `contexts:
+	CFG2 := `cli:
+  discoverySources:
+    - oci:
+        name: default
+        image: "/:"
+        unknown: cli-unknown
+    - local:
+        name: admin-local
+        path: admin
+contexts:
   - name: test-mc
     target: kubernetes
     group: one
@@ -111,15 +120,12 @@ currentContext:
         discoverySources:
             - oci:
                 name: default
-                image: "default-image"
+                image: "/:"
                 unknown: cli-unknown
               contextType: k8s
             - local:
                 name: admin-local
                 path: admin
-            - oci:
-                name: new-default
-                image: new-default-image
 servers:
     - name: test-mc
       type: managementcluster
@@ -139,8 +145,19 @@ servers:
           contextType: tmc
 current: test-mc
 `
-	//nolint:goconst
-	expectedCFG2 := `contexts:
+	expectedCFG2 := `cli:
+    discoverySources:
+        - oci:
+            name: default
+            image: "default-image"
+            unknown: cli-unknown
+        - local:
+            name: admin-local
+            path: admin
+        - oci:
+            name: new-default
+            image: new-default-image
+contexts:
     - name: test-mc
       target: kubernetes
       group: one
@@ -239,39 +256,36 @@ func TestCLIDiscoverySourceIntegration(t *testing.T) {
 }
 
 func setupDataWithPatchStrategy() (string, string, string, string) {
-	cfg := `clientOptions:
-  cli:
+	cfg2 := `cli:
+  discoverySources:
+    - oci:
+        name: default
+        image: "/:"
+        unknown: cli-unknown
+        annotation: new-annotation
+      contextType: k8s
+    - local:
+        name: admin-local
+        path: admin
+`
+	expectedCfg := `{}
+`
+	expectedCfg2 := `cli:
     discoverySources:
-      - oci:
-          name: default
-          image: "/:"
-          unknown: cli-unknown
-          annotation: new-annotation
-        contextType: k8s
-      - local:
-          name: admin-local
-          path: admin
-`
-	expectedCfg := `clientOptions:
-    cli:
-        discoverySources:
-            - oci:
-                name: default
-                image: "update-default-image"
-                unknown: cli-unknown
-              contextType: k8s
-            - local:
-                name: admin-local
-                path: admin
-            - oci:
-                name: new-default
-                image: new-default-image
+        - oci:
+            name: default
+            image: "update-default-image"
+            unknown: cli-unknown
+          contextType: k8s
+        - local:
+            name: admin-local
+            path: admin
+        - oci:
+            name: new-default
+            image: new-default-image
 `
 
-	expectedCfg2 := `{}
-`
-
-	return cfg, expectedCfg, "", expectedCfg2
+	return "", expectedCfg, cfg2, expectedCfg2
 }
 
 func TestCLIDiscoverySourceIntegrationWithPatchStrategy(t *testing.T) {
@@ -279,7 +293,7 @@ func TestCLIDiscoverySourceIntegrationWithPatchStrategy(t *testing.T) {
 	cfg, expectedCfg, cfg2, expectedCfg2 := setupDataWithPatchStrategy()
 	metadata := `configMetadata:
   patchStrategy:
-    clientOptions.cli.discoverySources.oci.annotation: replace`
+    cli.discoverySources.oci.annotation: replace`
 	cfgFiles, cleanUp := setupTestConfig(t, &CfgTestData{cfg: cfg, cfgNextGen: cfg2, cfgMetadata: metadata})
 
 	defer func() {

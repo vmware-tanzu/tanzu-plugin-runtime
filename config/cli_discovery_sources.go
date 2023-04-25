@@ -111,8 +111,8 @@ func getCLIDiscoverySources(node *yaml.Node) ([]configtypes.PluginDiscovery, err
 	if err != nil {
 		return nil, err
 	}
-	if cfg.ClientOptions != nil && cfg.ClientOptions.CLI != nil && cfg.ClientOptions.CLI.DiscoverySources != nil {
-		return cfg.ClientOptions.CLI.DiscoverySources, nil
+	if cfg.CoreCliOptions != nil && cfg.CoreCliOptions.DiscoverySources != nil {
+		return cfg.CoreCliOptions.DiscoverySources, nil
 	}
 	return nil, errors.New("cli discovery sources not found")
 }
@@ -122,8 +122,8 @@ func getCLIDiscoverySource(node *yaml.Node, name string) (*configtypes.PluginDis
 	if err != nil {
 		return nil, err
 	}
-	if cfg.ClientOptions != nil && cfg.ClientOptions.CLI != nil && cfg.ClientOptions.CLI.DiscoverySources != nil {
-		for _, discoverySource := range cfg.ClientOptions.CLI.DiscoverySources {
+	if cfg.CoreCliOptions != nil && cfg.CoreCliOptions.DiscoverySources != nil {
+		for _, discoverySource := range cfg.CoreCliOptions.DiscoverySources {
 			_, discoverySourceName := getDiscoverySourceTypeAndName(discoverySource)
 			if discoverySourceName == name {
 				return &discoverySource, nil
@@ -131,17 +131,6 @@ func getCLIDiscoverySource(node *yaml.Node, name string) (*configtypes.PluginDis
 		}
 	}
 	return nil, errors.New("cli discovery source not found")
-}
-
-// setCLIDiscoverySources Add/Update array of cli discovery sources to the yaml node
-func setCLIDiscoverySources(node *yaml.Node, discoverySources []configtypes.PluginDiscovery) (err error) {
-	for _, discoverySource := range discoverySources {
-		_, err = setCLIDiscoverySource(node, discoverySource)
-		if err != nil {
-			return err
-		}
-	}
-	return err
 }
 
 // setCLIDiscoverySource Add/Update cli discovery source in the yaml node
@@ -154,7 +143,6 @@ func setCLIDiscoverySource(node *yaml.Node, discoverySource configtypes.PluginDi
 
 	// Find the cli discovery sources node
 	keys := []nodeutils.Key{
-		{Name: KeyClientOptions, Type: yaml.MappingNode},
 		{Name: KeyCLI, Type: yaml.MappingNode},
 		{Name: KeyDiscoverySources, Type: yaml.SequenceNode},
 	}
@@ -164,14 +152,13 @@ func setCLIDiscoverySource(node *yaml.Node, discoverySource configtypes.PluginDi
 	}
 
 	// Add or Update cli discovery source to discovery sources node based on patch strategy
-	key := fmt.Sprintf("%v.%v.%v", KeyClientOptions, KeyCLI, KeyDiscoverySources)
+	key := fmt.Sprintf("%v.%v", KeyCLI, KeyDiscoverySources)
 	return setDiscoverySource(discoverySourcesNode, discoverySource, nodeutils.WithPatchStrategyKey(key), nodeutils.WithPatchStrategies(patchStrategies))
 }
 
 func deleteCLIDiscoverySource(node *yaml.Node, name string) error {
 	// Find cli discovery sources node in the yaml node
 	keys := []nodeutils.Key{
-		{Name: KeyClientOptions},
 		{Name: KeyCLI},
 		{Name: KeyDiscoverySources},
 	}

@@ -105,10 +105,6 @@ func clientConfigSetCLI(cfg *configtypes.ClientConfig, node *yaml.Node) (err err
 		if err != nil {
 			return err
 		}
-		err = clientConfigSetCLIDiscoverySources(cfg, node)
-		if err != nil {
-			return err
-		}
 		if cfg.ClientOptions.CLI.UnstableVersionSelector != "" {
 			setUnstableVersionSelector(node, string(cfg.ClientOptions.CLI.UnstableVersionSelector))
 		}
@@ -120,16 +116,6 @@ func clientConfigSetCLI(cfg *configtypes.ClientConfig, node *yaml.Node) (err err
 		}
 		if cfg.ClientOptions.CLI.CompatibilityFilePath != "" {
 			setCompatibilityFilePath(node, cfg.ClientOptions.CLI.CompatibilityFilePath)
-		}
-	}
-	return nil
-}
-
-func clientConfigSetCLIDiscoverySources(cfg *configtypes.ClientConfig, node *yaml.Node) error {
-	if cfg.ClientOptions.CLI.DiscoverySources != nil && len(cfg.ClientOptions.CLI.DiscoverySources) != 0 {
-		err := setCLIDiscoverySources(node, cfg.ClientOptions.CLI.DiscoverySources)
-		if err != nil {
-			return err
 		}
 	}
 	return nil

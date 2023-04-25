@@ -3,9 +3,6 @@ name: Cross-version API Compatibility Tests
 on:
   pull_request:
     branches: [main, release-*]
-    paths:
-      - "*"
-
   push:
     branches: [main, release-*]
 

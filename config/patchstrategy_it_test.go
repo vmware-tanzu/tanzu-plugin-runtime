@@ -13,28 +13,7 @@ import (
 )
 
 func setupConfigData() (string, string, string, string) {
-	cfg := `clientOptions:
-  cli:
-    discoverySources:
-      - gcp:
-          name: test
-          bucket: test-bucket
-          manifestPath: test-manifest-path
-          annotation: one
-          required: true
-      - gcp:
-          name: test2
-          bucket: test-bucket2
-          manifestPath: test-manifest-path2
-          annotation: one
-          required: true
-      - local:
-          name: test-local
-          bucket: test-bucket2
-          manifestPath: test-manifest-path2
-          annotation: one
-          required: true
-servers:
+	cfg := `servers:
   - name: test-mc
     type: managementcluster
     managementClusterOpts:
@@ -60,24 +39,7 @@ contexts:
 currentContext:
   kubernetes: test-mc
 `
-	expectedCfg := `clientOptions:
-    cli:
-        discoverySources:
-            - gcp:
-                name: test
-                bucket: updated-test-bucket
-                manifestPath: updated-test-manifest-path
-                annotation: one
-            - gcp:
-                name: test2
-                bucket: test-bucket2
-                manifestPath: test-manifest-path2
-                annotation: one
-                required: true
-            - oci:
-                name: test-local
-                image: test-local-image-path
-servers:
+	expectedCfg := `servers:
     - name: test-mc
       type: managementcluster
       managementClusterOpts:
@@ -89,7 +51,25 @@ servers:
 current: test-mc
 `
 
-	cfg2 := `contexts:
+	cfg2 := `cli:
+  discoverySources:
+    - oci:
+        name: test
+        image: image
+        annotation: one
+        required: true
+    - oci:
+        name: test2
+        image: image2
+        annotation: one
+        required: true
+    - local:
+        name: test-local
+        bucket: test-bucket2
+        manifestPath: test-manifest-path2
+        annotation: one
+        required: true
+contexts:
   - name: test-mc
     target: kubernetes
     group: one
@@ -105,7 +85,21 @@ current: test-mc
 currentContext:
     kubernetes: test-mc
 `
-	expectedCfg2 := `contexts:
+	expectedCfg2 := `cli:
+    discoverySources:
+        - oci:
+            name: test
+            image: image
+            annotation: one
+        - oci:
+            name: test2
+            image: image2
+            annotation: one
+            required: true
+        - oci:
+            name: test-local
+            image: test-local-image-path
+contexts:
     - name: test-mc
       target: kubernetes
       group: one
@@ -130,7 +124,7 @@ func setupConfigMetadata() string {
     contexts.group: replace
     contexts.clusterOpts.endpoint: replace
     contexts.clusterOpts.annotation: replace
-    clientOptions.cli.discoverySources.gcp.required: replace
+    cli.discoverySources.oci.required: replace
 `
 	return metadata
 }
@@ -149,17 +143,15 @@ func TestIntegrationWithReplacePatchStrategy(t *testing.T) {
 	// Get CLI discovery sources
 	expectedSources := []configtypes.PluginDiscovery{
 		{
-			GCP: &configtypes.GCPDiscovery{
-				Name:         "test",
-				Bucket:       "test-bucket",
-				ManifestPath: "test-manifest-path",
+			OCI: &configtypes.OCIDiscovery{
+				Name:  "test",
+				Image: "image",
 			},
 		},
 		{
-			GCP: &configtypes.GCPDiscovery{
-				Name:         "test2",
-				Bucket:       "test-bucket2",
-				ManifestPath: "test-manifest-path2",
+			OCI: &configtypes.OCIDiscovery{
+				Name:  "test2",
+				Image: "image2",
 			},
 		},
 		{
@@ -175,10 +167,9 @@ func TestIntegrationWithReplacePatchStrategy(t *testing.T) {
 
 	// Get CLI Discovery Source
 	expectedSource := &configtypes.PluginDiscovery{
-		GCP: &configtypes.GCPDiscovery{
-			Name:         "test",
-			Bucket:       "test-bucket",
-			ManifestPath: "test-manifest-path",
+		OCI: &configtypes.OCIDiscovery{
+			Name:  "test",
+			Image: "image",
 		},
 	}
 
@@ -189,10 +180,9 @@ func TestIntegrationWithReplacePatchStrategy(t *testing.T) {
 	// Update CLI discovery sources
 	updatedSources := []configtypes.PluginDiscovery{
 		{
-			GCP: &configtypes.GCPDiscovery{
-				Name:         "test",
-				Bucket:       "updated-test-bucket",
-				ManifestPath: "updated-test-manifest-path",
+			OCI: &configtypes.OCIDiscovery{
+				Name:  "test",
+				Image: "image",
 			},
 		},
 		{

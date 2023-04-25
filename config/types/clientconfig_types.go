@@ -67,6 +67,7 @@ type Context struct {
 
 	// DiscoverySources determines from where to discover plugins
 	// associated with this context.
+	// Deprecated: This field is deprecated.  It is currently no used.
 	DiscoverySources []PluginDiscovery `json:"discoverySources,omitempty" yaml:"discoverySources,omitempty"`
 }
 
@@ -156,6 +157,7 @@ type CLIOptions struct {
 	// Deprecated: Repositories has been deprecated and will be removed from future version
 	Repositories []PluginRepository `json:"repositories,omitempty" yaml:"repositories,omitempty"`
 	// DiscoverySources determines from where to discover stand-alone plugins
+	// Deprecated: DiscoverySources has been deprecated and will be removed in a future version
 	DiscoverySources []PluginDiscovery `json:"discoverySources,omitempty" yaml:"discoverySources,omitempty"`
 	// UnstableVersionSelector determined which version tags are allowed
 	//
@@ -286,6 +288,8 @@ type GCPPluginRepository struct {
 type CoreCliOptions struct {
 	// CEIPOptIn is the users CEIP opt-in/opt-out status.
 	CEIPOptIn string `json:"ceipOptIn,omitempty" yaml:"ceipOptIn,omitempty"`
+	// DiscoverySources determine where to discover plugins
+	DiscoverySources []PluginDiscovery `json:"discoverySources,omitempty" yaml:"discoverySources,omitempty"`
 }
 
 // ClientConfig is the Schema for the configs API

@@ -19,43 +19,29 @@ func TestGetCLIDiscoverySources(t *testing.T) {
 		cleanUp()
 	}()
 
+	discoveries := []configtypes.PluginDiscovery{
+		{
+			OCI: &configtypes.OCIDiscovery{
+				Name:  "test",
+				Image: "image",
+			},
+		},
+	}
+
 	tests := []struct {
-		name   string
-		in     *configtypes.ClientConfig
-		out    []configtypes.PluginDiscovery
-		errStr string
+		name    string
+		in, out []configtypes.PluginDiscovery
+		errStr  string
 	}{
 		{
 			name: "success get all",
-			in: &configtypes.ClientConfig{
-				ClientOptions: &configtypes.ClientOptions{
-					CLI: &configtypes.CLIOptions{
-						DiscoverySources: []configtypes.PluginDiscovery{
-							{
-								GCP: &configtypes.GCPDiscovery{
-									Name:         "test",
-									Bucket:       "updated-test-bucket",
-									ManifestPath: "test-manifest-path",
-								},
-							},
-						},
-					},
-				},
-			},
-			out: []configtypes.PluginDiscovery{
-				{
-					GCP: &configtypes.GCPDiscovery{
-						Name:         "test",
-						Bucket:       "updated-test-bucket",
-						ManifestPath: "test-manifest-path",
-					},
-				},
-			},
+			in:   discoveries,
+			out:  discoveries,
 		},
 	}
 	for _, spec := range tests {
 		t.Run(spec.name, func(t *testing.T) {
-			err := StoreClientConfig(spec.in)
+			err := SetCLIDiscoverySources(spec.in)
 			assert.NoError(t, err)
 			c, err := GetCLIDiscoverySources()
 			assert.Equal(t, spec.out, c)
@@ -72,40 +58,26 @@ func TestGetCLIDiscoverySource(t *testing.T) {
 		cleanUp()
 	}()
 
+	discovery := &configtypes.PluginDiscovery{
+		OCI: &configtypes.OCIDiscovery{
+			Name:  "test",
+			Image: "image",
+		},
+	}
+
 	tests := []struct {
-		name string
-		in   *configtypes.ClientConfig
-		out  *configtypes.PluginDiscovery
+		name    string
+		in, out *configtypes.PluginDiscovery
 	}{
 		{
 			name: "success get",
-			in: &configtypes.ClientConfig{
-				ClientOptions: &configtypes.ClientOptions{
-					CLI: &configtypes.CLIOptions{
-						DiscoverySources: []configtypes.PluginDiscovery{
-							{
-								GCP: &configtypes.GCPDiscovery{
-									Name:         "test",
-									Bucket:       "updated-test-bucket",
-									ManifestPath: "test-manifest-path",
-								},
-							},
-						},
-					},
-				},
-			},
-			out: &configtypes.PluginDiscovery{
-				GCP: &configtypes.GCPDiscovery{
-					Name:         "test",
-					Bucket:       "updated-test-bucket",
-					ManifestPath: "test-manifest-path",
-				},
-			},
+			in:   discovery,
+			out:  discovery,
 		},
 	}
 	for _, spec := range tests {
 		t.Run(spec.name, func(t *testing.T) {
-			err := StoreClientConfig(spec.in)
+			err := SetCLIDiscoverySource(*spec.in)
 			assert.NoError(t, err)
 			c, err := GetCLIDiscoverySource("test")
 			assert.Equal(t, spec.out, c)
@@ -131,10 +103,9 @@ func TestSetCLIDiscoverySources(t *testing.T) {
 			name: "success add test",
 			input: []configtypes.PluginDiscovery{
 				{
-					GCP: &configtypes.GCPDiscovery{
-						Name:         "test",
-						Bucket:       "test-bucket",
-						ManifestPath: "test-manifest-path",
+					OCI: &configtypes.OCIDiscovery{
+						Name:  "test",
+						Image: "image",
 					},
 				},
 				{
@@ -174,10 +145,9 @@ func TestSetCLIDiscoverySources(t *testing.T) {
 			name: "success update test",
 			input: []configtypes.PluginDiscovery{
 				{
-					GCP: &configtypes.GCPDiscovery{
-						Name:         "test",
-						Bucket:       "test-updated-bucket",
-						ManifestPath: "test-updated-manifest-path",
+					OCI: &configtypes.OCIDiscovery{
+						Name:  "test",
+						Image: "updatedImage",
 					},
 				},
 			},
@@ -187,36 +157,33 @@ func TestSetCLIDiscoverySources(t *testing.T) {
 			name: "should not persist same test",
 			input: []configtypes.PluginDiscovery{
 				{
-					GCP: &configtypes.GCPDiscovery{
-						Name:         "test",
-						Bucket:       "test-updated-bucket",
-						ManifestPath: "test-updated-manifest-path",
+					OCI: &configtypes.OCIDiscovery{
+						Name:  "test",
+						Image: "updatedImage",
 					},
 				},
 			},
 			total: 3,
 		},
 		{
-			name: "success add default gcp",
+			name: "success add default oci",
 			input: []configtypes.PluginDiscovery{
 				{
-					GCP: &configtypes.GCPDiscovery{
-						Name:         "default",
-						Bucket:       "test-bucket",
-						ManifestPath: "test-manifest-path",
+					OCI: &configtypes.OCIDiscovery{
+						Name:  "default",
+						Image: "image",
 					},
 				},
 			},
 			total: 3,
 		},
 		{
-			name: "success add default-local gcp",
+			name: "success add default-local oci",
 			input: []configtypes.PluginDiscovery{
 				{
-					GCP: &configtypes.GCPDiscovery{
-						Name:         "default-local",
-						Bucket:       "test-bucket",
-						ManifestPath: "test-manifest-path",
+					OCI: &configtypes.OCIDiscovery{
+						Name:  "default-local",
+						Image: "localImage",
 					},
 				},
 			},
@@ -268,45 +235,32 @@ func TestDeleteCLIDiscoverySource(t *testing.T) {
 
 	tests := []struct {
 		name   string
-		src    *configtypes.ClientConfig
+		src    []configtypes.PluginDiscovery
 		input  string
 		count  int
 		errStr string
-	}{{
-		name: "should return err on deleting non existing source",
-		src: &configtypes.ClientConfig{
-			ClientOptions: &configtypes.ClientOptions{
-				CLI: &configtypes.CLIOptions{
-					DiscoverySources: []configtypes.PluginDiscovery{
-						{
-							GCP: &configtypes.GCPDiscovery{
-								Name:         "test",
-								Bucket:       "test-bucket",
-								ManifestPath: "test-manifest-path",
-							},
-						},
+	}{
+		{
+			name: "should return err on deleting non existing source",
+			src: []configtypes.PluginDiscovery{
+				{
+					OCI: &configtypes.OCIDiscovery{
+						Name:  "test",
+						Image: "image",
 					},
 				},
 			},
+			input:  "test-notfound",
+			count:  1,
+			errStr: "cli discovery source not found",
 		},
-		input:  "test-notfound",
-		count:  1,
-		errStr: "cli discovery source not found",
-	},
 		{
 			name: "should delete existing test source",
-			src: &configtypes.ClientConfig{
-				ClientOptions: &configtypes.ClientOptions{
-					CLI: &configtypes.CLIOptions{
-						DiscoverySources: []configtypes.PluginDiscovery{
-							{
-								GCP: &configtypes.GCPDiscovery{
-									Name:         "test",
-									Bucket:       "test-bucket",
-									ManifestPath: "test-manifest-path",
-								},
-							},
-						},
+			src: []configtypes.PluginDiscovery{
+				{
+					OCI: &configtypes.OCIDiscovery{
+						Name:  "test",
+						Image: "image",
 					},
 				},
 			},
@@ -315,25 +269,17 @@ func TestDeleteCLIDiscoverySource(t *testing.T) {
 		},
 		{
 			name: "should delete test2 source",
-			src: &configtypes.ClientConfig{
-				ClientOptions: &configtypes.ClientOptions{
-					CLI: &configtypes.CLIOptions{
-						DiscoverySources: []configtypes.PluginDiscovery{
-							{
-								GCP: &configtypes.GCPDiscovery{
-									Name:         "test",
-									Bucket:       "test-bucket",
-									ManifestPath: "test-manifest-path",
-								},
-							},
-							{
-								GCP: &configtypes.GCPDiscovery{
-									Name:         "test2",
-									Bucket:       "test-bucket2",
-									ManifestPath: "test-manifest-path2",
-								},
-							},
-						},
+			src: []configtypes.PluginDiscovery{
+				{
+					OCI: &configtypes.OCIDiscovery{
+						Name:  "test",
+						Image: "image",
+					},
+				},
+				{
+					OCI: &configtypes.OCIDiscovery{
+						Name:  "test2",
+						Image: "image2",
 					},
 				},
 			},
@@ -342,30 +288,23 @@ func TestDeleteCLIDiscoverySource(t *testing.T) {
 		},
 		{
 			name: "should delete local default source",
-			src: &configtypes.ClientConfig{
-				ClientOptions: &configtypes.ClientOptions{
-					CLI: &configtypes.CLIOptions{
-						DiscoverySources: []configtypes.PluginDiscovery{
-							{
-								GCP: &configtypes.GCPDiscovery{
-									Name:         "test",
-									Bucket:       "test-bucket",
-									ManifestPath: "test-manifest-path",
-								},
-							},
-							{
-								Local: &configtypes.LocalDiscovery{
-									Name: "default",
-									Path: "standalone",
-								},
-							},
-							{
-								Local: &configtypes.LocalDiscovery{
-									Name: "admin-local",
-									Path: "admin",
-								},
-							},
-						},
+			src: []configtypes.PluginDiscovery{
+				{
+					OCI: &configtypes.OCIDiscovery{
+						Name:  "test",
+						Image: "image",
+					},
+				},
+				{
+					Local: &configtypes.LocalDiscovery{
+						Name: "default",
+						Path: "standalone",
+					},
+				},
+				{
+					Local: &configtypes.LocalDiscovery{
+						Name: "admin-local",
+						Path: "admin",
 					},
 				},
 			},
@@ -375,7 +314,7 @@ func TestDeleteCLIDiscoverySource(t *testing.T) {
 	}
 	for _, spec := range tests {
 		t.Run(spec.name, func(t *testing.T) {
-			err := StoreClientConfig(spec.src)
+			err := SetCLIDiscoverySources(spec.src)
 			assert.NoError(t, err)
 			err = DeleteCLIDiscoverySource(spec.input)
 			if spec.errStr != "" {
@@ -400,10 +339,9 @@ func TestIntegrationSetGetDeleteCLIDiscoverySource(t *testing.T) {
 
 	sources := []configtypes.PluginDiscovery{
 		{
-			GCP: &configtypes.GCPDiscovery{
-				Name:         "default",
-				Bucket:       "test-bucket",
-				ManifestPath: "test-manifest-path",
+			OCI: &configtypes.OCIDiscovery{
+				Name:  "default",
+				Image: "image",
 			},
 		},
 	}
@@ -449,11 +387,6 @@ func TestSetCLIDiscoverySourceLocalMulti(t *testing.T) {
 		cleanUp()
 	}()
 
-	src := &configtypes.ClientConfig{
-		ClientOptions: &configtypes.ClientOptions{
-			CLI: &configtypes.CLIOptions{},
-		},
-	}
 	input := configtypes.PluginDiscovery{
 		Local: &configtypes.LocalDiscovery{
 			Name: "admin-local",
@@ -474,9 +407,7 @@ func TestSetCLIDiscoverySourceLocalMulti(t *testing.T) {
 	}
 
 	// Actions
-	err := StoreClientConfig(src)
-	assert.NoError(t, err)
-	err = SetCLIDiscoverySource(input)
+	err := SetCLIDiscoverySource(input)
 	assert.NoError(t, err)
 	c, err := GetCLIDiscoverySource("admin-local")
 	assert.Equal(t, input.Local, c.Local)
@@ -511,10 +442,9 @@ func TestSetCLIDiscoverySourceWithDefaultAndDefaultLocal(t *testing.T) {
 			name: "success add default-test source",
 			input: []configtypes.PluginDiscovery{
 				{
-					GCP: &configtypes.GCPDiscovery{
-						Name:         "default-test",
-						Bucket:       "default-test-bucket",
-						ManifestPath: "default-test-manifest-path",
+					OCI: &configtypes.OCIDiscovery{
+						Name:  "default-test",
+						Image: "image",
 					},
 				},
 			},
@@ -524,10 +454,9 @@ func TestSetCLIDiscoverySourceWithDefaultAndDefaultLocal(t *testing.T) {
 			name: "success add default source",
 			input: []configtypes.PluginDiscovery{
 				{
-					GCP: &configtypes.GCPDiscovery{
-						Name:         "default",
-						Bucket:       "default-test-bucket",
-						ManifestPath: "default-test-manifest-path",
+					OCI: &configtypes.OCIDiscovery{
+						Name:  "default",
+						Image: "image",
 					},
 				},
 			},
@@ -537,10 +466,9 @@ func TestSetCLIDiscoverySourceWithDefaultAndDefaultLocal(t *testing.T) {
 			name: "success add default-local source",
 			input: []configtypes.PluginDiscovery{
 				{
-					GCP: &configtypes.GCPDiscovery{
-						Name:         "default-local",
-						Bucket:       "test-bucket",
-						ManifestPath: "test-manifest-path",
+					OCI: &configtypes.OCIDiscovery{
+						Name:  "default-local",
+						Image: "image",
 					},
 				},
 			},
@@ -551,10 +479,9 @@ func TestSetCLIDiscoverySourceWithDefaultAndDefaultLocal(t *testing.T) {
 			name: "success update default",
 			input: []configtypes.PluginDiscovery{
 				{
-					GCP: &configtypes.GCPDiscovery{
-						Name:         "default",
-						Bucket:       "default-test-bucket-updated",
-						ManifestPath: "default-test-manifest-path-updated",
+					OCI: &configtypes.OCIDiscovery{
+						Name:  "default",
+						Image: "updatedImage",
 					},
 				},
 			},
@@ -565,10 +492,9 @@ func TestSetCLIDiscoverySourceWithDefaultAndDefaultLocal(t *testing.T) {
 			name: "success update default-local",
 			input: []configtypes.PluginDiscovery{
 				{
-					GCP: &configtypes.GCPDiscovery{
-						Name:         "default-local",
-						Bucket:       "default-test-bucket-updated",
-						ManifestPath: "default-test-manifest-path-updated",
+					OCI: &configtypes.OCIDiscovery{
+						Name:  "default-local",
+						Image: "updatedImage",
 					},
 				},
 			},
@@ -579,10 +505,9 @@ func TestSetCLIDiscoverySourceWithDefaultAndDefaultLocal(t *testing.T) {
 			name: "success add default",
 			input: []configtypes.PluginDiscovery{
 				{
-					GCP: &configtypes.GCPDiscovery{
-						Name:         "default",
-						Bucket:       "default-test-bucket-updated",
-						ManifestPath: "default-test-manifest-path-updated",
+					OCI: &configtypes.OCIDiscovery{
+						Name:  "default",
+						Image: "updatedImage",
 					},
 				},
 				{
@@ -598,17 +523,15 @@ func TestSetCLIDiscoverySourceWithDefaultAndDefaultLocal(t *testing.T) {
 					},
 				},
 				{
-					GCP: &configtypes.GCPDiscovery{
-						Name:         "default",
-						Bucket:       "default-test-bucket-updated2",
-						ManifestPath: "default-test-manifest-path-updated2",
+					OCI: &configtypes.OCIDiscovery{
+						Name:  "default",
+						Image: "updatedImage2",
 					},
 				},
 				{
-					GCP: &configtypes.GCPDiscovery{
-						Name:         "test-gcp1",
-						Bucket:       "test-bucket-updated",
-						ManifestPath: "test-manifest-path-updated",
+					OCI: &configtypes.OCIDiscovery{
+						Name:  "test-oci1",
+						Image: "updatedImage",
 					},
 				},
 				{
@@ -619,7 +542,7 @@ func TestSetCLIDiscoverySourceWithDefaultAndDefaultLocal(t *testing.T) {
 				},
 				{
 					Local: &configtypes.LocalDiscovery{
-						Name: "test-gcp1",
+						Name: "test-oci1",
 						Path: "default-local-path",
 					},
 				},
@@ -661,10 +584,9 @@ func TestSetCLIDiscoverySourceMultiTypes(t *testing.T) {
 			name: "success add multiple discovery source types",
 			input: []configtypes.PluginDiscovery{
 				{
-					GCP: &configtypes.GCPDiscovery{
-						Name:         "default",
-						Bucket:       "default-test-bucket-updated",
-						ManifestPath: "default-test-manifest-path-updated",
+					OCI: &configtypes.OCIDiscovery{
+						Name:  "default",
+						Image: "defaultImage",
 					},
 				},
 				{
@@ -680,17 +602,15 @@ func TestSetCLIDiscoverySourceMultiTypes(t *testing.T) {
 					},
 				},
 				{
-					GCP: &configtypes.GCPDiscovery{
-						Name:         "default",
-						Bucket:       "default-test-bucket-updated2",
-						ManifestPath: "default-test-manifest-path-updated2",
+					OCI: &configtypes.OCIDiscovery{
+						Name:  "default",
+						Image: "defaultImage2",
 					},
 				},
 				{
-					GCP: &configtypes.GCPDiscovery{
-						Name:         "test-gcp1",
-						Bucket:       "test-bucket-updated",
-						ManifestPath: "test-manifest-path-updated",
+					OCI: &configtypes.OCIDiscovery{
+						Name:  "test-oci1",
+						Image: "updatedImage",
 					},
 				},
 				{
@@ -701,15 +621,14 @@ func TestSetCLIDiscoverySourceMultiTypes(t *testing.T) {
 				},
 				{
 					Local: &configtypes.LocalDiscovery{
-						Name: "test-gcp1",
+						Name: "test-oci1",
 						Path: "default-local-path",
 					},
 				},
 				{
-					GCP: &configtypes.GCPDiscovery{
-						Name:         "test-gcp2",
-						Bucket:       "test-bucket-updated",
-						ManifestPath: "test-manifest-path-updated",
+					OCI: &configtypes.OCIDiscovery{
+						Name:  "test-oci2",
+						Image: "updatedImage",
 					},
 				},
 			},

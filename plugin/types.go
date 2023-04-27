@@ -101,4 +101,7 @@ type PluginDescriptor struct {
 
 	// PostInstallHook is function to be run post install of a plugin.
 	PostInstallHook Hook `json:"-" yaml:"-"`
+
+	// DefaultFeatureFlags is default featureflags to be configured if missing when invoking plugin
+	DefaultFeatureFlags map[string]bool `json:"defaultFeatureFlags,omitempty" yaml:"defaultFeatureFlags,omitempty"`
 }

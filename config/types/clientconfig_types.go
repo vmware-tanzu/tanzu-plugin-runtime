@@ -294,8 +294,8 @@ type CoreCliOptions struct {
 
 // Cert provides a certificate configuration for an endpoint
 type Cert struct {
-	// Host is the host name/ip for which the certificate configuration is applicable
-	HostName string `json:"hostName,omitempty" yaml:"hostName,omitempty"`
+	// Host is the host(or ipaddress) or host:port for which the certificate configuration is applicable
+	Host string `json:"host,omitempty" yaml:"host,omitempty"`
 	// CACertData is the CA certificate for the host
 	CACertData string `json:"caCertData,omitempty" yaml:"caCertData,omitempty"`
 	// Insecure is to allow insecure connections with host
@@ -329,7 +329,7 @@ type ClientConfig struct {
 	// that goes into nextgen configuration file.
 	CoreCliOptions *CoreCliOptions `json:"cli,omitempty" yaml:"cli,omitempty"`
 
-	// Certs is the collection of hostname, and it's certificate data used to communicate with the host
+	// Certs is the collection of host, and its certificate data used to communicate with the host
 	Certs []*Cert `json:"certs,omitempty" yaml:"certs,omitempty"`
 }
 

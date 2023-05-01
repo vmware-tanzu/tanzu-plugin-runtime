@@ -25,17 +25,17 @@ func GetCerts() ([]*configtypes.Cert, error) {
 	return getCerts(node)
 }
 
-// GetCert retrieves the cert configuration by hostname
-func GetCert(hostName string) (*configtypes.Cert, error) {
-	if hostName == "" {
-		return nil, errors.New("hostname is empty")
+// GetCert retrieves the cert configuration by host
+func GetCert(host string) (*configtypes.Cert, error) {
+	if host == "" {
+		return nil, errors.New("host is empty")
 	}
 	// Retrieve client config node
 	node, err := getClientConfigNode()
 	if err != nil {
 		return nil, err
 	}
-	return getCert(node, hostName)
+	return getCert(node, host)
 }
 
 // SetCert add or update cert configuration
@@ -43,8 +43,8 @@ func SetCert(c *configtypes.Cert) error {
 	if c == nil {
 		return nil
 	}
-	if c.HostName == "" {
-		return errors.New("hostname is empty")
+	if c.Host == "" {
+		return errors.New("host is empty")
 	}
 	// Retrieve client config node
 	AcquireTanzuConfigLock()
@@ -67,10 +67,10 @@ func SetCert(c *configtypes.Cert) error {
 	return err
 }
 
-// DeleteCert delete a cert configuration by hostname
-func DeleteCert(hostName string) error {
-	if hostName == "" {
-		return errors.New("hostname is empty")
+// DeleteCert delete a cert configuration by host
+func DeleteCert(host string) error {
+	if host == "" {
+		return errors.New("host is empty")
 	}
 	// Retrieve client config node
 	AcquireTanzuConfigLock()
@@ -79,23 +79,23 @@ func DeleteCert(hostName string) error {
 	if err != nil {
 		return err
 	}
-	_, err = getCert(node, hostName)
+	_, err = getCert(node, host)
 	if err != nil {
 		return err
 	}
-	err = removeCert(node, hostName)
+	err = removeCert(node, host)
 	if err != nil {
 		return err
 	}
 	return persistConfig(node)
 }
 
-// CertExists checks if cert config by hostname already exists
-func CertExists(hostName string) (bool, error) {
-	if hostName == "" {
-		return false, errors.New("hostname is empty")
+// CertExists checks if cert config by host already exists
+func CertExists(host string) (bool, error) {
+	if host == "" {
+		return false, errors.New("host is empty")
 	}
-	exists, _ := GetCert(hostName)
+	exists, _ := GetCert(host)
 	return exists != nil, nil
 }
 
@@ -112,18 +112,18 @@ func getCerts(node *yaml.Node) ([]*configtypes.Cert, error) {
 	return make([]*configtypes.Cert, 0), nil
 }
 
-// Pre-reqs: node != nil and hostName != ""
-func getCert(node *yaml.Node, hostName string) (*configtypes.Cert, error) {
+// Pre-reqs: node != nil and host != ""
+func getCert(node *yaml.Node, host string) (*configtypes.Cert, error) {
 	cfg, err := convertNodeToClientConfig(node)
 	if err != nil {
 		return nil, err
 	}
 	for _, cert := range cfg.Certs {
-		if cert.HostName == hostName {
+		if cert.Host == host {
 			return cert, nil
 		}
 	}
-	return nil, fmt.Errorf("cert configuration for %v not found", hostName)
+	return nil, fmt.Errorf("cert configuration for %v not found", host)
 }
 
 // Pre-reqs: node != nil and cert != nil
@@ -153,8 +153,8 @@ func setCert(node *yaml.Node, cert *configtypes.Cert) (persist bool, err error) 
 	var result []*yaml.Node
 	// Skip duplicate for cert
 	for _, certNode := range certsNode.Content {
-		if index := nodeutils.GetNodeIndex(certNode.Content, "hostName"); index != -1 &&
-			certNode.Content[index].Value == cert.HostName {
+		if index := nodeutils.GetNodeIndex(certNode.Content, "host"); index != -1 &&
+			certNode.Content[index].Value == cert.Host {
 			exists = true
 			// replace the nodes as per patch strategy
 			_, err = nodeutils.DeleteNodes(newCertNode.Content[0], certNode, nodeutils.WithPatchStrategyKey(KeyCerts), nodeutils.WithPatchStrategies(patchStrategies))
@@ -179,7 +179,7 @@ func setCert(node *yaml.Node, cert *configtypes.Cert) (persist bool, err error) 
 }
 
 //nolint:dupl
-func removeCert(node *yaml.Node, hostName string) error {
+func removeCert(node *yaml.Node, host string) error {
 	// Find the certs node in the yaml node
 	keys := []nodeutils.Key{
 		{Name: KeyCerts},
@@ -190,7 +190,7 @@ func removeCert(node *yaml.Node, hostName string) error {
 	}
 	var certs []*yaml.Node
 	for _, certNode := range certsNode.Content {
-		if index := nodeutils.GetNodeIndex(certNode.Content, "hostName"); index != -1 && certNode.Content[index].Value == hostName {
+		if index := nodeutils.GetNodeIndex(certNode.Content, "host"); index != -1 && certNode.Content[index].Value == host {
 			continue
 		}
 		certs = append(certs, certNode)

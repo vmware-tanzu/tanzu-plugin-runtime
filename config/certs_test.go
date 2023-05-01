@@ -20,13 +20,13 @@ func TestSetGetDeleteCerts(t *testing.T) {
 	}()
 
 	cert1 := &configtypes.Cert{
-		HostName:       "test1",
+		Host:           "test1",
 		CACertData:     "<REDACTED>",
 		SkipCertVerify: "false",
 	}
 
 	cert2 := &configtypes.Cert{
-		HostName:       "test2",
+		Host:           "test2",
 		CACertData:     "<REDACTED>",
 		SkipCertVerify: "true",
 		Insecure:       "false",
@@ -51,13 +51,13 @@ func TestSetGetDeleteCerts(t *testing.T) {
 	assert.Equal(t, cert2, ctx)
 
 	_, err = GetCert("")
-	assert.Equal(t, "hostname is empty", err.Error())
+	assert.Equal(t, "host is empty", err.Error())
 
 	err = DeleteCert("test")
 	assert.Equal(t, "cert configuration for test not found", err.Error())
 
 	err = DeleteCert("")
-	assert.Equal(t, "hostname is empty", err.Error())
+	assert.Equal(t, "host is empty", err.Error())
 
 	err = DeleteCert("test1")
 	assert.Nil(t, err)
@@ -83,7 +83,7 @@ func TestSetCert(t *testing.T) {
 		{
 			name: "should add new cert to empty client config",
 			cert: &configtypes.Cert{
-				HostName:       "test.vmware.com",
+				Host:           "test.vmware.com",
 				CACertData:     "testCAData",
 				SkipCertVerify: "true",
 				Insecure:       "true",
@@ -92,7 +92,7 @@ func TestSetCert(t *testing.T) {
 		{
 			name: "should update existing cert",
 			cert: &configtypes.Cert{
-				HostName:       "test.vmware.com",
+				Host:           "test.vmware.com",
 				CACertData:     "testCADataUpdated",
 				Insecure:       "false",
 				SkipCertVerify: "false",
@@ -101,7 +101,7 @@ func TestSetCert(t *testing.T) {
 		{
 			name: "should update existing cert with SkipCertVerify and Insecure field",
 			cert: &configtypes.Cert{
-				HostName:       "test.vmware.com",
+				Host:           "test.vmware.com",
 				CACertData:     "testCADataUpdated",
 				SkipCertVerify: "true",
 				Insecure:       "true",
@@ -110,21 +110,21 @@ func TestSetCert(t *testing.T) {
 		{
 			name: "should add the new cert to the existing certs",
 			cert: &configtypes.Cert{
-				HostName:       "test.vmware.com:443",
+				Host:           "test.vmware.com:443",
 				CACertData:     "testCAData2",
 				SkipCertVerify: "true",
 				Insecure:       "false",
 			},
 		},
 		{
-			name: "should return error when the hostname is empty",
+			name: "should return error when the host is empty",
 			cert: &configtypes.Cert{
-				HostName:       "",
+				Host:           "",
 				CACertData:     "testCAData2",
 				SkipCertVerify: "true",
 				Insecure:       "false",
 			},
-			errStr: "hostname is empty",
+			errStr: "host is empty",
 		},
 		{
 			name: "should not return error when the cert is nil",
@@ -142,7 +142,7 @@ func TestSetCert(t *testing.T) {
 			}
 			// if cert is not nil, validate with GetCert
 			if tc.cert != nil {
-				ok, err := CertExists(tc.cert.HostName)
+				ok, err := CertExists(tc.cert.Host)
 				if tc.errStr == "" {
 					assert.True(t, ok)
 					assert.NoError(t, err)
@@ -150,7 +150,7 @@ func TestSetCert(t *testing.T) {
 					assert.EqualError(t, err, tc.errStr)
 				}
 
-				gotCert, err := GetCert(tc.cert.HostName)
+				gotCert, err := GetCert(tc.cert.Host)
 				if tc.errStr == "" {
 					assert.NoError(t, err)
 					assert.Equal(t, tc.cert, gotCert)
@@ -184,13 +184,13 @@ func TestGetCerts(t *testing.T) {
 		{
 			name: "should return the cert added",
 			cert: &configtypes.Cert{
-				HostName:   "test.vmware.com",
+				Host:       "test.vmware.com",
 				CACertData: "testCAData",
 				Insecure:   "false",
 			},
 			wantCerts: []*configtypes.Cert{
 				{
-					HostName:   "test.vmware.com",
+					Host:       "test.vmware.com",
 					CACertData: "testCAData",
 					Insecure:   "false",
 				},
@@ -199,13 +199,13 @@ func TestGetCerts(t *testing.T) {
 		{
 			name: "should return the cert updated",
 			cert: &configtypes.Cert{
-				HostName:   "test.vmware.com",
+				Host:       "test.vmware.com",
 				CACertData: "testCADataUpdated",
 				Insecure:   "true",
 			},
 			wantCerts: []*configtypes.Cert{
 				{
-					HostName:   "test.vmware.com",
+					Host:       "test.vmware.com",
 					CACertData: "testCADataUpdated",
 					Insecure:   "true",
 				},
@@ -214,19 +214,19 @@ func TestGetCerts(t *testing.T) {
 		{
 			name: "should return both the existing and the new cert added",
 			cert: &configtypes.Cert{
-				HostName:       "test.vmware.com:443",
+				Host:           "test.vmware.com:443",
 				CACertData:     "testCAData2",
 				SkipCertVerify: "true",
 				Insecure:       "false",
 			},
 			wantCerts: []*configtypes.Cert{
 				{
-					HostName:   "test.vmware.com",
+					Host:       "test.vmware.com",
 					CACertData: "testCADataUpdated",
 					Insecure:   "true",
 				},
 				{
-					HostName:       "test.vmware.com:443",
+					Host:           "test.vmware.com:443",
 					CACertData:     "testCAData2",
 					SkipCertVerify: "true",
 					Insecure:       "false",

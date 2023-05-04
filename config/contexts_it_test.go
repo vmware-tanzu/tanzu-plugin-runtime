@@ -41,6 +41,34 @@ servers:
           manifestPath: updated-test-manifest-path
           annotation: one
           required: true
+  - type: managementcluster
+    managementClusterOpts:
+      endpoint: updated-test-endpoint
+      path: updated-test-path
+      context: updated-test-context
+      annotation: one
+      required: true
+    discoverySources:
+      - gcp:
+          name: test
+          bucket: updated-test-bucket
+          manifestPath: updated-test-manifest-path
+          annotation: one
+          required: true
+  - type: managementcluster
+    managementClusterOpts:
+      endpoint: updated-test-endpoint
+      path: updated-test-path
+      context: updated-test-context
+      annotation: one
+      required: true
+    discoverySources:
+      - gcp:
+          name: test
+          bucket: updated-test-bucket
+          manifestPath: updated-test-manifest-path
+          annotation: one
+          required: true
 current: test-mc
 `
 	expectedCfg := `clientOptions:
@@ -58,6 +86,34 @@ current: test-mc
 servers:
     - name: test-mc
       type: managementcluster
+      managementClusterOpts:
+        endpoint: updated-test-endpoint
+        path: updated-test-path
+        context: updated-test-context
+        annotation: one
+        required: true
+      discoverySources:
+        - gcp:
+            name: test
+            bucket: updated-test-bucket
+            manifestPath: updated-test-manifest-path
+            annotation: one
+            required: true
+    - type: managementcluster
+      managementClusterOpts:
+        endpoint: updated-test-endpoint
+        path: updated-test-path
+        context: updated-test-context
+        annotation: one
+        required: true
+      discoverySources:
+        - gcp:
+            name: test
+            bucket: updated-test-bucket
+            manifestPath: updated-test-manifest-path
+            annotation: one
+            required: true
+    - type: managementcluster
       managementClusterOpts:
         endpoint: updated-test-endpoint
         path: updated-test-path
@@ -103,12 +159,84 @@ current: test-mc2
           manifestPath: test-manifest-path
           annotation: one
           required: true
+  - target: kubernetes
+    group: one
+    clusterOpts:
+      isManagementCluster: true
+      annotation: one
+      required: true
+      annotationStruct:
+        one: one
+      endpoint: test-endpoint
+      path: test-path
+      context: test-context
+    discoverySources:
+      - gcp:
+          name: test
+          bucket: test-bucket
+          manifestPath: test-manifest-path
+          annotation: one
+          required: true
+  - target: kubernetes
+    group: one
+    clusterOpts:
+      isManagementCluster: true
+      annotation: one
+      required: true
+      annotationStruct:
+        one: one
+      endpoint: test-endpoint
+      path: test-path
+      context: test-context
+    discoverySources:
+      - gcp:
+          name: test
+          bucket: test-bucket
+          manifestPath: test-manifest-path
+          annotation: one
+          required: true
 currentContext:
   kubernetes: test-mc
 `
 	expectedCfg2 := `contexts:
     - name: test-mc
       target: kubernetes
+      group: one
+      clusterOpts:
+        isManagementCluster: true
+        annotation: one
+        required: true
+        annotationStruct:
+            one: one
+        endpoint: test-endpoint
+        path: test-path
+        context: test-context
+      discoverySources:
+        - gcp:
+            name: test
+            bucket: test-bucket
+            manifestPath: test-manifest-path
+            annotation: one
+            required: true
+    - target: kubernetes
+      group: one
+      clusterOpts:
+        isManagementCluster: true
+        annotation: one
+        required: true
+        annotationStruct:
+            one: one
+        endpoint: test-endpoint
+        path: test-path
+        context: test-context
+      discoverySources:
+        - gcp:
+            name: test
+            bucket: test-bucket
+            manifestPath: test-manifest-path
+            annotation: one
+            required: true
+    - target: kubernetes
       group: one
       clusterOpts:
         isManagementCluster: true
@@ -175,6 +303,7 @@ func TestContextsIntegration(t *testing.T) {
 	}
 	assert.Nil(t, err)
 	assert.Equal(t, expected, context)
+
 	// Add new Context
 	newCtx := &configtypes.Context{
 		Name:   "test-mc2",
@@ -199,6 +328,32 @@ func TestContextsIntegration(t *testing.T) {
 	ctx, err := GetContext("test-mc2")
 	assert.Nil(t, err)
 	assert.Equal(t, newCtx, ctx)
+
+	// Try to add context with empty name
+	contextWithEmptyName := &configtypes.Context{
+		Name:   "",
+		Target: configtypes.TargetK8s,
+		ClusterOpts: &configtypes.ClusterServer{
+			Path:                "test-path",
+			Context:             "test-context",
+			IsManagementCluster: true,
+		},
+		DiscoverySources: []configtypes.PluginDiscovery{
+			{
+				GCP: &configtypes.GCPDiscovery{
+					Name:         "test",
+					Bucket:       "test-bucket",
+					ManifestPath: "test-manifest-path",
+				},
+			},
+		},
+	}
+	err = SetContext(contextWithEmptyName, true)
+	assert.Equal(t, "context name cannot be empty", err.Error())
+	ctx, err = GetContext("")
+	assert.Equal(t, "context name cannot be empty", err.Error())
+	assert.Nil(t, ctx)
+
 	// Update existing Context
 	updatedCtx := &configtypes.Context{
 		Name:   "test-mc2",
@@ -224,6 +379,7 @@ func TestContextsIntegration(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, updatedCtx, ctx)
 
+	//Read config files
 	file, err := os.ReadFile(cfgTestFiles[0].Name())
 	assert.NoError(t, err)
 	assert.Equal(t, expectedCfg, string(file))

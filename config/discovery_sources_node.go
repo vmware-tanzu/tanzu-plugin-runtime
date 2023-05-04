@@ -64,9 +64,9 @@ func setDiscoverySource(discoverySourcesNode *yaml.Node, discoverySource configt
 	var result []*yaml.Node
 
 	// Get discovery source type and name
-	newOrUpdatedDiscoverySourceType, newOrUpdatedDiscoverySourceName := getDiscoverySourceTypeAndName(discoverySource)
-	if newOrUpdatedDiscoverySourceType == "" || newOrUpdatedDiscoverySourceName == "" {
-		return persist, errors.New("not found")
+	newOrUpdatedDiscoverySourceType, newOrUpdatedDiscoverySourceName, err := getDiscoverySourceTypeAndName(discoverySource)
+	if err != nil {
+		return persist, err
 	}
 
 	// Loop through each discovery source node
@@ -134,19 +134,35 @@ func setDiscoverySource(discoverySourcesNode *yaml.Node, discoverySource configt
 	return persist, err
 }
 
-func getDiscoverySourceTypeAndName(discoverySource configtypes.PluginDiscovery) (string, string) {
-	if discoverySource.GCP != nil && discoverySource.GCP.Name != "" { //nolint:staticcheck
-		return DiscoveryTypeGCP, discoverySource.GCP.Name //nolint:staticcheck
-	} else if discoverySource.OCI != nil && discoverySource.OCI.Name != "" {
-		return DiscoveryTypeOCI, discoverySource.OCI.Name
-	} else if discoverySource.Local != nil && discoverySource.Local.Name != "" {
-		return DiscoveryTypeLocal, discoverySource.Local.Name
-	} else if discoverySource.Kubernetes != nil && discoverySource.Kubernetes.Name != "" {
-		return DiscoveryTypeKubernetes, discoverySource.Kubernetes.Name
-	} else if discoverySource.REST != nil && discoverySource.REST.Name != "" {
-		return DiscoveryTypeREST, discoverySource.REST.Name
+func getDiscoverySourceTypeAndName(discoverySource configtypes.PluginDiscovery) (string, string, error) {
+	var discoverySourceType, discoverySourceName string
+
+	switch {
+	//nolint:staticcheck // Deprecated
+	case discoverySource.GCP != nil:
+		discoverySourceType = DiscoveryTypeGCP
+		discoverySourceName = discoverySource.GCP.Name
+	case discoverySource.OCI != nil:
+		discoverySourceType = DiscoveryTypeOCI
+		discoverySourceName = discoverySource.OCI.Name
+	case discoverySource.Local != nil:
+		discoverySourceType = DiscoveryTypeLocal
+		discoverySourceName = discoverySource.Local.Name
+	case discoverySource.Kubernetes != nil:
+		discoverySourceType = DiscoveryTypeKubernetes
+		discoverySourceName = discoverySource.Kubernetes.Name
+	case discoverySource.REST != nil:
+		discoverySourceType = DiscoveryTypeREST
+		discoverySourceName = discoverySource.REST.Name
+	default:
+		return "", "", errors.New("discovery source type cannot be empty")
 	}
-	return "", ""
+
+	if discoverySourceName == "" {
+		return "", "", errors.New("discovery source name cannot be empty")
+	}
+
+	return discoverySourceType, discoverySourceName, nil
 }
 
 // Find the matching discovery source type and index from accepted discovery sources

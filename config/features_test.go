@@ -21,11 +21,49 @@ func TestIsFeatureEnabled(t *testing.T) {
 		cleanupDir(LocalDirName)
 	}()
 	tests := []struct {
-		name    string
-		feature map[string]configtypes.FeatureMap
-		plugin  string
-		key     string
+		name           string
+		feature        map[string]configtypes.FeatureMap
+		plugin         string
+		key            string
+		errStr         string
+		errStrForStore string
 	}{
+		{
+			name: "empty plugin",
+			feature: map[string]configtypes.FeatureMap{
+				"": {
+					"context-aware-cli-for-plugins": "true",
+				},
+			},
+			plugin:         "",
+			key:            "context-aware-cli-for-plugins",
+			errStr:         "plugin cannot be empty",
+			errStrForStore: "plugin cannot be empty",
+		},
+		{
+			name: "empty key",
+			feature: map[string]configtypes.FeatureMap{
+				"global": {
+					"": "true",
+				},
+			},
+			plugin:         "global",
+			key:            "",
+			errStr:         "key cannot be empty",
+			errStrForStore: "key cannot be empty",
+		},
+		{
+			name: "empty value",
+			feature: map[string]configtypes.FeatureMap{
+				"global": {
+					"context-aware-cli-for-plugins": "",
+				},
+			},
+			plugin:         "global",
+			key:            "context-aware-cli-for-plugins",
+			errStr:         "not found",
+			errStrForStore: "value cannot be empty",
+		},
 		{
 			name: "success context-aware-cli-for-plugins",
 			feature: map[string]configtypes.FeatureMap{
@@ -45,10 +83,19 @@ func TestIsFeatureEnabled(t *testing.T) {
 				},
 			}
 			err := StoreClientConfig(cfg)
-			assert.NoError(t, err)
+			if tc.errStrForStore != "" {
+				assert.Equal(t, tc.errStrForStore, err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
+
 			ok, err := IsFeatureEnabled(tc.plugin, tc.key)
-			assert.NoError(t, err)
-			assert.Equal(t, ok, true)
+			if tc.errStr != "" {
+				assert.Equal(t, tc.errStr, err.Error())
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, ok, true)
+			}
 		})
 	}
 }
@@ -118,12 +165,32 @@ func TestSetFeature(t *testing.T) {
 		cleanupDir(LocalDirName)
 	}()
 	tests := []struct {
-		name   string
-		cfg    *configtypes.ClientConfig
-		plugin string
-		key    string
-		value  bool
+		name         string
+		cfg          *configtypes.ClientConfig
+		plugin       string
+		key          string
+		value        bool
+		errStrForSet string
+		errStrForGet string
 	}{
+		{
+			name:         "empty plugin",
+			cfg:          &configtypes.ClientConfig{},
+			plugin:       "",
+			key:          "context-aware-cli-for-plugins",
+			value:        false,
+			errStrForSet: "plugin cannot be empty",
+			errStrForGet: "plugin cannot be empty",
+		},
+		{
+			name:         "empty key",
+			cfg:          &configtypes.ClientConfig{},
+			plugin:       "global",
+			key:          "",
+			value:        false,
+			errStrForSet: "key cannot be empty",
+			errStrForGet: "key cannot be empty",
+		},
 		{
 			name: "success context-aware-cli-for-plugins",
 			cfg: &configtypes.ClientConfig{
@@ -175,11 +242,21 @@ func TestSetFeature(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			err := StoreClientConfig(tc.cfg)
 			assert.NoError(t, err)
+
 			err = SetFeature(tc.plugin, tc.key, strconv.FormatBool(tc.value))
-			assert.NoError(t, err)
+			if tc.errStrForSet != "" {
+				assert.Equal(t, tc.errStrForSet, err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
+
 			ok, err := IsFeatureEnabled(tc.plugin, tc.key)
-			assert.NoError(t, err)
-			assert.Equal(t, ok, tc.value)
+			if tc.errStrForGet != "" {
+				assert.Equal(t, tc.errStrForGet, err.Error())
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, ok, tc.value)
+			}
 		})
 	}
 }

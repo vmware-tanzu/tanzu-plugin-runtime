@@ -105,6 +105,11 @@ func getSettings(node *yaml.Node) (map[string]string, error) {
 }
 
 func getSetting(node *yaml.Node, key string) (string, error) {
+	// check if key is empty
+	if key == "" {
+		return "", errors.New("key cannot be empty")
+	}
+
 	cfgMetadata, err := convertNodeToMetadata(node)
 	if err != nil {
 		return "", err
@@ -122,6 +127,11 @@ func getSetting(node *yaml.Node, key string) (string, error) {
 }
 
 func deleteSetting(node *yaml.Node, key string) (err error) {
+	// check if key is empty
+	if key == "" {
+		return errors.New("key cannot be empty")
+	}
+
 	// find settings node
 	keys := []nodeutils.Key{
 		{Name: KeyConfigMetadata, Type: yaml.MappingNode},
@@ -152,6 +162,15 @@ func deleteSetting(node *yaml.Node, key string) (err error) {
 
 //nolint:dupl
 func setSetting(node *yaml.Node, key, value string) (persist bool, err error) {
+	// check if key is empty
+	if key == "" {
+		return false, errors.New("key cannot be empty")
+	}
+	// check if value is empty
+	if value == "" {
+		return false, errors.New("value cannot be empty")
+	}
+
 	// find settings node
 	keys := []nodeutils.Key{
 		{Name: KeyConfigMetadata, Type: yaml.MappingNode},

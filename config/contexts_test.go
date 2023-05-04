@@ -1136,3 +1136,59 @@ func TestSetContextWithUniquePermissions(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, 7, len(s.GlobalOpts.Auth.Permissions))
 }
+
+func TestSetContextWithEmptyName(t *testing.T) {
+	// setup
+	func() {
+		LocalDirName = TestLocalDirName
+	}()
+	defer func() {
+		cleanupDir(LocalDirName)
+	}()
+	tcs := []struct {
+		name    string
+		ctx     *configtypes.Context
+		current bool
+		errStr  string
+	}{
+		{
+			name: "success  current",
+			ctx: &configtypes.Context{
+				Name:   "",
+				Target: configtypes.TargetK8s,
+				ClusterOpts: &configtypes.ClusterServer{
+					Endpoint:            "test-endpoint",
+					Path:                "test-path",
+					Context:             "test-context",
+					IsManagementCluster: true,
+				},
+			},
+			errStr: "context name cannot be empty",
+		},
+		{
+			name: "success re empty current",
+			ctx: &configtypes.Context{
+				Name:   "",
+				Target: configtypes.TargetK8s,
+				ClusterOpts: &configtypes.ClusterServer{
+					Endpoint:            "test-endpoint",
+					Path:                "test-path",
+					Context:             "test-context",
+					IsManagementCluster: true,
+				},
+			},
+			errStr: "context name cannot be empty",
+		},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.name, func(t *testing.T) {
+			err := SetContext(tc.ctx, tc.current)
+			if tc.errStr == "" {
+				assert.NoError(t, err)
+			} else {
+				assert.EqualError(t, err, tc.errStr)
+			}
+		})
+	}
+}

@@ -22,6 +22,10 @@ func GetEdition() (string, error) {
 
 // SetEdition adds or updates edition value
 func SetEdition(val string) (err error) {
+	// Check if val is empty
+	if val == "" {
+		return errors.New("value cannot be empty")
+	}
 	// Retrieve client config node
 	AcquireTanzuConfigLock()
 	defer ReleaseTanzuConfigLock()

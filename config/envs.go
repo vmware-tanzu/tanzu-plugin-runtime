@@ -42,11 +42,16 @@ func GetEnv(key string) (string, error) {
 }
 
 func getEnv(node *yaml.Node, key string) (string, error) {
+	// check if key is empty
+	if key == "" {
+		return "", errors.New("key cannot be empty")
+	}
+
 	cfg, err := convertNodeToClientConfig(node)
 	if err != nil {
 		return "", err
 	}
-	if cfg.ClientOptions == nil && cfg.ClientOptions.Env == nil {
+	if cfg.ClientOptions == nil || cfg.ClientOptions.Env == nil {
 		return "", errors.New("not found")
 	}
 	if val, ok := cfg.ClientOptions.Env[key]; ok {
@@ -72,6 +77,11 @@ func DeleteEnv(key string) error {
 }
 
 func deleteEnv(node *yaml.Node, key string) (err error) {
+	// check if key is empty
+	if key == "" {
+		return errors.New("key cannot be empty")
+	}
+
 	// find env node
 	keys := []nodeutils.Key{
 		{Name: KeyClientOptions},
@@ -123,6 +133,16 @@ func SetEnv(key, value string) (err error) {
 
 //nolint:dupl
 func setEnv(node *yaml.Node, key, value string) (persist bool, err error) {
+	// check if key is empty
+	if key == "" {
+		return false, errors.New("key cannot be empty")
+	}
+
+	// check if value is empty
+	if value == "" {
+		return false, errors.New("value cannot be empty")
+	}
+
 	// find env node
 	keys := []nodeutils.Key{
 		{Name: KeyClientOptions, Type: yaml.MappingNode},

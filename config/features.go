@@ -31,6 +31,16 @@ func IsFeatureEnabled(plugin, key string) (bool, error) {
 }
 
 func getFeature(node *yaml.Node, plugin, key string) (string, error) {
+	// check if plugin is empty
+	if plugin == "" {
+		return "", errors.New("plugin cannot be empty")
+	}
+
+	// check if key is empty
+	if key == "" {
+		return "", errors.New("key cannot be empty")
+	}
+
 	cfg, err := convertNodeToClientConfig(node)
 	if err != nil {
 		return "", err
@@ -61,6 +71,15 @@ func DeleteFeature(plugin, key string) error {
 }
 
 func deleteFeature(node *yaml.Node, plugin, key string) error {
+	// check if plugin is empty
+	if plugin == "" {
+		return errors.New("plugin cannot be empty")
+	}
+
+	// check if key is empty
+	if key == "" {
+		return errors.New("key cannot be empty")
+	}
 	// Find plugin node
 	keys := []nodeutils.Key{
 		{Name: KeyClientOptions},
@@ -105,6 +124,21 @@ func SetFeature(plugin, key, value string) (err error) {
 }
 
 func setFeature(node *yaml.Node, plugin, key, value string) (persist bool, err error) {
+	// check if plugin is empty
+	if plugin == "" {
+		return false, errors.New("plugin cannot be empty")
+	}
+
+	// check if key is empty
+	if key == "" {
+		return false, errors.New("key cannot be empty")
+	}
+
+	// check if value is empty
+	if value == "" {
+		return false, errors.New("value cannot be empty")
+	}
+
 	// find plugin node
 	keys := []nodeutils.Key{
 		{Name: KeyClientOptions, Type: yaml.MappingNode},

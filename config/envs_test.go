@@ -59,11 +59,13 @@ func TestGetEnv(t *testing.T) {
 	defer func() {
 		cleanupDir(LocalDirName)
 	}()
+
 	tests := []struct {
-		name   string
-		in     *configtypes.ClientConfig
-		out    string
-		errStr string
+		name           string
+		in             *configtypes.ClientConfig
+		out            string
+		errStr         string
+		errStrForInput string
 	}{
 		{
 			name: "success k8s",
@@ -76,15 +78,61 @@ func TestGetEnv(t *testing.T) {
 			},
 			out: "test",
 		},
+		{
+			name: "get options with empty key",
+			in: &configtypes.ClientConfig{
+				ClientOptions: &configtypes.ClientOptions{
+					Env: map[string]string{
+						"test": "test",
+					},
+				},
+			},
+			out:    "",
+			errStr: "key cannot be empty",
+		},
+		{
+			name: "store options with empty key",
+			in: &configtypes.ClientConfig{
+				ClientOptions: &configtypes.ClientOptions{
+					Env: map[string]string{
+						"": "test",
+					},
+				},
+			},
+			out:            "",
+			errStr:         "key cannot be empty",
+			errStrForInput: "key cannot be empty",
+		},
+		{
+			name: "store options with empty val",
+			in: &configtypes.ClientConfig{
+				ClientOptions: &configtypes.ClientOptions{
+					Env: map[string]string{
+						"test-empty-val": "",
+					},
+				},
+			},
+			out:            "test-empty-val",
+			errStr:         "not found",
+			errStrForInput: "value cannot be empty",
+		},
 	}
 	for _, spec := range tests {
 		t.Run(spec.name, func(t *testing.T) {
 			err := StoreClientConfig(spec.in)
-			assert.NoError(t, err)
-			c, err := GetEnv("test")
-			assert.NoError(t, err)
-			assert.Equal(t, spec.out, c)
-			assert.NoError(t, err)
+			if spec.errStrForInput != "" {
+				assert.Equal(t, spec.errStrForInput, err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
+
+			c, err := GetEnv(spec.out)
+			if spec.errStr != "" {
+				assert.Equal(t, spec.errStr, err.Error())
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, spec.out, c)
+			}
 		})
 	}
 }

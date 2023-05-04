@@ -6,6 +6,7 @@ package config
 import (
 	"fmt"
 
+	"github.com/pkg/errors"
 	"gopkg.in/yaml.v3"
 
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/config/nodeutils"
@@ -246,6 +247,11 @@ func EndpointFromContext(s *configtypes.Context) (endpoint string, err error) {
 }
 
 func getContext(node *yaml.Node, name string) (*configtypes.Context, error) {
+	// check if context name is empty
+	if name == "" {
+		return nil, errors.New("context name cannot be empty")
+	}
+
 	cfg, err := convertNodeToClientConfig(node)
 	if err != nil {
 		return nil, err
@@ -285,6 +291,11 @@ func setContexts(node *yaml.Node, contexts []*configtypes.Context) (err error) {
 }
 
 func setContext(node *yaml.Node, ctx *configtypes.Context) (persist bool, err error) {
+	// Check if ctx.Name is empty
+	if ctx.Name == "" {
+		return false, errors.New("context name cannot be empty")
+	}
+
 	// Get Patch Strategies from config metadata
 	patchStrategies, err := GetConfigMetadataPatchStrategy()
 	if err != nil {
@@ -394,6 +405,11 @@ func removeCurrentContext(node *yaml.Node, ctx *configtypes.Context) error {
 
 //nolint:dupl
 func removeContext(node *yaml.Node, name string) error {
+	// check if context name is empty
+	if name == "" {
+		return errors.New("context name cannot be empty")
+	}
+
 	// Find the contexts node in the yaml node
 	keys := []nodeutils.Key{
 		{Name: KeyContexts},

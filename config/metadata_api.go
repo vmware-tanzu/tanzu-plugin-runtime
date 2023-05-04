@@ -125,6 +125,11 @@ func setConfigMetadataPatchStrategies(node *yaml.Node, patchStrategies map[strin
 }
 
 func setConfigMetadataPatchStrategy(node *yaml.Node, key, value string) error {
+	// check if key is empty
+	if key == "" {
+		return errors.New("key cannot be empty")
+	}
+
 	if !strings.EqualFold(value, "replace") && !strings.EqualFold(value, "merge") {
 		return errors.New("allowed values are replace or merge")
 	}

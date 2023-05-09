@@ -26,7 +26,7 @@ func TestSetCEIPOptIn(t *testing.T) {
 			value: "true",
 		},
 		{
-			name:  "should update and persist eipOptIn value as false",
+			name:  "should update and persist ceipOptIn value as false",
 			value: "false",
 		},
 		{
@@ -42,6 +42,56 @@ func TestSetCEIPOptIn(t *testing.T) {
 			c, err := GetCEIPOptIn()
 			assert.Equal(t, spec.value, c)
 			assert.NoError(t, err)
+		})
+	}
+}
+
+func TestSetEULAStatus(t *testing.T) {
+	// Setup config test data
+	_, cleanUp := setupTestConfig(t, &CfgTestData{})
+
+	defer func() {
+		cleanUp()
+	}()
+
+	tests := []struct {
+		name        string
+		value       EULAStatus
+		expectError bool
+	}{
+		{
+			name:        "should persist eulaStatus value as accepted when empty client config",
+			value:       EULAStatusAccepted,
+			expectError: false,
+		},
+		{
+			name:        "should update and persist shown eulaStatus value",
+			value:       EULAStatusShown,
+			expectError: false,
+		},
+		{
+			name:        "should update and persist unset eulaStatus value",
+			value:       EULAStatusUnset,
+			expectError: false,
+		},
+		{
+			name:        "should error on invalid eulaStatus value",
+			value:       EULAStatus("invalidinvalid"),
+			expectError: true,
+		},
+	}
+
+	for _, spec := range tests {
+		t.Run(spec.name, func(t *testing.T) {
+			err := SetEULAStatus(spec.value)
+			if spec.expectError {
+				assert.Equal(t, "invalid eula status", err.Error())
+			} else {
+				assert.NoError(t, err)
+				val, err := GetEULAStatus()
+				assert.Equal(t, spec.value, val)
+				assert.NoError(t, err)
+			}
 		})
 	}
 }

@@ -11,14 +11,6 @@ import (
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 )
 
-func (opts *ContextOpts) ShouldNotIncludeTarget() bool {
-	return opts.Target == ""
-}
-
-func (opts *ContextOpts) ShouldNotIncludeContextType() bool {
-	return opts.Type == ""
-}
-
 func (opts *GetCurrentContextInputOptions) ShouldNotIncludeTarget() bool {
 	return opts.Target == ""
 }
@@ -29,26 +21,6 @@ func (opts *GetCurrentContextInputOptions) ShouldNotIncludeContextType() bool {
 
 func (opts *RemoveCurrentContextInputOptions) ShouldNotIncludeTarget() bool {
 	return opts.Target == ""
-}
-
-func (opts *ContextOpts) ValidName() bool {
-	return opts.Name != ""
-}
-
-func (opts *ContextOpts) ValidTarget() bool {
-	return opts.Target != "" && (opts.Target == TargetK8s || opts.Target == TargetTMC)
-}
-
-func (opts *ContextOpts) ValidContextType() bool {
-	return opts.Type != "" && (opts.Type == CtxTypeK8s || opts.Type == CtxTypeTMC)
-}
-
-func (opts *ContextOpts) ValidGlobalOptsOrClusterOpts() bool {
-	return (opts.GlobalOpts != nil && opts.GlobalOpts.Endpoint != "") || (opts.ClusterOpts != nil && opts.ClusterOpts.Endpoint != "")
-}
-
-func (opts *ContextOpts) ValidDiscoverySources() bool {
-	return opts.DiscoverySources != nil || len(opts.DiscoverySources) == 0
 }
 
 // Validate  the setContextInputOptions as per runtime version i.e. check whether mandatory fields are set and throw error if missing

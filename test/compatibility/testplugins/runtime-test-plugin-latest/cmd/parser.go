@@ -28,3 +28,13 @@ func parseServer(server string) (*configtypes.Server, error) { //nolint:staticch
 	}
 	return &s, nil
 }
+
+// parseCLIDiscoverySource unmarshalls string to PluginDiscovery struct
+func parseCLIDiscoverySource(source string) (*configtypes.PluginDiscovery, error) {
+	var pluginDiscovery configtypes.PluginDiscovery
+	err := yaml.Unmarshal([]byte(source), &pluginDiscovery)
+	if err != nil {
+		return nil, err
+	}
+	return &pluginDiscovery, nil
+}

@@ -31,8 +31,8 @@ func TestTriggerEnvAPIs(t *testing.T) {
 					Name:    core.SetEnvAPI,
 					Version: core.VersionLatest,
 					Arguments: map[core.APIArgumentType]interface{}{
-						core.KeyName:   "compatibility-tests",
-						core.ValueName: "default-env-val",
+						core.Key:   "compatibility-tests",
+						core.Value: "default-env-val",
 					},
 					Output: &core.Output{
 						Result:  "success",

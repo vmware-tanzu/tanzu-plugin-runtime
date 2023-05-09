@@ -36,25 +36,30 @@ const (
 	GetEnvAPI               RuntimeAPIName = "GetEnv"
 	DeleteEnvAPI            RuntimeAPIName = "DeleteEnv"
 	GetEnvConfigurationsAPI RuntimeAPIName = "GetEnvConfigurations"
+
+	SetCLIDiscoverySourceAPI    RuntimeAPIName = "SetCLIDiscoverySource"
+	GetCLIDiscoverySourceAPI    RuntimeAPIName = "GetCLIDiscoverySource"
+	DeleteCLIDiscoverySourceAPI RuntimeAPIName = "DeleteCLIDiscoverySource"
 )
 
 // APIArgumentType describes all the arguments types required for Runtime APIs
 type APIArgumentType string
 
 const (
-	ClientConfig APIArgumentType = "clientConfig"
-	Context      APIArgumentType = "context"
-	ContextName  APIArgumentType = "contextName"
-	SetCurrent   APIArgumentType = "setCurrent"
-	Server       APIArgumentType = "server"
-	ServerName   APIArgumentType = "serverName"
-	Name         APIArgumentType = "name"
-	Target       APIArgumentType = "target"
-	ContextType  APIArgumentType = "contextType"
-	Feature      APIArgumentType = "feature"
-	Plugin       APIArgumentType = "plugin"
-	Key          APIArgumentType = "key"
-	Value        APIArgumentType = "value"
+	ClientConfig    APIArgumentType = "clientConfig"
+	Context         APIArgumentType = "context"
+	ContextName     APIArgumentType = "contextName"
+	SetCurrent      APIArgumentType = "setCurrent"
+	Server          APIArgumentType = "server"
+	ServerName      APIArgumentType = "serverName"
+	Name            APIArgumentType = "name"
+	Target          APIArgumentType = "target"
+	ContextType     APIArgumentType = "contextType"
+	Feature         APIArgumentType = "feature"
+	Plugin          APIArgumentType = "plugin"
+	Key             APIArgumentType = "key"
+	Value           APIArgumentType = "value"
+	DiscoverySource APIArgumentType = "discoverySource"
 )
 
 type Result string

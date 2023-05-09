@@ -1,6 +1,7 @@
 // Copyright 2023 VMware, Inc. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
+// Package framework provides all types, validator, helpers methods to create Runtime API commands
 package framework
 
 import (

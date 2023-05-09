@@ -10,6 +10,18 @@ import (
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/config/nodeutils"
 )
 
+// EULAStatus is the user's EULA acceptance status
+type EULAStatus string
+
+const (
+	// User is shown the EULA, but has not accepted it.
+	EULAStatusShown EULAStatus = "shown"
+	// User has accepted EULA.
+	EULAStatusAccepted EULAStatus = "accepted"
+	// Acceptance state is not set
+	EULAStatusUnset EULAStatus = ""
+)
+
 // GetCEIPOptIn retrieves ClientOptions ceipOptIn
 func GetCEIPOptIn() (string, error) {
 	// Retrieve client config node
@@ -52,7 +64,7 @@ func getCEIPOptIn(node *yaml.Node) (string, error) {
 }
 
 // GetEULAStatus retrieves ClientOptions ceipOptIn
-func GetEULAStatus() (string, error) {
+func GetEULAStatus() (EULAStatus, error) {
 	// Retrieve client config node
 	node, err := getClientConfigNode()
 	if err != nil {
@@ -62,7 +74,7 @@ func GetEULAStatus() (string, error) {
 }
 
 // SetEULAStatus adds or updates ceipOptIn value
-func SetEULAStatus(val string) (err error) {
+func SetEULAStatus(val EULAStatus) (err error) {
 	// Retrieve client config node
 	AcquireTanzuConfigLock()
 	defer ReleaseTanzuConfigLock()
@@ -72,7 +84,7 @@ func SetEULAStatus(val string) (err error) {
 	}
 
 	// Add or update EULA acceptance status in the yaml node
-	persist := setCLIOptionsString(node, KeyEULAStatus, val)
+	persist := setCLIOptionsString(node, KeyEULAStatus, string(val))
 
 	// Persist the config node to the file
 	if persist {
@@ -81,13 +93,16 @@ func SetEULAStatus(val string) (err error) {
 	return err
 }
 
-func getEULAStatus(node *yaml.Node) (string, error) {
+func getEULAStatus(node *yaml.Node) (EULAStatus, error) {
 	cfg, err := convertNodeToClientConfig(node)
 	if err != nil {
 		return "", err
 	}
 	if cfg != nil && cfg.CoreCliOptions != nil {
-		return cfg.CoreCliOptions.EULAStatus, nil
+		if cfg.CoreCliOptions.EULAStatus == "" {
+			return EULAStatusUnset, nil
+		}
+		return EULAStatus(cfg.CoreCliOptions.EULAStatus), nil
 	}
 	return "", errors.New("eulaStatus not found")
 }

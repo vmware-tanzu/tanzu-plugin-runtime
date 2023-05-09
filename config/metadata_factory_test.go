@@ -13,6 +13,10 @@ import (
 )
 
 func TestConfigMetadataNodeUpdateInParallel(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode.")
+	}
+
 	addPatchStrategy := func(key, value string) error {
 		// Get config metadata node
 		_, err := getMetadataNode()

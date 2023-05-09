@@ -15,6 +15,10 @@ import (
 )
 
 func TestClientConfigNodeUpdateInParallel(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode.")
+	}
+
 	addServer := func(mcName string) error {
 		_, err := getClientConfigNode()
 		if err != nil {

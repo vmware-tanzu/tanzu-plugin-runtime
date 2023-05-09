@@ -255,6 +255,10 @@ func TestConfigLegacyDirWithoutEnvConfigKey(t *testing.T) {
 }
 
 func TestClientConfigUpdateInParallel(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode.")
+	}
+
 	addServer := func(mcName string) error {
 		_, err := GetClientConfig()
 		if err != nil {

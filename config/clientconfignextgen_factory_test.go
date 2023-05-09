@@ -35,6 +35,10 @@ func TestGetClientConfigNextGenNode(t *testing.T) {
 }
 
 func TestClientConfigNextGenNodeUpdateInParallel(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode.")
+	}
+
 	addContext := func(mcName string) error {
 		_, err := getClientConfigNextGenNode()
 		if err != nil {

@@ -31,22 +31,13 @@ func SetCEIPOptIn(val string) (err error) {
 	}
 
 	// Add or Update ceipOptIn in the yaml node
-	persist := setCEIPOptIn(node, val)
+	persist := setCLIOptionsString(node, KeyCEIPOptIn, val)
 
 	// Persist the config node to the file
 	if persist {
 		return persistConfig(node)
 	}
 	return err
-}
-
-func setCEIPOptIn(node *yaml.Node, val string) (persist bool) {
-	ceipOptInNode := getNGCLIOptionsChildNode(KeyCEIPOptIn, node)
-	if ceipOptInNode != nil && ceipOptInNode.Value != val {
-		ceipOptInNode.Value = val
-		persist = true
-	}
-	return persist
 }
 
 func getCEIPOptIn(node *yaml.Node) (string, error) {
@@ -60,6 +51,47 @@ func getCEIPOptIn(node *yaml.Node) (string, error) {
 	return "", errors.New("ceipOptIn not found")
 }
 
+// GetEULAStatus retrieves ClientOptions ceipOptIn
+func GetEULAStatus() (string, error) {
+	// Retrieve client config node
+	node, err := getClientConfigNode()
+	if err != nil {
+		return "", err
+	}
+	return getEULAStatus(node)
+}
+
+// SetEULAStatus adds or updates ceipOptIn value
+func SetEULAStatus(val string) (err error) {
+	// Retrieve client config node
+	AcquireTanzuConfigLock()
+	defer ReleaseTanzuConfigLock()
+	node, err := getClientConfigNodeNoLock()
+	if err != nil {
+		return err
+	}
+
+	// Add or update EULA acceptance status in the yaml node
+	persist := setCLIOptionsString(node, KeyEULAStatus, val)
+
+	// Persist the config node to the file
+	if persist {
+		return persistConfig(node)
+	}
+	return err
+}
+
+func getEULAStatus(node *yaml.Node) (string, error) {
+	cfg, err := convertNodeToClientConfig(node)
+	if err != nil {
+		return "", err
+	}
+	if cfg != nil && cfg.CoreCliOptions != nil {
+		return cfg.CoreCliOptions.EULAStatus, nil
+	}
+	return "", errors.New("eulaStatus not found")
+}
+
 // getNGCLIOptionsChildNode parses the yaml node and returns the matched node based on configOptions
 func getNGCLIOptionsChildNode(key string, node *yaml.Node) *yaml.Node {
 	configOptions := func(c *nodeutils.CfgNode) {
@@ -71,4 +103,13 @@ func getNGCLIOptionsChildNode(key string, node *yaml.Node) *yaml.Node {
 	}
 	keyNode := nodeutils.FindNode(node.Content[0], configOptions)
 	return keyNode
+}
+
+func setCLIOptionsString(node *yaml.Node, key, val string) (persist bool) {
+	ceipOptInNode := getNGCLIOptionsChildNode(key, node)
+	if ceipOptInNode != nil && ceipOptInNode.Value != val {
+		ceipOptInNode.Value = val
+		persist = true
+	}
+	return persist
 }

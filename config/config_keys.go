@@ -23,5 +23,6 @@ const (
 	KeyBomRepo                 = "bomRepo"
 	KeyCompatibilityFilePath   = "compatibilityFilePath"
 	KeyCEIPOptIn               = "ceipOptIn"
+	KeyEULAStatus              = "eulaStatus"
 	KeyCerts                   = "certs"
 )

@@ -40,6 +40,17 @@ const (
 	SetCLIDiscoverySourceAPI    RuntimeAPIName = "SetCLIDiscoverySource"
 	GetCLIDiscoverySourceAPI    RuntimeAPIName = "GetCLIDiscoverySource"
 	DeleteCLIDiscoverySourceAPI RuntimeAPIName = "DeleteCLIDiscoverySource"
+
+	GetMetadataAPI                     RuntimeAPIName = "GetMetadata"
+	GetConfigMetadataAPI               RuntimeAPIName = "GetConfigMetadata"
+	GetConfigMetadataPatchStrategyAPI  RuntimeAPIName = "GetConfigMetadataPatchStrategy"
+	SetConfigMetadataPatchStrategyAPI  RuntimeAPIName = "SetConfigMetadataPatchStrategy"
+	GetConfigMetadataSettingsAPI       RuntimeAPIName = "GetConfigMetadataSettings"
+	GetConfigMetadataSettingAPI        RuntimeAPIName = "GetConfigMetadataSetting"
+	IsConfigMetadataSettingsEnabledAPI RuntimeAPIName = "IsConfigMetadataSettingsEnabled"
+	UseUnifiedConfigAPI                RuntimeAPIName = "UseUnifiedConfig"
+	DeleteConfigMetadataSettingAPI     RuntimeAPIName = "DeleteConfigMetadataSetting"
+	SetConfigMetadataSettingAPI        RuntimeAPIName = "SetConfigMetadataSetting"
 )
 
 // APIArgumentType describes all the arguments types required for Runtime APIs
@@ -60,6 +71,7 @@ const (
 	Key             APIArgumentType = "key"
 	Value           APIArgumentType = "value"
 	DiscoverySource APIArgumentType = "discoverySource"
+	PatchStrategies APIArgumentType = "patchStrategies"
 )
 
 type Result string

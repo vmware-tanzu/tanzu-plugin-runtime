@@ -7,12 +7,21 @@ nouns:
   - available
   - available-upgrades
   - aws
+  - build
+  - builder
+  - buildpack
+  - buildservice
   - ceip-participation
   - cluster
+  - clusterbuilder
+  - clusterbuildpack
   - clustergroup
+  - clusterstack
+  - clusterstore
   - component
   - credentials
   - data-protection
+  - image
   - insight
   - installed
   - kubeconfig
@@ -45,9 +54,12 @@ verbs:
   - init
   - install
   - list
+  - logs
   - register
   - scale
   - show
+  - status
+  - trigger
   - update
   - upgrade
   - version
@@ -61,7 +73,9 @@ command-flags:
   - apiToken
   - app
   - bind
+  - bom
   - browser
+  - build
   - ca-bundle
   - ca-bundle-data
   - ceip-participation
@@ -90,6 +104,7 @@ command-flags:
   - env
   - feature-flags
   - file
+  - filter
   - force
   - force-csp
   - gcp-bucket-name

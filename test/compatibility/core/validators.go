@@ -7,7 +7,7 @@ import (
 	"fmt"
 )
 
-// Validate validated the whether passed version is valid and supported
+// Validate to verify passed version is valid and supported
 func (r *RuntimeAPIVersion) Validate() (bool, error) {
 	if r == nil || r.RuntimeVersion == "" {
 		return false, fmt.Errorf("runtime version is mandatory")
@@ -19,7 +19,7 @@ func (r *RuntimeAPIVersion) Validate() (bool, error) {
 	return true, nil
 }
 
-// IsRuntimeVersionSupported check whether passed version is currently supported
+// IsRuntimeVersionSupported check whether version is currently supported
 func (version RuntimeVersion) IsRuntimeVersionSupported() bool {
 	for _, v := range SupportedRuntimeVersions {
 		if v == version {

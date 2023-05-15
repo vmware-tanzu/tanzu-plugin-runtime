@@ -12,3 +12,7 @@ const (
 	CompatibilityTestOne string = "compatibility-test-one"
 	CompatibilityTestTwo string = "compatibility-test-two"
 )
+
+// global constants
+
+const ErrNotFound = "not found"

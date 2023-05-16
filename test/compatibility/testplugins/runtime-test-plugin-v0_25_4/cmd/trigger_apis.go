@@ -33,6 +33,9 @@ var apiHandlers = map[core.RuntimeAPIName]func(*core.API) *core.APIResponse{
 	// Feature Flag APIs
 	core.IsFeatureEnabledAPI:   triggerIsFeatureActivatedAPI,
 	core.IsFeatureActivatedAPI: triggerIsFeatureActivatedAPI,
+
+	// Env APIs
+	core.GetEnvConfigurationsAPI: triggerGetEnvConfigurationsAPI,
 }
 
 // triggerAPIs trigger runtime apis and construct logs

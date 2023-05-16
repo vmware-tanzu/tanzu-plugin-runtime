@@ -31,6 +31,11 @@ const (
 	IsFeatureEnabledAPI   RuntimeAPIName = "IsFeatureEnabled"
 	IsFeatureActivatedAPI RuntimeAPIName = "IsFeatureActivated"
 	DeleteFeatureAPI      RuntimeAPIName = "DeleteFeature"
+
+	SetEnvAPI               RuntimeAPIName = "SetEnv"
+	GetEnvAPI               RuntimeAPIName = "GetEnv"
+	DeleteEnvAPI            RuntimeAPIName = "DeleteEnv"
+	GetEnvConfigurationsAPI RuntimeAPIName = "GetEnvConfigurations"
 )
 
 // APIArgumentType describes all the arguments types required for Runtime APIs

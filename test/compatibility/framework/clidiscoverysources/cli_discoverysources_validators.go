@@ -9,7 +9,7 @@ import (
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 )
 
-// Validate  the setDiscoverySourceInputOptions as per runtime version i.e. check whether mandatory fields are set and throw error if missing
+// Validate the setDiscoverySourceInputOptions as per runtime version i.e. check whether mandatory fields are set and throw error if missing
 //
 //nolint:dupl
 func (opts *SetCLIDiscoverySourceInputOptions) Validate() (bool, error) {
@@ -20,13 +20,13 @@ func (opts *SetCLIDiscoverySourceInputOptions) Validate() (bool, error) {
 	}
 
 	switch opts.RuntimeVersion {
-	case core.VersionLatest, core.Version0280:
+	case core.VersionLatest, core.Version0280, core.Version0116:
 		err = opts.PluginDiscoveryOpts.ValidPluginDiscovery()
 		if err != nil {
 			return false, err
 		}
 		return true, nil
-	case core.Version0254, core.Version0116:
+	case core.Version0254:
 		err = opts.PluginDiscoveryOpts.ValidPluginDiscovery()
 		if err != nil {
 			return false, err
@@ -65,13 +65,13 @@ func (opts *GetCLIDiscoverySourceOutputOptions) Validate() (bool, error) {
 	}
 
 	switch opts.RuntimeVersion {
-	case core.VersionLatest, core.Version0280:
+	case core.VersionLatest, core.Version0280, core.Version0116:
 		err = opts.PluginDiscoveryOpts.ValidPluginDiscovery()
 		if err != nil {
 			return false, err
 		}
 		return true, nil
-	case core.Version0254, core.Version0116:
+	case core.Version0254:
 		err = opts.PluginDiscoveryOpts.ValidPluginDiscovery()
 		if err != nil {
 			return false, err

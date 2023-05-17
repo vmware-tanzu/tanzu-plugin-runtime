@@ -32,13 +32,13 @@ var _ = ginkgo.Describe("Cross-version CLI Discovery Source APIs Compatibility T
 			testCase := core.NewTestCase().Add(clidiscoverysources.DefaultSetCLIDiscoverySourceCommand(core.VersionLatest))
 
 			// Add GetCLIDiscoverySource Commands on all supported Runtime library versions
-			testCase.Add(clidiscoverysources.DefaultGetCLIDiscoverySourceCommand(core.VersionLatest)).Add(clidiscoverysources.DefaultGetCLIDiscoverySourceCommand(core.Version0280, clidiscoverysources.WithError(clidiscoverysources.CLIDiscoverySourceNotFound)))
+			testCase.Add(clidiscoverysources.DefaultGetCLIDiscoverySourceCommand(core.VersionLatest, clidiscoverysources.WithStrictValidationStrategy())).Add(clidiscoverysources.DefaultGetCLIDiscoverySourceCommand(core.Version0280, clidiscoverysources.WithError(clidiscoverysources.CLIDiscoverySourceNotFound)))
 
 			// Add DeleteCLIDiscoverySource v0.28.0 Command
 			testCase.Add(clidiscoverysources.DefaultDeleteCLIDiscoverySourceCommand(core.Version0280))
 
 			// Add GetCLIDiscoverySource Commands on all supported Runtime library versions
-			testCase.Add(clidiscoverysources.DefaultGetCLIDiscoverySourceCommand(core.VersionLatest)).Add(clidiscoverysources.DefaultGetCLIDiscoverySourceCommand(core.Version0280, clidiscoverysources.WithError(clidiscoverysources.CLIDiscoverySourceNotFound)))
+			testCase.Add(clidiscoverysources.DefaultGetCLIDiscoverySourceCommand(core.VersionLatest, clidiscoverysources.WithStrictValidationStrategy())).Add(clidiscoverysources.DefaultGetCLIDiscoverySourceCommand(core.Version0280, clidiscoverysources.WithError(clidiscoverysources.CLIDiscoverySourceNotFound)))
 
 			// Run all the commands
 			executer.Execute(testCase)
@@ -49,13 +49,13 @@ var _ = ginkgo.Describe("Cross-version CLI Discovery Source APIs Compatibility T
 			testCase := core.NewTestCase().Add(clidiscoverysources.DefaultSetCLIDiscoverySourceCommand(core.Version0280))
 
 			// Add GetCLIDiscoverySource Commands on all supported Runtime library versions
-			testCase.Add(clidiscoverysources.DefaultGetCLIDiscoverySourceCommand(core.VersionLatest, clidiscoverysources.WithError(clidiscoverysources.CLIDiscoverySourceNotFound))).Add(clidiscoverysources.DefaultGetCLIDiscoverySourceCommand(core.Version0280))
+			testCase.Add(clidiscoverysources.DefaultGetCLIDiscoverySourceCommand(core.VersionLatest, clidiscoverysources.WithError(clidiscoverysources.CLIDiscoverySourceNotFound))).Add(clidiscoverysources.DefaultGetCLIDiscoverySourceCommand(core.Version0280, clidiscoverysources.WithStrictValidationStrategy()))
 
 			// Add DeleteCLIDiscoverySource v0.28.0 Command
 			testCase.Add(clidiscoverysources.DefaultDeleteCLIDiscoverySourceCommand(core.VersionLatest))
 
 			// Add GetCLIDiscoverySource Commands on all supported Runtime library versions
-			testCase.Add(clidiscoverysources.DefaultGetCLIDiscoverySourceCommand(core.VersionLatest, clidiscoverysources.WithError(clidiscoverysources.CLIDiscoverySourceNotFound))).Add(clidiscoverysources.DefaultGetCLIDiscoverySourceCommand(core.Version0280))
+			testCase.Add(clidiscoverysources.DefaultGetCLIDiscoverySourceCommand(core.VersionLatest, clidiscoverysources.WithError(clidiscoverysources.CLIDiscoverySourceNotFound))).Add(clidiscoverysources.DefaultGetCLIDiscoverySourceCommand(core.Version0280, clidiscoverysources.WithStrictValidationStrategy()))
 
 			// Run all the commands
 			executer.Execute(testCase)

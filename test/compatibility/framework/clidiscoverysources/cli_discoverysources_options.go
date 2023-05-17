@@ -30,9 +30,8 @@ type SetCLIDiscoverySourceInputOptions struct {
 
 // SetCLIDiscoverySourceOutputOptions used to generate SetCLIDiscoverySource command
 type SetCLIDiscoverySourceOutputOptions struct {
-	*core.RuntimeAPIVersion                         // required
-	Error                   string                  // expected error message could be the sub string of actual error message
-	ValidationStrategy      core.ValidationStrategy // Type of validation to be performed i.e. exact or partial. default is partial
+	*core.RuntimeAPIVersion        // required
+	Error                   string // expected error message could be the sub string of actual error message
 }
 
 // DeleteCLIDiscoverySourceInputOptions used to generate DeleteCLIDiscoverySource command
@@ -43,9 +42,8 @@ type DeleteCLIDiscoverySourceInputOptions struct {
 
 // DeleteCLIDiscoverySourceOutputOptions used to generate DeleteCLIDiscoverySource command
 type DeleteCLIDiscoverySourceOutputOptions struct {
-	*core.RuntimeAPIVersion                         // required
-	ValidationStrategy      core.ValidationStrategy // Type of validation to be performed i.e. exact or partial. default is partial
-	Error                   string                  // expected error message could be the sub string of actual error message
+	*core.RuntimeAPIVersion        // required
+	Error                   string // expected error message could be the sub string of actual error message
 }
 
 // CfgCLIDiscoverySourcesArgs used to construct input and output options
@@ -58,6 +56,16 @@ type CfgCLIDiscoverySourcesArgs struct {
 }
 
 type CfgCLIDiscoverySourcesArgsOption func(*CfgCLIDiscoverySourcesArgs)
+
+func WithValidationStrategy(v core.ValidationStrategy) CfgCLIDiscoverySourcesArgsOption {
+	return func(c *CfgCLIDiscoverySourcesArgs) {
+		c.ValidationStrategy = v
+	}
+}
+
+func WithStrictValidationStrategy() CfgCLIDiscoverySourcesArgsOption {
+	return WithValidationStrategy(core.ValidationStrategyStrict)
+}
 
 func WithRuntimeAPIVersion(v *core.RuntimeAPIVersion) CfgCLIDiscoverySourcesArgsOption {
 	return func(c *CfgCLIDiscoverySourcesArgs) {

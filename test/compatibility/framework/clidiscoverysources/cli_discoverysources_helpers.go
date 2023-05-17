@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	CLIDiscoverySourceNotFound           = "cli discovery source not found"
+	CLIDiscoverySourceNotFound    string = "cli discovery source not found"
 	CompatibilityTestsSourceName  string = "compatibility-tests-source-name"
 	CompatibilityTestsSourceImage string = "compatibility-tests-source-image"
 )
@@ -41,8 +41,7 @@ func DefaultSetCLIDiscoverySourceCommand(version core.RuntimeVersion, opts ...Cf
 		RuntimeAPIVersion: &core.RuntimeAPIVersion{
 			RuntimeVersion: version,
 		},
-		ValidationStrategy: args.ValidationStrategy,
-		Error:              args.Error,
+		Error: args.Error,
 	}
 
 	// Construct API command
@@ -108,8 +107,7 @@ func DefaultDeleteCLIDiscoverySourceCommand(version core.RuntimeVersion, opts ..
 		RuntimeAPIVersion: &core.RuntimeAPIVersion{
 			RuntimeVersion: version,
 		},
-		ValidationStrategy: args.ValidationStrategy,
-		Error:              args.Error,
+		Error: args.Error,
 	}
 
 	// Construct API command
@@ -126,7 +124,11 @@ func DefaultCLIDiscoverySourcePerVersion(version core.RuntimeVersion) *CfgCLIDis
 	}
 
 	switch version {
-	case core.Version0116, core.Version0254:
+	case core.Version0116:
+		return NewCfgCLIDiscoverySourcesArgs(
+			WithOCIDiscoveryOpts(oci),
+		)
+	case core.Version0254:
 		return NewCfgCLIDiscoverySourcesArgs(
 			WithOCIDiscoveryOpts(oci),
 			WithContextType(types.CtxTypeTMC),

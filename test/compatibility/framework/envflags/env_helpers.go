@@ -100,8 +100,7 @@ func DefaultDeleteEnvCommand(version core.RuntimeVersion, opts ...CfgEnvOptionAr
 		RuntimeAPIVersion: &core.RuntimeAPIVersion{
 			RuntimeVersion: version,
 		},
-		ValidationStrategy: args.ValidationStrategy,
-		Error:              args.Error,
+		Error: args.Error,
 	}
 
 	cmd, err := NewDeleteEnvCommand(inputOpts, outputOpts)
@@ -132,8 +131,7 @@ func DefaultSetEnvCommand(version core.RuntimeVersion, opts ...CfgEnvOptionArgs)
 		RuntimeAPIVersion: &core.RuntimeAPIVersion{
 			RuntimeVersion: version,
 		},
-		ValidationStrategy: args.ValidationStrategy,
-		Error:              args.Error,
+		Error: args.Error,
 	}
 
 	cmd, err := NewSetEnvCommand(inputOpts, outputOpts)

@@ -1,8 +1,8 @@
 // Copyright 2023 VMware, Inc. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-// Package framework provides all types, validator, helpers methods to create Runtime API commands
-package framework
+// Package types provides all types, validator, helpers methods to create Runtime API commands
+package types
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

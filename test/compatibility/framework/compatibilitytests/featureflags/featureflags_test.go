@@ -34,10 +34,10 @@ var _ = ginkgo.Describe("Cross-version Feature Flags APIs compatibility tests", 
 			testCase := core.NewTestCase().Add(featureflags.DefaultSetFeatureCommand(core.VersionLatest))
 
 			// Add IsFeatureEnabled latest, v0.28.0, v0.25.4, v0.11.6 Commands
-			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.VersionLatest))
-			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0280))
-			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0254))
-			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0116))
+			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.VersionLatest, featureflags.WithStrictValidationStrategy()))
+			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0280, featureflags.WithStrictValidationStrategy()))
+			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0254, featureflags.WithStrictValidationStrategy()))
+			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0116, featureflags.WithStrictValidationStrategy()))
 
 			// Add DeleteFeature v0.28.0 Command
 			testCase.Add(featureflags.DefaultDeleteFeatureCommand(core.Version0280))
@@ -59,10 +59,10 @@ var _ = ginkgo.Describe("Cross-version Feature Flags APIs compatibility tests", 
 			testCase := core.NewTestCase().Add(featureflags.DefaultSetFeatureCommand(core.Version0280))
 
 			// Add IsFeatureEnabled latest, v0.28.0, v0.25.4, v0.11.6 Commands
-			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.VersionLatest))
-			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0280))
-			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0254))
-			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0116))
+			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.VersionLatest, featureflags.WithStrictValidationStrategy()))
+			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0280, featureflags.WithStrictValidationStrategy()))
+			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0254, featureflags.WithStrictValidationStrategy()))
+			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0116, featureflags.WithStrictValidationStrategy()))
 
 			// Add DeleteFeature latest Command
 			testCase.Add(featureflags.DefaultDeleteFeatureCommand(core.VersionLatest))
@@ -89,14 +89,14 @@ var _ = ginkgo.Describe("Cross-version Feature Flags APIs compatibility tests", 
 			testCase.Add(featureflags.DefaultSetFeatureCommand(core.VersionLatest, featureflags.WithKey(featureflags.CompatibilityTestsPluginKey0), featureflags.WithValue("false")))
 
 			// Add IsFeatureEnabled latest, v0.28.0, v0.25.4, v0.11.6 Commands
-			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.VersionLatest))
-			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0280))
-			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0254))
-			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0116))
-			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.VersionLatest, featureflags.WithKey(featureflags.CompatibilityTestsPluginKey0), featureflags.WithValue("false")))
-			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0280, featureflags.WithKey(featureflags.CompatibilityTestsPluginKey0), featureflags.WithValue("false")))
-			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0254, featureflags.WithKey(featureflags.CompatibilityTestsPluginKey0), featureflags.WithValue("false")))
-			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0116, featureflags.WithKey(featureflags.CompatibilityTestsPluginKey0), featureflags.WithValue("false")))
+			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.VersionLatest, featureflags.WithStrictValidationStrategy()))
+			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0280, featureflags.WithStrictValidationStrategy()))
+			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0254, featureflags.WithStrictValidationStrategy()))
+			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0116, featureflags.WithStrictValidationStrategy()))
+			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.VersionLatest, featureflags.WithKey(featureflags.CompatibilityTestsPluginKey0), featureflags.WithValue("false"), featureflags.WithStrictValidationStrategy()))
+			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0280, featureflags.WithKey(featureflags.CompatibilityTestsPluginKey0), featureflags.WithValue("false"), featureflags.WithStrictValidationStrategy()))
+			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0254, featureflags.WithKey(featureflags.CompatibilityTestsPluginKey0), featureflags.WithValue("false"), featureflags.WithStrictValidationStrategy()))
+			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0116, featureflags.WithKey(featureflags.CompatibilityTestsPluginKey0), featureflags.WithValue("false"), featureflags.WithStrictValidationStrategy()))
 
 			// Add DeleteFeature v0.28.0 Command
 			testCase.Add(featureflags.DefaultDeleteFeatureCommand(core.Version0280))
@@ -106,10 +106,10 @@ var _ = ginkgo.Describe("Cross-version Feature Flags APIs compatibility tests", 
 			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0280, featureflags.WithError(common.ErrNotFound)))
 			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0254, featureflags.WithError(common.ErrNotFound)))
 			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0116, featureflags.WithError(common.ErrNotFound)))
-			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.VersionLatest, featureflags.WithKey(featureflags.CompatibilityTestsPluginKey0), featureflags.WithValue("false")))
-			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0280, featureflags.WithKey(featureflags.CompatibilityTestsPluginKey0), featureflags.WithValue("false")))
-			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0254, featureflags.WithKey(featureflags.CompatibilityTestsPluginKey0), featureflags.WithValue("false")))
-			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0116, featureflags.WithKey(featureflags.CompatibilityTestsPluginKey0), featureflags.WithValue("false")))
+			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.VersionLatest, featureflags.WithKey(featureflags.CompatibilityTestsPluginKey0), featureflags.WithValue("false"), featureflags.WithStrictValidationStrategy()))
+			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0280, featureflags.WithKey(featureflags.CompatibilityTestsPluginKey0), featureflags.WithValue("false"), featureflags.WithStrictValidationStrategy()))
+			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0254, featureflags.WithKey(featureflags.CompatibilityTestsPluginKey0), featureflags.WithValue("false"), featureflags.WithStrictValidationStrategy()))
+			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0116, featureflags.WithKey(featureflags.CompatibilityTestsPluginKey0), featureflags.WithValue("false"), featureflags.WithStrictValidationStrategy()))
 
 			// Run all the commands
 			executer.Execute(testCase)
@@ -124,14 +124,14 @@ var _ = ginkgo.Describe("Cross-version Feature Flags APIs compatibility tests", 
 			testCase.Add(featureflags.DefaultSetFeatureCommand(core.VersionLatest, featureflags.WithKey(featureflags.CompatibilityTestsPluginKey0), featureflags.WithValue("false")))
 
 			// Add IsFeatureEnabled latest, v0.28.0, v0.25.4, v0.11.6 Commands
-			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.VersionLatest))
-			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0280))
-			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0254))
-			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0116))
-			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.VersionLatest, featureflags.WithKey(featureflags.CompatibilityTestsPluginKey0), featureflags.WithValue("false")))
-			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0280, featureflags.WithKey(featureflags.CompatibilityTestsPluginKey0), featureflags.WithValue("false")))
-			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0254, featureflags.WithKey(featureflags.CompatibilityTestsPluginKey0), featureflags.WithValue("false")))
-			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0116, featureflags.WithKey(featureflags.CompatibilityTestsPluginKey0), featureflags.WithValue("false")))
+			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.VersionLatest, featureflags.WithStrictValidationStrategy()))
+			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0280, featureflags.WithStrictValidationStrategy()))
+			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0254, featureflags.WithStrictValidationStrategy()))
+			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0116, featureflags.WithStrictValidationStrategy()))
+			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.VersionLatest, featureflags.WithKey(featureflags.CompatibilityTestsPluginKey0), featureflags.WithValue("false"), featureflags.WithStrictValidationStrategy()))
+			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0280, featureflags.WithKey(featureflags.CompatibilityTestsPluginKey0), featureflags.WithValue("false"), featureflags.WithStrictValidationStrategy()))
+			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0254, featureflags.WithKey(featureflags.CompatibilityTestsPluginKey0), featureflags.WithValue("false"), featureflags.WithStrictValidationStrategy()))
+			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0116, featureflags.WithKey(featureflags.CompatibilityTestsPluginKey0), featureflags.WithValue("false"), featureflags.WithStrictValidationStrategy()))
 
 			// Add DeleteFeature latest Command
 			testCase.Add(featureflags.DefaultDeleteFeatureCommand(core.VersionLatest))
@@ -141,10 +141,10 @@ var _ = ginkgo.Describe("Cross-version Feature Flags APIs compatibility tests", 
 			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0280, featureflags.WithError(common.ErrNotFound)))
 			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0254, featureflags.WithError(common.ErrNotFound)))
 			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0116, featureflags.WithError(common.ErrNotFound)))
-			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.VersionLatest, featureflags.WithKey(featureflags.CompatibilityTestsPluginKey0), featureflags.WithValue("false")))
-			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0280, featureflags.WithKey(featureflags.CompatibilityTestsPluginKey0), featureflags.WithValue("false")))
-			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0254, featureflags.WithKey(featureflags.CompatibilityTestsPluginKey0), featureflags.WithValue("false")))
-			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0116, featureflags.WithKey(featureflags.CompatibilityTestsPluginKey0), featureflags.WithValue("false")))
+			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.VersionLatest, featureflags.WithKey(featureflags.CompatibilityTestsPluginKey0), featureflags.WithValue("false"), featureflags.WithStrictValidationStrategy()))
+			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0280, featureflags.WithKey(featureflags.CompatibilityTestsPluginKey0), featureflags.WithValue("false"), featureflags.WithStrictValidationStrategy()))
+			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0254, featureflags.WithKey(featureflags.CompatibilityTestsPluginKey0), featureflags.WithValue("false"), featureflags.WithStrictValidationStrategy()))
+			testCase.Add(featureflags.DefaultIsFeatureEnabledCommand(core.Version0116, featureflags.WithKey(featureflags.CompatibilityTestsPluginKey0), featureflags.WithValue("false"), featureflags.WithStrictValidationStrategy()))
 
 			// Run all the commands
 			executer.Execute(testCase)

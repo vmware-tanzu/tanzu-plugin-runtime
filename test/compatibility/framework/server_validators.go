@@ -11,22 +11,6 @@ import (
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 )
 
-func (opts *ServerOpts) ValidName() bool {
-	return opts.Name != ""
-}
-
-func (opts *ServerOpts) ValidServerType() bool {
-	return opts.Type != "" && (opts.Type == ManagementClusterServerType || opts.Type == GlobalServerType)
-}
-
-func (opts *ServerOpts) ValidGlobalOptsOrManagementClusterOpts() bool {
-	return (opts.GlobalOpts != nil && opts.GlobalOpts.Endpoint != "") || (opts.ManagementClusterOpts != nil && opts.ManagementClusterOpts.Endpoint != "")
-}
-
-func (opts *ServerOpts) ValidDiscoverySources() bool {
-	return opts.DiscoverySources != nil || len(opts.DiscoverySources) == 0
-}
-
 // Validate  the setServerInputOptions as per runtime version i.e. check whether mandatory fields are set and throw error if missing
 func (opts *SetServerInputOptions) Validate() (bool, error) {
 	// Run Core Validators

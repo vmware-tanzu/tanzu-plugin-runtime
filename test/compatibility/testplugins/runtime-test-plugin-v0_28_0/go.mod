@@ -5,6 +5,7 @@ go 1.18
 replace github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core => ../../core
 
 require (
+	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.6.1
 	github.com/stretchr/testify v1.8.1
 	github.com/vmware-tanzu/tanzu-framework/apis/cli v0.0.0-20230214111918-af087107ddc3
@@ -28,7 +29,6 @@ require (
 	github.com/mattn/go-isatty v0.0.16 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	golang.org/x/net v0.7.0 // indirect
 	golang.org/x/sys v0.5.0 // indirect

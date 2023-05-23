@@ -5,6 +5,7 @@ package framework
 
 import (
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/types"
 )
 
 // GetServerInputOptions used to generate GetServer command
@@ -16,7 +17,7 @@ type GetServerInputOptions struct {
 // GetServerOutputOptions used to generate GetServer command
 type GetServerOutputOptions struct {
 	*core.RuntimeAPIVersion                         // required
-	*ServerOpts                                     // For specific version options look into ServerOpts definition
+	*types.ServerOpts                               // For specific version options look into ServerOpts definition
 	ValidationStrategy      core.ValidationStrategy // Type of validation to be performed i.e. exact or partial. default is partial
 	Error                   string                  // expected error message could be the sub string of actual error message
 }
@@ -24,7 +25,7 @@ type GetServerOutputOptions struct {
 // SetServerInputOptions used to generate SetServer command
 type SetServerInputOptions struct {
 	*core.RuntimeAPIVersion      // required
-	*ServerOpts                  // required
+	*types.ServerOpts            // required
 	SetCurrentServer        bool // required
 }
 
@@ -67,7 +68,7 @@ type GetCurrentServerInputOptions struct {
 // GetCurrentServerOutputOptions used to generate GetCurrentServer command
 type GetCurrentServerOutputOptions struct {
 	*core.RuntimeAPIVersion                         // required
-	*ServerOpts                                     // For specific version options look into ServerOpts definition
+	*types.ServerOpts                               // For specific version options look into ServerOpts definition
 	ValidationStrategy      core.ValidationStrategy // Type of validation to be performed i.e. exact or partial. default is partial
 	Error                   string                  // expected error message could be the sub string of actual error message
 }

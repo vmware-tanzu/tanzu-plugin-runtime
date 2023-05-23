@@ -43,9 +43,8 @@ type SetEnvInputOptions struct {
 
 // SetEnvOutputOptions used to generate SetEnv command
 type SetEnvOutputOptions struct {
-	*core.RuntimeAPIVersion                         // required
-	ValidationStrategy      core.ValidationStrategy // Type of validation to be performed i.e. exact or partial. default is partial
-	Error                   string                  // expected error message could be the sub string of actual error message
+	*core.RuntimeAPIVersion        // required
+	Error                   string // expected error message could be the sub string of actual error message
 }
 
 // DeleteEnvInputOptions used to generate DeleteEnv command
@@ -57,9 +56,8 @@ type DeleteEnvInputOptions struct {
 
 // DeleteEnvOutputOptions used to generate DeleteEnv command
 type DeleteEnvOutputOptions struct {
-	*core.RuntimeAPIVersion                         // required
-	ValidationStrategy      core.ValidationStrategy // Type of validation to be performed i.e. exact or partial. default is partial
-	Error                   string                  // expected error message could be the sub string of actual error message
+	*core.RuntimeAPIVersion        // required
+	Error                   string // expected error message could be the sub string of actual error message
 }
 
 // CfgEnvArgs arguments struct that are used to create Env API commands
@@ -102,6 +100,10 @@ func WithValidationStrategy(vs core.ValidationStrategy) CfgEnvOptionArgs {
 	return func(c *CfgEnvArgs) {
 		c.ValidationStrategy = vs
 	}
+}
+
+func WithStrictValidationStrategy() CfgEnvOptionArgs {
+	return WithValidationStrategy(core.ValidationStrategyStrict)
 }
 
 func WithError(e string) CfgEnvOptionArgs {

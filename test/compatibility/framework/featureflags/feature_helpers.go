@@ -72,8 +72,7 @@ func DefaultDeleteFeatureCommand(version core.RuntimeVersion, opts ...CfgFeature
 		RuntimeAPIVersion: &core.RuntimeAPIVersion{
 			RuntimeVersion: version,
 		},
-		ValidationStrategy: args.ValidationStrategy,
-		Error:              args.Error,
+		Error: args.Error,
 	}
 
 	cmd, err := NewDeleteFeatureCommand(inputOpts, outputOpts)
@@ -106,8 +105,7 @@ func DefaultSetFeatureCommand(version core.RuntimeVersion, opts ...CfgFeatureOpt
 		RuntimeAPIVersion: &core.RuntimeAPIVersion{
 			RuntimeVersion: version,
 		},
-		ValidationStrategy: args.ValidationStrategy,
-		Error:              args.Error,
+		Error: args.Error,
 	}
 
 	cmd, err := NewSetFeatureCommand(inputOpts, outputOpts)

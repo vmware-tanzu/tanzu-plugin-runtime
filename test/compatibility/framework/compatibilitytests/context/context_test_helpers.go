@@ -10,6 +10,8 @@ import (
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
 
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/types"
+
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework"
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/compatibilitytests/common"
@@ -446,10 +448,10 @@ func DefaultSetContextInputOptions(version core.RuntimeVersion, contextName stri
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: version,
 			},
-			ContextOpts: &framework.ContextOpts{
+			ContextOpts: &types.ContextOpts{
 				Name:   contextName,
-				Target: framework.TargetK8s,
-				GlobalOpts: &framework.GlobalServerOpts{
+				Target: types.TargetK8s,
+				GlobalOpts: &types.GlobalServerOpts{
 					Endpoint: "default-compatibility-test-endpoint",
 				},
 			},
@@ -459,10 +461,10 @@ func DefaultSetContextInputOptions(version core.RuntimeVersion, contextName stri
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: core.Version0254,
 			},
-			ContextOpts: &framework.ContextOpts{
+			ContextOpts: &types.ContextOpts{
 				Name: contextName,
-				Type: framework.CtxTypeK8s,
-				GlobalOpts: &framework.GlobalServerOpts{
+				Type: types.CtxTypeK8s,
+				GlobalOpts: &types.GlobalServerOpts{
 					Endpoint: "default-compatibility-test-endpoint",
 				},
 			},
@@ -489,10 +491,10 @@ func DefaultGetContextOutputOptions(version core.RuntimeVersion, contextName str
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: version,
 			},
-			ContextOpts: &framework.ContextOpts{
+			ContextOpts: &types.ContextOpts{
 				Name:   contextName,
-				Target: framework.TargetK8s,
-				GlobalOpts: &framework.GlobalServerOpts{
+				Target: types.TargetK8s,
+				GlobalOpts: &types.GlobalServerOpts{
 					Endpoint: common.DefaultEndpoint,
 				},
 			},
@@ -503,10 +505,10 @@ func DefaultGetContextOutputOptions(version core.RuntimeVersion, contextName str
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: core.Version0254,
 			},
-			ContextOpts: &framework.ContextOpts{
+			ContextOpts: &types.ContextOpts{
 				Name: contextName,
-				Type: framework.CtxTypeK8s,
-				GlobalOpts: &framework.GlobalServerOpts{
+				Type: types.CtxTypeK8s,
+				GlobalOpts: &types.GlobalServerOpts{
 					Endpoint: common.DefaultEndpoint,
 				},
 			},
@@ -554,14 +556,14 @@ func DefaultGetCurrentContextInputOptions(version core.RuntimeVersion) *framewor
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: version,
 			},
-			Target: framework.TargetK8s,
+			Target: types.TargetK8s,
 		}
 	case core.Version0254:
 		return &framework.GetCurrentContextInputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: core.Version0254,
 			},
-			ContextType: framework.CtxTypeK8s,
+			ContextType: types.CtxTypeK8s,
 		}
 	}
 	return nil
@@ -575,10 +577,10 @@ func DefaultGetCurrentContextOutputOptions(version core.RuntimeVersion, contextN
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: core.VersionLatest,
 			},
-			ContextOpts: &framework.ContextOpts{
+			ContextOpts: &types.ContextOpts{
 				Name:   contextName,
-				Target: framework.TargetK8s,
-				GlobalOpts: &framework.GlobalServerOpts{
+				Target: types.TargetK8s,
+				GlobalOpts: &types.GlobalServerOpts{
 					Endpoint: common.DefaultEndpoint,
 				},
 			},
@@ -589,10 +591,10 @@ func DefaultGetCurrentContextOutputOptions(version core.RuntimeVersion, contextN
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: core.Version0254,
 			},
-			ContextOpts: &framework.ContextOpts{
+			ContextOpts: &types.ContextOpts{
 				Name: contextName,
-				Type: framework.CtxTypeK8s,
-				GlobalOpts: &framework.GlobalServerOpts{
+				Type: types.CtxTypeK8s,
+				GlobalOpts: &types.GlobalServerOpts{
 					Endpoint: common.DefaultEndpoint,
 				},
 			},
@@ -609,14 +611,14 @@ func DefaultGetCurrentContextOutputOptionsWithError(version core.RuntimeVersion)
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: version,
 			},
-			Error: fmt.Sprintf("no current context set for target \"%v\"", framework.TargetK8s),
+			Error: fmt.Sprintf("no current context set for target \"%v\"", types.TargetK8s),
 		}
 	case core.Version0254:
 		return &framework.GetCurrentContextOutputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: version,
 			},
-			Error: fmt.Sprintf("no current context set for type \"%v\"", framework.CtxTypeK8s),
+			Error: fmt.Sprintf("no current context set for type \"%v\"", types.CtxTypeK8s),
 		}
 	}
 	return nil
@@ -630,7 +632,7 @@ func DefaultRemoveCurrentContextInputOptions(version core.RuntimeVersion) *frame
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: version,
 			},
-			Target: framework.TargetK8s,
+			Target: types.TargetK8s,
 		}
 	}
 	return nil
@@ -644,14 +646,14 @@ func DefaultRemoveCurrentContextOutputOptionsWithError(version core.RuntimeVersi
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: version,
 			},
-			Error: fmt.Sprintf("no current context set for target \"%v\"", framework.TargetK8s),
+			Error: fmt.Sprintf("no current context set for target \"%v\"", types.TargetK8s),
 		}
 	case core.Version0254:
 		return &framework.RemoveCurrentContextOutputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: version,
 			},
-			Error: fmt.Sprintf("no current context set for type \"%v\"", framework.CtxTypeK8s),
+			Error: fmt.Sprintf("no current context set for type \"%v\"", types.CtxTypeK8s),
 		}
 	}
 	return nil

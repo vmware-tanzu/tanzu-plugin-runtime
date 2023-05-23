@@ -41,6 +41,11 @@ var apiHandlers = map[core.RuntimeAPIName]func(*core.API) *core.APIResponse{
 	core.GetEnvAPI:               triggerGetEnvAPI,
 	core.GetEnvConfigurationsAPI: triggerGetEnvConfigurationsAPI,
 	core.DeleteEnvAPI:            triggerDeleteEnvAPI,
+
+	// CLI Discovery Source APIs
+	core.SetCLIDiscoverySourceAPI:    triggerSetCLIDiscoverySourceAPI,
+	core.GetCLIDiscoverySourceAPI:    triggerGetCLIDiscoverySourceAPI,
+	core.DeleteCLIDiscoverySourceAPI: triggerDeleteCLIDiscoverySourceAPI,
 }
 
 // triggerAPIs trigger runtime apis and construct logs

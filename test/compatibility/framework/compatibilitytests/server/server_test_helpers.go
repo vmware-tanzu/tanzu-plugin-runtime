@@ -10,6 +10,8 @@ import (
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
 
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/types"
+
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework"
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/compatibilitytests/common"
@@ -531,10 +533,10 @@ func DefaultSetServerInputOptions(version core.RuntimeVersion, serverName string
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: version,
 			},
-			ServerOpts: &framework.ServerOpts{
+			ServerOpts: &types.ServerOpts{
 				Name: serverName,
-				Type: framework.ManagementClusterServerType,
-				GlobalOpts: &framework.GlobalServerOpts{
+				Type: types.ManagementClusterServerType,
+				GlobalOpts: &types.GlobalServerOpts{
 					Endpoint: common.DefaultEndpoint,
 				},
 			},
@@ -562,10 +564,10 @@ func DefaultGetServerOutputOptions(version core.RuntimeVersion, serverName strin
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: version,
 			},
-			ServerOpts: &framework.ServerOpts{
+			ServerOpts: &types.ServerOpts{
 				Name: serverName,
-				Type: framework.ManagementClusterServerType,
-				GlobalOpts: &framework.GlobalServerOpts{
+				Type: types.ManagementClusterServerType,
+				GlobalOpts: &types.GlobalServerOpts{
 					Endpoint: common.DefaultEndpoint,
 				},
 			},
@@ -576,10 +578,10 @@ func DefaultGetServerOutputOptions(version core.RuntimeVersion, serverName strin
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: version,
 			},
-			ServerOpts: &framework.ServerOpts{
+			ServerOpts: &types.ServerOpts{
 				Name: serverName,
-				Type: framework.ManagementClusterServerType,
-				GlobalOpts: &framework.GlobalServerOpts{
+				Type: types.ManagementClusterServerType,
+				GlobalOpts: &types.GlobalServerOpts{
 					Endpoint: common.DefaultEndpoint,
 				},
 			},
@@ -633,10 +635,10 @@ func DefaultGetCurrentServerOutputOptions(version core.RuntimeVersion, serverNam
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: version,
 			},
-			ServerOpts: &framework.ServerOpts{
+			ServerOpts: &types.ServerOpts{
 				Name: serverName,
-				Type: framework.ManagementClusterServerType,
-				GlobalOpts: &framework.GlobalServerOpts{
+				Type: types.ManagementClusterServerType,
+				GlobalOpts: &types.GlobalServerOpts{
 					Endpoint: common.DefaultEndpoint,
 				},
 			},
@@ -647,10 +649,10 @@ func DefaultGetCurrentServerOutputOptions(version core.RuntimeVersion, serverNam
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: core.Version0280,
 			},
-			ServerOpts: &framework.ServerOpts{
+			ServerOpts: &types.ServerOpts{
 				Name: serverName,
-				Type: framework.ManagementClusterServerType,
-				GlobalOpts: &framework.GlobalServerOpts{
+				Type: types.ManagementClusterServerType,
+				GlobalOpts: &types.GlobalServerOpts{
 					Endpoint: common.DefaultEndpoint,
 				},
 			},

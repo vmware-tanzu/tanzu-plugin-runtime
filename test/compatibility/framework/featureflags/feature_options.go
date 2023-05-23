@@ -32,9 +32,8 @@ type SetFeatureInputOptions struct {
 
 // SetFeatureOutputOptions used to generate SetFeature command
 type SetFeatureOutputOptions struct {
-	*core.RuntimeAPIVersion                         // required
-	ValidationStrategy      core.ValidationStrategy // Type of validation to be performed i.e. exact or partial. default is partial
-	Error                   string                  // expected error message could be the sub string of actual error message
+	*core.RuntimeAPIVersion        // required
+	Error                   string // expected error message could be the sub string of actual error message
 }
 
 // DeleteFeatureInputOptions used to generate DeleteFeature command
@@ -47,9 +46,8 @@ type DeleteFeatureInputOptions struct {
 
 // DeleteFeatureOutputOptions used to generate DeleteFeature command
 type DeleteFeatureOutputOptions struct {
-	*core.RuntimeAPIVersion                         // required
-	ValidationStrategy      core.ValidationStrategy // Type of validation to be performed i.e. exact or partial. default is partial
-	Error                   string                  // expected error message could be the sub string of actual error message
+	*core.RuntimeAPIVersion        // required
+	Error                   string // expected error message could be the sub string of actual error message
 }
 
 type CfgFeatureArgs struct {
@@ -98,6 +96,10 @@ func WithValidationStrategy(vs core.ValidationStrategy) CfgFeatureOptionArgs {
 	return func(c *CfgFeatureArgs) {
 		c.ValidationStrategy = vs
 	}
+}
+
+func WithStrictValidationStrategy() CfgFeatureOptionArgs {
+	return WithValidationStrategy(core.ValidationStrategyStrict)
 }
 
 func WithError(e string) CfgFeatureOptionArgs {

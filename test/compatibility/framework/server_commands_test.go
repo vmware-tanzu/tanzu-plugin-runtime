@@ -8,6 +8,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/types"
+
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 )
 
@@ -23,10 +25,10 @@ func TestNewSetServerCommand(t *testing.T) {
 				RuntimeAPIVersion: &core.RuntimeAPIVersion{
 					RuntimeVersion: core.VersionLatest,
 				},
-				ServerOpts: &ServerOpts{
+				ServerOpts: &types.ServerOpts{
 					Name: "compatibility-one",
-					Type: ManagementClusterServerType,
-					GlobalOpts: &GlobalServerOpts{
+					Type: types.ManagementClusterServerType,
+					GlobalOpts: &types.GlobalServerOpts{
 						Endpoint: "default-compatibility-test-endpoint",
 					},
 				},
@@ -82,10 +84,10 @@ func TestNewGetServerCommand(t *testing.T) {
 				RuntimeAPIVersion: &core.RuntimeAPIVersion{
 					RuntimeVersion: core.Version0280,
 				},
-				ServerOpts: &ServerOpts{
+				ServerOpts: &types.ServerOpts{
 					Name: "compatibility-one",
-					Type: ManagementClusterServerType,
-					GlobalOpts: &GlobalServerOpts{
+					Type: types.ManagementClusterServerType,
+					GlobalOpts: &types.GlobalServerOpts{
 						Endpoint: "default-compatibility-test-endpoint",
 					},
 				},
@@ -225,10 +227,10 @@ func TestNewGetCurrentServerCommand(t *testing.T) {
 				RuntimeAPIVersion: &core.RuntimeAPIVersion{
 					RuntimeVersion: core.Version0280,
 				},
-				ServerOpts: &ServerOpts{
+				ServerOpts: &types.ServerOpts{
 					Name: "compatibility-one",
-					Type: ManagementClusterServerType,
-					GlobalOpts: &GlobalServerOpts{
+					Type: types.ManagementClusterServerType,
+					GlobalOpts: &types.GlobalServerOpts{
 						Endpoint: "default-compatibility-test-endpoint",
 					},
 				},

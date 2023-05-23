@@ -8,6 +8,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/types"
+
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 )
 
@@ -23,10 +25,10 @@ func TestNewSetContextCommand(t *testing.T) {
 				RuntimeAPIVersion: &core.RuntimeAPIVersion{
 					RuntimeVersion: core.VersionLatest,
 				},
-				ContextOpts: &ContextOpts{
+				ContextOpts: &types.ContextOpts{
 					Name:   "compatibility-one",
-					Target: TargetK8s,
-					GlobalOpts: &GlobalServerOpts{
+					Target: types.TargetK8s,
+					GlobalOpts: &types.GlobalServerOpts{
 						Endpoint: "default-compatibility-test-endpoint",
 					},
 				},
@@ -82,10 +84,10 @@ func TestNewGetContextCommand(t *testing.T) {
 				RuntimeAPIVersion: &core.RuntimeAPIVersion{
 					RuntimeVersion: core.Version0280,
 				},
-				ContextOpts: &ContextOpts{
+				ContextOpts: &types.ContextOpts{
 					Name:   "compatibility-one",
-					Target: TargetK8s,
-					GlobalOpts: &GlobalServerOpts{
+					Target: types.TargetK8s,
+					GlobalOpts: &types.GlobalServerOpts{
 						Endpoint: "default-compatibility-test-endpoint",
 					},
 				},
@@ -221,15 +223,15 @@ func TestNewGetCurrentContextCommand(t *testing.T) {
 				RuntimeAPIVersion: &core.RuntimeAPIVersion{
 					RuntimeVersion: core.VersionLatest,
 				},
-				Target: TargetK8s,
+				Target: types.TargetK8s,
 			}, &GetCurrentContextOutputOptions{
 				RuntimeAPIVersion: &core.RuntimeAPIVersion{
 					RuntimeVersion: core.Version0280,
 				},
-				ContextOpts: &ContextOpts{
+				ContextOpts: &types.ContextOpts{
 					Name:   "compatibility-one",
-					Target: TargetK8s,
-					GlobalOpts: &GlobalServerOpts{
+					Target: types.TargetK8s,
+					GlobalOpts: &types.GlobalServerOpts{
 						Endpoint: "default-compatibility-test-endpoint",
 					},
 				},
@@ -240,7 +242,7 @@ func TestNewGetCurrentContextCommand(t *testing.T) {
 						Name:    core.GetCurrentContextAPIName,
 						Version: core.VersionLatest,
 						Arguments: map[core.APIArgumentType]interface{}{
-							core.Target: TargetK8s,
+							core.Target: types.TargetK8s,
 						},
 						Output: &core.Output{
 							ValidationStrategy: "",
@@ -279,7 +281,7 @@ func TestNewRemoveCurrentContextCommand(t *testing.T) {
 				RuntimeAPIVersion: &core.RuntimeAPIVersion{
 					RuntimeVersion: core.VersionLatest,
 				},
-				Target: TargetK8s,
+				Target: types.TargetK8s,
 			}, nil,
 			&core.Command{
 				APIs: []*core.API{
@@ -287,7 +289,7 @@ func TestNewRemoveCurrentContextCommand(t *testing.T) {
 						Name:    core.RemoveCurrentContextAPIName,
 						Version: core.VersionLatest,
 						Arguments: map[core.APIArgumentType]interface{}{
-							core.Target: TargetK8s,
+							core.Target: types.TargetK8s,
 						},
 						Output: &core.Output{
 							ValidationStrategy: "",

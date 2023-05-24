@@ -14,6 +14,7 @@ import (
 
 // CopyLegacyConfigDir copies configuration files from legacy config dir to the new location. This is a no-op if the legacy dir
 // does not exist or if the new config dir already exists.
+// Deprecated: This API is deprecated use config next gen APIs
 func CopyLegacyConfigDir() error {
 	legacyPath, err := legacyLocalDir()
 	if err != nil {
@@ -42,6 +43,8 @@ func CopyLegacyConfigDir() error {
 }
 
 // storeConfigToLegacyDir stores configuration to legacy dir and logs warning in case of errors.
+//
+// Deprecated: This method is deprecated
 func storeConfigToLegacyDir(data []byte) {
 	var (
 		err                      error
@@ -74,6 +77,8 @@ func storeConfigToLegacyDir(data []byte) {
 }
 
 // persistLegacyClientConfig write to config.yaml
+//
+// Deprecated: This method is deprecated
 func persistLegacyClientConfig(node *yaml.Node) error {
 	data, err := yaml.Marshal(node)
 	if err != nil {

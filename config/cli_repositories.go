@@ -14,6 +14,8 @@ import (
 )
 
 // GetCLIRepositories retrieves cli repositories
+//
+// Deprecated: This API is deprecated
 func GetCLIRepositories() ([]configtypes.PluginRepository, error) {
 	// Retrieve client config node
 	node, err := getClientConfigNode()
@@ -25,6 +27,8 @@ func GetCLIRepositories() ([]configtypes.PluginRepository, error) {
 }
 
 // GetCLIRepository retrieves cli repository by name
+//
+// Deprecated: This API is deprecated
 func GetCLIRepository(name string) (*configtypes.PluginRepository, error) {
 	// Retrieve client config node
 	node, err := getClientConfigNode()
@@ -36,6 +40,8 @@ func GetCLIRepository(name string) (*configtypes.PluginRepository, error) {
 }
 
 // SetCLIRepository add or update a repository
+//
+// Deprecated: This API is deprecated
 func SetCLIRepository(repository configtypes.PluginRepository) (err error) {
 	// Retrieve client config node
 	AcquireTanzuConfigLock()
@@ -63,6 +69,8 @@ func SetCLIRepository(repository configtypes.PluginRepository) (err error) {
 }
 
 // DeleteCLIRepository delete a cli repository by name
+//
+// Deprecated: This API is deprecated
 func DeleteCLIRepository(name string) error {
 	// Retrieve client config node
 	AcquireTanzuConfigLock()
@@ -82,6 +90,7 @@ func DeleteCLIRepository(name string) error {
 	return persistConfig(node)
 }
 
+// Deprecated: This method is deprecated
 func getCLIRepositories(node *yaml.Node) ([]configtypes.PluginRepository, error) {
 	cfg, err := convertNodeToClientConfig(node)
 	if err != nil {
@@ -93,6 +102,7 @@ func getCLIRepositories(node *yaml.Node) ([]configtypes.PluginRepository, error)
 	return nil, errors.New("cli repositories not found")
 }
 
+// Deprecated: This method is deprecated
 func getCLIRepository(node *yaml.Node, name string) (*configtypes.PluginRepository, error) {
 	cfg, err := convertNodeToClientConfig(node)
 	if err != nil {
@@ -109,6 +119,7 @@ func getCLIRepository(node *yaml.Node, name string) (*configtypes.PluginReposito
 	return nil, errors.New("cli repository not found")
 }
 
+// Deprecated: This method is deprecated
 func setCLIRepositories(node *yaml.Node, repos []configtypes.PluginRepository) (err error) {
 	for _, repository := range repos {
 		_, err = setCLIRepository(node, repository)
@@ -119,6 +130,7 @@ func setCLIRepositories(node *yaml.Node, repos []configtypes.PluginRepository) (
 	return err
 }
 
+// Deprecated: This method is deprecated
 func setCLIRepository(node *yaml.Node, repository configtypes.PluginRepository) (persist bool, err error) {
 	// Retrieve the patch strategies from config metadata
 	patchStrategies, err := GetConfigMetadataPatchStrategy()
@@ -141,6 +153,7 @@ func setCLIRepository(node *yaml.Node, repository configtypes.PluginRepository) 
 	return setRepository(cliRepositoriesNode, repository, nodeutils.WithPatchStrategies(patchStrategies), nodeutils.WithPatchStrategyKey(fmt.Sprintf("%v.%v.%v", KeyClientOptions, KeyCLI, KeyRepositories)))
 }
 
+// Deprecated: This method is deprecated
 func deleteCLIRepository(node *yaml.Node, name string) error {
 	// Find the cli repositories node in the yaml node
 	keys := []nodeutils.Key{
@@ -176,6 +189,7 @@ func deleteCLIRepository(node *yaml.Node, name string) error {
 	return nil
 }
 
+// Deprecated: This method is deprecated
 func setRepository(repositoriesNode *yaml.Node, repository configtypes.PluginRepository, patchStrategyOpts ...nodeutils.PatchStrategyOpts) (persist bool, err error) {
 	newNode, err := convertObjectToNode(&repository)
 	if err != nil {
@@ -223,6 +237,7 @@ func setRepository(repositoriesNode *yaml.Node, repository configtypes.PluginRep
 	return persist, err
 }
 
+// Deprecated: This method is deprecated
 func getRepositoryTypeAndName(repository configtypes.PluginRepository) (string, string) {
 	if repository.GCPPluginRepository != nil && repository.GCPPluginRepository.Name != "" {
 		return "gcpPluginRepository", repository.GCPPluginRepository.Name

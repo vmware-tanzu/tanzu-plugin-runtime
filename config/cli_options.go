@@ -11,6 +11,8 @@ import (
 )
 
 // GetEdition retrieves ClientOptions Edition
+//
+// Deprecated: This API is deprecated
 func GetEdition() (string, error) {
 	// Retrieve client config node
 	node, err := getClientConfigNode()
@@ -21,6 +23,8 @@ func GetEdition() (string, error) {
 }
 
 // SetEdition adds or updates edition value
+//
+// Deprecated: This API is deprecated
 func SetEdition(val string) (err error) {
 	// Check if val is empty
 	if val == "" {
@@ -44,6 +48,7 @@ func SetEdition(val string) (err error) {
 	return err
 }
 
+// Deprecated: This method is deprecated
 func setEdition(node *yaml.Node, val string) (persist bool) {
 	editionNode := getCLIOptionsChildNode(KeyEdition, node)
 	if editionNode != nil && editionNode.Value != val {
@@ -53,18 +58,19 @@ func setEdition(node *yaml.Node, val string) (persist bool) {
 	return persist
 }
 
+// Deprecated: This method is deprecated
 func getEdition(node *yaml.Node) (string, error) {
 	cfg, err := convertNodeToClientConfig(node)
 	if err != nil {
 		return "", err
 	}
 	if cfg != nil && cfg.ClientOptions != nil && cfg.ClientOptions.CLI != nil {
-		//nolint:staticcheck
 		return string(cfg.ClientOptions.CLI.Edition), nil
 	}
 	return "", errors.New("edition not found")
 }
 
+// Deprecated: This method is deprecated
 func setUnstableVersionSelector(node *yaml.Node, name string) (persist bool) {
 	unstableVersionSelectorNode := getCLIOptionsChildNode(KeyUnstableVersionSelector, node)
 	if unstableVersionSelectorNode != nil && unstableVersionSelectorNode.Value != name {
@@ -74,6 +80,7 @@ func setUnstableVersionSelector(node *yaml.Node, name string) (persist bool) {
 	return persist
 }
 
+// Deprecated: This method is deprecated
 func setBomRepo(node *yaml.Node, repo string) (persist bool) {
 	bomRepoNode := getCLIOptionsChildNode(KeyBomRepo, node)
 	if bomRepoNode != nil && bomRepoNode.Value != repo {
@@ -83,6 +90,7 @@ func setBomRepo(node *yaml.Node, repo string) (persist bool) {
 	return persist
 }
 
+// Deprecated: This method is deprecated
 func setCompatibilityFilePath(node *yaml.Node, filepath string) (persist bool) {
 	compatibilityFilePathNode := getCLIOptionsChildNode(KeyCompatibilityFilePath, node)
 	if compatibilityFilePathNode.Value != filepath {
@@ -93,6 +101,8 @@ func setCompatibilityFilePath(node *yaml.Node, filepath string) (persist bool) {
 }
 
 // getCLIOptionsChildNode parses the yaml node and returns the matched node based on configOptions
+//
+// Deprecated: This method is deprecated
 func getCLIOptionsChildNode(key string, node *yaml.Node) *yaml.Node {
 	configOptions := func(c *nodeutils.CfgNode) {
 		c.ForceCreate = true

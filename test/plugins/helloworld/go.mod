@@ -5,7 +5,7 @@ go 1.18
 replace github.com/vmware-tanzu/tanzu-plugin-runtime => ../../../
 
 require (
-	github.com/spf13/cobra v1.6.1
+	github.com/spf13/cobra v1.7.0
 	github.com/vmware-tanzu/tanzu-plugin-runtime v0.0.0-00010101000000-000000000000
 )
 
@@ -14,7 +14,7 @@ require (
 	github.com/briandowns/spinner v1.19.0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
 	github.com/fatih/color v1.9.0 // indirect
-	github.com/inconshreveable/mousetrap v1.0.1 // indirect
+	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/logrusorgru/aurora v2.0.3+incompatible // indirect
 	github.com/mattn/go-colorable v0.1.4 // indirect

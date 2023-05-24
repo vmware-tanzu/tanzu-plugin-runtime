@@ -7,17 +7,17 @@ package metadata
 import (
 	"strconv"
 
-	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
-
 	"gopkg.in/yaml.v3"
+
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 )
 
 // NewSetConfigMetadataPatchStrategyCommand constructs a command to make a call to specific runtime version SetConfigMetadata API
-// Input Parameter inputOpts has all input parameters which are required for Runtime SetConfigMetadata API
+// Input Parameter: inputOpts has all input parameters which are required for Runtime SetConfigMetadata API
 // Input Parameter: outputOpts has details about expected output from Runtime SetConfigMetadata API call
 // Return: command to execute or error if any validations fails for SetConfigMetadataInputOptions or SetConfigMetadataOutputOptions
-// This method does validate the input parameters  SetConfigMetadataInputOptions or SetConfigMetadataOutputOptions based on Runtime API Version
-// For more details about supported parameters refer to SetConfigMetadataInputOptions or SetConfigMetadataOutputOptions definition(and ConfigMetadataOpts struct, which is embedded)
+// This method does validate the input parameters SetConfigMetadataInputOptions or SetConfigMetadataOutputOptions based on Runtime API Version
+// For more details about supported parameters refer to SetConfigMetadataInputOptions or SetConfigMetadataOutputOptions definition (and ConfigMetadataOpts struct, which is embedded)
 //
 //nolint:dupl
 func NewSetConfigMetadataPatchStrategyCommand(inputOpts *SetConfigMetadataPatchStrategyInputOptions, outputOpts *SetConfigMetadataPatchStrategyOutputOptions) (*core.Command, error) {
@@ -65,11 +65,11 @@ func NewSetConfigMetadataPatchStrategyCommand(inputOpts *SetConfigMetadataPatchS
 }
 
 // NewSetConfigMetadataSettingCommand constructs a command to make a call to specific runtime version SetConfigMetadata API
-// Input Parameter inputOpts has all input parameters which are required for Runtime SetConfigMetadata API
+// Input Parameter: inputOpts has all input parameters which are required for Runtime SetConfigMetadata API
 // Input Parameter: outputOpts has details about expected output from Runtime SetConfigMetadata API call
 // Return: command to execute or error if any validations fails for SetConfigMetadataInputOptions or SetConfigMetadataOutputOptions
-// This method does validate the input parameters  SetConfigMetadataInputOptions or SetConfigMetadataOutputOptions based on Runtime API Version
-// For more details about supported parameters refer to SetConfigMetadataInputOptions or SetConfigMetadataOutputOptions definition(and ConfigMetadataOpts struct, which is embedded)
+// This method does validate the input parameters SetConfigMetadataInputOptions or SetConfigMetadataOutputOptions based on Runtime API Version
+// For more details about supported parameters refer to SetConfigMetadataInputOptions or SetConfigMetadataOutputOptions definition (and ConfigMetadataOpts struct, which is embedded)
 //
 //nolint:dupl
 func NewSetConfigMetadataSettingCommand(inputOpts *SetConfigMetadataSettingInputOptions, outputOpts *SetConfigMetadataSettingOutputOptions) (*core.Command, error) {
@@ -117,11 +117,11 @@ func NewSetConfigMetadataSettingCommand(inputOpts *SetConfigMetadataSettingInput
 }
 
 // NewDeleteConfigMetadataSettingCommand constructs a command to make a call to specific runtime version DeleteConfigMetadata API
-// Input Parameter inputOpts has all input parameters which are required for Runtime DeleteConfigMetadata API
+// Input Parameter: inputOpts has all input parameters which are required for Runtime DeleteConfigMetadata API
 // Input Parameter: outputOpts has details about expected output from Runtime DeleteConfigMetadata API call
 // Return: command to execute or error if any validations fails for DeleteConfigMetadataInputOptions or DeleteConfigMetadataOutputOptions
-// This method does validate the input parameters  DeleteConfigMetadataInputOptions or DeleteConfigMetadataOutputOptions based on Runtime API Version
-// For more details about supported parameters refer to DeleteConfigMetadataInputOptions or DeleteConfigMetadataOutputOptions definition(and ConfigMetadataOpts struct, which is embedded)
+// This method does validate the input parameters DeleteConfigMetadataInputOptions or DeleteConfigMetadataOutputOptions based on Runtime API Version
+// For more details about supported parameters refer to DeleteConfigMetadataInputOptions or DeleteConfigMetadataOutputOptions definition (and ConfigMetadataOpts struct, which is embedded)
 func NewDeleteConfigMetadataSettingCommand(inputOpts *DeleteConfigMetadataSettingInputOptions, outputOpts *DeleteConfigMetadataSettingOutputOptions) (*core.Command, error) {
 	// Init the Command object
 	c := &core.Command{}
@@ -165,11 +165,11 @@ func NewDeleteConfigMetadataSettingCommand(inputOpts *DeleteConfigMetadataSettin
 }
 
 // NewGetMetadataCommand constructs a command to make a call to specific runtime version GetConfigMetadata API
-// Input Parameter inputOpts has all input parameters which are required for Runtime GetConfigMetadata API
+// Input Parameter: inputOpts has all input parameters which are required for Runtime GetConfigMetadata API
 // Input Parameter: outputOpts has details about expected output from Runtime GetConfigMetadata API call
 // Return: command to execute or error if any validations fails for GetConfigMetadataInputOptions or GetConfigMetadataOutputOptions
-// This method does validate the input parameters  GetConfigMetadataInputOptions or GetConfigMetadataOutputOptions based on Runtime API Version
-// For more details about supported parameters refer to GetConfigMetadataInputOptions or GetConfigMetadataOutputOptions definition(and ConfigMetadataOpts struct, which is embedded)
+// This method does validate the input parameters GetConfigMetadataInputOptions or GetConfigMetadataOutputOptions based on Runtime API Version
+// For more details about supported parameters refer to GetConfigMetadataInputOptions or GetConfigMetadataOutputOptions definition (and ConfigMetadataOpts struct, which is embedded)
 //
 //nolint:dupl
 func NewGetMetadataCommand(inputOpts *GetMetadataInputOptions, outputOpts *GetMetadataOutputOptions) (*core.Command, error) {
@@ -228,11 +228,11 @@ func NewGetMetadataCommand(inputOpts *GetMetadataInputOptions, outputOpts *GetMe
 }
 
 // NewGetConfigMetadataCommand constructs a command to make a call to specific runtime version GetConfigMetadata API
-// Input Parameter inputOpts has all input parameters which are required for Runtime GetConfigMetadata API
+// Input Parameter: inputOpts has all input parameters which are required for Runtime GetConfigMetadata API
 // Input Parameter: outputOpts has details about expected output from Runtime GetConfigMetadata API call
 // Return: command to execute or error if any validations fails for GetConfigMetadataInputOptions or GetConfigMetadataOutputOptions
-// This method does validate the input parameters  GetConfigMetadataInputOptions or GetConfigMetadataOutputOptions based on Runtime API Version
-// For more details about supported parameters refer to GetConfigMetadataInputOptions or GetConfigMetadataOutputOptions definition(and ConfigMetadataOpts struct, which is embedded)
+// This method does validate the input parameters GetConfigMetadataInputOptions or GetConfigMetadataOutputOptions based on Runtime API Version
+// For more details about supported parameters refer to GetConfigMetadataInputOptions or GetConfigMetadataOutputOptions definition (and ConfigMetadataOpts struct, which is embedded)
 //
 //nolint:dupl
 func NewGetConfigMetadataCommand(inputOpts *GetConfigMetadataInputOptions, outputOpts *GetConfigMetadataOutputOptions) (*core.Command, error) {
@@ -291,11 +291,11 @@ func NewGetConfigMetadataCommand(inputOpts *GetConfigMetadataInputOptions, outpu
 }
 
 // NewGetConfigMetadataPatchStrategyCommand constructs a command to make a call to specific runtime version GetConfigMetadata API
-// Input Parameter inputOpts has all input parameters which are required for Runtime GetConfigMetadata API
+// Input Parameter: inputOpts has all input parameters which are required for Runtime GetConfigMetadata API
 // Input Parameter: outputOpts has details about expected output from Runtime GetConfigMetadata API call
 // Return: command to execute or error if any validations fails for GetConfigMetadataInputOptions or GetConfigMetadataOutputOptions
-// This method does validate the input parameters  GetConfigMetadataInputOptions or GetConfigMetadataOutputOptions based on Runtime API Version
-// For more details about supported parameters refer to GetConfigMetadataInputOptions or GetConfigMetadataOutputOptions definition(and ConfigMetadataOpts struct, which is embedded)
+// This method does validate the input parameters GetConfigMetadataInputOptions or GetConfigMetadataOutputOptions based on Runtime API Version
+// For more details about supported parameters refer to GetConfigMetadataInputOptions or GetConfigMetadataOutputOptions definition (and ConfigMetadataOpts struct, which is embedded)
 //
 //nolint:dupl
 func NewGetConfigMetadataPatchStrategyCommand(inputOpts *GetConfigMetadataPatchStrategyInputOptions, outputOpts *GetConfigMetadataPatchStrategyOutputOptions) (*core.Command, error) {
@@ -354,11 +354,11 @@ func NewGetConfigMetadataPatchStrategyCommand(inputOpts *GetConfigMetadataPatchS
 }
 
 // NewGetConfigMetadataSettingsCommand constructs a command to make a call to specific runtime version GetConfigMetadata API
-// Input Parameter inputOpts has all input parameters which are required for Runtime GetConfigMetadata API
+// Input Parameter: inputOpts has all input parameters which are required for Runtime GetConfigMetadata API
 // Input Parameter: outputOpts has details about expected output from Runtime GetConfigMetadata API call
 // Return: command to execute or error if any validations fails for GetConfigMetadataInputOptions or GetConfigMetadataOutputOptions
-// This method does validate the input parameters  GetConfigMetadataInputOptions or GetConfigMetadataOutputOptions based on Runtime API Version
-// For more details about supported parameters refer to GetConfigMetadataInputOptions or GetConfigMetadataOutputOptions definition(and ConfigMetadataOpts struct, which is embedded)
+// This method does validate the input parameters GetConfigMetadataInputOptions or GetConfigMetadataOutputOptions based on Runtime API Version
+// For more details about supported parameters refer to GetConfigMetadataInputOptions or GetConfigMetadataOutputOptions definition (and ConfigMetadataOpts struct, which is embedded)
 //
 //nolint:dupl
 func NewGetConfigMetadataSettingsCommand(inputOpts *GetConfigMetadataSettingsInputOptions, outputOpts *GetConfigMetadataSettingsOutputOptions) (*core.Command, error) {
@@ -417,11 +417,11 @@ func NewGetConfigMetadataSettingsCommand(inputOpts *GetConfigMetadataSettingsInp
 }
 
 // NewGetConfigMetadataSettingCommand constructs a command to make a call to specific runtime version GetConfigMetadata API
-// Input Parameter inputOpts has all input parameters which are required for Runtime GetConfigMetadata API
+// Input Parameter: inputOpts has all input parameters which are required for Runtime GetConfigMetadata API
 // Input Parameter: outputOpts has details about expected output from Runtime GetConfigMetadata API call
 // Return: command to execute or error if any validations fails for GetConfigMetadataInputOptions or GetConfigMetadataOutputOptions
-// This method does validate the input parameters  GetConfigMetadataInputOptions or GetConfigMetadataOutputOptions based on Runtime API Version
-// For more details about supported parameters refer to GetConfigMetadataInputOptions or GetConfigMetadataOutputOptions definition(and ConfigMetadataOpts struct, which is embedded)
+// This method does validate the input parameters GetConfigMetadataInputOptions or GetConfigMetadataOutputOptions based on Runtime API Version
+// For more details about supported parameters refer to GetConfigMetadataInputOptions or GetConfigMetadataOutputOptions definition (and ConfigMetadataOpts struct, which is embedded)
 func NewGetConfigMetadataSettingCommand(inputOpts *GetConfigMetadataSettingInputOptions, outputOpts *GetConfigMetadataSettingOutputOptions) (*core.Command, error) {
 	// Init the Command object
 	c := &core.Command{}
@@ -478,11 +478,11 @@ func NewGetConfigMetadataSettingCommand(inputOpts *GetConfigMetadataSettingInput
 }
 
 // NewIsConfigMetadataSettingsEnabledCommand constructs a command to make a call to specific runtime version GetConfigMetadata API
-// Input Parameter inputOpts has all input parameters which are required for Runtime GetConfigMetadata API
+// Input Parameter: inputOpts has all input parameters which are required for Runtime GetConfigMetadata API
 // Input Parameter: outputOpts has details about expected output from Runtime GetConfigMetadata API call
 // Return: command to execute or error if any validations fails for GetConfigMetadataInputOptions or GetConfigMetadataOutputOptions
-// This method does validate the input parameters  GetConfigMetadataInputOptions or GetConfigMetadataOutputOptions based on Runtime API Version
-// For more details about supported parameters refer to GetConfigMetadataInputOptions or GetConfigMetadataOutputOptions definition(and ConfigMetadataOpts struct, which is embedded)
+// This method does validate the input parameters GetConfigMetadataInputOptions or GetConfigMetadataOutputOptions based on Runtime API Version
+// For more details about supported parameters refer to GetConfigMetadataInputOptions or GetConfigMetadataOutputOptions definition (and ConfigMetadataOpts struct, which is embedded)
 func NewIsConfigMetadataSettingsEnabledCommand(inputOpts *IsConfigMetadataSettingsEnabledInputOptions, outputOpts *IsConfigMetadataSettingsEnabledOutputOptions) (*core.Command, error) {
 	// Init the Command object
 	c := &core.Command{}
@@ -539,11 +539,11 @@ func NewIsConfigMetadataSettingsEnabledCommand(inputOpts *IsConfigMetadataSettin
 }
 
 // NewUseUnifiedConfigCommand constructs a command to make a call to specific runtime version GetConfigMetadata API
-// Input Parameter inputOpts has all input parameters which are required for Runtime GetConfigMetadata API
+// Input Parameter: inputOpts has all input parameters which are required for Runtime GetConfigMetadata API
 // Input Parameter: outputOpts has details about expected output from Runtime GetConfigMetadata API call
 // Return: command to execute or error if any validations fails for GetConfigMetadataInputOptions or GetConfigMetadataOutputOptions
-// This method does validate the input parameters  GetConfigMetadataInputOptions or GetConfigMetadataOutputOptions based on Runtime API Version
-// For more details about supported parameters refer to GetConfigMetadataInputOptions or GetConfigMetadataOutputOptions definition(and ConfigMetadataOpts struct, which is embedded)
+// This method does validate the input parameters GetConfigMetadataInputOptions or GetConfigMetadataOutputOptions based on Runtime API Version
+// For more details about supported parameters refer to GetConfigMetadataInputOptions or GetConfigMetadataOutputOptions definition (and ConfigMetadataOpts struct, which is embedded)
 func NewUseUnifiedConfigCommand(inputOpts *UseUnifiedConfigInputOptions, outputOpts *UseUnifiedConfigOutputOptions) (*core.Command, error) {
 	// Init the Command object
 	c := &core.Command{}

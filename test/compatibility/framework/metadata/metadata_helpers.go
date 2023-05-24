@@ -21,7 +21,7 @@ const (
 	CompatibilityTestsMetadataSettingsValue      = "true"
 )
 
-// DefaultSetConfigMetadataPatchStrategyCommand creates a GetEnvConfigurations Command with default input and output options
+// DefaultSetConfigMetadataPatchStrategyCommand creates a SetConfigMetadataPatchStrategy Command with default input and output options
 //
 //nolint:dupl
 func DefaultSetConfigMetadataPatchStrategyCommand(version core.RuntimeVersion, opts ...CfgMetadataOptionArgs) *core.Command {
@@ -55,7 +55,7 @@ func DefaultSetConfigMetadataPatchStrategyCommand(version core.RuntimeVersion, o
 	return cmd
 }
 
-// DefaultSetConfigMetadataSettingCommand creates a GetEnvConfigurations Command with default input and output options
+// DefaultSetConfigMetadataSettingCommand creates a SetConfigMetadataSetting Command with default input and output options
 //
 //nolint:dupl
 func DefaultSetConfigMetadataSettingCommand(version core.RuntimeVersion, opts ...CfgMetadataOptionArgs) *core.Command {
@@ -89,7 +89,7 @@ func DefaultSetConfigMetadataSettingCommand(version core.RuntimeVersion, opts ..
 	return cmd
 }
 
-// DefaultDeleteConfigMetadataSettingCommand creates a GetEnvConfigurations Command with default input and output options
+// DefaultDeleteConfigMetadataSettingCommand creates a DeleteConfigMetadataSetting Command with default input and output options
 func DefaultDeleteConfigMetadataSettingCommand(version core.RuntimeVersion, opts ...CfgMetadataOptionArgs) *core.Command {
 	args := &CfgMetadataArgs{
 		Key: CompatibilityTestsMetadataSettingsKey,
@@ -119,7 +119,7 @@ func DefaultDeleteConfigMetadataSettingCommand(version core.RuntimeVersion, opts
 	return cmd
 }
 
-// DefaultGetMetadataCommand creates a GetEnvConfigurations Command with default input and output options
+// DefaultGetMetadataCommand creates a GetMetadataCommand Command with default input and output options
 func DefaultGetMetadataCommand(version core.RuntimeVersion, opts ...CfgMetadataOptionArgs) *core.Command {
 	patchStrategies := map[string]string{
 		CompatibilityTestsMetadataPatchStrategyKey: CompatibilityTestsMetadataPatchStrategyValue,
@@ -162,7 +162,7 @@ func DefaultGetMetadataCommand(version core.RuntimeVersion, opts ...CfgMetadataO
 	return cmd
 }
 
-// DefaultGetConfigMetadataCommand creates a GetEnvConfigurations Command with default input and output options
+// DefaultGetConfigMetadataCommand creates a GetConfigMetadata Command with default input and output options
 func DefaultGetConfigMetadataCommand(version core.RuntimeVersion, opts ...CfgMetadataOptionArgs) *core.Command {
 	patchStrategies := map[string]string{
 		CompatibilityTestsMetadataPatchStrategyKey: CompatibilityTestsMetadataPatchStrategyValue,
@@ -203,7 +203,7 @@ func DefaultGetConfigMetadataCommand(version core.RuntimeVersion, opts ...CfgMet
 	return cmd
 }
 
-// DefaultGetConfigMetadataPatchStrategyCommand creates a GetEnvConfigurations Command with default input and output options
+// DefaultGetConfigMetadataPatchStrategyCommand creates a GetConfigMetadataPatchStrategy Command with default input and output options
 //
 //nolint:dupl
 func DefaultGetConfigMetadataPatchStrategyCommand(version core.RuntimeVersion, opts ...CfgMetadataOptionArgs) *core.Command {
@@ -239,7 +239,7 @@ func DefaultGetConfigMetadataPatchStrategyCommand(version core.RuntimeVersion, o
 	return cmd
 }
 
-// DefaultGetConfigMetadataSettingCommand creates a GetEnvConfigurations Command with default input and output options
+// DefaultGetConfigMetadataSettingCommand creates a GetConfigMetadataSetting Command with default input and output options
 func DefaultGetConfigMetadataSettingCommand(version core.RuntimeVersion, opts ...CfgMetadataOptionArgs) *core.Command {
 	args := &CfgMetadataArgs{
 		Key:   CompatibilityTestsMetadataSettingsKey,
@@ -271,7 +271,7 @@ func DefaultGetConfigMetadataSettingCommand(version core.RuntimeVersion, opts ..
 	return cmd
 }
 
-// DefaultGetConfigMetadataSettingsCommand creates a GetEnvConfigurations Command with default input and output options
+// DefaultGetConfigMetadataSettingsCommand creates a GetConfigMetadataSettings Command with default input and output options
 //
 //nolint:dupl
 func DefaultGetConfigMetadataSettingsCommand(version core.RuntimeVersion, opts ...CfgMetadataOptionArgs) *core.Command {
@@ -307,7 +307,7 @@ func DefaultGetConfigMetadataSettingsCommand(version core.RuntimeVersion, opts .
 	return cmd
 }
 
-// DefaultIsConfigMetadataSettingsEnabledCommand creates a GetEnvConfigurations Command with default input and output options
+// DefaultIsConfigMetadataSettingsEnabledCommand creates a IsConfigMetadataSettingsEnabled Command with default input and output options
 func DefaultIsConfigMetadataSettingsEnabledCommand(version core.RuntimeVersion, opts ...CfgMetadataOptionArgs) *core.Command {
 	args := &CfgMetadataArgs{
 		Key:     CompatibilityTestsMetadataSettingsKey,
@@ -338,7 +338,7 @@ func DefaultIsConfigMetadataSettingsEnabledCommand(version core.RuntimeVersion, 
 	return cmd
 }
 
-// DefaultUseUnifiedConfigCommand creates a GetEnvConfigurations Command with default input and output options
+// DefaultUseUnifiedConfigCommand creates a UseUnifiedConfig Command with default input and output options
 func DefaultUseUnifiedConfigCommand(version core.RuntimeVersion, opts ...CfgMetadataOptionArgs) *core.Command {
 	args := &CfgMetadataArgs{
 		Enabled: true,

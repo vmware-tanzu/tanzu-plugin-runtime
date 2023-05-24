@@ -18,51 +18,56 @@ const (
 	fakePluginScriptFmtString string = `#!/bin/bash
 # Fake tanzu core binary
 
-# fake alternate command that simply echos args provided
-bad() { echo "bad command failed"; exit 1; }
+# fake command that simulates a plugin lcm operation
 plugin() {
-	# error to stderr
-	>&2 echo "$@ failed"
-
-	# regular output to stdout
-	echo "$@ succeeded"
+	if [ "%s" -eq "0" ]; then
+		# regular output to stderr
+		>&2 echo "$@ succeeded"
+	else
+		# error to stderr
+		>&2 echo "$@ failed"
+	fi
 
 	exit %s
 }
 
+# fake alternate command to use
 newcommand() {
-	# error to stderr
-	>&2 echo "$@ failed"
-
-	# regular output to stdout
-	echo "$@ succeeded"
+	if [ "%s" -eq "0" ]; then
+		# regular output to stdout
+		echo "$@ succeeded"
+	else
+		# error to stderr
+		>&2 echo "$@ failed"
+	fi
 
 	exit %s
 }
 
 case "$1" in
-    _custom_command) "newcommand $@";;
+    # simulate returning an alternative set of args to invoke with, which
+    # translates to running the command 'newcommand'
+    %s) shift && shift && echo "newcommand $@";;
     newcommand)   $1 "$@";;
     plugin)   $1 "$@";;
-    bad)   $1 "$@";;
     *) cat << EOF
-Tanzu Core CLI mock
+Tanzu Core CLI Fake
 
 Usage:
   tanzu [command]
 
 Available Commands:
-  newcommand  fake new command
+  plugin          fake command
+  newcommand      fake new command
   _custom_command provide alternate command to invoke, if available
-  bad     (non-working)
 EOF
-       exit 0
+       exit 1
        ;;
 esac
 `
 )
 
-func setupFakeCLI(dir string, exitStatus string, newCommandExitStatus string) (string, error) {
+func setupFakeCLI(dir string, exitStatus string, newCommandExitStatus string, enableCustomCommand bool) (string, error) {
 	filePath := filepath.Join(dir, "tanzu")
 
 	f, err := os.OpenFile(filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0755)
@@ -71,29 +76,52 @@ func setupFakeCLI(dir string, exitStatus string, newCommandExitStatus string) (s
 	}
 	defer f.Close()
 
-	fmt.Fprintf(f, fakePluginScriptFmtString, exitStatus, newCommandExitStatus)
+	fakeCustomCommandName := "unused_command"
+	// when enabled, the fake CLI script generated will be capable of
+	// returning an alternate set of args for a provided set of args
+	if enableCustomCommand {
+		fakeCustomCommandName = customCommandName
+	}
+
+	fmt.Fprintf(f, fakePluginScriptFmtString, exitStatus, exitStatus, newCommandExitStatus, newCommandExitStatus, fakeCustomCommandName)
 
 	return filePath, nil
 }
 
 func TestSyncPlugins(t *testing.T) {
 	tests := []struct {
-		test            string
-		exitStatus      string
-		expectedOutput  string
-		expectedFailure bool
+		test                 string
+		exitStatus           string
+		newCommandExitStatus string
+		expectedOutput       string
+		expectedFailure      bool
+		enableCustomCommand  bool
 	}{
 		{
-			test:            "with no alternate command, sync successfully",
+			test:            "with no alternate command and sync successfully",
 			exitStatus:      "0",
 			expectedOutput:  "plugin sync succeeded\n",
 			expectedFailure: false,
 		},
 		{
-			test:            "with no alternate command, sync unsuccessfully",
+			test:            "with no alternate command and sync unsuccessfully",
 			exitStatus:      "1",
 			expectedOutput:  "plugin sync failed\n",
 			expectedFailure: true,
+		},
+		{
+			test:                 "with alternate command and sync successfully",
+			newCommandExitStatus: "0",
+			expectedOutput:       "newcommand sync --target kubernetes succeeded\n",
+			expectedFailure:      false,
+			enableCustomCommand:  true,
+		},
+		{
+			test:                 "with alternate command and sync unsuccessfully",
+			newCommandExitStatus: "1",
+			expectedOutput:       "newcommand sync --target kubernetes failed\n",
+			expectedFailure:      true,
+			enableCustomCommand:  true,
 		},
 	}
 
@@ -104,7 +132,7 @@ func TestSyncPlugins(t *testing.T) {
 		t.Run(spec.test, func(t *testing.T) {
 			assert := assert.New(t)
 
-			cliPath, err := setupFakeCLI(dir, spec.exitStatus, spec.exitStatus)
+			cliPath, err := setupFakeCLI(dir, spec.exitStatus, spec.newCommandExitStatus, spec.enableCustomCommand)
 			assert.Nil(err)
 			os.Setenv("TANZU_BIN", cliPath)
 

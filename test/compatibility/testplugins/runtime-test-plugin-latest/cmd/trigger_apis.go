@@ -46,6 +46,18 @@ var apiHandlers = map[core.RuntimeAPIName]func(*core.API) *core.APIResponse{
 	core.SetCLIDiscoverySourceAPI:    triggerSetCLIDiscoverySourceAPI,
 	core.GetCLIDiscoverySourceAPI:    triggerGetCLIDiscoverySourceAPI,
 	core.DeleteCLIDiscoverySourceAPI: triggerDeleteCLIDiscoverySourceAPI,
+
+	// Metadata APIs
+	core.SetConfigMetadataSettingAPI:        triggerSetConfigMetadataSettingAPI,
+	core.SetConfigMetadataPatchStrategyAPI:  triggerSetConfigMetadataPatchStrategyAPI,
+	core.DeleteConfigMetadataSettingAPI:     triggerDeleteConfigMetadataSettingAPI,
+	core.GetMetadataAPI:                     triggerGetMetadataAPI,
+	core.GetConfigMetadataAPI:               triggerGetConfigMetadataAPI,
+	core.GetConfigMetadataPatchStrategyAPI:  triggerGetConfigMetadataPatchStrategyAPI,
+	core.GetConfigMetadataSettingsAPI:       triggerGetConfigMetadataSettingsAPI,
+	core.GetConfigMetadataSettingAPI:        triggerGetConfigMetadataSettingAPI,
+	core.IsConfigMetadataSettingsEnabledAPI: triggerIsConfigMetadataSettingsEnabledAPI,
+	core.UseUnifiedConfigAPI:                triggerUseUnifiedConfigAPI,
 }
 
 // triggerAPIs trigger runtime apis and construct logs

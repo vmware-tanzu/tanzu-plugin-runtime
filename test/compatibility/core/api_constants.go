@@ -51,6 +51,9 @@ const (
 	UseUnifiedConfigAPI                RuntimeAPIName = "UseUnifiedConfig"
 	DeleteConfigMetadataSettingAPI     RuntimeAPIName = "DeleteConfigMetadataSetting"
 	SetConfigMetadataSettingAPI        RuntimeAPIName = "SetConfigMetadataSetting"
+
+	GetClientConfigAPI   RuntimeAPIName = "GetClientConfig"
+	StoreClientConfigAPI RuntimeAPIName = "StoreClientConfig"
 )
 
 // APIArgumentType describes all the arguments types required for Runtime APIs

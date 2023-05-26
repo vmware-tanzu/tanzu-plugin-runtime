@@ -306,7 +306,18 @@ type PluginDiscoveryOpts struct {
 	// LocalDiscovery is set if the plugins are to be discovered via Local Manifest fast.
 	Local *LocalDiscoveryOpts `json:"local,omitempty" yaml:"local,omitempty"`
 	// ContextType the discovery source is associated with (applicable only for stand-alone plugins).
-	ContextType ContextType `json:"contextType,omitempty" yaml:"contextType,omitempty"`
+	ContextType ContextType `json:"contextType,omitempty" yaml:",omitempty"`
+}
+
+// CoreCliOptionsOpts are core CLI specific options that are specific to CLI(not for plugins) like ceipOptIn, etc
+// that goes into nextgen configuration file.
+type CoreCliOptionsOpts struct {
+	// CEIPOptIn is the user's CEIP opt-in/opt-out status.
+	CEIPOptIn string `json:"ceipOptIn,omitempty" yaml:"ceipOptIn,omitempty"`
+	// EULAStatus is the EULA acceptance status.
+	EULAStatus string `json:"eulaStatus,omitempty" yaml:"eulaStatus,omitempty"`
+	// DiscoverySources determine where to discover plugins
+	DiscoverySources []PluginDiscoveryOpts `json:"discoverySources,omitempty" yaml:"discoverySources,omitempty"`
 }
 
 // ClientConfigOpts is the Schema for the configs API
@@ -328,12 +339,10 @@ type ClientConfigOpts struct {
 	// CurrentContext for every type.
 	CurrentContext map[string]string `json:"currentContext,omitempty" yaml:"currentContext,omitempty"`
 
-	// CurrentContext for every type.
-	CurrentContextWithContextType map[ContextType]string `json:"currentContextContextType,omitempty" yaml:"currentContextContextType,omitempty"`
-
-	// CurrentContext for every type.
-	CurrentContextWithTarget map[Target]string `json:"currentContextTarget,omitempty" yaml:"currentContextTarget,omitempty"`
-
 	// ClientOptions are client specific options.
 	ClientOptions *ClientOptionsOpts `json:"clientOptions,omitempty" yaml:"clientOptions,omitempty"`
+
+	// CoreCliOptions are core CLI specific options that are specific to CLI(not for plugins) like ceipOptIn, etc
+	// that goes into nextgen configuration file.
+	CoreCliOptions *CoreCliOptionsOpts `json:"cli,omitempty" yaml:"cli,omitempty"`
 }

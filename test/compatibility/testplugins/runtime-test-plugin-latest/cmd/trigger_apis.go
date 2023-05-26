@@ -58,6 +58,10 @@ var apiHandlers = map[core.RuntimeAPIName]func(*core.API) *core.APIResponse{
 	core.GetConfigMetadataSettingAPI:        triggerGetConfigMetadataSettingAPI,
 	core.IsConfigMetadataSettingsEnabledAPI: triggerIsConfigMetadataSettingsEnabledAPI,
 	core.UseUnifiedConfigAPI:                triggerUseUnifiedConfigAPI,
+
+	// Global APIs
+	core.GetClientConfigAPI:   triggerGetClientConfigAPI,
+	core.StoreClientConfigAPI: triggerStoreClientConfigAPI,
 }
 
 // triggerAPIs trigger runtime apis and construct logs

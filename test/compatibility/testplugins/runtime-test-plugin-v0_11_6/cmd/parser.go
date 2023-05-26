@@ -18,3 +18,13 @@ func parseServer(server string) (*configtypes.Server, error) {
 	}
 	return &s, nil
 }
+
+// parseClientConfig unmarshalls string to ClientConfig struct
+func parseClientConfig(cfgStr string) (*configtypes.ClientConfig, error) {
+	var cfg configtypes.ClientConfig
+	err := yaml.Unmarshal([]byte(cfgStr), &cfg)
+	if err != nil {
+		return nil, err
+	}
+	return &cfg, nil
+}

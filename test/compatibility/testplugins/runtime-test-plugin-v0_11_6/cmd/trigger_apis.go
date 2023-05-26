@@ -27,6 +27,10 @@ var apiHandlers = map[core.RuntimeAPIName]func(*core.API) *core.APIResponse{
 
 	// Env APIs
 	core.GetEnvConfigurationsAPI: triggerGetEnvConfigurationsAPI,
+
+	// Global APIs
+	core.GetClientConfigAPI:   triggerGetClientConfigAPI,
+	core.StoreClientConfigAPI: triggerStoreClientConfigAPI,
 }
 
 // triggerAPIs trigger runtime apis and construct logs

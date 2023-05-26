@@ -55,11 +55,30 @@ func ValidateAPIsOutput(apis []*core.API, stdout string) {
 	}
 }
 
-// ValidateMaps recursive equality check on map structs
 func ValidateMaps(actual, expected map[string]interface{}) bool {
 	for k, v := range expected {
 		if reflect.ValueOf(v).Kind() == reflect.Map {
-			ValidateMaps(actual[k].(map[string]interface{}), v.(map[string]interface{}))
+			if !ValidateMaps(actual[k].(map[string]interface{}), v.(map[string]interface{})) {
+				return false
+			}
+		} else if reflect.ValueOf(v).Kind() == reflect.Slice {
+			// Convert v and actual[k] to []interface{} and check equality
+			actualSlice, ok1 := actual[k].([]interface{})
+			expectedSlice, ok2 := v.([]interface{})
+			if !ok1 || !ok2 || len(actualSlice) != len(expectedSlice) {
+				gomega.Expect(actual[k]).To(gomega.Equal(v))
+				return false
+			}
+			for i := range expectedSlice {
+				if reflect.ValueOf(expectedSlice[i]).Kind() == reflect.Map {
+					if !ValidateMaps(actualSlice[i].(map[string]interface{}), expectedSlice[i].(map[string]interface{})) {
+						return false
+					}
+				} else if !reflect.DeepEqual(actualSlice[i], expectedSlice[i]) {
+					gomega.Expect(actualSlice[i]).To(gomega.Equal(expectedSlice[i]))
+					return false
+				}
+			}
 		} else if !reflect.DeepEqual(actual[k], v) {
 			gomega.Expect(actual[k]).To(gomega.Equal(v))
 			return false

@@ -6,13 +6,11 @@ package metadata_test
 import (
 	"github.com/onsi/ginkgo/v2"
 
-	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/compatibilitytests/common"
-
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/executer"
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/metadata"
-
-	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/types"
 )
 
 var _ = ginkgo.Describe("Cross-version ConfigMetadata Flags APIs compatibility tests", func() {
@@ -50,8 +48,8 @@ var _ = ginkgo.Describe("Cross-version ConfigMetadata Flags APIs compatibility t
 			testCase.Add(metadata.DefaultDeleteConfigMetadataSettingCommand(core.Version0280))
 
 			// Add GetConfigMetadata latest, v0.28.0 Commands
-			metadataOpts := &framework.MetadataOpts{
-				ConfigMetadata: &framework.ConfigMetadataOpts{
+			metadataOpts := &types.MetadataOpts{
+				ConfigMetadata: &types.ConfigMetadataOpts{
 					Settings: map[string]string{},
 				},
 			}
@@ -88,8 +86,8 @@ var _ = ginkgo.Describe("Cross-version ConfigMetadata Flags APIs compatibility t
 			testCase.Add(metadata.DefaultDeleteConfigMetadataSettingCommand(core.VersionLatest))
 
 			// Add GetConfigMetadata latest, v0.28.0 Commands
-			metadataOpts := &framework.MetadataOpts{
-				ConfigMetadata: &framework.ConfigMetadataOpts{
+			metadataOpts := &types.MetadataOpts{
+				ConfigMetadata: &types.ConfigMetadataOpts{
 					Settings: map[string]string{},
 				},
 			}

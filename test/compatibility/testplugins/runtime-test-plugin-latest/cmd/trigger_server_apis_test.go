@@ -30,10 +30,10 @@ globalOpts:
 	}{
 		{
 			name:    "Trigger SetServerAPI",
-			apiName: core.SetServerAPIName,
+			apiName: core.SetServerAPI,
 			apis: []core.API{
 				{
-					Name:    core.SetServerAPIName,
+					Name:    core.SetServerAPI,
 					Version: core.VersionLatest,
 					Arguments: map[core.APIArgumentType]interface{}{
 						core.Server:     server,
@@ -45,7 +45,7 @@ globalOpts:
 					},
 				},
 				{
-					Name:    core.SetServerAPIName,
+					Name:    core.SetServerAPI,
 					Version: core.VersionLatest,
 					Arguments: map[core.APIArgumentType]interface{}{
 						core.Server:     server,
@@ -59,7 +59,7 @@ globalOpts:
 			},
 
 			expectedLogs: map[core.RuntimeAPIName][]core.APILog{
-				core.SetServerAPIName: {
+				core.SetServerAPI: {
 					{
 						APIResponse: &core.APIResponse{
 							ResponseBody: "",
@@ -78,10 +78,10 @@ globalOpts:
 
 		{
 			name:    "Trigger GetServerAPI",
-			apiName: core.GetServerAPIName,
+			apiName: core.GetServerAPI,
 			apis: []core.API{
 				{
-					Name:    core.SetServerAPIName,
+					Name:    core.SetServerAPI,
 					Version: core.VersionLatest,
 					Arguments: map[core.APIArgumentType]interface{}{
 						core.Server:     server,
@@ -93,7 +93,7 @@ globalOpts:
 					},
 				},
 				{
-					Name:    core.GetServerAPIName,
+					Name:    core.GetServerAPI,
 					Version: core.VersionLatest,
 					Arguments: map[core.APIArgumentType]interface{}{
 						core.ServerName: "compatibility-test-one",
@@ -106,7 +106,7 @@ globalOpts:
 			},
 
 			expectedLogs: map[core.RuntimeAPIName][]core.APILog{
-				core.GetServerAPIName: {
+				core.GetServerAPI: {
 					{
 						APIResponse: &core.APIResponse{
 							ResponseBody: &configtypes.Server{
@@ -125,10 +125,10 @@ globalOpts:
 
 		{
 			name:    "Trigger RemoveServerAPI",
-			apiName: core.RemoveServerAPIName,
+			apiName: core.RemoveServerAPI,
 			apis: []core.API{
 				{
-					Name:    core.SetServerAPIName,
+					Name:    core.SetServerAPI,
 					Version: core.VersionLatest,
 					Arguments: map[core.APIArgumentType]interface{}{
 						core.Server:     server,
@@ -140,7 +140,7 @@ globalOpts:
 					},
 				},
 				{
-					Name:    core.RemoveServerAPIName,
+					Name:    core.RemoveServerAPI,
 					Version: core.VersionLatest,
 					Arguments: map[core.APIArgumentType]interface{}{
 						core.ServerName: "compatibility-test-one",
@@ -153,7 +153,7 @@ globalOpts:
 			},
 
 			expectedLogs: map[core.RuntimeAPIName][]core.APILog{
-				core.RemoveServerAPIName: {
+				core.RemoveServerAPI: {
 					{
 						APIResponse: &core.APIResponse{
 							ResponseBody: "",
@@ -166,10 +166,10 @@ globalOpts:
 
 		{
 			name:    "Trigger DeleteServerAPI",
-			apiName: core.DeleteServerAPIName,
+			apiName: core.DeleteServerAPI,
 			apis: []core.API{
 				{
-					Name:    core.SetServerAPIName,
+					Name:    core.SetServerAPI,
 					Version: core.VersionLatest,
 					Arguments: map[core.APIArgumentType]interface{}{
 						core.Server:     server,
@@ -181,7 +181,7 @@ globalOpts:
 					},
 				},
 				{
-					Name:    core.DeleteServerAPIName,
+					Name:    core.DeleteServerAPI,
 					Version: core.VersionLatest,
 					Arguments: map[core.APIArgumentType]interface{}{
 						core.ServerName: "compatibility-test-one",
@@ -194,7 +194,7 @@ globalOpts:
 			},
 
 			expectedLogs: map[core.RuntimeAPIName][]core.APILog{
-				core.DeleteServerAPIName: {
+				core.DeleteServerAPI: {
 					{
 						APIResponse: &core.APIResponse{
 							ResponseBody: "",
@@ -207,10 +207,10 @@ globalOpts:
 
 		{
 			name:    "Trigger SetCurrentServerAPI",
-			apiName: core.SetCurrentServerAPIName,
+			apiName: core.SetCurrentServerAPI,
 			apis: []core.API{
 				{
-					Name:    core.SetServerAPIName,
+					Name:    core.SetServerAPI,
 					Version: core.VersionLatest,
 					Arguments: map[core.APIArgumentType]interface{}{
 						core.Server:     server,
@@ -222,7 +222,7 @@ globalOpts:
 					},
 				},
 				{
-					Name:    core.SetCurrentServerAPIName,
+					Name:    core.SetCurrentServerAPI,
 					Version: core.VersionLatest,
 					Arguments: map[core.APIArgumentType]interface{}{
 						core.ServerName: "compatibility-test-one",
@@ -235,7 +235,7 @@ globalOpts:
 			},
 
 			expectedLogs: map[core.RuntimeAPIName][]core.APILog{
-				core.SetCurrentServerAPIName: {
+				core.SetCurrentServerAPI: {
 					{
 						APIResponse: &core.APIResponse{
 							ResponseBody: "",
@@ -248,10 +248,10 @@ globalOpts:
 
 		{
 			name:    "Trigger GetCurrentServerAPI",
-			apiName: core.GetCurrentServerAPIName,
+			apiName: core.GetCurrentServerAPI,
 			apis: []core.API{
 				{
-					Name:    core.SetServerAPIName,
+					Name:    core.SetServerAPI,
 					Version: core.VersionLatest,
 					Arguments: map[core.APIArgumentType]interface{}{
 						core.Server:     server,
@@ -263,7 +263,7 @@ globalOpts:
 					},
 				},
 				{
-					Name:    core.SetCurrentServerAPIName,
+					Name:    core.SetCurrentServerAPI,
 					Version: core.VersionLatest,
 					Arguments: map[core.APIArgumentType]interface{}{
 						core.ServerName: "compatibility-test-one",
@@ -274,7 +274,7 @@ globalOpts:
 					},
 				},
 				{
-					Name:    core.GetCurrentServerAPIName,
+					Name:    core.GetCurrentServerAPI,
 					Version: core.VersionLatest,
 					Arguments: map[core.APIArgumentType]interface{}{
 						core.Target: "kubernetes",
@@ -287,7 +287,7 @@ globalOpts:
 			},
 
 			expectedLogs: map[core.RuntimeAPIName][]core.APILog{
-				core.GetCurrentServerAPIName: {
+				core.GetCurrentServerAPI: {
 					{
 						APIResponse: &core.APIResponse{
 							ResponseBody: &configtypes.Server{
@@ -306,10 +306,10 @@ globalOpts:
 
 		{
 			name:    "Trigger RemoveCurrentServerAPI",
-			apiName: core.RemoveCurrentServerAPIName,
+			apiName: core.RemoveCurrentServerAPI,
 			apis: []core.API{
 				{
-					Name:    core.SetServerAPIName,
+					Name:    core.SetServerAPI,
 					Version: core.VersionLatest,
 					Arguments: map[core.APIArgumentType]interface{}{
 						core.Server:     server,
@@ -321,7 +321,7 @@ globalOpts:
 					},
 				},
 				{
-					Name:    core.SetCurrentServerAPIName,
+					Name:    core.SetCurrentServerAPI,
 					Version: core.VersionLatest,
 					Arguments: map[core.APIArgumentType]interface{}{
 						core.ServerName: "compatibility-test-one",
@@ -332,7 +332,7 @@ globalOpts:
 					},
 				},
 				{
-					Name:    core.RemoveCurrentServerAPIName,
+					Name:    core.RemoveCurrentServerAPI,
 					Version: core.VersionLatest,
 					Arguments: map[core.APIArgumentType]interface{}{
 						core.ServerName: "compatibility-test-one",
@@ -345,7 +345,7 @@ globalOpts:
 			},
 
 			expectedLogs: map[core.RuntimeAPIName][]core.APILog{
-				core.RemoveCurrentServerAPIName: {
+				core.RemoveCurrentServerAPI: {
 					{
 						APIResponse: &core.APIResponse{
 							ResponseBody: "",

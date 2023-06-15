@@ -8,24 +8,24 @@ package core
 type RuntimeAPIName string
 
 const (
-	SetContextAPIName           RuntimeAPIName = "SetContext"
-	AddContextAPIName           RuntimeAPIName = "AddContext"
-	GetContextAPIName           RuntimeAPIName = "GetContext"
-	DeleteContextAPIName        RuntimeAPIName = "DeleteContext"
-	RemoveContextAPIName        RuntimeAPIName = "RemoveContext"
-	SetCurrentContextAPIName    RuntimeAPIName = "SetCurrentContext"
-	GetCurrentContextAPIName    RuntimeAPIName = "GetCurrentContext"
-	RemoveCurrentContextAPIName RuntimeAPIName = "RemoveCurrentContext"
+	SetContextAPI           RuntimeAPIName = "SetContext"
+	AddContextAPI           RuntimeAPIName = "AddContext"
+	GetContextAPIName       RuntimeAPIName = "GetContext"
+	DeleteContextAPI        RuntimeAPIName = "DeleteContext"
+	RemoveContextAPI        RuntimeAPIName = "RemoveContext"
+	SetCurrentContextAPI    RuntimeAPIName = "SetCurrentContext"
+	GetCurrentContextAPI    RuntimeAPIName = "GetCurrentContext"
+	RemoveCurrentContextAPI RuntimeAPIName = "RemoveCurrentContext"
 
-	SetServerAPIName           RuntimeAPIName = "SetServer"
-	AddServerAPIName           RuntimeAPIName = "AddServer"
-	PutServerAPIName           RuntimeAPIName = "PutServer"
-	GetServerAPIName           RuntimeAPIName = "GetServer"
-	DeleteServerAPIName        RuntimeAPIName = "DeleteServer"
-	RemoveServerAPIName        RuntimeAPIName = "RemoveServer"
-	SetCurrentServerAPIName    RuntimeAPIName = "SetCurrentServer"
-	GetCurrentServerAPIName    RuntimeAPIName = "GetCurrentServer"
-	RemoveCurrentServerAPIName RuntimeAPIName = "RemoveCurrentServer"
+	SetServerAPI           RuntimeAPIName = "SetServer"
+	AddServerAPI           RuntimeAPIName = "AddServer"
+	PutServerAPI           RuntimeAPIName = "PutServer"
+	GetServerAPI           RuntimeAPIName = "GetServer"
+	DeleteServerAPI        RuntimeAPIName = "DeleteServer"
+	RemoveServerAPI        RuntimeAPIName = "RemoveServer"
+	SetCurrentServerAPI    RuntimeAPIName = "SetCurrentServer"
+	GetCurrentServerAPI    RuntimeAPIName = "GetCurrentServer"
+	RemoveCurrentServerAPI RuntimeAPIName = "RemoveCurrentServer"
 
 	SetFeatureAPI         RuntimeAPIName = "SetFeature"
 	IsFeatureEnabledAPI   RuntimeAPIName = "IsFeatureEnabled"
@@ -74,7 +74,6 @@ const (
 	Key             APIArgumentType = "key"
 	Value           APIArgumentType = "value"
 	DiscoverySource APIArgumentType = "discoverySource"
-	PatchStrategies APIArgumentType = "patchStrategies"
 )
 
 type Result string

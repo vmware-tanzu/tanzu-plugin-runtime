@@ -10,82 +10,81 @@ import (
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
 
-	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/types"
-
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
-	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework"
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/compatibilitytests/common"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/context"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/types"
 )
 
 // Helper struct provides input and output options and api commands to be used in test cases
 type Helper struct {
 	// SetContext Input Options
-	SetContextInputOptionsForRuntime0254      *framework.SetContextInputOptions
-	SetContextInputOptionsForRuntime0280      *framework.SetContextInputOptions
-	SetContextInputOptionsForRuntimeLatest    *framework.SetContextInputOptions
-	SetContextTwoInputOptionsForRuntime0254   *framework.SetContextInputOptions
-	SetContextTwoInputOptionsForRuntime0280   *framework.SetContextInputOptions
-	SetContextTwoInputOptionsForRuntimeLatest *framework.SetContextInputOptions
+	SetContextInputOptionsForRuntime0254      *context.SetContextInputOptions
+	SetContextInputOptionsForRuntime0280      *context.SetContextInputOptions
+	SetContextInputOptionsForRuntimeLatest    *context.SetContextInputOptions
+	SetContextTwoInputOptionsForRuntime0254   *context.SetContextInputOptions
+	SetContextTwoInputOptionsForRuntime0280   *context.SetContextInputOptions
+	SetContextTwoInputOptionsForRuntimeLatest *context.SetContextInputOptions
 
 	// SetCurrentContext Input Options
-	SetCurrentContextInputOptionsForRuntime0254   *framework.SetCurrentContextInputOptions
-	SetCurrentContextInputOptionsForRuntime0280   *framework.SetCurrentContextInputOptions
-	SetCurrentContextInputOptionsForRuntimeLatest *framework.SetCurrentContextInputOptions
+	SetCurrentContextInputOptionsForRuntime0254   *context.SetCurrentContextInputOptions
+	SetCurrentContextInputOptionsForRuntime0280   *context.SetCurrentContextInputOptions
+	SetCurrentContextInputOptionsForRuntimeLatest *context.SetCurrentContextInputOptions
 
 	// GetContext Input Options
-	GetContextInputOptionsForRuntimeLatest    *framework.GetContextInputOptions
-	GetContextInputOptionsForRuntime0280      *framework.GetContextInputOptions
-	GetContextInputOptionsForRuntime0254      *framework.GetContextInputOptions
-	GetContextTwoInputOptionsForRuntimeLatest *framework.GetContextInputOptions
-	GetContextTwoInputOptionsForRuntime0280   *framework.GetContextInputOptions
-	GetContextTwoInputOptionsForRuntime0254   *framework.GetContextInputOptions
+	GetContextInputOptionsForRuntimeLatest    *context.GetContextInputOptions
+	GetContextInputOptionsForRuntime0280      *context.GetContextInputOptions
+	GetContextInputOptionsForRuntime0254      *context.GetContextInputOptions
+	GetContextTwoInputOptionsForRuntimeLatest *context.GetContextInputOptions
+	GetContextTwoInputOptionsForRuntime0280   *context.GetContextInputOptions
+	GetContextTwoInputOptionsForRuntime0254   *context.GetContextInputOptions
 
 	// GetContext Output Options
-	GetContextOutputOptionsForRuntime0254      *framework.GetContextOutputOptions
-	GetContextOutputOptionsForRuntime0280      *framework.GetContextOutputOptions
-	GetContextOutputOptionsForRuntimeLatest    *framework.GetContextOutputOptions
-	GetContextTwoOutputOptionsForRuntime0254   *framework.GetContextOutputOptions
-	GetContextTwoOutputOptionsForRuntime0280   *framework.GetContextOutputOptions
-	GetContextTwoOutputOptionsForRuntimeLatest *framework.GetContextOutputOptions
+	GetContextOutputOptionsForRuntime0254      *context.GetContextOutputOptions
+	GetContextOutputOptionsForRuntime0280      *context.GetContextOutputOptions
+	GetContextOutputOptionsForRuntimeLatest    *context.GetContextOutputOptions
+	GetContextTwoOutputOptionsForRuntime0254   *context.GetContextOutputOptions
+	GetContextTwoOutputOptionsForRuntime0280   *context.GetContextOutputOptions
+	GetContextTwoOutputOptionsForRuntimeLatest *context.GetContextOutputOptions
 
 	// GetContext Output Options with expected error
-	GetContextOutputOptionsForRuntimeLatestWithError    *framework.GetContextOutputOptions
-	GetContextOutputOptionsForRuntime0280WithError      *framework.GetContextOutputOptions
-	GetContextOutputOptionsForRuntime0254WithError      *framework.GetContextOutputOptions
-	GetContextTwoOutputOptionsForRuntimeLatestWithError *framework.GetContextOutputOptions
-	GetContextTwoOutputOptionsForRuntime0280WithError   *framework.GetContextOutputOptions
+	GetContextOutputOptionsForRuntimeLatestWithError    *context.GetContextOutputOptions
+	GetContextOutputOptionsForRuntime0280WithError      *context.GetContextOutputOptions
+	GetContextOutputOptionsForRuntime0254WithError      *context.GetContextOutputOptions
+	GetContextTwoOutputOptionsForRuntimeLatestWithError *context.GetContextOutputOptions
+	GetContextTwoOutputOptionsForRuntime0280WithError   *context.GetContextOutputOptions
 
 	// GetCurrentContext Input Options
-	GetCurrentContextInputOptionsForRuntime0254   *framework.GetCurrentContextInputOptions
-	GetCurrentContextInputOptionsForRuntime0280   *framework.GetCurrentContextInputOptions
-	GetCurrentContextInputOptionsForRuntimeLatest *framework.GetCurrentContextInputOptions
+	GetCurrentContextInputOptionsForRuntime0254   *context.GetCurrentContextInputOptions
+	GetCurrentContextInputOptionsForRuntime0280   *context.GetCurrentContextInputOptions
+	GetCurrentContextInputOptionsForRuntimeLatest *context.GetCurrentContextInputOptions
 
 	// GetCurrentContext Output Options
-	GetCurrentContextOutputOptionsForRuntime0254   *framework.GetCurrentContextOutputOptions
-	GetCurrentContextOutputOptionsForRuntime0280   *framework.GetCurrentContextOutputOptions
-	GetCurrentContextOutputOptionsForRuntimeLatest *framework.GetCurrentContextOutputOptions
+	GetCurrentContextOutputOptionsForRuntime0254   *context.GetCurrentContextOutputOptions
+	GetCurrentContextOutputOptionsForRuntime0280   *context.GetCurrentContextOutputOptions
+	GetCurrentContextOutputOptionsForRuntimeLatest *context.GetCurrentContextOutputOptions
 
 	// GetCurrentContext Output Options with expected error
-	GetCurrentContextOutputOptionsForRuntimeLatestWithError *framework.GetCurrentContextOutputOptions
-	GetCurrentContextOutputOptionsForRuntime0280WithError   *framework.GetCurrentContextOutputOptions
-	GetCurrentContextOutputOptionsForRuntime0254WithError   *framework.GetCurrentContextOutputOptions
+	GetCurrentContextOutputOptionsForRuntimeLatestWithError *context.GetCurrentContextOutputOptions
+	GetCurrentContextOutputOptionsForRuntime0280WithError   *context.GetCurrentContextOutputOptions
+	GetCurrentContextOutputOptionsForRuntime0254WithError   *context.GetCurrentContextOutputOptions
 
 	// DeleteContext Input Options
-	DeleteContextInputOptionsForRuntime0254   *framework.DeleteContextInputOptions
-	DeleteContextInputOptionsForRuntime0280   *framework.DeleteContextInputOptions
-	DeleteContextInputOptionsForRuntimeLatest *framework.DeleteContextInputOptions
+	DeleteContextInputOptionsForRuntime0254   *context.DeleteContextInputOptions
+	DeleteContextInputOptionsForRuntime0280   *context.DeleteContextInputOptions
+	DeleteContextInputOptionsForRuntimeLatest *context.DeleteContextInputOptions
 
 	// DeleteContext Output Options with expected error
-	DeleteContextOutputOptionsForRuntime0280WithError   *framework.DeleteContextOutputOptions
-	DeleteContextOutputOptionsForRuntimeLatestWithError *framework.DeleteContextOutputOptions
+	DeleteContextOutputOptionsForRuntime0280WithError   *context.DeleteContextOutputOptions
+	DeleteContextOutputOptionsForRuntimeLatestWithError *context.DeleteContextOutputOptions
 
 	// RemoveCurrentContext Input Options
-	RemoveCurrentContextInputOptionsForRuntime0280   *framework.RemoveCurrentContextInputOptions
-	RemoveCurrentContextInputOptionsForRuntimeLatest *framework.RemoveCurrentContextInputOptions
+	RemoveCurrentContextInputOptionsForRuntime0280   *context.RemoveCurrentContextInputOptions
+	RemoveCurrentContextInputOptionsForRuntimeLatest *context.RemoveCurrentContextInputOptions
 
 	// RemoveCurrentContext Output Options with expected error
-	RemoveCurrentContextOutputOptionsForRuntimeLatestWithError *framework.RemoveCurrentContextOutputOptions
-	RemoveCurrentContextOutputOptionsForRuntime0280WithError   *framework.RemoveCurrentContextOutputOptions
+	RemoveCurrentContextOutputOptionsForRuntimeLatestWithError *context.RemoveCurrentContextOutputOptions
+	RemoveCurrentContextOutputOptionsForRuntime0280WithError   *context.RemoveCurrentContextOutputOptions
 
 	// Context API Commands
 	// SetContext API Commands
@@ -181,19 +180,19 @@ func (b *Helper) CreateRemoveCurrentContextAPICommands() {
 	// Create RemoveCurrentContext Commands with input and output options
 	ginkgo.By("Create RemoveCurrentContext API Commands")
 
-	removeCurrentContextCmdForRuntime0280, err := framework.NewRemoveCurrentContextCommand(b.RemoveCurrentContextInputOptionsForRuntime0280, nil)
+	removeCurrentContextCmdForRuntime0280, err := context.NewRemoveCurrentContextCommand(b.RemoveCurrentContextInputOptionsForRuntime0280, nil)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.RemoveCurrentContextCmdForRuntime0280 = removeCurrentContextCmdForRuntime0280
 
-	removeCurrentContextCmdForRuntimeLatest, err := framework.NewRemoveCurrentContextCommand(b.RemoveCurrentContextInputOptionsForRuntimeLatest, nil)
+	removeCurrentContextCmdForRuntimeLatest, err := context.NewRemoveCurrentContextCommand(b.RemoveCurrentContextInputOptionsForRuntimeLatest, nil)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.RemoveCurrentContextCmdForRuntimeLatest = removeCurrentContextCmdForRuntimeLatest
 
-	removeCurrentContextCmdForRuntimeLatestWithError, err := framework.NewRemoveCurrentContextCommand(b.RemoveCurrentContextInputOptionsForRuntimeLatest, b.RemoveCurrentContextOutputOptionsForRuntimeLatestWithError)
+	removeCurrentContextCmdForRuntimeLatestWithError, err := context.NewRemoveCurrentContextCommand(b.RemoveCurrentContextInputOptionsForRuntimeLatest, b.RemoveCurrentContextOutputOptionsForRuntimeLatestWithError)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.RemoveCurrentContextCmdForRuntimeLatestWithError = removeCurrentContextCmdForRuntimeLatestWithError
 
-	removeCurrentContextCmdForRuntime0280WithError, err := framework.NewRemoveCurrentContextCommand(b.RemoveCurrentContextInputOptionsForRuntime0280, b.RemoveCurrentContextOutputOptionsForRuntime0280WithError)
+	removeCurrentContextCmdForRuntime0280WithError, err := context.NewRemoveCurrentContextCommand(b.RemoveCurrentContextInputOptionsForRuntime0280, b.RemoveCurrentContextOutputOptionsForRuntime0280WithError)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.RemoveCurrentContextCmdForRuntime0280WithError = removeCurrentContextCmdForRuntime0280WithError
 }
@@ -216,23 +215,23 @@ func (b *Helper) CreateDeleteContextAPICommands() {
 	// Create DeleteContext Commands with input and output options
 	ginkgo.By("Create DeleteContext API Commands")
 
-	deleteContextCmdForRuntimeLatest, err := framework.NewDeleteContextCommand(b.DeleteContextInputOptionsForRuntimeLatest, nil)
+	deleteContextCmdForRuntimeLatest, err := context.NewDeleteContextCommand(b.DeleteContextInputOptionsForRuntimeLatest, nil)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.DeleteContextCmdForRuntimeLatest = deleteContextCmdForRuntimeLatest
 
-	deleteContextCmdForRuntime0280, err := framework.NewDeleteContextCommand(b.DeleteContextInputOptionsForRuntime0280, nil)
+	deleteContextCmdForRuntime0280, err := context.NewDeleteContextCommand(b.DeleteContextInputOptionsForRuntime0280, nil)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.DeleteContextCmdForRuntime0280 = deleteContextCmdForRuntime0280
 
-	deleteContextCmdForRuntime0254, err := framework.NewDeleteContextCommand(b.DeleteContextInputOptionsForRuntime0254, nil)
+	deleteContextCmdForRuntime0254, err := context.NewDeleteContextCommand(b.DeleteContextInputOptionsForRuntime0254, nil)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.DeleteContextCmdForRuntime0254 = deleteContextCmdForRuntime0254
 
-	deleteContextCmdForRuntime0280WithError, err := framework.NewDeleteContextCommand(b.DeleteContextInputOptionsForRuntime0280, b.DeleteContextOutputOptionsForRuntime0280WithError)
+	deleteContextCmdForRuntime0280WithError, err := context.NewDeleteContextCommand(b.DeleteContextInputOptionsForRuntime0280, b.DeleteContextOutputOptionsForRuntime0280WithError)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.DeleteContextCmdForRuntime0280WithError = deleteContextCmdForRuntime0280WithError
 
-	deleteContextCmdForRuntimeLatestWithError, err := framework.NewDeleteContextCommand(b.DeleteContextInputOptionsForRuntimeLatest, b.DeleteContextOutputOptionsForRuntimeLatestWithError)
+	deleteContextCmdForRuntimeLatestWithError, err := context.NewDeleteContextCommand(b.DeleteContextInputOptionsForRuntimeLatest, b.DeleteContextOutputOptionsForRuntimeLatestWithError)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.DeleteContextCmdForRuntimeLatestWithError = deleteContextCmdForRuntimeLatestWithError
 }
@@ -271,47 +270,47 @@ func (b *Helper) CreateGetContextAPICommands() {
 	// Create GetContext Commands with input and output options
 	ginkgo.By("Create GetContext API Commands")
 
-	getContextCmdForRuntimeLatest, err := framework.NewGetContextCommand(b.GetContextInputOptionsForRuntimeLatest, b.GetContextOutputOptionsForRuntimeLatest)
+	getContextCmdForRuntimeLatest, err := context.NewGetContextCommand(b.GetContextInputOptionsForRuntimeLatest, b.GetContextOutputOptionsForRuntimeLatest)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.GetContextCmdForRuntimeLatest = getContextCmdForRuntimeLatest
 
-	getContextCmdForRuntime0280, err := framework.NewGetContextCommand(b.GetContextInputOptionsForRuntime0280, b.GetContextOutputOptionsForRuntime0280)
+	getContextCmdForRuntime0280, err := context.NewGetContextCommand(b.GetContextInputOptionsForRuntime0280, b.GetContextOutputOptionsForRuntime0280)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.GetContextCmdForRuntime0280 = getContextCmdForRuntime0280
 
-	getContextCmdForRuntime0254, err := framework.NewGetContextCommand(b.GetContextInputOptionsForRuntime0254, b.GetContextOutputOptionsForRuntime0254)
+	getContextCmdForRuntime0254, err := context.NewGetContextCommand(b.GetContextInputOptionsForRuntime0254, b.GetContextOutputOptionsForRuntime0254)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.GetContextCmdForRuntime0254 = getContextCmdForRuntime0254
 
-	getContextTwoCmdForRuntimeLatest, err := framework.NewGetContextCommand(b.GetContextTwoInputOptionsForRuntimeLatest, b.GetContextTwoOutputOptionsForRuntimeLatest)
+	getContextTwoCmdForRuntimeLatest, err := context.NewGetContextCommand(b.GetContextTwoInputOptionsForRuntimeLatest, b.GetContextTwoOutputOptionsForRuntimeLatest)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.GetContextTwoCmdForRuntimeLatest = getContextTwoCmdForRuntimeLatest
 
-	getContextTwoCmdForRuntime0280, err := framework.NewGetContextCommand(b.GetContextTwoInputOptionsForRuntime0280, b.GetContextTwoOutputOptionsForRuntime0280)
+	getContextTwoCmdForRuntime0280, err := context.NewGetContextCommand(b.GetContextTwoInputOptionsForRuntime0280, b.GetContextTwoOutputOptionsForRuntime0280)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.GetContextTwoCmdForRuntime0280 = getContextTwoCmdForRuntime0280
 
-	getContextTwoCmdForRuntime0254, err := framework.NewGetContextCommand(b.GetContextTwoInputOptionsForRuntime0254, b.GetContextTwoOutputOptionsForRuntime0254)
+	getContextTwoCmdForRuntime0254, err := context.NewGetContextCommand(b.GetContextTwoInputOptionsForRuntime0254, b.GetContextTwoOutputOptionsForRuntime0254)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.GetContextTwoCmdForRuntime0254 = getContextTwoCmdForRuntime0254
 
-	getContextCmdForRuntimeLatestWithError, err := framework.NewGetContextCommand(b.GetContextInputOptionsForRuntimeLatest, b.GetContextOutputOptionsForRuntimeLatestWithError)
+	getContextCmdForRuntimeLatestWithError, err := context.NewGetContextCommand(b.GetContextInputOptionsForRuntimeLatest, b.GetContextOutputOptionsForRuntimeLatestWithError)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.GetContextCmdForRuntimeLatestWithError = getContextCmdForRuntimeLatestWithError
 
-	getContextCmdForRuntime0280WithError, err := framework.NewGetContextCommand(b.GetContextInputOptionsForRuntime0280, b.GetContextOutputOptionsForRuntime0280WithError)
+	getContextCmdForRuntime0280WithError, err := context.NewGetContextCommand(b.GetContextInputOptionsForRuntime0280, b.GetContextOutputOptionsForRuntime0280WithError)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.GetContextCmdForRuntime0280WithError = getContextCmdForRuntime0280WithError
 
-	getContextCmdForRuntime0254WithError, err := framework.NewGetContextCommand(b.GetContextInputOptionsForRuntime0254, b.GetContextOutputOptionsForRuntime0254WithError)
+	getContextCmdForRuntime0254WithError, err := context.NewGetContextCommand(b.GetContextInputOptionsForRuntime0254, b.GetContextOutputOptionsForRuntime0254WithError)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.GetContextCmdForRuntime0254WithError = getContextCmdForRuntime0254WithError
 
-	getContextTwoCmdForRuntimeLatestWithError, err := framework.NewGetContextCommand(b.GetContextTwoInputOptionsForRuntimeLatest, b.GetContextTwoOutputOptionsForRuntimeLatestWithError)
+	getContextTwoCmdForRuntimeLatestWithError, err := context.NewGetContextCommand(b.GetContextTwoInputOptionsForRuntimeLatest, b.GetContextTwoOutputOptionsForRuntimeLatestWithError)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.GetContextTwoCmdForRuntimeLatestWithError = getContextTwoCmdForRuntimeLatestWithError
 
-	getContextTwoCmdForRuntime0280WithError, err := framework.NewGetContextCommand(b.GetContextTwoInputOptionsForRuntime0280, b.GetContextTwoOutputOptionsForRuntime0280WithError)
+	getContextTwoCmdForRuntime0280WithError, err := context.NewGetContextCommand(b.GetContextTwoInputOptionsForRuntime0280, b.GetContextTwoOutputOptionsForRuntime0280WithError)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.GetContextTwoCmdForRuntime0280WithError = getContextTwoCmdForRuntime0280WithError
 }
@@ -339,27 +338,27 @@ func (b *Helper) CreateGetCurrentContextAPICommands() {
 	// Create GetCurrentContext Commands with input and output options
 	ginkgo.By("Create GetCurrentContext API Commands")
 
-	getCurrentContextCmdForRuntimeLatest, err := framework.NewGetCurrentContextCommand(b.GetCurrentContextInputOptionsForRuntimeLatest, b.GetCurrentContextOutputOptionsForRuntimeLatest)
+	getCurrentContextCmdForRuntimeLatest, err := context.NewGetCurrentContextCommand(b.GetCurrentContextInputOptionsForRuntimeLatest, b.GetCurrentContextOutputOptionsForRuntimeLatest)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.GetCurrentContextCmdForRuntimeLatest = getCurrentContextCmdForRuntimeLatest
 
-	getCurrentContextCmdForRuntime0280, err := framework.NewGetCurrentContextCommand(b.GetCurrentContextInputOptionsForRuntime0280, b.GetCurrentContextOutputOptionsForRuntime0280)
+	getCurrentContextCmdForRuntime0280, err := context.NewGetCurrentContextCommand(b.GetCurrentContextInputOptionsForRuntime0280, b.GetCurrentContextOutputOptionsForRuntime0280)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.GetCurrentContextCmdForRuntime0280 = getCurrentContextCmdForRuntime0280
 
-	getCurrentContextCmdForRuntime0254, err := framework.NewGetCurrentContextCommand(b.GetCurrentContextInputOptionsForRuntime0254, b.GetCurrentContextOutputOptionsForRuntime0254)
+	getCurrentContextCmdForRuntime0254, err := context.NewGetCurrentContextCommand(b.GetCurrentContextInputOptionsForRuntime0254, b.GetCurrentContextOutputOptionsForRuntime0254)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.GetCurrentContextCmdForRuntime0254 = getCurrentContextCmdForRuntime0254
 
-	getCurrentContextCmdForRuntimeLatestWithError, err := framework.NewGetCurrentContextCommand(b.GetCurrentContextInputOptionsForRuntimeLatest, b.GetCurrentContextOutputOptionsForRuntimeLatestWithError)
+	getCurrentContextCmdForRuntimeLatestWithError, err := context.NewGetCurrentContextCommand(b.GetCurrentContextInputOptionsForRuntimeLatest, b.GetCurrentContextOutputOptionsForRuntimeLatestWithError)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.GetCurrentContextCmdForRuntimeLatestWithError = getCurrentContextCmdForRuntimeLatestWithError
 
-	getCurrentContextCmdForRuntime0280WithError, err := framework.NewGetCurrentContextCommand(b.GetCurrentContextInputOptionsForRuntime0280, b.GetCurrentContextOutputOptionsForRuntime0280WithError)
+	getCurrentContextCmdForRuntime0280WithError, err := context.NewGetCurrentContextCommand(b.GetCurrentContextInputOptionsForRuntime0280, b.GetCurrentContextOutputOptionsForRuntime0280WithError)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.GetCurrentContextCmdForRuntime0280WithError = getCurrentContextCmdForRuntime0280WithError
 
-	getCurrentContextCmdForRuntime0254WithError, err := framework.NewGetCurrentContextCommand(b.GetCurrentContextInputOptionsForRuntime0254, b.GetCurrentContextOutputOptionsForRuntime0254WithError)
+	getCurrentContextCmdForRuntime0254WithError, err := context.NewGetCurrentContextCommand(b.GetCurrentContextInputOptionsForRuntime0254, b.GetCurrentContextOutputOptionsForRuntime0254WithError)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.GetCurrentContextCmdForRuntime0254WithError = getCurrentContextCmdForRuntime0254WithError
 }
@@ -379,15 +378,15 @@ func (b *Helper) CreateSetCurrentContextAPICommands() {
 	// Create SetCurrentContext Commands with input and output options
 	ginkgo.By("Create SetCurrentContext API Commands")
 
-	setCurrentContextCmdForRuntimeLatest, err := framework.NewSetCurrentContextCommand(b.SetCurrentContextInputOptionsForRuntimeLatest, nil)
+	setCurrentContextCmdForRuntimeLatest, err := context.NewSetCurrentContextCommand(b.SetCurrentContextInputOptionsForRuntimeLatest, nil)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.SetCurrentContextCmdForRuntimeLatest = setCurrentContextCmdForRuntimeLatest
 
-	setCurrentContextCmdForRuntime0280, err := framework.NewSetCurrentContextCommand(b.SetCurrentContextInputOptionsForRuntime0280, nil)
+	setCurrentContextCmdForRuntime0280, err := context.NewSetCurrentContextCommand(b.SetCurrentContextInputOptionsForRuntime0280, nil)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.SetCurrentContextCmdForRuntime0280 = setCurrentContextCmdForRuntime0280
 
-	setCurrentContextCmdForRuntime0254, err := framework.NewSetCurrentContextCommand(b.SetCurrentContextInputOptionsForRuntime0254, nil)
+	setCurrentContextCmdForRuntime0254, err := context.NewSetCurrentContextCommand(b.SetCurrentContextInputOptionsForRuntime0254, nil)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.SetCurrentContextCmdForRuntime0254 = setCurrentContextCmdForRuntime0254
 }
@@ -420,31 +419,31 @@ func (b *Helper) CreateSetContextAPICommands() {
 	// Create SetContext Commands with input and output options
 	ginkgo.By("Create SetContext API Commands")
 
-	setContextCmdForRuntimeLatest, err := framework.NewSetContextCommand(b.SetContextInputOptionsForRuntimeLatest, nil)
+	setContextCmdForRuntimeLatest, err := context.NewSetContextCommand(b.SetContextInputOptionsForRuntimeLatest, nil)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.SetContextCmdForRuntimeLatest = setContextCmdForRuntimeLatest
-	setContextCmdForRuntime0254, err := framework.NewSetContextCommand(b.SetContextInputOptionsForRuntime0254, nil)
+	setContextCmdForRuntime0254, err := context.NewSetContextCommand(b.SetContextInputOptionsForRuntime0254, nil)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.SetContextCmdForRuntime0254 = setContextCmdForRuntime0254
-	setContextCmdForRuntime0280, err := framework.NewSetContextCommand(b.SetContextInputOptionsForRuntime0280, nil)
+	setContextCmdForRuntime0280, err := context.NewSetContextCommand(b.SetContextInputOptionsForRuntime0280, nil)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.SetContextCmdForRuntime0280 = setContextCmdForRuntime0280
-	setContextTwoCmdForRuntimeLatest, err := framework.NewSetContextCommand(b.SetContextTwoInputOptionsForRuntimeLatest, nil)
+	setContextTwoCmdForRuntimeLatest, err := context.NewSetContextCommand(b.SetContextTwoInputOptionsForRuntimeLatest, nil)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.SetContextTwoCmdForRuntimeLatest = setContextTwoCmdForRuntimeLatest
-	setContextTwoCmdForRuntime0254, err := framework.NewSetContextCommand(b.SetContextTwoInputOptionsForRuntime0254, nil)
+	setContextTwoCmdForRuntime0254, err := context.NewSetContextCommand(b.SetContextTwoInputOptionsForRuntime0254, nil)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.SetContextTwoCmdForRuntime0254 = setContextTwoCmdForRuntime0254
-	setContextTwoCmdForRuntime0280, err := framework.NewSetContextCommand(b.SetContextTwoInputOptionsForRuntime0280, nil)
+	setContextTwoCmdForRuntime0280, err := context.NewSetContextCommand(b.SetContextTwoInputOptionsForRuntime0280, nil)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.SetContextTwoCmdForRuntime0280 = setContextTwoCmdForRuntime0280
 }
 
 // DefaultSetContextInputOptions helper method to construct SetContext API input options
-func DefaultSetContextInputOptions(version core.RuntimeVersion, contextName string) *framework.SetContextInputOptions {
+func DefaultSetContextInputOptions(version core.RuntimeVersion, contextName string) *context.SetContextInputOptions {
 	switch version {
 	case core.VersionLatest, core.Version0280:
-		return &framework.SetContextInputOptions{
+		return &context.SetContextInputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: version,
 			},
@@ -457,7 +456,7 @@ func DefaultSetContextInputOptions(version core.RuntimeVersion, contextName stri
 			},
 		}
 	case core.Version0254:
-		return &framework.SetContextInputOptions{
+		return &context.SetContextInputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: core.Version0254,
 			},
@@ -474,8 +473,8 @@ func DefaultSetContextInputOptions(version core.RuntimeVersion, contextName stri
 }
 
 // DefaultGetContextInputOptions helper method to construct GetContext API input options
-func DefaultGetContextInputOptions(version core.RuntimeVersion, contextName string) *framework.GetContextInputOptions {
-	return &framework.GetContextInputOptions{
+func DefaultGetContextInputOptions(version core.RuntimeVersion, contextName string) *context.GetContextInputOptions {
+	return &context.GetContextInputOptions{
 		RuntimeAPIVersion: &core.RuntimeAPIVersion{
 			RuntimeVersion: version,
 		},
@@ -484,10 +483,10 @@ func DefaultGetContextInputOptions(version core.RuntimeVersion, contextName stri
 }
 
 // DefaultGetContextOutputOptions helper method to construct GetContext API output options
-func DefaultGetContextOutputOptions(version core.RuntimeVersion, contextName string) *framework.GetContextOutputOptions {
+func DefaultGetContextOutputOptions(version core.RuntimeVersion, contextName string) *context.GetContextOutputOptions {
 	switch version {
 	case core.VersionLatest, core.Version0280:
-		return &framework.GetContextOutputOptions{
+		return &context.GetContextOutputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: version,
 			},
@@ -501,7 +500,7 @@ func DefaultGetContextOutputOptions(version core.RuntimeVersion, contextName str
 			ValidationStrategy: core.ValidationStrategyStrict,
 		}
 	case core.Version0254:
-		return &framework.GetContextOutputOptions{
+		return &context.GetContextOutputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: core.Version0254,
 			},
@@ -518,17 +517,17 @@ func DefaultGetContextOutputOptions(version core.RuntimeVersion, contextName str
 }
 
 // DefaultGetContextOutputOptionsWithError helper method to construct GetContext API output options with error
-func DefaultGetContextOutputOptionsWithError(version core.RuntimeVersion, contextName string) *framework.GetContextOutputOptions {
+func DefaultGetContextOutputOptionsWithError(version core.RuntimeVersion, contextName string) *context.GetContextOutputOptions {
 	switch version {
 	case core.VersionLatest, core.Version0280:
-		return &framework.GetContextOutputOptions{
+		return &context.GetContextOutputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: version,
 			},
 			Error: fmt.Sprintf("context %v not found", contextName),
 		}
 	case core.Version0254:
-		return &framework.GetContextOutputOptions{
+		return &context.GetContextOutputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: core.Version0254,
 			},
@@ -539,8 +538,8 @@ func DefaultGetContextOutputOptionsWithError(version core.RuntimeVersion, contex
 }
 
 // DefaultSetCurrentContextInputOptions helper method to construct SetCurrentContext API input options
-func DefaultSetCurrentContextInputOptions(version core.RuntimeVersion, contextName string) *framework.SetCurrentContextInputOptions {
-	return &framework.SetCurrentContextInputOptions{
+func DefaultSetCurrentContextInputOptions(version core.RuntimeVersion, contextName string) *context.SetCurrentContextInputOptions {
+	return &context.SetCurrentContextInputOptions{
 		RuntimeAPIVersion: &core.RuntimeAPIVersion{
 			RuntimeVersion: version,
 		},
@@ -549,17 +548,17 @@ func DefaultSetCurrentContextInputOptions(version core.RuntimeVersion, contextNa
 }
 
 // DefaultGetCurrentContextInputOptions helper method to construct GetCurrentContext API input options
-func DefaultGetCurrentContextInputOptions(version core.RuntimeVersion) *framework.GetCurrentContextInputOptions {
+func DefaultGetCurrentContextInputOptions(version core.RuntimeVersion) *context.GetCurrentContextInputOptions {
 	switch version {
 	case core.VersionLatest, core.Version0280:
-		return &framework.GetCurrentContextInputOptions{
+		return &context.GetCurrentContextInputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: version,
 			},
 			Target: types.TargetK8s,
 		}
 	case core.Version0254:
-		return &framework.GetCurrentContextInputOptions{
+		return &context.GetCurrentContextInputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: core.Version0254,
 			},
@@ -570,10 +569,10 @@ func DefaultGetCurrentContextInputOptions(version core.RuntimeVersion) *framewor
 }
 
 // DefaultGetCurrentContextOutputOptions helper method to construct GetCurrentContext API output options
-func DefaultGetCurrentContextOutputOptions(version core.RuntimeVersion, contextName string) *framework.GetCurrentContextOutputOptions {
+func DefaultGetCurrentContextOutputOptions(version core.RuntimeVersion, contextName string) *context.GetCurrentContextOutputOptions {
 	switch version {
 	case core.VersionLatest, core.Version0280:
-		return &framework.GetCurrentContextOutputOptions{
+		return &context.GetCurrentContextOutputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: core.VersionLatest,
 			},
@@ -587,7 +586,7 @@ func DefaultGetCurrentContextOutputOptions(version core.RuntimeVersion, contextN
 			ValidationStrategy: core.ValidationStrategyStrict,
 		}
 	case core.Version0254:
-		return &framework.GetCurrentContextOutputOptions{
+		return &context.GetCurrentContextOutputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: core.Version0254,
 			},
@@ -604,17 +603,17 @@ func DefaultGetCurrentContextOutputOptions(version core.RuntimeVersion, contextN
 }
 
 // DefaultGetCurrentContextOutputOptionsWithError helper method to construct GetCurrentContext API output options with error
-func DefaultGetCurrentContextOutputOptionsWithError(version core.RuntimeVersion) *framework.GetCurrentContextOutputOptions {
+func DefaultGetCurrentContextOutputOptionsWithError(version core.RuntimeVersion) *context.GetCurrentContextOutputOptions {
 	switch version {
 	case core.VersionLatest, core.Version0280:
-		return &framework.GetCurrentContextOutputOptions{
+		return &context.GetCurrentContextOutputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: version,
 			},
 			Error: fmt.Sprintf("no current context set for target \"%v\"", types.TargetK8s),
 		}
 	case core.Version0254:
-		return &framework.GetCurrentContextOutputOptions{
+		return &context.GetCurrentContextOutputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: version,
 			},
@@ -625,10 +624,10 @@ func DefaultGetCurrentContextOutputOptionsWithError(version core.RuntimeVersion)
 }
 
 // DefaultRemoveCurrentContextInputOptions helper method to construct RemoveCurrentContext API input options
-func DefaultRemoveCurrentContextInputOptions(version core.RuntimeVersion) *framework.RemoveCurrentContextInputOptions {
+func DefaultRemoveCurrentContextInputOptions(version core.RuntimeVersion) *context.RemoveCurrentContextInputOptions {
 	switch version {
 	case core.VersionLatest, core.Version0280:
-		return &framework.RemoveCurrentContextInputOptions{
+		return &context.RemoveCurrentContextInputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: version,
 			},
@@ -639,17 +638,17 @@ func DefaultRemoveCurrentContextInputOptions(version core.RuntimeVersion) *frame
 }
 
 // DefaultRemoveCurrentContextOutputOptionsWithError helper method to construct RemoveCurrentContext API output option
-func DefaultRemoveCurrentContextOutputOptionsWithError(version core.RuntimeVersion) *framework.RemoveCurrentContextOutputOptions {
+func DefaultRemoveCurrentContextOutputOptionsWithError(version core.RuntimeVersion) *context.RemoveCurrentContextOutputOptions {
 	switch version {
 	case core.VersionLatest, core.Version0280:
-		return &framework.RemoveCurrentContextOutputOptions{
+		return &context.RemoveCurrentContextOutputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: version,
 			},
 			Error: fmt.Sprintf("no current context set for target \"%v\"", types.TargetK8s),
 		}
 	case core.Version0254:
-		return &framework.RemoveCurrentContextOutputOptions{
+		return &context.RemoveCurrentContextOutputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: version,
 			},
@@ -660,8 +659,8 @@ func DefaultRemoveCurrentContextOutputOptionsWithError(version core.RuntimeVersi
 }
 
 // DefaultDeleteContextInputOptions helper method to construct DeleteContext API input options
-func DefaultDeleteContextInputOptions(version core.RuntimeVersion, contextName string) *framework.DeleteContextInputOptions {
-	return &framework.DeleteContextInputOptions{
+func DefaultDeleteContextInputOptions(version core.RuntimeVersion, contextName string) *context.DeleteContextInputOptions {
+	return &context.DeleteContextInputOptions{
 		RuntimeAPIVersion: &core.RuntimeAPIVersion{
 			RuntimeVersion: version,
 		},
@@ -670,17 +669,17 @@ func DefaultDeleteContextInputOptions(version core.RuntimeVersion, contextName s
 }
 
 // DefaultDeleteContextOutputOptionsWithError helper method to construct DeleteContext API output options
-func DefaultDeleteContextOutputOptionsWithError(version core.RuntimeVersion, contextName string) *framework.DeleteContextOutputOptions {
+func DefaultDeleteContextOutputOptionsWithError(version core.RuntimeVersion, contextName string) *context.DeleteContextOutputOptions {
 	switch version {
 	case core.VersionLatest, core.Version0280:
-		return &framework.DeleteContextOutputOptions{
+		return &context.DeleteContextOutputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: version,
 			},
 			Error: fmt.Sprintf("context %v not found", contextName),
 		}
 	case core.Version0254:
-		return &framework.DeleteContextOutputOptions{
+		return &context.DeleteContextOutputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: core.Version0254,
 			},

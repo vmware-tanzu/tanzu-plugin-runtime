@@ -1,7 +1,7 @@
 // Copyright 2023 VMware, Inc. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-package framework
+package context
 
 import (
 	"testing"
@@ -36,7 +36,7 @@ func TestNewSetContextCommand(t *testing.T) {
 			&core.Command{
 				APIs: []*core.API{
 					{
-						Name:    core.SetContextAPIName,
+						Name:    core.SetContextAPI,
 						Version: core.VersionLatest,
 						Arguments: map[core.APIArgumentType]interface{}{
 							"context": `name: compatibility-one
@@ -142,7 +142,7 @@ func TestNewDeleteContextCommand(t *testing.T) {
 			&core.Command{
 				APIs: []*core.API{
 					{
-						Name:    core.DeleteContextAPIName,
+						Name:    core.DeleteContextAPI,
 						Version: core.VersionLatest,
 						Arguments: map[core.APIArgumentType]interface{}{
 							"contextName": "compatibility-one",
@@ -185,7 +185,7 @@ func TestNewSetCurrentContextCommand(t *testing.T) {
 			&core.Command{
 				APIs: []*core.API{
 					{
-						Name:    core.SetCurrentContextAPIName,
+						Name:    core.SetCurrentContextAPI,
 						Version: core.VersionLatest,
 						Arguments: map[core.APIArgumentType]interface{}{
 							"contextName": "compatibility-one",
@@ -239,7 +239,7 @@ func TestNewGetCurrentContextCommand(t *testing.T) {
 			&core.Command{
 				APIs: []*core.API{
 					{
-						Name:    core.GetCurrentContextAPIName,
+						Name:    core.GetCurrentContextAPI,
 						Version: core.VersionLatest,
 						Arguments: map[core.APIArgumentType]interface{}{
 							core.Target: types.TargetK8s,
@@ -286,7 +286,7 @@ func TestNewRemoveCurrentContextCommand(t *testing.T) {
 			&core.Command{
 				APIs: []*core.API{
 					{
-						Name:    core.RemoveCurrentContextAPIName,
+						Name:    core.RemoveCurrentContextAPI,
 						Version: core.VersionLatest,
 						Arguments: map[core.APIArgumentType]interface{}{
 							core.Target: types.TargetK8s,

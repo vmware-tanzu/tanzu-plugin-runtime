@@ -1,7 +1,7 @@
 // Copyright 2023 VMware, Inc. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-package framework
+package server
 
 import (
 	"testing"
@@ -36,7 +36,7 @@ func TestNewSetServerCommand(t *testing.T) {
 			&core.Command{
 				APIs: []*core.API{
 					{
-						Name:    core.SetServerAPIName,
+						Name:    core.SetServerAPI,
 						Version: core.VersionLatest,
 						Arguments: map[core.APIArgumentType]interface{}{
 							core.Server: `name: compatibility-one
@@ -95,7 +95,7 @@ func TestNewGetServerCommand(t *testing.T) {
 			&core.Command{
 				APIs: []*core.API{
 					{
-						Name:    core.GetServerAPIName,
+						Name:    core.GetServerAPI,
 						Version: core.VersionLatest,
 						Arguments: map[core.APIArgumentType]interface{}{
 							core.ServerName: "compatibility-one",
@@ -142,7 +142,7 @@ func TestNewDeleteServerCommand(t *testing.T) {
 			&core.Command{
 				APIs: []*core.API{
 					{
-						Name:    core.DeleteServerAPIName,
+						Name:    core.DeleteServerAPI,
 						Version: core.VersionLatest,
 						Arguments: map[core.APIArgumentType]interface{}{
 							core.ServerName: "compatibility-one",
@@ -185,7 +185,7 @@ func TestNewSetCurrentServerCommand(t *testing.T) {
 			&core.Command{
 				APIs: []*core.API{
 					{
-						Name:    core.SetCurrentServerAPIName,
+						Name:    core.SetCurrentServerAPI,
 						Version: core.VersionLatest,
 						Arguments: map[core.APIArgumentType]interface{}{
 							core.ServerName: "compatibility-one",
@@ -238,7 +238,7 @@ func TestNewGetCurrentServerCommand(t *testing.T) {
 			&core.Command{
 				APIs: []*core.API{
 					{
-						Name:      core.GetCurrentServerAPIName,
+						Name:      core.GetCurrentServerAPI,
 						Version:   core.VersionLatest,
 						Arguments: map[core.APIArgumentType]interface{}{},
 						Output: &core.Output{
@@ -283,7 +283,7 @@ func TestNewRemoveCurrentServerCommand(t *testing.T) {
 			&core.Command{
 				APIs: []*core.API{
 					{
-						Name:    core.RemoveCurrentServerAPIName,
+						Name:    core.RemoveCurrentServerAPI,
 						Version: core.VersionLatest,
 						Arguments: map[core.APIArgumentType]interface{}{
 							core.ServerName: "compatibility-one",

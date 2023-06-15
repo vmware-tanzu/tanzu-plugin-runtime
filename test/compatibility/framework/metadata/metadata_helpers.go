@@ -7,9 +7,8 @@ package metadata
 import (
 	"github.com/onsi/gomega"
 
-	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework"
-
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/types"
 )
 
 // Metadata related constants
@@ -130,8 +129,8 @@ func DefaultGetMetadataCommand(version core.RuntimeVersion, opts ...CfgMetadataO
 	}
 
 	args := &CfgMetadataArgs{
-		MetadataOpts: &framework.MetadataOpts{
-			ConfigMetadata: &framework.ConfigMetadataOpts{
+		MetadataOpts: &types.MetadataOpts{
+			ConfigMetadata: &types.ConfigMetadataOpts{
 				PatchStrategy: patchStrategies,
 				Settings:      settings,
 			},
@@ -173,7 +172,7 @@ func DefaultGetConfigMetadataCommand(version core.RuntimeVersion, opts ...CfgMet
 	}
 
 	args := &CfgMetadataArgs{
-		ConfigMetadataOpts: &framework.ConfigMetadataOpts{
+		ConfigMetadataOpts: &types.ConfigMetadataOpts{
 			PatchStrategy: patchStrategies,
 			Settings:      settings,
 		},

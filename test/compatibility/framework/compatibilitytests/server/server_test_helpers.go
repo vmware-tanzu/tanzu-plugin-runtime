@@ -10,11 +10,10 @@ import (
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
 
-	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/types"
-
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
-	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework"
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/compatibilitytests/common"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/server"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/types"
 )
 
 const ServerNotFound = "current server \"\" not found in tanzu config"
@@ -22,88 +21,88 @@ const ServerNotFound = "current server \"\" not found in tanzu config"
 // Helper struct provides input and output options and api commands to be used in test cases
 type Helper struct {
 	// SetServer Input Options
-	SetServerInputOptionsForRuntime0116   *framework.SetServerInputOptions
-	SetServerInputOptionsForRuntime0254   *framework.SetServerInputOptions
-	SetServerInputOptionsForRuntime0280   *framework.SetServerInputOptions
-	SetServerInputOptionsForRuntimeLatest *framework.SetServerInputOptions
+	SetServerInputOptionsForRuntime0116   *server.SetServerInputOptions
+	SetServerInputOptionsForRuntime0254   *server.SetServerInputOptions
+	SetServerInputOptionsForRuntime0280   *server.SetServerInputOptions
+	SetServerInputOptionsForRuntimeLatest *server.SetServerInputOptions
 
-	SetServerTwoInputOptionsForRuntime0116   *framework.SetServerInputOptions
-	SetServerTwoInputOptionsForRuntime0254   *framework.SetServerInputOptions
-	SetServerTwoInputOptionsForRuntime0280   *framework.SetServerInputOptions
-	SetServerTwoInputOptionsForRuntimeLatest *framework.SetServerInputOptions
+	SetServerTwoInputOptionsForRuntime0116   *server.SetServerInputOptions
+	SetServerTwoInputOptionsForRuntime0254   *server.SetServerInputOptions
+	SetServerTwoInputOptionsForRuntime0280   *server.SetServerInputOptions
+	SetServerTwoInputOptionsForRuntimeLatest *server.SetServerInputOptions
 
 	// SetCurrentServer Input Options
-	SetCurrentServerInputOptionsForRuntime0116   *framework.SetCurrentServerInputOptions
-	SetCurrentServerInputOptionsForRuntime0254   *framework.SetCurrentServerInputOptions
-	SetCurrentServerInputOptionsForRuntime0280   *framework.SetCurrentServerInputOptions
-	SetCurrentServerInputOptionsForRuntimeLatest *framework.SetCurrentServerInputOptions
+	SetCurrentServerInputOptionsForRuntime0116   *server.SetCurrentServerInputOptions
+	SetCurrentServerInputOptionsForRuntime0254   *server.SetCurrentServerInputOptions
+	SetCurrentServerInputOptionsForRuntime0280   *server.SetCurrentServerInputOptions
+	SetCurrentServerInputOptionsForRuntimeLatest *server.SetCurrentServerInputOptions
 
 	// GetServer Input Options
-	GetServerInputOptionsForRuntimeLatest *framework.GetServerInputOptions
-	GetServerInputOptionsForRuntime0280   *framework.GetServerInputOptions
-	GetServerInputOptionsForRuntime0254   *framework.GetServerInputOptions
-	GetServerInputOptionsForRuntime0116   *framework.GetServerInputOptions
+	GetServerInputOptionsForRuntimeLatest *server.GetServerInputOptions
+	GetServerInputOptionsForRuntime0280   *server.GetServerInputOptions
+	GetServerInputOptionsForRuntime0254   *server.GetServerInputOptions
+	GetServerInputOptionsForRuntime0116   *server.GetServerInputOptions
 
-	GetServerTwoInputOptionsForRuntimeLatest *framework.GetServerInputOptions
-	GetServerTwoInputOptionsForRuntime0280   *framework.GetServerInputOptions
-	GetServerTwoInputOptionsForRuntime0254   *framework.GetServerInputOptions
-	GetServerTwoInputOptionsForRuntime0116   *framework.GetServerInputOptions
+	GetServerTwoInputOptionsForRuntimeLatest *server.GetServerInputOptions
+	GetServerTwoInputOptionsForRuntime0280   *server.GetServerInputOptions
+	GetServerTwoInputOptionsForRuntime0254   *server.GetServerInputOptions
+	GetServerTwoInputOptionsForRuntime0116   *server.GetServerInputOptions
 
 	// GetServer Output Options
-	GetServerOutputOptionsForRuntime0116   *framework.GetServerOutputOptions
-	GetServerOutputOptionsForRuntime0254   *framework.GetServerOutputOptions
-	GetServerOutputOptionsForRuntime0280   *framework.GetServerOutputOptions
-	GetServerOutputOptionsForRuntimeLatest *framework.GetServerOutputOptions
+	GetServerOutputOptionsForRuntime0116   *server.GetServerOutputOptions
+	GetServerOutputOptionsForRuntime0254   *server.GetServerOutputOptions
+	GetServerOutputOptionsForRuntime0280   *server.GetServerOutputOptions
+	GetServerOutputOptionsForRuntimeLatest *server.GetServerOutputOptions
 
-	GetServerTwoOutputOptionsForRuntime0116   *framework.GetServerOutputOptions
-	GetServerTwoOutputOptionsForRuntime0254   *framework.GetServerOutputOptions
-	GetServerTwoOutputOptionsForRuntime0280   *framework.GetServerOutputOptions
-	GetServerTwoOutputOptionsForRuntimeLatest *framework.GetServerOutputOptions
+	GetServerTwoOutputOptionsForRuntime0116   *server.GetServerOutputOptions
+	GetServerTwoOutputOptionsForRuntime0254   *server.GetServerOutputOptions
+	GetServerTwoOutputOptionsForRuntime0280   *server.GetServerOutputOptions
+	GetServerTwoOutputOptionsForRuntimeLatest *server.GetServerOutputOptions
 
 	// GetServer Output Options with expected error
-	GetServerOutputOptionsForRuntimeLatestWithError *framework.GetServerOutputOptions
-	GetServerOutputOptionsForRuntime0280WithError   *framework.GetServerOutputOptions
-	GetServerOutputOptionsForRuntime0254WithError   *framework.GetServerOutputOptions
-	GetServerOutputOptionsForRuntime0116WithError   *framework.GetServerOutputOptions
+	GetServerOutputOptionsForRuntimeLatestWithError *server.GetServerOutputOptions
+	GetServerOutputOptionsForRuntime0280WithError   *server.GetServerOutputOptions
+	GetServerOutputOptionsForRuntime0254WithError   *server.GetServerOutputOptions
+	GetServerOutputOptionsForRuntime0116WithError   *server.GetServerOutputOptions
 
-	GetServerTwoOutputOptionsForRuntimeLatestWithError *framework.GetServerOutputOptions
-	GetServerTwoOutputOptionsForRuntime0280WithError   *framework.GetServerOutputOptions
+	GetServerTwoOutputOptionsForRuntimeLatestWithError *server.GetServerOutputOptions
+	GetServerTwoOutputOptionsForRuntime0280WithError   *server.GetServerOutputOptions
 
 	// GetCurrentServer Input Options
-	GetCurrentServerInputOptionsForRuntime0116   *framework.GetCurrentServerInputOptions
-	GetCurrentServerInputOptionsForRuntime0254   *framework.GetCurrentServerInputOptions
-	GetCurrentServerInputOptionsForRuntime0280   *framework.GetCurrentServerInputOptions
-	GetCurrentServerInputOptionsForRuntimeLatest *framework.GetCurrentServerInputOptions
+	GetCurrentServerInputOptionsForRuntime0116   *server.GetCurrentServerInputOptions
+	GetCurrentServerInputOptionsForRuntime0254   *server.GetCurrentServerInputOptions
+	GetCurrentServerInputOptionsForRuntime0280   *server.GetCurrentServerInputOptions
+	GetCurrentServerInputOptionsForRuntimeLatest *server.GetCurrentServerInputOptions
 
 	// GetCurrentServer Output Options
-	GetCurrentServerOutputOptionsForRuntime0116   *framework.GetCurrentServerOutputOptions
-	GetCurrentServerOutputOptionsForRuntime0254   *framework.GetCurrentServerOutputOptions
-	GetCurrentServerOutputOptionsForRuntime0280   *framework.GetCurrentServerOutputOptions
-	GetCurrentServerOutputOptionsForRuntimeLatest *framework.GetCurrentServerOutputOptions
+	GetCurrentServerOutputOptionsForRuntime0116   *server.GetCurrentServerOutputOptions
+	GetCurrentServerOutputOptionsForRuntime0254   *server.GetCurrentServerOutputOptions
+	GetCurrentServerOutputOptionsForRuntime0280   *server.GetCurrentServerOutputOptions
+	GetCurrentServerOutputOptionsForRuntimeLatest *server.GetCurrentServerOutputOptions
 
 	// GetCurrentServer Output Options with expected error
-	GetCurrentServerOutputOptionsForRuntimeLatestWithError *framework.GetCurrentServerOutputOptions
-	GetCurrentServerOutputOptionsForRuntime0280WithError   *framework.GetCurrentServerOutputOptions
-	GetCurrentServerOutputOptionsForRuntime0254WithError   *framework.GetCurrentServerOutputOptions
-	GetCurrentServerOutputOptionsForRuntime0116WithError   *framework.GetCurrentServerOutputOptions
+	GetCurrentServerOutputOptionsForRuntimeLatestWithError *server.GetCurrentServerOutputOptions
+	GetCurrentServerOutputOptionsForRuntime0280WithError   *server.GetCurrentServerOutputOptions
+	GetCurrentServerOutputOptionsForRuntime0254WithError   *server.GetCurrentServerOutputOptions
+	GetCurrentServerOutputOptionsForRuntime0116WithError   *server.GetCurrentServerOutputOptions
 
 	// DeleteServer Input Options
-	DeleteServerInputOptionsForRuntime0254   *framework.DeleteServerInputOptions
-	DeleteServerInputOptionsForRuntime0280   *framework.DeleteServerInputOptions
-	DeleteServerInputOptionsForRuntimeLatest *framework.DeleteServerInputOptions
-	DeleteServerInputOptionsForRuntime0116   *framework.DeleteServerInputOptions
+	DeleteServerInputOptionsForRuntime0254   *server.DeleteServerInputOptions
+	DeleteServerInputOptionsForRuntime0280   *server.DeleteServerInputOptions
+	DeleteServerInputOptionsForRuntimeLatest *server.DeleteServerInputOptions
+	DeleteServerInputOptionsForRuntime0116   *server.DeleteServerInputOptions
 
 	// DeleteServer Output Options with expected error
-	DeleteServerOutputOptionsForRuntime0280WithError   *framework.DeleteServerOutputOptions
-	DeleteServerOutputOptionsForRuntimeLatestWithError *framework.DeleteServerOutputOptions
+	DeleteServerOutputOptionsForRuntime0280WithError   *server.DeleteServerOutputOptions
+	DeleteServerOutputOptionsForRuntimeLatestWithError *server.DeleteServerOutputOptions
 
 	// RemoveCurrentServer Input Options
-	RemoveCurrentServerInputOptionsForRuntime0280   *framework.RemoveCurrentServerInputOptions
-	RemoveCurrentServerInputOptionsForRuntimeLatest *framework.RemoveCurrentServerInputOptions
+	RemoveCurrentServerInputOptionsForRuntime0280   *server.RemoveCurrentServerInputOptions
+	RemoveCurrentServerInputOptionsForRuntimeLatest *server.RemoveCurrentServerInputOptions
 
 	// RemoveCurrentServer Output Options with expected error
-	RemoveCurrentServerOutputOptionsForRuntimeLatestWithError *framework.RemoveCurrentServerOutputOptions
-	RemoveCurrentServerOutputOptionsForRuntime0280WithError   *framework.RemoveCurrentServerOutputOptions
+	RemoveCurrentServerOutputOptionsForRuntimeLatestWithError *server.RemoveCurrentServerOutputOptions
+	RemoveCurrentServerOutputOptionsForRuntime0280WithError   *server.RemoveCurrentServerOutputOptions
 
 	// Server API Commands
 	// SetServer API Commands
@@ -209,19 +208,19 @@ func (b *Helper) CreateRemoveCurrentServerAPICommands() {
 	// Create RemoveCurrentServer Commands with input and output options
 	ginkgo.By("Create RemoveCurrentServer API Commands")
 
-	removeCurrentServerCmdForRuntime0280, err := framework.NewRemoveCurrentServerCommand(b.RemoveCurrentServerInputOptionsForRuntime0280, nil)
+	removeCurrentServerCmdForRuntime0280, err := server.NewRemoveCurrentServerCommand(b.RemoveCurrentServerInputOptionsForRuntime0280, nil)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.RemoveCurrentServerCmdForRuntime0280 = removeCurrentServerCmdForRuntime0280
 
-	removeCurrentServerCmdForRuntimeLatest, err := framework.NewRemoveCurrentServerCommand(b.RemoveCurrentServerInputOptionsForRuntimeLatest, nil)
+	removeCurrentServerCmdForRuntimeLatest, err := server.NewRemoveCurrentServerCommand(b.RemoveCurrentServerInputOptionsForRuntimeLatest, nil)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.RemoveCurrentServerCmdForRuntimeLatest = removeCurrentServerCmdForRuntimeLatest
 
-	removeCurrentServerCmdForRuntimeLatestWithError, err := framework.NewRemoveCurrentServerCommand(b.RemoveCurrentServerInputOptionsForRuntimeLatest, b.RemoveCurrentServerOutputOptionsForRuntimeLatestWithError)
+	removeCurrentServerCmdForRuntimeLatestWithError, err := server.NewRemoveCurrentServerCommand(b.RemoveCurrentServerInputOptionsForRuntimeLatest, b.RemoveCurrentServerOutputOptionsForRuntimeLatestWithError)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.RemoveCurrentServerCmdForRuntimeLatestWithError = removeCurrentServerCmdForRuntimeLatestWithError
 
-	removeCurrentServerCmdForRuntime0280WithError, err := framework.NewRemoveCurrentServerCommand(b.RemoveCurrentServerInputOptionsForRuntime0280, b.RemoveCurrentServerOutputOptionsForRuntime0280WithError)
+	removeCurrentServerCmdForRuntime0280WithError, err := server.NewRemoveCurrentServerCommand(b.RemoveCurrentServerInputOptionsForRuntime0280, b.RemoveCurrentServerOutputOptionsForRuntime0280WithError)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.RemoveCurrentServerCmdForRuntime0280WithError = removeCurrentServerCmdForRuntime0280WithError
 }
@@ -245,27 +244,27 @@ func (b *Helper) CreateDeleteServerAPICommands() {
 	// Create DeleteServer Commands with input and output options
 	ginkgo.By("Create DeleteServer API Commands")
 
-	deleteServerCmdForRuntimeLatest, err := framework.NewDeleteServerCommand(b.DeleteServerInputOptionsForRuntimeLatest, nil)
+	deleteServerCmdForRuntimeLatest, err := server.NewDeleteServerCommand(b.DeleteServerInputOptionsForRuntimeLatest, nil)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.DeleteServerCmdForRuntimeLatest = deleteServerCmdForRuntimeLatest
 
-	deleteServerCmdForRuntime0280, err := framework.NewDeleteServerCommand(b.DeleteServerInputOptionsForRuntime0280, nil)
+	deleteServerCmdForRuntime0280, err := server.NewDeleteServerCommand(b.DeleteServerInputOptionsForRuntime0280, nil)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.DeleteServerCmdForRuntime0280 = deleteServerCmdForRuntime0280
 
-	deleteServerCmdForRuntime0254, err := framework.NewDeleteServerCommand(b.DeleteServerInputOptionsForRuntime0254, nil)
+	deleteServerCmdForRuntime0254, err := server.NewDeleteServerCommand(b.DeleteServerInputOptionsForRuntime0254, nil)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.DeleteServerCmdForRuntime0254 = deleteServerCmdForRuntime0254
 
-	deleteServerCmdForRuntime0116, err := framework.NewDeleteServerCommand(b.DeleteServerInputOptionsForRuntime0116, nil)
+	deleteServerCmdForRuntime0116, err := server.NewDeleteServerCommand(b.DeleteServerInputOptionsForRuntime0116, nil)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.DeleteServerCmdForRuntime0116 = deleteServerCmdForRuntime0116
 
-	deleteServerCmdForRuntime0280WithError, err := framework.NewDeleteServerCommand(b.DeleteServerInputOptionsForRuntime0280, b.DeleteServerOutputOptionsForRuntime0280WithError)
+	deleteServerCmdForRuntime0280WithError, err := server.NewDeleteServerCommand(b.DeleteServerInputOptionsForRuntime0280, b.DeleteServerOutputOptionsForRuntime0280WithError)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.DeleteServerCmdForRuntime0280WithError = deleteServerCmdForRuntime0280WithError
 
-	deleteServerCmdForRuntimeLatestWithError, err := framework.NewDeleteServerCommand(b.DeleteServerInputOptionsForRuntimeLatest, b.DeleteServerOutputOptionsForRuntimeLatestWithError)
+	deleteServerCmdForRuntimeLatestWithError, err := server.NewDeleteServerCommand(b.DeleteServerInputOptionsForRuntimeLatest, b.DeleteServerOutputOptionsForRuntimeLatestWithError)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.DeleteServerCmdForRuntimeLatestWithError = deleteServerCmdForRuntimeLatestWithError
 }
@@ -309,59 +308,59 @@ func (b *Helper) CreateGetServerAPICommands() {
 	// Create GetServer Commands with input and output options
 	ginkgo.By("Create GetServer API Commands")
 
-	getServerCmdForRuntimeLatest, err := framework.NewGetServerCommand(b.GetServerInputOptionsForRuntimeLatest, b.GetServerOutputOptionsForRuntimeLatest)
+	getServerCmdForRuntimeLatest, err := server.NewGetServerCommand(b.GetServerInputOptionsForRuntimeLatest, b.GetServerOutputOptionsForRuntimeLatest)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.GetServerCmdForRuntimeLatest = getServerCmdForRuntimeLatest
 
-	getServerCmdForRuntime0280, err := framework.NewGetServerCommand(b.GetServerInputOptionsForRuntime0280, b.GetServerOutputOptionsForRuntime0280)
+	getServerCmdForRuntime0280, err := server.NewGetServerCommand(b.GetServerInputOptionsForRuntime0280, b.GetServerOutputOptionsForRuntime0280)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.GetServerCmdForRuntime0280 = getServerCmdForRuntime0280
 
-	getServerCmdForRuntime0254, err := framework.NewGetServerCommand(b.GetServerInputOptionsForRuntime0254, b.GetServerOutputOptionsForRuntime0254)
+	getServerCmdForRuntime0254, err := server.NewGetServerCommand(b.GetServerInputOptionsForRuntime0254, b.GetServerOutputOptionsForRuntime0254)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.GetServerCmdForRuntime0254 = getServerCmdForRuntime0254
 
-	getServerCmdForRuntime0116, err := framework.NewGetServerCommand(b.GetServerInputOptionsForRuntime0116, b.GetServerOutputOptionsForRuntime0116)
+	getServerCmdForRuntime0116, err := server.NewGetServerCommand(b.GetServerInputOptionsForRuntime0116, b.GetServerOutputOptionsForRuntime0116)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.GetServerCmdForRuntime0116 = getServerCmdForRuntime0116
 
-	getServerTwoCmdForRuntimeLatest, err := framework.NewGetServerCommand(b.GetServerTwoInputOptionsForRuntimeLatest, b.GetServerTwoOutputOptionsForRuntimeLatest)
+	getServerTwoCmdForRuntimeLatest, err := server.NewGetServerCommand(b.GetServerTwoInputOptionsForRuntimeLatest, b.GetServerTwoOutputOptionsForRuntimeLatest)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.GetServerTwoCmdForRuntimeLatest = getServerTwoCmdForRuntimeLatest
 
-	getServerTwoCmdForRuntime0280, err := framework.NewGetServerCommand(b.GetServerTwoInputOptionsForRuntime0280, b.GetServerTwoOutputOptionsForRuntime0280)
+	getServerTwoCmdForRuntime0280, err := server.NewGetServerCommand(b.GetServerTwoInputOptionsForRuntime0280, b.GetServerTwoOutputOptionsForRuntime0280)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.GetServerTwoCmdForRuntime0280 = getServerTwoCmdForRuntime0280
 
-	getServerTwoCmdForRuntime0254, err := framework.NewGetServerCommand(b.GetServerTwoInputOptionsForRuntime0254, b.GetServerTwoOutputOptionsForRuntime0254)
+	getServerTwoCmdForRuntime0254, err := server.NewGetServerCommand(b.GetServerTwoInputOptionsForRuntime0254, b.GetServerTwoOutputOptionsForRuntime0254)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.GetServerTwoCmdForRuntime0254 = getServerTwoCmdForRuntime0254
 
-	getServerTwoCmdForRuntime0116, err := framework.NewGetServerCommand(b.GetServerTwoInputOptionsForRuntime0116, b.GetServerTwoOutputOptionsForRuntime0116)
+	getServerTwoCmdForRuntime0116, err := server.NewGetServerCommand(b.GetServerTwoInputOptionsForRuntime0116, b.GetServerTwoOutputOptionsForRuntime0116)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.GetServerTwoCmdForRuntime0116 = getServerTwoCmdForRuntime0116
 
-	getServerCmdForRuntimeLatestWithError, err := framework.NewGetServerCommand(b.GetServerInputOptionsForRuntimeLatest, b.GetServerOutputOptionsForRuntimeLatestWithError)
+	getServerCmdForRuntimeLatestWithError, err := server.NewGetServerCommand(b.GetServerInputOptionsForRuntimeLatest, b.GetServerOutputOptionsForRuntimeLatestWithError)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.GetServerCmdForRuntimeLatestWithError = getServerCmdForRuntimeLatestWithError
 
-	getServerCmdForRuntime0280WithError, err := framework.NewGetServerCommand(b.GetServerInputOptionsForRuntime0280, b.GetServerOutputOptionsForRuntime0280WithError)
+	getServerCmdForRuntime0280WithError, err := server.NewGetServerCommand(b.GetServerInputOptionsForRuntime0280, b.GetServerOutputOptionsForRuntime0280WithError)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.GetServerCmdForRuntime0280WithError = getServerCmdForRuntime0280WithError
 
-	getServerCmdForRuntime0254WithError, err := framework.NewGetServerCommand(b.GetServerInputOptionsForRuntime0254, b.GetServerOutputOptionsForRuntime0254WithError)
+	getServerCmdForRuntime0254WithError, err := server.NewGetServerCommand(b.GetServerInputOptionsForRuntime0254, b.GetServerOutputOptionsForRuntime0254WithError)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.GetServerCmdForRuntime0254WithError = getServerCmdForRuntime0254WithError
 
-	getServerCmdForRuntime0116WithError, err := framework.NewGetServerCommand(b.GetServerInputOptionsForRuntime0116, b.GetServerOutputOptionsForRuntime0116WithError)
+	getServerCmdForRuntime0116WithError, err := server.NewGetServerCommand(b.GetServerInputOptionsForRuntime0116, b.GetServerOutputOptionsForRuntime0116WithError)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.GetServerCmdForRuntime0116WithError = getServerCmdForRuntime0116WithError
 
-	getServerTwoCmdForRuntimeLatestWithError, err := framework.NewGetServerCommand(b.GetServerTwoInputOptionsForRuntimeLatest, b.GetServerTwoOutputOptionsForRuntimeLatestWithError)
+	getServerTwoCmdForRuntimeLatestWithError, err := server.NewGetServerCommand(b.GetServerTwoInputOptionsForRuntimeLatest, b.GetServerTwoOutputOptionsForRuntimeLatestWithError)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.GetServerTwoCmdForRuntimeLatestWithError = getServerTwoCmdForRuntimeLatestWithError
 
-	getServerTwoCmdForRuntime0280WithError, err := framework.NewGetServerCommand(b.GetServerTwoInputOptionsForRuntime0280, b.GetServerTwoOutputOptionsForRuntime0280WithError)
+	getServerTwoCmdForRuntime0280WithError, err := server.NewGetServerCommand(b.GetServerTwoInputOptionsForRuntime0280, b.GetServerTwoOutputOptionsForRuntime0280WithError)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.GetServerTwoCmdForRuntime0280WithError = getServerTwoCmdForRuntime0280WithError
 }
@@ -392,35 +391,35 @@ func (b *Helper) CreateGetCurrentServerAPICommands() {
 	// Create GetCurrentServer Commands with input and output options
 	ginkgo.By("Create GetCurrentServer API Commands")
 
-	getCurrentServerCmdForRuntimeLatest, err := framework.NewGetCurrentServerCommand(b.GetCurrentServerInputOptionsForRuntimeLatest, b.GetCurrentServerOutputOptionsForRuntimeLatest)
+	getCurrentServerCmdForRuntimeLatest, err := server.NewGetCurrentServerCommand(b.GetCurrentServerInputOptionsForRuntimeLatest, b.GetCurrentServerOutputOptionsForRuntimeLatest)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.GetCurrentServerCmdForRuntimeLatest = getCurrentServerCmdForRuntimeLatest
 
-	getCurrentServerCmdForRuntime0280, err := framework.NewGetCurrentServerCommand(b.GetCurrentServerInputOptionsForRuntime0280, b.GetCurrentServerOutputOptionsForRuntime0280)
+	getCurrentServerCmdForRuntime0280, err := server.NewGetCurrentServerCommand(b.GetCurrentServerInputOptionsForRuntime0280, b.GetCurrentServerOutputOptionsForRuntime0280)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.GetCurrentServerCmdForRuntime0280 = getCurrentServerCmdForRuntime0280
 
-	getCurrentServerCmdForRuntime0254, err := framework.NewGetCurrentServerCommand(b.GetCurrentServerInputOptionsForRuntime0254, b.GetCurrentServerOutputOptionsForRuntime0254)
+	getCurrentServerCmdForRuntime0254, err := server.NewGetCurrentServerCommand(b.GetCurrentServerInputOptionsForRuntime0254, b.GetCurrentServerOutputOptionsForRuntime0254)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.GetCurrentServerCmdForRuntime0254 = getCurrentServerCmdForRuntime0254
 
-	getCurrentServerCmdForRuntime0116, err := framework.NewGetCurrentServerCommand(b.GetCurrentServerInputOptionsForRuntime0116, b.GetCurrentServerOutputOptionsForRuntime0116)
+	getCurrentServerCmdForRuntime0116, err := server.NewGetCurrentServerCommand(b.GetCurrentServerInputOptionsForRuntime0116, b.GetCurrentServerOutputOptionsForRuntime0116)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.GetCurrentServerCmdForRuntime0116 = getCurrentServerCmdForRuntime0116
 
-	getCurrentServerCmdForRuntimeLatestWithError, err := framework.NewGetCurrentServerCommand(b.GetCurrentServerInputOptionsForRuntimeLatest, b.GetCurrentServerOutputOptionsForRuntimeLatestWithError)
+	getCurrentServerCmdForRuntimeLatestWithError, err := server.NewGetCurrentServerCommand(b.GetCurrentServerInputOptionsForRuntimeLatest, b.GetCurrentServerOutputOptionsForRuntimeLatestWithError)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.GetCurrentServerCmdForRuntimeLatestWithError = getCurrentServerCmdForRuntimeLatestWithError
 
-	getCurrentServerCmdForRuntime0280WithError, err := framework.NewGetCurrentServerCommand(b.GetCurrentServerInputOptionsForRuntime0280, b.GetCurrentServerOutputOptionsForRuntime0280WithError)
+	getCurrentServerCmdForRuntime0280WithError, err := server.NewGetCurrentServerCommand(b.GetCurrentServerInputOptionsForRuntime0280, b.GetCurrentServerOutputOptionsForRuntime0280WithError)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.GetCurrentServerCmdForRuntime0280WithError = getCurrentServerCmdForRuntime0280WithError
 
-	getCurrentServerCmdForRuntime0254WithError, err := framework.NewGetCurrentServerCommand(b.GetCurrentServerInputOptionsForRuntime0254, b.GetCurrentServerOutputOptionsForRuntime0254WithError)
+	getCurrentServerCmdForRuntime0254WithError, err := server.NewGetCurrentServerCommand(b.GetCurrentServerInputOptionsForRuntime0254, b.GetCurrentServerOutputOptionsForRuntime0254WithError)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.GetCurrentServerCmdForRuntime0254WithError = getCurrentServerCmdForRuntime0254WithError
 
-	getCurrentServerCmdForRuntime0116WithError, err := framework.NewGetCurrentServerCommand(b.GetCurrentServerInputOptionsForRuntime0116, b.GetCurrentServerOutputOptionsForRuntime0116WithError)
+	getCurrentServerCmdForRuntime0116WithError, err := server.NewGetCurrentServerCommand(b.GetCurrentServerInputOptionsForRuntime0116, b.GetCurrentServerOutputOptionsForRuntime0116WithError)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.GetCurrentServerCmdForRuntime0116WithError = getCurrentServerCmdForRuntime0116WithError
 }
@@ -441,19 +440,19 @@ func (b *Helper) CreateSetCurrentServerAPICommands() {
 	// Create SetCurrentServer Commands with input and output options
 	ginkgo.By("Create SetCurrentServer API Commands")
 
-	setCurrentServerCmdForRuntimeLatest, err := framework.NewSetCurrentServerCommand(b.SetCurrentServerInputOptionsForRuntimeLatest, nil)
+	setCurrentServerCmdForRuntimeLatest, err := server.NewSetCurrentServerCommand(b.SetCurrentServerInputOptionsForRuntimeLatest, nil)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.SetCurrentServerCmdForRuntimeLatest = setCurrentServerCmdForRuntimeLatest
 
-	setCurrentServerCmdForRuntime0280, err := framework.NewSetCurrentServerCommand(b.SetCurrentServerInputOptionsForRuntime0280, nil)
+	setCurrentServerCmdForRuntime0280, err := server.NewSetCurrentServerCommand(b.SetCurrentServerInputOptionsForRuntime0280, nil)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.SetCurrentServerCmdForRuntime0280 = setCurrentServerCmdForRuntime0280
 
-	setCurrentServerCmdForRuntime0254, err := framework.NewSetCurrentServerCommand(b.SetCurrentServerInputOptionsForRuntime0254, nil)
+	setCurrentServerCmdForRuntime0254, err := server.NewSetCurrentServerCommand(b.SetCurrentServerInputOptionsForRuntime0254, nil)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.SetCurrentServerCmdForRuntime0254 = setCurrentServerCmdForRuntime0254
 
-	setCurrentServerCmdForRuntime0116, err := framework.NewSetCurrentServerCommand(b.SetCurrentServerInputOptionsForRuntime0116, nil)
+	setCurrentServerCmdForRuntime0116, err := server.NewSetCurrentServerCommand(b.SetCurrentServerInputOptionsForRuntime0116, nil)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.SetCurrentServerCmdForRuntime0116 = setCurrentServerCmdForRuntime0116
 }
@@ -492,44 +491,44 @@ func (b *Helper) CreateSetServerAPICommands() {
 	// Create SetServer Commands with input and output options
 	ginkgo.By("Create SetServer API Commands")
 
-	setServerCmdForRuntimeLatest, err := framework.NewSetServerCommand(b.SetServerInputOptionsForRuntimeLatest, nil)
+	setServerCmdForRuntimeLatest, err := server.NewSetServerCommand(b.SetServerInputOptionsForRuntimeLatest, nil)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.SetServerCmdForRuntimeLatest = setServerCmdForRuntimeLatest
 
-	setServerCmdForRuntime0254, err := framework.NewSetServerCommand(b.SetServerInputOptionsForRuntime0254, nil)
+	setServerCmdForRuntime0254, err := server.NewSetServerCommand(b.SetServerInputOptionsForRuntime0254, nil)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.SetServerCmdForRuntime0254 = setServerCmdForRuntime0254
 
-	setServerCmdForRuntime0280, err := framework.NewSetServerCommand(b.SetServerInputOptionsForRuntime0280, nil)
+	setServerCmdForRuntime0280, err := server.NewSetServerCommand(b.SetServerInputOptionsForRuntime0280, nil)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.SetServerCmdForRuntime0280 = setServerCmdForRuntime0280
 
-	setServerCmdForRuntime0116, err := framework.NewSetServerCommand(b.SetServerInputOptionsForRuntime0116, nil)
+	setServerCmdForRuntime0116, err := server.NewSetServerCommand(b.SetServerInputOptionsForRuntime0116, nil)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.SetServerCmdForRuntime0116 = setServerCmdForRuntime0116
 
-	setServerTwoCmdForRuntimeLatest, err := framework.NewSetServerCommand(b.SetServerTwoInputOptionsForRuntimeLatest, nil)
+	setServerTwoCmdForRuntimeLatest, err := server.NewSetServerCommand(b.SetServerTwoInputOptionsForRuntimeLatest, nil)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.SetServerTwoCmdForRuntimeLatest = setServerTwoCmdForRuntimeLatest
 
-	setServerTwoCmdForRuntime0254, err := framework.NewSetServerCommand(b.SetServerTwoInputOptionsForRuntime0254, nil)
+	setServerTwoCmdForRuntime0254, err := server.NewSetServerCommand(b.SetServerTwoInputOptionsForRuntime0254, nil)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.SetServerTwoCmdForRuntime0254 = setServerTwoCmdForRuntime0254
 
-	setServerTwoCmdForRuntime0280, err := framework.NewSetServerCommand(b.SetServerTwoInputOptionsForRuntime0280, nil)
+	setServerTwoCmdForRuntime0280, err := server.NewSetServerCommand(b.SetServerTwoInputOptionsForRuntime0280, nil)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.SetServerTwoCmdForRuntime0280 = setServerTwoCmdForRuntime0280
 
-	setServerTwoCmdForRuntime0116, err := framework.NewSetServerCommand(b.SetServerTwoInputOptionsForRuntime0116, nil)
+	setServerTwoCmdForRuntime0116, err := server.NewSetServerCommand(b.SetServerTwoInputOptionsForRuntime0116, nil)
 	gomega.Expect(err).To(gomega.BeNil())
 	b.SetServerTwoCmdForRuntime0116 = setServerTwoCmdForRuntime0116
 }
 
 // DefaultSetServerInputOptions helper method to construct SetServer API input options
-func DefaultSetServerInputOptions(version core.RuntimeVersion, serverName string) *framework.SetServerInputOptions {
+func DefaultSetServerInputOptions(version core.RuntimeVersion, serverName string) *server.SetServerInputOptions {
 	switch version {
 	case core.VersionLatest, core.Version0280, core.Version0254, core.Version0116:
-		return &framework.SetServerInputOptions{
+		return &server.SetServerInputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: version,
 			},
@@ -547,8 +546,8 @@ func DefaultSetServerInputOptions(version core.RuntimeVersion, serverName string
 }
 
 // DefaultGetServerInputOptions helper method to construct GetServer API input options
-func DefaultGetServerInputOptions(version core.RuntimeVersion, serverName string) *framework.GetServerInputOptions {
-	return &framework.GetServerInputOptions{
+func DefaultGetServerInputOptions(version core.RuntimeVersion, serverName string) *server.GetServerInputOptions {
+	return &server.GetServerInputOptions{
 		RuntimeAPIVersion: &core.RuntimeAPIVersion{
 			RuntimeVersion: version,
 		},
@@ -557,10 +556,10 @@ func DefaultGetServerInputOptions(version core.RuntimeVersion, serverName string
 }
 
 // DefaultGetServerOutputOptions helper method to construct GetServer API output options
-func DefaultGetServerOutputOptions(version core.RuntimeVersion, serverName string) *framework.GetServerOutputOptions {
+func DefaultGetServerOutputOptions(version core.RuntimeVersion, serverName string) *server.GetServerOutputOptions {
 	switch version {
 	case core.VersionLatest, core.Version0280:
-		return &framework.GetServerOutputOptions{
+		return &server.GetServerOutputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: version,
 			},
@@ -574,7 +573,7 @@ func DefaultGetServerOutputOptions(version core.RuntimeVersion, serverName strin
 			ValidationStrategy: core.ValidationStrategyStrict,
 		}
 	case core.Version0254, core.Version0116:
-		return &framework.GetServerOutputOptions{
+		return &server.GetServerOutputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: version,
 			},
@@ -591,10 +590,10 @@ func DefaultGetServerOutputOptions(version core.RuntimeVersion, serverName strin
 }
 
 // DefaultGetServerOutputOptionsWithError helper method to construct GetServer API output options with error
-func DefaultGetServerOutputOptionsWithError(version core.RuntimeVersion, serverName string) *framework.GetServerOutputOptions {
+func DefaultGetServerOutputOptionsWithError(version core.RuntimeVersion, serverName string) *server.GetServerOutputOptions {
 	switch version {
 	case core.VersionLatest, core.Version0280, core.Version0254, core.Version0116:
-		return &framework.GetServerOutputOptions{
+		return &server.GetServerOutputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: core.VersionLatest,
 			},
@@ -605,8 +604,8 @@ func DefaultGetServerOutputOptionsWithError(version core.RuntimeVersion, serverN
 }
 
 // DefaultSetCurrentServerInputOptions helper method to construct SetCurrentServer API input options
-func DefaultSetCurrentServerInputOptions(version core.RuntimeVersion, serverName string) *framework.SetCurrentServerInputOptions {
-	return &framework.SetCurrentServerInputOptions{
+func DefaultSetCurrentServerInputOptions(version core.RuntimeVersion, serverName string) *server.SetCurrentServerInputOptions {
+	return &server.SetCurrentServerInputOptions{
 		RuntimeAPIVersion: &core.RuntimeAPIVersion{
 			RuntimeVersion: version,
 		},
@@ -615,10 +614,10 @@ func DefaultSetCurrentServerInputOptions(version core.RuntimeVersion, serverName
 }
 
 // DefaultGetCurrentServerInputOptions helper method to construct GetCurrentServer API input options
-func DefaultGetCurrentServerInputOptions(version core.RuntimeVersion) *framework.GetCurrentServerInputOptions {
+func DefaultGetCurrentServerInputOptions(version core.RuntimeVersion) *server.GetCurrentServerInputOptions {
 	switch version {
 	case core.VersionLatest, core.Version0280, core.Version0254, core.Version0116:
-		return &framework.GetCurrentServerInputOptions{
+		return &server.GetCurrentServerInputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: core.VersionLatest,
 			},
@@ -628,10 +627,10 @@ func DefaultGetCurrentServerInputOptions(version core.RuntimeVersion) *framework
 }
 
 // DefaultGetCurrentServerOutputOptions helper method to construct GetCurrentServer API output options
-func DefaultGetCurrentServerOutputOptions(version core.RuntimeVersion, serverName string) *framework.GetCurrentServerOutputOptions {
+func DefaultGetCurrentServerOutputOptions(version core.RuntimeVersion, serverName string) *server.GetCurrentServerOutputOptions {
 	switch version {
 	case core.VersionLatest, core.Version0254, core.Version0116:
-		return &framework.GetCurrentServerOutputOptions{
+		return &server.GetCurrentServerOutputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: version,
 			},
@@ -645,7 +644,7 @@ func DefaultGetCurrentServerOutputOptions(version core.RuntimeVersion, serverNam
 			ValidationStrategy: core.ValidationStrategyStrict,
 		}
 	case core.Version0280:
-		return &framework.GetCurrentServerOutputOptions{
+		return &server.GetCurrentServerOutputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: core.Version0280,
 			},
@@ -663,10 +662,10 @@ func DefaultGetCurrentServerOutputOptions(version core.RuntimeVersion, serverNam
 }
 
 // DefaultGetCurrentServerOutputOptionsWithError helper method to construct GetCurrentServer API output options with error
-func DefaultGetCurrentServerOutputOptionsWithError(version core.RuntimeVersion) *framework.GetCurrentServerOutputOptions {
+func DefaultGetCurrentServerOutputOptionsWithError(version core.RuntimeVersion) *server.GetCurrentServerOutputOptions {
 	switch version {
 	case core.VersionLatest, core.Version0280, core.Version0254, core.Version0116:
-		return &framework.GetCurrentServerOutputOptions{
+		return &server.GetCurrentServerOutputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: version,
 			},
@@ -677,10 +676,10 @@ func DefaultGetCurrentServerOutputOptionsWithError(version core.RuntimeVersion) 
 }
 
 // DefaultRemoveCurrentServerInputOptions helper method to construct RemoveCurrentServer API input options
-func DefaultRemoveCurrentServerInputOptions(version core.RuntimeVersion) *framework.RemoveCurrentServerInputOptions {
+func DefaultRemoveCurrentServerInputOptions(version core.RuntimeVersion) *server.RemoveCurrentServerInputOptions {
 	switch version {
 	case core.VersionLatest, core.Version0280:
-		return &framework.RemoveCurrentServerInputOptions{
+		return &server.RemoveCurrentServerInputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: version,
 			},
@@ -691,10 +690,10 @@ func DefaultRemoveCurrentServerInputOptions(version core.RuntimeVersion) *framew
 }
 
 // DefaultRemoveCurrentServerOutputOptionsWithError helper method to construct RemoveCurrentServer API output option
-func DefaultRemoveCurrentServerOutputOptionsWithError(version core.RuntimeVersion, serverName string) *framework.RemoveCurrentServerOutputOptions {
+func DefaultRemoveCurrentServerOutputOptionsWithError(version core.RuntimeVersion, serverName string) *server.RemoveCurrentServerOutputOptions {
 	switch version {
 	case core.VersionLatest, core.Version0280, core.Version0254, core.Version0116:
-		return &framework.RemoveCurrentServerOutputOptions{
+		return &server.RemoveCurrentServerOutputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: version,
 			},
@@ -705,8 +704,8 @@ func DefaultRemoveCurrentServerOutputOptionsWithError(version core.RuntimeVersio
 }
 
 // DefaultDeleteServerInputOptions helper method to construct DeleteServer API input options
-func DefaultDeleteServerInputOptions(version core.RuntimeVersion, serverName string) *framework.DeleteServerInputOptions {
-	return &framework.DeleteServerInputOptions{
+func DefaultDeleteServerInputOptions(version core.RuntimeVersion, serverName string) *server.DeleteServerInputOptions {
+	return &server.DeleteServerInputOptions{
 		RuntimeAPIVersion: &core.RuntimeAPIVersion{
 			RuntimeVersion: version,
 		},
@@ -715,10 +714,10 @@ func DefaultDeleteServerInputOptions(version core.RuntimeVersion, serverName str
 }
 
 // DefaultDeleteServerOutputOptionsWithError helper method to construct DeleteServer API output options
-func DefaultDeleteServerOutputOptionsWithError(version core.RuntimeVersion, serverName string) *framework.DeleteServerOutputOptions {
+func DefaultDeleteServerOutputOptionsWithError(version core.RuntimeVersion, serverName string) *server.DeleteServerOutputOptions {
 	switch version {
 	case core.VersionLatest, core.Version0280, core.Version0254, core.Version0116:
-		return &framework.DeleteServerOutputOptions{
+		return &server.DeleteServerOutputOptions{
 			RuntimeAPIVersion: &core.RuntimeAPIVersion{
 				RuntimeVersion: version,
 			},

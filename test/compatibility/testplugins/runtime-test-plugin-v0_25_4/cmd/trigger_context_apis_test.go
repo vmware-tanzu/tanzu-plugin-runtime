@@ -33,10 +33,10 @@ globalOpts:
 	}{
 		{
 			name:    "Trigger SetContext API",
-			apiName: core.SetContextAPIName,
+			apiName: core.SetContextAPI,
 			apis: []core.API{
 				{
-					Name:    core.SetContextAPIName,
+					Name:    core.SetContextAPI,
 					Version: core.Version0254,
 					Arguments: map[core.APIArgumentType]interface{}{
 						core.Context:    ctx,
@@ -50,7 +50,7 @@ globalOpts:
 			},
 
 			expectedLogs: map[core.RuntimeAPIName][]core.APILog{
-				core.SetContextAPIName: {
+				core.SetContextAPI: {
 					{
 						APIResponse: &core.APIResponse{
 							ResponseBody: "",
@@ -66,7 +66,7 @@ globalOpts:
 			apiName: core.GetContextAPIName,
 			apis: []core.API{
 				{
-					Name:    core.SetContextAPIName,
+					Name:    core.SetContextAPI,
 					Version: core.Version0254,
 					Arguments: map[core.APIArgumentType]interface{}{
 						core.Context:    ctx,
@@ -110,10 +110,10 @@ globalOpts:
 
 		{
 			name:    "Trigger RemoveContext API",
-			apiName: core.RemoveContextAPIName,
+			apiName: core.RemoveContextAPI,
 			apis: []core.API{
 				{
-					Name:    core.SetContextAPIName,
+					Name:    core.SetContextAPI,
 					Version: core.Version0254,
 					Arguments: map[core.APIArgumentType]interface{}{
 						core.Context:    ctx,
@@ -125,7 +125,7 @@ globalOpts:
 					},
 				},
 				{
-					Name:    core.RemoveContextAPIName,
+					Name:    core.RemoveContextAPI,
 					Version: core.Version0254,
 					Arguments: map[core.APIArgumentType]interface{}{
 						core.ContextName: "context-one",
@@ -138,7 +138,7 @@ globalOpts:
 			},
 
 			expectedLogs: map[core.RuntimeAPIName][]core.APILog{
-				core.RemoveContextAPIName: {
+				core.RemoveContextAPI: {
 					{
 						APIResponse: &core.APIResponse{
 							ResponseBody: "",
@@ -151,10 +151,10 @@ globalOpts:
 
 		{
 			name:    "Trigger DeleteContext API",
-			apiName: core.DeleteContextAPIName,
+			apiName: core.DeleteContextAPI,
 			apis: []core.API{
 				{
-					Name:    core.SetContextAPIName,
+					Name:    core.SetContextAPI,
 					Version: core.Version0254,
 					Arguments: map[core.APIArgumentType]interface{}{
 						core.Context:    ctx,
@@ -166,7 +166,7 @@ globalOpts:
 					},
 				},
 				{
-					Name:    core.DeleteContextAPIName,
+					Name:    core.DeleteContextAPI,
 					Version: core.Version0254,
 					Arguments: map[core.APIArgumentType]interface{}{
 						core.ContextName: "context-one",
@@ -179,7 +179,7 @@ globalOpts:
 			},
 
 			expectedLogs: map[core.RuntimeAPIName][]core.APILog{
-				core.DeleteContextAPIName: {
+				core.DeleteContextAPI: {
 					{
 						APIResponse: &core.APIResponse{
 							ResponseBody: "",
@@ -192,10 +192,10 @@ globalOpts:
 
 		{
 			name:    "Trigger SetCurrentContext API",
-			apiName: core.SetCurrentContextAPIName,
+			apiName: core.SetCurrentContextAPI,
 			apis: []core.API{
 				{
-					Name:    core.SetContextAPIName,
+					Name:    core.SetContextAPI,
 					Version: core.Version0254,
 					Arguments: map[core.APIArgumentType]interface{}{
 						core.Context:    ctx,
@@ -207,7 +207,7 @@ globalOpts:
 					},
 				},
 				{
-					Name:    core.SetCurrentContextAPIName,
+					Name:    core.SetCurrentContextAPI,
 					Version: core.Version0254,
 					Arguments: map[core.APIArgumentType]interface{}{
 						core.ContextName: "context-one",
@@ -220,7 +220,7 @@ globalOpts:
 			},
 
 			expectedLogs: map[core.RuntimeAPIName][]core.APILog{
-				core.SetCurrentContextAPIName: {
+				core.SetCurrentContextAPI: {
 					{
 						APIResponse: &core.APIResponse{
 							ResponseBody: "",
@@ -233,10 +233,10 @@ globalOpts:
 
 		{
 			name:    "Trigger GetCurrentContext API",
-			apiName: core.GetCurrentContextAPIName,
+			apiName: core.GetCurrentContextAPI,
 			apis: []core.API{
 				{
-					Name:    core.SetContextAPIName,
+					Name:    core.SetContextAPI,
 					Version: core.Version0254,
 					Arguments: map[core.APIArgumentType]interface{}{
 						core.Context:    ctx,
@@ -248,7 +248,7 @@ globalOpts:
 					},
 				},
 				{
-					Name:    core.SetCurrentContextAPIName,
+					Name:    core.SetCurrentContextAPI,
 					Version: core.Version0254,
 					Arguments: map[core.APIArgumentType]interface{}{
 						core.ContextName: "context-one",
@@ -259,7 +259,7 @@ globalOpts:
 					},
 				},
 				{
-					Name:    core.GetCurrentContextAPIName,
+					Name:    core.GetCurrentContextAPI,
 					Version: core.Version0254,
 					Arguments: map[core.APIArgumentType]interface{}{
 						core.ContextType: "k8s",
@@ -272,7 +272,7 @@ globalOpts:
 			},
 
 			expectedLogs: map[core.RuntimeAPIName][]core.APILog{
-				core.GetCurrentContextAPIName: {
+				core.GetCurrentContextAPI: {
 					{
 						APIResponse: &core.APIResponse{
 							ResponseBody: &configapi.Context{

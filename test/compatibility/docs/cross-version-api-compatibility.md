@@ -16,18 +16,27 @@ When writing a test involving two versions of Runtime library APIs a test writer
 ├── core # compatibility core module contains types and helpers methods
 ├── docs # compatibility testing docs on how to write a test and framework details
 ├── framework # compatibility framework contains helper methods to construct API Commands, Test Case builder, executer, validator and actual tests
+│   ├── clidiscoverysources # contains command, helper functions to write test for CLI Discovery Sources APIs
 │   ├── compatibilitytests # config APIs compatibility test cases
-│   │   ├── context # context API compatibility test cases
+│   │   ├── clidiscoverysources # cli discovery sources APIs compatibility test cases
+│   │   ├── context # context APIs compatibility test cases
 │   │   ├── contextserver # combination tests including context and server APIs compatibility test cases
-│   │   └── server # server API compatibility test cases
+│   │   ├── envflags # env APIs compatibility test cases
+│   │   ├── featureflags # feature flags APIs compatibility test cases
+│   │   ├── legacyclientconfig # legacy client config APIs compatibility test cases
+│   │   ├── metadata # config metadata APIs compatibility test cases
+│   │   └── server # server APIs compatibility test cases
+│   ├── context # contains command, helper functions to write test for Context APIs
+│   ├── envflags # contains command, helper functions to write test for Env APIs
 │   ├── executer # Functions to execute the testcase
+│   ├── featureflags # contains command, helper functions to write test for Feature flags APIs
+│   ├── legacyclientconfig # contains command, helper functions to write test for legacy client config APIs
+│   ├── metadata # contains command, helper functions to write test for Metadata APIs
+│   ├── server # contains command, helper functions to write test for Server APIs
+│   ├── types  # contains config types
 │   └── validators # validator functions to validate the input and output options of API Commands
-└── testplugins  # Specific Runtime version Test Plugin to trigger APIs
+└── testplugins # Specific Runtime version Test Plugin to trigger APIs
     ├── bin # Generated test plugin binaries
-    │   ├── runtime-test-plugin-latest
-    │   ├── runtime-test-plugin-v0_11_6
-    │   ├── runtime-test-plugin-v0_25_4
-    │   └── runtime-test-plugin-v0_28_0
     ├── runtime-test-plugin-latest
     ├── runtime-test-plugin-v0_11_6
     ├── runtime-test-plugin-v0_25_4
@@ -100,16 +109,45 @@ The tests are added for below Runtime APIs
 - Test Suite located at `test/compatibility/framework/compatibilitytests/contextserver`
 - Total number of tests added 18
 
+#### CLI Discovery Sources APIs
+
+- Test Suite located at `test/compatibility/framework/compatibilitytests/clidiscoverysources`
+- Tests involving CLI Discovery Sources APIs SetCLIDiscoverySource, GetCLIDiscoverySource, DeleteCLIDiscoverySource
+- Total number of tests added 5
+
+#### Feature flags APIs
+
+- Test Suite located at `test/compatibility/framework/compatibilitytests/featureflags`
+- Tests involving Feature flags APIs SetFeature, IsFeatureEnabled
+- Total number of tests added 5
+
+#### Env APIs
+
+- Test Suite located at `test/compatibility/framework/compatibilitytests/envflags`
+- Tests involving Env APIs SetEnv, GetEnv, DeleteEnv
+- Total number of tests added 4
+
+#### Legacy Client Config APIs
+
+- Test Suite located at `test/compatibility/framework/compatibilitytests/legacyclientconfig`
+- Tests involving Env APIs StoreClientConfig, GetClientConfig
+- Total number of tests added 3
+
+#### Metadata APIs
+
+- Test Suite located at `test/compatibility/framework/compatibilitytests/metadata`
+- Tests involving Env APIs GetMetadata, GetConfigMetadata, GetConfigMetadataPatchStrategy, SetConfigMetadataPatchStrategy, GetConfigMetadataSettings,
+  GetConfigMetadataSetting, IsConfigMetadataSettingsEnabled, UseUnifiedConfig, DeleteConfigMetadataSetting, SetConfigMetadataSetting.
+- Total number of tests added 2
+
 |     Runtime APIs      | latest | v0.28.0 | v0.25.4 | v0.11.6 |
 |:---------------------:|:------:|:-------:|:-------:|:-------:|
 |     Contexts APIs     | Added  |  Added  |  Added  |   N/A   |
 |     Servers APIs      | Added  |  Added  |  Added  |  Added  |
-| DiscoverySources APIs |  TBA   |   TBA   |   TBA   |   TBA   |
-|  Feature Flags APIs   |  TBA   |   TBA   |   TBA   |   TBA   |
-|       Env APIs        |  TBA   |   TBA   |   TBA   |   TBA   |
-| Config Metadata APIs  |  TBA   |   TBA   |   TBA   |   TBA   |
-|  Client Options APIs  |  TBA   |   TBA   |   TBA   |   TBA   |
-|   Repositories APIs   |  TBA   |   TBA   |   TBA   |   TBA   |
+| DiscoverySources APIs | Added  |  Added  |  Added  |  Added  |
+|  Feature Flags APIs   | Added  |  Added  |  Added  |   N/A   |
+|       Env APIs        | Added  |  Added  |  Added  |   N/A   |
+| Config Metadata APIs  | Added  |  Added  |   N/A   |   N/A   |
 
 - For the latest test results check the most recent job that is run for the workflow [Tanzu Plugin Runtime Cross-version API Compatibility Tests](https://github.com/vmware-tanzu/tanzu-plugin-runtime/actions/workflows/compatibility_tests.yaml?query=branch%3Amain)
 

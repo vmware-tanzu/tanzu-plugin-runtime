@@ -12,14 +12,14 @@ import (
 // Route to runtime API method call based on passed command value
 var apiHandlers = map[core.RuntimeAPIName]func(*core.API) *core.APIResponse{
 	// Server APIs
-	core.SetServerAPIName:        triggerSetServerAPI,
-	core.AddServerAPIName:        triggerSetServerAPI,
-	core.PutServerAPIName:        triggerSetServerAPI,
-	core.GetServerAPIName:        triggerGetServerAPI,
-	core.RemoveServerAPIName:     triggerRemoveServerAPI,
-	core.DeleteServerAPIName:     triggerRemoveServerAPI,
-	core.SetCurrentServerAPIName: triggerSetCurrentServerAPI,
-	core.GetCurrentServerAPIName: triggerGetCurrentServerAPI,
+	core.SetServerAPI:        triggerSetServerAPI,
+	core.AddServerAPI:        triggerSetServerAPI,
+	core.PutServerAPI:        triggerSetServerAPI,
+	core.GetServerAPI:        triggerGetServerAPI,
+	core.RemoveServerAPI:     triggerRemoveServerAPI,
+	core.DeleteServerAPI:     triggerRemoveServerAPI,
+	core.SetCurrentServerAPI: triggerSetCurrentServerAPI,
+	core.GetCurrentServerAPI: triggerGetCurrentServerAPI,
 
 	// Feature Flag APIs
 	core.IsFeatureEnabledAPI:   triggerIsFeatureActivatedAPI,

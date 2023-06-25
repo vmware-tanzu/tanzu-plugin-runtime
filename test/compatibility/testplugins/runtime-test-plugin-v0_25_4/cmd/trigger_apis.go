@@ -12,23 +12,23 @@ import (
 // Route to runtime API method call based on passed command value
 var apiHandlers = map[core.RuntimeAPIName]func(*core.API) *core.APIResponse{
 	// Context APIs
-	core.AddContextAPIName:        triggerAddContextAPI,
-	core.SetContextAPIName:        triggerAddContextAPI,
-	core.GetContextAPIName:        triggerGetContextAPI,
-	core.RemoveContextAPIName:     triggerRemoveContextAPI,
-	core.DeleteContextAPIName:     triggerRemoveContextAPI,
-	core.SetCurrentContextAPIName: triggerSetCurrentContextAPI,
-	core.GetCurrentContextAPIName: triggerGetCurrentContextAPI,
+	core.AddContextAPI:        triggerAddContextAPI,
+	core.SetContextAPI:        triggerAddContextAPI,
+	core.GetContextAPIName:    triggerGetContextAPI,
+	core.RemoveContextAPI:     triggerRemoveContextAPI,
+	core.DeleteContextAPI:     triggerRemoveContextAPI,
+	core.SetCurrentContextAPI: triggerSetCurrentContextAPI,
+	core.GetCurrentContextAPI: triggerGetCurrentContextAPI,
 
 	// Server APIs
-	core.AddServerAPIName:        triggerAddServerAPI,
-	core.SetServerAPIName:        triggerSetServerAPI,
-	core.PutServerAPIName:        triggerSetServerAPI,
-	core.GetServerAPIName:        triggerGetServerAPI,
-	core.RemoveServerAPIName:     triggerRemoveServerAPI,
-	core.DeleteServerAPIName:     triggerRemoveServerAPI,
-	core.SetCurrentServerAPIName: triggerSetCurrentServerAPI,
-	core.GetCurrentServerAPIName: triggerGetCurrentServerAPI,
+	core.AddServerAPI:        triggerAddServerAPI,
+	core.SetServerAPI:        triggerSetServerAPI,
+	core.PutServerAPI:        triggerSetServerAPI,
+	core.GetServerAPI:        triggerGetServerAPI,
+	core.RemoveServerAPI:     triggerRemoveServerAPI,
+	core.DeleteServerAPI:     triggerRemoveServerAPI,
+	core.SetCurrentServerAPI: triggerSetCurrentServerAPI,
+	core.GetCurrentServerAPI: triggerGetCurrentServerAPI,
 
 	// Feature Flag APIs
 	core.IsFeatureEnabledAPI:   triggerIsFeatureActivatedAPI,

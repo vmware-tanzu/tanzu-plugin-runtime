@@ -1,7 +1,8 @@
 // Copyright 2023 VMware, Inc. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-package framework
+// Package server provides all types, validator, helpers methods to create Runtime Server API commands
+package server
 
 import (
 	"gopkg.in/yaml.v3"
@@ -15,8 +16,6 @@ import (
 // Return: command to execute or error if any validations fails for SetServerInputOptions or SetServerOutputOptions
 // This method does validate the input parameters  SetServerInputOptions or SetServerOutputOptions based on Runtime API Version
 // For more details about supported parameters refer to SetServerInputOptions or SetServerOutputOptions definition(and ServerOpts struct, which is embedded)
-//
-//nolint:dupl
 func NewSetServerCommand(inputOpts *SetServerInputOptions, outputOpts *SetServerOutputOptions) (*core.Command, error) {
 	// Init the Command object
 	c := &core.Command{}
@@ -25,7 +24,7 @@ func NewSetServerCommand(inputOpts *SetServerInputOptions, outputOpts *SetServer
 	api := &core.API{}
 
 	// Set API name
-	api.Name = core.SetServerAPIName
+	api.Name = core.SetServerAPI
 
 	// Validate the SetServer input arguments
 	_, err := inputOpts.Validate()
@@ -86,7 +85,7 @@ func NewGetServerCommand(inputOpts *GetServerInputOptions, outputOpts *GetServer
 	api := &core.API{}
 
 	// Set API name
-	api.Name = core.GetServerAPIName
+	api.Name = core.GetServerAPI
 
 	// Validate the Input Options
 	_, err := inputOpts.Validate()
@@ -147,8 +146,6 @@ func NewGetServerCommand(inputOpts *GetServerInputOptions, outputOpts *GetServer
 // Return: command to execute or error if any validations fails for DeleteServerInputOptions or DeleteServerOutputOptions
 // This method does validate the input parameters  DeleteServerInputOptions or DeleteServerOutputOptions based on Runtime API Version
 // For more details about supported parameters refer to DeleteServerInputOptions or DeleteServerOutputOptions definition(and ServerOpts struct, which is embedded)
-//
-//nolint:dupl
 func NewDeleteServerCommand(inputOpts *DeleteServerInputOptions, outputOpts *DeleteServerOutputOptions) (*core.Command, error) {
 	// Init the Command object
 	c := &core.Command{}
@@ -157,7 +154,7 @@ func NewDeleteServerCommand(inputOpts *DeleteServerInputOptions, outputOpts *Del
 	api := &core.API{}
 
 	// Set API name
-	api.Name = core.DeleteServerAPIName
+	api.Name = core.DeleteServerAPI
 
 	// Validate the input options
 	_, err := inputOpts.Validate()
@@ -202,7 +199,7 @@ func NewSetCurrentServerCommand(inputOpts *SetCurrentServerInputOptions, outputO
 	c := &core.Command{}
 
 	// Init the API object
-	api := &core.API{Name: core.SetCurrentServerAPIName}
+	api := &core.API{Name: core.SetCurrentServerAPI}
 
 	// Validate the Input Options
 	_, err := inputOpts.Validate()
@@ -247,7 +244,7 @@ func NewGetCurrentServerCommand(inputOpts *GetCurrentServerInputOptions, outputO
 	// Init the Command object
 	c := &core.Command{}
 	// Init the API object
-	api := &core.API{Name: core.GetCurrentServerAPIName}
+	api := &core.API{Name: core.GetCurrentServerAPI}
 
 	// Validate the Input Options
 	_, err := inputOpts.Validate()
@@ -309,7 +306,7 @@ func NewRemoveCurrentServerCommand(inputOpts *RemoveCurrentServerInputOptions, o
 	c := &core.Command{}
 
 	// Init the API object
-	api := &core.API{Name: core.RemoveCurrentServerAPIName}
+	api := &core.API{Name: core.RemoveCurrentServerAPI}
 
 	// Validate the Input Options
 	_, err := inputOpts.Validate()

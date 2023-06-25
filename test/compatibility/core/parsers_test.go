@@ -32,7 +32,7 @@ func TestParseRuntimeAPIsFromFile(t *testing.T) {
 `,
 			[]API{
 				{
-					Name:    SetContextAPIName,
+					Name:    SetContextAPI,
 					Version: VersionLatest,
 					Arguments: map[APIArgumentType]interface{}{
 						Context: `name: context-one

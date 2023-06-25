@@ -20,7 +20,7 @@ func TestConstructTestPluginCmd(t *testing.T) {
 			version: VersionLatest,
 			apis: []*API{
 				{
-					Name:      SetContextAPIName,
+					Name:      SetContextAPI,
 					Version:   VersionLatest,
 					Arguments: map[APIArgumentType]interface{}{},
 					Output:    nil,

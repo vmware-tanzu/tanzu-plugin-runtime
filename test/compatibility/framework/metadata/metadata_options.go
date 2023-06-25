@@ -5,7 +5,7 @@ package metadata
 
 import (
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
-	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/types"
 )
 
 // GetMetadataInputOptions used to generate GetEnv command
@@ -16,7 +16,7 @@ type GetMetadataInputOptions struct {
 // GetMetadataOutputOptions used to generate GetEnv command
 type GetMetadataOutputOptions struct {
 	*core.RuntimeAPIVersion // required
-	MetadataOpts            *framework.MetadataOpts
+	MetadataOpts            *types.MetadataOpts
 	Error                   string
 	ValidationStrategy      core.ValidationStrategy // Type of validation to be performed i.e. exact or partial. default is partial
 }
@@ -29,7 +29,7 @@ type GetConfigMetadataInputOptions struct {
 // GetConfigMetadataOutputOptions used to generate GetEnv command
 type GetConfigMetadataOutputOptions struct {
 	*core.RuntimeAPIVersion // required
-	ConfigMetadataOpts      *framework.ConfigMetadataOpts
+	ConfigMetadataOpts      *types.ConfigMetadataOpts
 	Error                   string
 	ValidationStrategy      core.ValidationStrategy // Type of validation to be performed i.e. exact or partial. default is partial
 }
@@ -144,8 +144,8 @@ type SetConfigMetadataPatchStrategyOutputOptions struct {
 
 type CfgMetadataArgs struct {
 	*core.RuntimeAPIVersion // required
-	MetadataOpts            *framework.MetadataOpts
-	ConfigMetadataOpts      *framework.ConfigMetadataOpts
+	MetadataOpts            *types.MetadataOpts
+	ConfigMetadataOpts      *types.ConfigMetadataOpts
 	PatchStrategy           map[string]string
 	Settings                map[string]string
 	Key                     string // required
@@ -163,13 +163,13 @@ func WithRuntimeAPIVersion(v *core.RuntimeAPIVersion) CfgMetadataOptionArgs {
 	}
 }
 
-func WithMetadataOpts(m *framework.MetadataOpts) CfgMetadataOptionArgs {
+func WithMetadataOpts(m *types.MetadataOpts) CfgMetadataOptionArgs {
 	return func(c *CfgMetadataArgs) {
 		c.MetadataOpts = m
 	}
 }
 
-func WithConfigMetadataOpts(cm *framework.ConfigMetadataOpts) CfgMetadataOptionArgs {
+func WithConfigMetadataOpts(cm *types.ConfigMetadataOpts) CfgMetadataOptionArgs {
 	return func(c *CfgMetadataArgs) {
 		c.ConfigMetadataOpts = cm
 	}

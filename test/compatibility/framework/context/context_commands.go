@@ -1,8 +1,8 @@
 // Copyright 2023 VMware, Inc. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-// Package framework provides all types, validator, helpers methods to create Runtime API commands
-package framework
+// Package context provides all types, validator, helpers methods to create Runtime Context API commands
+package context
 
 import (
 	"fmt"
@@ -18,8 +18,6 @@ import (
 // Return: command to execute or error if any validations fails for SetContextInputOptions or SetContextOutputOptions
 // This method does validate the input parameters  SetContextInputOptions or SetContextOutputOptions based on Runtime API Version
 // For more details about supported parameters refer to SetContextInputOptions or SetContextOutputOptions definition(and ContextOpts struct, which is embedded)
-//
-//nolint:dupl
 func NewSetContextCommand(inputOpts *SetContextInputOptions, outputOpts *SetContextOutputOptions) (*core.Command, error) {
 	// Init the Command object
 	c := &core.Command{}
@@ -28,7 +26,7 @@ func NewSetContextCommand(inputOpts *SetContextInputOptions, outputOpts *SetCont
 	api := &core.API{}
 
 	// Set API name
-	api.Name = core.SetContextAPIName
+	api.Name = core.SetContextAPI
 
 	// Validate the SetContext input arguments
 	_, err := inputOpts.Validate()
@@ -148,8 +146,6 @@ func NewGetContextCommand(inputOpts *GetContextInputOptions, outputOpts *GetCont
 // Return: command to execute or error if any validations fails for DeleteContextInputOptions or DeleteContextOutputOptions
 // This method does validate the input parameters  DeleteContextInputOptions or DeleteContextOutputOptions based on Runtime API Version
 // For more details about supported parameters refer to DeleteContextInputOptions or DeleteContextOutputOptions definition(and ContextOpts struct, which is embedded)
-//
-//nolint:dupl
 func NewDeleteContextCommand(inputOpts *DeleteContextInputOptions, outputOpts *DeleteContextOutputOptions) (*core.Command, error) {
 	// Init the Command object
 	c := &core.Command{}
@@ -158,7 +154,7 @@ func NewDeleteContextCommand(inputOpts *DeleteContextInputOptions, outputOpts *D
 	api := &core.API{}
 
 	// Set API name
-	api.Name = core.DeleteContextAPIName
+	api.Name = core.DeleteContextAPI
 
 	// Validate the input options
 	_, err := inputOpts.Validate()
@@ -203,7 +199,7 @@ func NewSetCurrentContextCommand(inputOpts *SetCurrentContextInputOptions, outpu
 	c := &core.Command{}
 
 	// Init the API object
-	api := &core.API{Name: core.SetCurrentContextAPIName}
+	api := &core.API{Name: core.SetCurrentContextAPI}
 
 	// Validate the Input Options
 	_, err := inputOpts.Validate()
@@ -248,7 +244,7 @@ func NewGetCurrentContextCommand(inputOpts *GetCurrentContextInputOptions, outpu
 	// Init the Command object
 	c := &core.Command{}
 	// Init the API object
-	api := &core.API{Name: core.GetCurrentContextAPIName}
+	api := &core.API{Name: core.GetCurrentContextAPI}
 
 	// Validate the Input Options
 	_, err := inputOpts.Validate()
@@ -317,7 +313,7 @@ func NewRemoveCurrentContextCommand(removeCurrentContextInputOptions *RemoveCurr
 
 	// Init the API object
 	api := &core.API{}
-	api.Name = core.RemoveCurrentContextAPIName
+	api.Name = core.RemoveCurrentContextAPI
 	api.Version = removeCurrentContextInputOptions.RuntimeVersion
 
 	// Validate the Input Options

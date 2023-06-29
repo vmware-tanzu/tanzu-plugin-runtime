@@ -111,6 +111,47 @@ func getEULAStatus(node *yaml.Node) (EULAStatus, error) {
 	return "", errors.New("eulaStatus not found")
 }
 
+// GetCLIId retrieves cliId
+func GetCLIId() (string, error) {
+	// Retrieve client config node
+	node, err := getClientConfigNode()
+	if err != nil {
+		return "", err
+	}
+	return getCLIId(node)
+}
+
+// SetCLIId adds or updates cliId value
+func SetCLIId(val string) (err error) {
+	// Retrieve client config node
+	AcquireTanzuConfigLock()
+	defer ReleaseTanzuConfigLock()
+	node, err := getClientConfigNodeNoLock()
+	if err != nil {
+		return err
+	}
+
+	// Add or Update cliId in the yaml node
+	persist := setCLIOptionsString(node, KeyCLIId, val)
+
+	// Persist the config node to the file
+	if persist {
+		return persistConfig(node)
+	}
+	return err
+}
+
+func getCLIId(node *yaml.Node) (string, error) {
+	cfg, err := convertNodeToClientConfig(node)
+	if err != nil {
+		return "", err
+	}
+	if cfg != nil && cfg.CoreCliOptions != nil {
+		return cfg.CoreCliOptions.CliID, nil
+	}
+	return "", errors.New("cliId not found")
+}
+
 // getNGCLIOptionsChildNode parses the yaml node and returns the matched node based on configOptions
 func getNGCLIOptionsChildNode(key string, node *yaml.Node) *yaml.Node {
 	configOptions := func(c *nodeutils.CfgNode) {

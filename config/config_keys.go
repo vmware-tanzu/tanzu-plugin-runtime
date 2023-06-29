@@ -25,4 +25,7 @@ const (
 	KeyCEIPOptIn               = "ceipOptIn"
 	KeyEULAStatus              = "eulaStatus"
 	KeyCerts                   = "certs"
+	KeyTelemetry               = "telemetry"
+	KeyCLIId                   = "cliId"
+	KeySource                  = "source"
 )

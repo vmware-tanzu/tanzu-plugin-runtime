@@ -95,3 +95,40 @@ func TestSetEULAStatus(t *testing.T) {
 		})
 	}
 }
+
+func TestSetCLIId(t *testing.T) {
+	// Setup config test data
+	_, cleanUp := setupTestConfig(t, &CfgTestData{})
+
+	defer func() {
+		cleanUp()
+	}()
+
+	tests := []struct {
+		name  string
+		value string
+	}{
+		{
+			name:  "should persist cliId value when empty client config",
+			value: "fake-cli-id",
+		},
+		{
+			name:  "should update and persist cliId value",
+			value: "fake-cli-id-updated",
+		},
+		{
+			name:  "should not persist same value false",
+			value: "fake-cli-id-updated",
+		},
+	}
+
+	for _, spec := range tests {
+		t.Run(spec.name, func(t *testing.T) {
+			err := SetCLIId(spec.value)
+			assert.NoError(t, err)
+			c, err := GetCLIId()
+			assert.Equal(t, spec.value, c)
+			assert.NoError(t, err)
+		})
+	}
+}

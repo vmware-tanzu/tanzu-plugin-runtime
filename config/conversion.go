@@ -181,6 +181,7 @@ func convertObjectToNode[
 		*configtypes.PluginRepository |
 		*configtypes.Context |
 		*configtypes.Cert |
+		*configtypes.TelemetryOptions |
 		*configtypes.PluginDiscovery](obj T) (*yaml.Node, error) {
 
 	bytes, err := yaml.Marshal(obj)

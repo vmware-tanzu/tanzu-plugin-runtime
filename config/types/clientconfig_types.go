@@ -297,6 +297,15 @@ type CoreCliOptions struct {
 	EULAStatus string `json:"eulaStatus,omitempty" yaml:"eulaStatus,omitempty"`
 	// DiscoverySources determine where to discover plugins
 	DiscoverySources []PluginDiscovery `json:"discoverySources,omitempty" yaml:"discoverySources,omitempty"`
+	// CliID is the uuid uniquely identifying the CLI instance
+	CliID string `json:"cliId,omitempty" yaml:"cliId,omitempty"`
+	// TelemetryOptions are the core CLI specific telemetry options
+	TelemetryOptions *TelemetryOptions `json:"telemetry,omitempty" yaml:"telemetry,omitempty"`
+}
+
+type TelemetryOptions struct {
+	// Source is the path of the telemetry source database
+	Source string `json:"source,omitempty" yaml:"source,omitempty"`
 }
 
 // Cert provides a certificate configuration for an endpoint

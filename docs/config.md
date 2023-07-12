@@ -83,6 +83,13 @@ func GetEnvConfigurations() map[string]string
 func GetEdition() (string, error)
 func SetEdition(val string) (err error)
 
+// Telemetry APIs
+func GetCEIPOptIn() (string, error)
+func SetCEIPOptIn(val string) (err error)
+func GetCLITelemetryOptions() (*configtypes.TelemetryOptions, error)
+func SetCLITelemetryOptions(c *configtypes.TelemetryOptions) error
+func DeleteTelemetryOptions() errors
+
 // Discovery Sources APIs
 func GetCLIDiscoverySources() ([]configtypes.PluginDiscovery, error)
 func GetCLIDiscoverySource(name string) (*configtypes.PluginDiscovery, error)

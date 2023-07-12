@@ -306,6 +306,10 @@ type CoreCliOptions struct {
 type TelemetryOptions struct {
 	// Source is the path of the telemetry source database
 	Source string `json:"source,omitempty" yaml:"source,omitempty"`
+	// CSPOrgID is the organization ID the user
+	CSPOrgID string `json:"cspOrgID,omitempty" yaml:"cspOrgID,omitempty"`
+	// EntitlementAccountNumber is the organization ID the user
+	EntitlementAccountNumber string `json:"entitlementAccountNumber,omitempty" yaml:"entitlementAccountNumber,omitempty"`
 }
 
 // Cert provides a certificate configuration for an endpoint

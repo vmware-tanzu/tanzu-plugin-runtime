@@ -20,11 +20,19 @@ func TestSetGetTelemetryOptions(t *testing.T) {
 	}()
 
 	telOptions := &configtypes.TelemetryOptions{
-		Source: "/fake/path",
+		Source:                   "/fake/path",
+		CSPOrgID:                 "fake-csp-org-id",
+		EntitlementAccountNumber: "fake-entitlement-account-number",
 	}
 
 	telOptionsUpdate := &configtypes.TelemetryOptions{
 		Source: "/fake/path/updated",
+	}
+
+	telOptionsUpdate2 := &configtypes.TelemetryOptions{
+		Source:                   "/fake/path/updated-2",
+		CSPOrgID:                 "fake-csp-org-id-2",
+		EntitlementAccountNumber: "fake-entitlement-account-number-2",
 	}
 
 	// get telemetry options when the config file is empty
@@ -40,13 +48,25 @@ func TestSetGetTelemetryOptions(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, telOptions, gotTelemetryoptions)
 
-	// update telemetry options
+	// update telemetry options with one field in the input options
 	err = SetCLITelemetryOptions(telOptionsUpdate)
 	assert.NoError(t, err)
 
 	gotTelemetryoptions, err = GetCLITelemetryOptions()
 	assert.Nil(t, err)
-	assert.Equal(t, gotTelemetryoptions, telOptionsUpdate)
+	assert.Equal(t, gotTelemetryoptions, &configtypes.TelemetryOptions{
+		Source:                   "/fake/path/updated",
+		CSPOrgID:                 "fake-csp-org-id",
+		EntitlementAccountNumber: "fake-entitlement-account-number",
+	})
+
+	// update telemetry options with all the fields in the input options
+	err = SetCLITelemetryOptions(telOptionsUpdate2)
+	assert.NoError(t, err)
+
+	gotTelemetryoptions, err = GetCLITelemetryOptions()
+	assert.Nil(t, err)
+	assert.Equal(t, gotTelemetryoptions, telOptionsUpdate2)
 
 	// test configuring with nil
 	err = SetCLITelemetryOptions(nil)
@@ -62,7 +82,9 @@ func TestDeleteTelemetryOptions(t *testing.T) {
 	}()
 
 	telOptions := &configtypes.TelemetryOptions{
-		Source: "/fake/path",
+		Source:                   "/fake/path",
+		CSPOrgID:                 "fake-csp-org-id",
+		EntitlementAccountNumber: "fake-entitlement-account-number",
 	}
 
 	// delete telemetry options when the config file is empty should not return error

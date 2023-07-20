@@ -260,6 +260,9 @@ currentContext:
         path: test-path-updated
         context: test-context-updated
         isManagementCluster: true
+      additionalMetadata:
+        metaToken: updated-token1
+        newToken: optional
       discoverySources:
         - gcp:
             name: test
@@ -322,6 +325,9 @@ func TestContextsIntegration(t *testing.T) {
 				},
 			},
 		},
+		AdditionalMetadata: map[string]interface{}{
+			"metaToken": "token1",
+		},
 	}
 	err = SetContext(newCtx, true)
 	assert.NoError(t, err)
@@ -371,6 +377,10 @@ func TestContextsIntegration(t *testing.T) {
 					ManifestPath: "test-manifest-path-updated",
 				},
 			},
+		},
+		AdditionalMetadata: map[string]interface{}{
+			"metaToken": "updated-token1",
+			"newToken":  "optional",
 		},
 	}
 	err = SetContext(updatedCtx, true)

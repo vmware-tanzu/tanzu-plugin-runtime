@@ -28,6 +28,24 @@ func TestUniqNode(t *testing.T) {
 				},
 				{
 					Kind:  yaml.ScalarNode,
+					Value: "test2",
+					Style: 0,
+					Tag:   "!!str",
+				},
+			},
+		},
+		{
+			name:  "success 1 uniq nodes",
+			count: 1,
+			nodes: []*yaml.Node{
+				{
+					Kind:  yaml.ScalarNode,
+					Value: "test",
+					Style: 0,
+					Tag:   "!!str",
+				},
+				{
+					Kind:  yaml.ScalarNode,
 					Value: "",
 					Style: 0,
 					Tag:   "!!str",

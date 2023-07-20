@@ -13,9 +13,11 @@ func UniqNodes(nodes []*yaml.Node) []*yaml.Node {
 	mapper := make(map[string]bool)
 
 	for _, node := range nodes {
-		if _, ok := mapper[node.Value]; !ok {
-			mapper[node.Value] = true
-			uniq = append(uniq, node)
+		if node.Value != "" {
+			if _, ok := mapper[node.Value]; !ok {
+				mapper[node.Value] = true
+				uniq = append(uniq, node)
+			}
 		}
 	}
 

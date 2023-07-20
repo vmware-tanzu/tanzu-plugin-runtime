@@ -38,6 +38,9 @@ func TestSetGetDeleteContext(t *testing.T) {
 				},
 			},
 		},
+		AdditionalMetadata: map[string]interface{}{
+			"metaToken": "token1",
+		},
 	}
 
 	ctx2 := &configtypes.Context{
@@ -56,6 +59,9 @@ func TestSetGetDeleteContext(t *testing.T) {
 					ManifestPath: "test-manifest-path",
 				},
 			},
+		},
+		AdditionalMetadata: map[string]interface{}{
+			"metaToken": "token1",
 		},
 	}
 
@@ -105,6 +111,8 @@ contexts:
       ctx-field: new-ctx-field
       optional: true
       target: kubernetes
+      additionalMetadata:
+        metaToken: token1
       clusterOpts:
         isManagementCluster: true
         endpoint: old-test-endpoint
@@ -151,6 +159,9 @@ contexts:
 				},
 			},
 		},
+		AdditionalMetadata: map[string]interface{}{
+			"metaToken": "token1",
+		},
 	}
 
 	err := SetContext(ctx, false)
@@ -162,6 +173,7 @@ contexts:
 	assert.Equal(t, c.ClusterOpts.Endpoint, "old-test-endpoint")
 	assert.Equal(t, c.ClusterOpts.Path, ctx.ClusterOpts.Path)
 	assert.Equal(t, c.ClusterOpts.Context, ctx.ClusterOpts.Context)
+	assert.Equal(t, c.AdditionalMetadata, ctx.AdditionalMetadata)
 }
 
 func TestSetContextWithDiscoverySourceWithNewFields(t *testing.T) {
@@ -576,6 +588,9 @@ func TestSetContext(t *testing.T) {
 					Context:             "test-context",
 					IsManagementCluster: true,
 				},
+				AdditionalMetadata: map[string]interface{}{
+					"metaToken": "token1",
+				},
 			},
 			current: true,
 		},
@@ -590,6 +605,9 @@ func TestSetContext(t *testing.T) {
 					Path:                "test-path",
 					Context:             "test-context",
 					IsManagementCluster: true,
+				},
+				AdditionalMetadata: map[string]interface{}{
+					"metaToken": "token1",
 				},
 			},
 		},
@@ -624,6 +642,9 @@ func TestSetContext(t *testing.T) {
 					Path:                "updated-test-path",
 					Context:             "updated-test-context",
 					IsManagementCluster: true,
+				},
+				AdditionalMetadata: map[string]interface{}{
+					"metaToken": "updated-token1",
 				},
 			},
 		},

@@ -49,7 +49,10 @@ func mergeNodes(src, dst *yaml.Node) error {
 			}
 		}
 	case yaml.SequenceNode:
-		setSeqNode(src, dst)
+		err := setSeqNode(src, dst)
+		if err != nil {
+			return errors.Wrap(err, "merge at key "+src.Content[0].Value)
+		}
 	case yaml.DocumentNode:
 		err := mergeNodes(src.Content[0], dst.Content[0])
 		if err != nil {
@@ -66,9 +69,37 @@ func mergeNodes(src, dst *yaml.Node) error {
 }
 
 // Construct unique sequence nodes for scalar value type
-func setSeqNode(src, dst *yaml.Node) {
-	if dst.Content[0].Kind == yaml.ScalarNode && src.Content[0].Kind == yaml.ScalarNode {
-		dst.Content = append(dst.Content, src.Content...)
-		dst.Content = UniqNodes(dst.Content)
+func setSeqNode(src, dst *yaml.Node) error {
+	if len(src.Content) == 0 {
+		return nil // Nothing to merge
 	}
+
+	switch src.Content[0].Kind {
+	case yaml.ScalarNode:
+		if len(dst.Content) > 0 && dst.Content[0].Kind == yaml.ScalarNode {
+			dst.Content = append(dst.Content, src.Content...)
+			dst.Content = UniqNodes(dst.Content) // Ensure uniqueness among scalar nodes
+		} else {
+			dst.Content = src.Content
+		}
+	case yaml.SequenceNode:
+		if len(dst.Content) > 0 && dst.Content[0].Kind == yaml.SequenceNode {
+			if err := mergeNodes(src.Content[0], dst.Content[0]); err != nil {
+				return errors.New("merge at key " + src.Content[0].Value + " failed with err " + err.Error())
+			}
+		} else {
+			dst.Content = src.Content
+		}
+
+	case yaml.MappingNode:
+		if len(dst.Content) > 0 && dst.Content[0].Kind == yaml.MappingNode {
+			if err := mergeNodes(src.Content[0], dst.Content[0]); err != nil {
+				return errors.New("merge at key " + src.Content[0].Value + " failed with err " + err.Error())
+			}
+		} else {
+			dst.Content = src.Content
+		}
+	}
+
+	return nil
 }

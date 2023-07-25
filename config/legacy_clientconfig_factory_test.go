@@ -151,13 +151,16 @@ current: test-mc
         path: test-context-path
         context: test-context
       discoverySources:
-        - local:
-            name: test
-            path: test-local-path
         - gcp:
             name: test2
             bucket: ctx-test-bucket
             manifestPath: ctx-test-manifest-path
+            annotation: one
+            required: true
+          contextType: tmc
+        - local:
+            name: test
+            path: test-local-path
 currentContext:
     kubernetes: test-mc
 `

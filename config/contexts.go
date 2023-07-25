@@ -296,11 +296,8 @@ func setContext(node *yaml.Node, ctx *configtypes.Context) (persist bool, err er
 		return false, errors.New("context name cannot be empty")
 	}
 
-	// Get Patch Strategies from config metadata
-	patchStrategies, err := GetConfigMetadataPatchStrategy()
-	if err != nil {
-		patchStrategies = make(map[string]string)
-	}
+	// Get Patch Strategies
+	patchStrategies := constructPatchStrategies()
 
 	var persistDiscoverySources bool
 
@@ -358,6 +355,22 @@ func setContext(node *yaml.Node, ctx *configtypes.Context) (persist bool, err er
 	}
 	contextsNode.Content = result
 	return persistDiscoverySources || persist, err
+}
+
+// Get Patch Strategies from config metadata
+// By default;  AdditionalMetadata field will be patched in replace strategy if there are no patch strategies
+func constructPatchStrategies() map[string]string {
+	patchStrategies, err := GetConfigMetadataPatchStrategy()
+	if err != nil {
+		patchStrategies = map[string]string{
+			"contexts.additionalMetadata": "replace",
+		}
+	}
+	// Verify if there are patch strategies defined for `contexts.additionalMetadata` if not set replace by default
+	if patchStrategies != nil && patchStrategies["contexts.additionalMetadata"] != "merge" {
+		patchStrategies["contexts.additionalMetadata"] = "replace"
+	}
+	return patchStrategies
 }
 
 func setCurrentContext(node *yaml.Node, ctx *configtypes.Context) (persist bool, err error) {

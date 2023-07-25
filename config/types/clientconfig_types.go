@@ -65,6 +65,9 @@ type Context struct {
 	// ClusterOpts if the context is a kubernetes cluster.
 	ClusterOpts *ClusterServer `json:"clusterOpts,omitempty" yaml:"clusterOpts,omitempty"`
 
+	// AdditionalMetadata to provide any additional data that is respective to each context
+	AdditionalMetadata map[string]interface{} `json:"additionalMetadata,omitempty" yaml:"additionalMetadata,omitempty"`
+
 	// DiscoverySources determines from where to discover plugins
 	// associated with this context.
 	// Deprecated: This field is deprecated.  It is currently no used.

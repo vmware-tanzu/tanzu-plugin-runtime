@@ -28,4 +28,5 @@ const (
 	KeyTelemetry               = "telemetry"
 	KeyCLIId                   = "cliId"
 	KeySource                  = "source"
+	KeyAdditionalMetadata      = "additionalMetadata"
 )

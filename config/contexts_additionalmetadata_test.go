@@ -11,94 +11,6 @@ import (
 	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
 
-func TestDeleteContextAdditionalMetadata(t *testing.T) {
-	// Setup config data
-	_, cleanUp := setupTestConfig(t, &CfgTestData{cfgNextGen: ``, cfg: ``, cfgMetadata: ``})
-
-	defer func() {
-		cleanUp()
-	}()
-
-	var testcases = []struct {
-		name       string
-		ctx        *configtypes.Context
-		ctxOptions ContextOptions
-		out        map[string]interface{}
-		errStr     string
-	}{
-
-		{
-			name: "should add additional metadata",
-			ctx: &configtypes.Context{
-				Name:   "test-mc",
-				Target: configtypes.TargetK8s,
-				AdditionalMetadata: map[string]interface{}{
-					"issuer":  "vmw1",
-					"issuer2": "vmw1",
-					"issuer3": "vmw1",
-				},
-			},
-			ctxOptions: WithAdditionalMetadataKey("issuer4"),
-			out: map[string]interface{}{
-				"issuer":  "vmw1",
-				"issuer2": "vmw1",
-				"issuer3": "vmw1",
-			},
-		},
-
-		{
-			name: "should update additional metadata",
-			ctx: &configtypes.Context{
-				Name:   "test-mc",
-				Target: configtypes.TargetK8s,
-				AdditionalMetadata: map[string]interface{}{
-					"issuer": "vmw2",
-				},
-			},
-			ctxOptions: WithAdditionalMetadataKey("issuer"),
-			out: map[string]interface{}{
-				"issuer2": "vmw1",
-				"issuer3": "vmw1",
-			},
-		},
-		{
-			name: "should delete all additional metadata",
-			ctx: &configtypes.Context{
-				Name:   "test-mc",
-				Target: configtypes.TargetK8s,
-				AdditionalMetadata: map[string]interface{}{
-					"issuer":  "vmw2",
-					"issuer2": "vmw2",
-					"issuer3": "vmw2",
-					"issuer4": "vmw2",
-				},
-			},
-			ctxOptions: WithDeleteAllAdditionalMetadata(),
-			out:        nil,
-		},
-	}
-
-	for _, tc := range testcases {
-		t.Run(tc.name, func(t *testing.T) {
-			// perform test
-			err := SetContext(tc.ctx, false)
-			if tc.errStr == "" {
-				assert.NoError(t, err)
-			} else {
-				assert.EqualError(t, err, tc.errStr)
-			}
-
-			err = DeleteContextAdditionalMetadata(tc.ctx.Name, tc.ctxOptions)
-			assert.NoError(t, err)
-
-			ctx, err := GetContext(tc.ctx.Name)
-			assert.NoError(t, err)
-
-			assert.Equal(t, tc.out, ctx.AdditionalMetadata)
-		})
-	}
-}
-
 func TestContextAdditionalMetadataStringToString(t *testing.T) {
 	// Setup config data
 	_, cleanUp := setupTestConfig(t, &CfgTestData{cfgNextGen: ``, cfg: ``, cfgMetadata: ``})
@@ -115,56 +27,83 @@ func TestContextAdditionalMetadataStringToString(t *testing.T) {
 	}{
 
 		{
-			name: "should add additional metadata tags:tag1",
+			name: "should add additional metadata \"issuer1\": \"vmw1\"",
 			ctx: &configtypes.Context{
 				Name:   "test-mc",
 				Target: configtypes.TargetK8s,
 				AdditionalMetadata: map[string]interface{}{
-					"issuer": "vmw1",
+					"issuer1": "vmw1",
 				},
+			},
+			out: map[string]interface{}{
+				"issuer1": "vmw1",
 			},
 		},
 		{
-			name: "should update additional metadata tags:tag2",
+			name: "should update additional metadata \"issuer2\": \"vmw2\",",
 			ctx: &configtypes.Context{
 				Name:   "test-mc",
 				Target: configtypes.TargetK8s,
 				AdditionalMetadata: map[string]interface{}{
-					"issuer": "vmw2",
+					"issuer2": "vmw2",
 				},
 			},
-		},
-
-		{
-			name: "should clear additional metadata string:string",
-			ctx: &configtypes.Context{
-				Name:   "test-mc",
-				Target: configtypes.TargetK8s,
-				AdditionalMetadata: map[string]interface{}{
-					"issuer": "",
-				},
+			out: map[string]interface{}{
+				"issuer2": "vmw2",
 			},
 		},
 
 		{
-			name: "should update additional metadata tags:tag1",
+			name: "should clear additional metadata \"issuer1\": \"\",",
 			ctx: &configtypes.Context{
 				Name:   "test-mc",
 				Target: configtypes.TargetK8s,
 				AdditionalMetadata: map[string]interface{}{
-					"issuer": "vmw1",
+					"issuer1": "",
 				},
+			},
+			out: map[string]interface{}{
+				"issuer1": "",
+			},
+		},
+
+		{
+			name: "should update additional metadata \"issuer1\": \"vmw1\",",
+			ctx: &configtypes.Context{
+				Name:   "test-mc",
+				Target: configtypes.TargetK8s,
+				AdditionalMetadata: map[string]interface{}{
+					"issuer1": "vmw1",
+				},
+			},
+			out: map[string]interface{}{
+				"issuer1": "vmw1",
 			},
 		},
 		{
-			name: "should update additional metadata tags:tag2",
+			name: "should update additional metadata \"issuer2\": \"vmw\",\n\t\t\t\t\t\"issuer1\": \"vmw\",",
 			ctx: &configtypes.Context{
 				Name:   "test-mc",
 				Target: configtypes.TargetK8s,
 				AdditionalMetadata: map[string]interface{}{
-					"issuer": "vmw2",
+					"issuer2": "vmw",
+					"issuer1": "vmw",
 				},
 			},
+			out: map[string]interface{}{
+				"issuer1": "vmw",
+				"issuer2": "vmw",
+			},
+		},
+
+		{
+			name: "should delete all additional metadata",
+			ctx: &configtypes.Context{
+				Name:               "test-mc",
+				Target:             configtypes.TargetK8s,
+				AdditionalMetadata: map[string]interface{}{},
+			},
+			out: nil,
 		},
 	}
 
@@ -180,11 +119,7 @@ func TestContextAdditionalMetadataStringToString(t *testing.T) {
 			ctx, err := GetContext(tc.ctx.Name)
 			assert.NoError(t, err)
 
-			if tc.out != nil {
-				assert.Equal(t, tc.out, ctx.AdditionalMetadata)
-			} else {
-				assert.Equal(t, tc.ctx.AdditionalMetadata, ctx.AdditionalMetadata)
-			}
+			assert.Equal(t, tc.out, ctx.AdditionalMetadata)
 		})
 	}
 }
@@ -205,9 +140,8 @@ func TestContextAdditionalMetadataStringToInt(t *testing.T) {
 	}{
 
 		// Additional metadata of map[string]int
-
 		{
-			name: "should add additional metadata tags:0",
+			name: "should add additional metadata \"contextId\": 0,",
 			ctx: &configtypes.Context{
 				Name:   "test-mc",
 				Target: configtypes.TargetK8s,
@@ -220,7 +154,7 @@ func TestContextAdditionalMetadataStringToInt(t *testing.T) {
 			},
 		},
 		{
-			name: "should update additional metadata tags:1",
+			name: "should update additional metadata \"contextId\": 1,",
 			ctx: &configtypes.Context{
 				Name:   "test-mc",
 				Target: configtypes.TargetK8s,
@@ -271,7 +205,7 @@ func TestContextAdditionalMetadataStringToStringArray(t *testing.T) {
 	}{
 
 		{
-			name: "should add additional metadata \"tags\": []string{},",
+			name: "should add additional metadata \"issuers\": []string{},",
 			ctx: &configtypes.Context{
 				Name:   "test-mc",
 				Target: configtypes.TargetK8s,
@@ -284,7 +218,7 @@ func TestContextAdditionalMetadataStringToStringArray(t *testing.T) {
 			},
 		},
 		{
-			name: "should update additional metadata \"tags\": []string{\"tag1\"},",
+			name: "should update additional metadata \t\"issuers\": []interface{}{\"vmw1\"},",
 			ctx: &configtypes.Context{
 				Name:   "test-mc",
 				Target: configtypes.TargetK8s,
@@ -292,9 +226,12 @@ func TestContextAdditionalMetadataStringToStringArray(t *testing.T) {
 					"issuers": []interface{}{"vmw1"},
 				},
 			},
+			out: map[string]interface{}{
+				"issuers": []interface{}{"vmw1"},
+			},
 		},
 		{
-			name: "should update additional metadata \"tags\": []string{\"tag2\"},",
+			name: "should update additional metadata \"issuers\": []interface{}{\"vmw1\", \"vmw2\"},",
 			ctx: &configtypes.Context{
 				Name:   "test-mc",
 				Target: configtypes.TargetK8s,
@@ -302,9 +239,12 @@ func TestContextAdditionalMetadataStringToStringArray(t *testing.T) {
 					"issuers": []interface{}{"vmw1", "vmw2"},
 				},
 			},
+			out: map[string]interface{}{
+				"issuers": []interface{}{"vmw1", "vmw2"},
+			},
 		},
 		{
-			name: "should update additional metadata \"tags\": []string{\"tag1\", \"tag2\"},",
+			name: "should update additional metadata \"issuers\": []interface{}{\"vmw1\", \"vmw2\"},",
 			ctx: &configtypes.Context{
 				Name:   "test-mc",
 				Target: configtypes.TargetK8s,
@@ -312,9 +252,12 @@ func TestContextAdditionalMetadataStringToStringArray(t *testing.T) {
 					"issuers": []interface{}{"vmw1", "vmw2"},
 				},
 			},
+			out: map[string]interface{}{
+				"issuers": []interface{}{"vmw1", "vmw2"},
+			},
 		},
 		{
-			name: "should update additional metadata \"tags\": []string{\"tag3\", \"tag4\"},\n",
+			name: "should update additional metadata \"issuers\": []interface{}{\"vmw1\", \"vmw2\", \"vmw3\", \"vmw4\"},",
 			ctx: &configtypes.Context{
 				Name:   "test-mc",
 				Target: configtypes.TargetK8s,
@@ -322,16 +265,18 @@ func TestContextAdditionalMetadataStringToStringArray(t *testing.T) {
 					"issuers": []interface{}{"vmw1", "vmw2", "vmw3", "vmw4"},
 				},
 			},
+			out: map[string]interface{}{
+				"issuers": []interface{}{"vmw1", "vmw2", "vmw3", "vmw4"},
+			},
 		},
 		{
-			name: "should update additional metadata \"tags\": []string{\"tag3\", \"tag4\", \"tag1\"},",
+			name: "should delete all additional metadata",
 			ctx: &configtypes.Context{
-				Name:   "test-mc",
-				Target: configtypes.TargetK8s,
-				AdditionalMetadata: map[string]interface{}{
-					"issuers": []interface{}{"vmw1", "vmw2", "vmw3", "vmw4"},
-				},
+				Name:               "test-mc",
+				Target:             configtypes.TargetK8s,
+				AdditionalMetadata: map[string]interface{}{},
 			},
+			out: nil,
 		},
 	}
 
@@ -347,11 +292,7 @@ func TestContextAdditionalMetadataStringToStringArray(t *testing.T) {
 			ctx, err := GetContext(tc.ctx.Name)
 			assert.NoError(t, err)
 
-			if tc.out != nil {
-				assert.Equal(t, tc.out, ctx.AdditionalMetadata)
-			} else {
-				assert.Equal(t, tc.ctx.AdditionalMetadata, ctx.AdditionalMetadata)
-			}
+			assert.Equal(t, tc.out, ctx.AdditionalMetadata)
 		})
 	}
 }
@@ -401,7 +342,6 @@ func TestContextAdditionalMetadataStringToMap(t *testing.T) {
 			},
 			out: map[string]interface{}{
 				"auth": map[string]interface{}{
-					"a1": "x",
 					"a2": "y",
 				},
 			},
@@ -420,7 +360,6 @@ func TestContextAdditionalMetadataStringToMap(t *testing.T) {
 			out: map[string]interface{}{
 				"auth": map[string]interface{}{
 					"a1": "y",
-					"a2": "y",
 				},
 			},
 		},
@@ -440,7 +379,6 @@ func TestContextAdditionalMetadataStringToMap(t *testing.T) {
 				"auth": map[string]interface{}{
 					"a1": "z",
 					"a3": "z",
-					"a2": "y",
 				},
 			},
 		},
@@ -656,9 +594,6 @@ func TestContextAdditionalMetadataStringToStructArray(t *testing.T) {
 						"accessToken": "token1",
 						"IDToken":     "id-1",
 					},
-					map[string]interface{}{
-						"accessToken": "token2",
-					},
 				},
 			},
 		},
@@ -685,12 +620,7 @@ func TestContextAdditionalMetadataStringToStructArray(t *testing.T) {
 			out: map[string]interface{}{
 				"globalAuth": []interface{}{
 					map[string]interface{}{
-						"accessToken": "token1",
-						"IDToken":     "id-1",
 						"permissions": []interface{}{"p1"},
-					},
-					map[string]interface{}{
-						"accessToken": "token2",
 					},
 				},
 				"globalAuth2": []interface{}{

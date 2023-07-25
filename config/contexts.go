@@ -14,33 +14,6 @@ import (
 	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
 
-// ContextOpts is used to construct options for context apis
-type ContextOpts struct {
-	DeleteAllAdditionalMetadata bool   // To delete the entire additional metadata property of context
-	AdditionalMetadataKey       string // key string to identify the additional metadata property
-}
-
-// ContextOptions are used to pass options for context apis
-type ContextOptions func(c *ContextOpts)
-
-// WithDeleteAllAdditionalMetadata to delete all additional metadata of a context
-func WithDeleteAllAdditionalMetadata() ContextOptions {
-	return func(c *ContextOpts) {
-		c.DeleteAllAdditionalMetadata = true
-	}
-}
-
-// WithAdditionalMetadataKey to specify additional metadata key
-func WithAdditionalMetadataKey(key string) ContextOptions {
-	return func(c *ContextOpts) {
-		c.AdditionalMetadataKey = key
-	}
-}
-
-func NewContextOpts() *ContextOpts {
-	return &ContextOpts{}
-}
-
 // GetContext retrieves the context by name
 func GetContext(name string) (*configtypes.Context, error) {
 	// Retrieve client config node
@@ -273,44 +246,6 @@ func EndpointFromContext(s *configtypes.Context) (endpoint string, err error) {
 	}
 }
 
-// DeleteContextAdditionalMetadata deletes additionalMetadata of a specific context in the Tanzu client configuration.
-// The contextName parameter specifies the name of the context from which additionalMetadata is to be deleted.
-// The options parameter allows providing additional context configuration options.
-func DeleteContextAdditionalMetadata(contextName string, options ...ContextOptions) error {
-	// Create a new contextOptions with default values
-	contextOptions := NewContextOpts()
-
-	// Apply any provided options to the contextOptions
-	for _, opt := range options {
-		opt(contextOptions)
-	}
-
-	// Acquire a lock on the Tanzu client configuration to ensure exclusive access during modifications.
-	AcquireTanzuConfigLock()
-	defer ReleaseTanzuConfigLock()
-
-	// Retrieve the YAML node representing the client configuration.
-	node, err := getClientConfigNodeNoLock()
-	if err != nil {
-		return err
-	}
-
-	// Get the context node for the specified contextName from the client configuration.
-	ctx, err := getContext(node, contextName)
-	if err != nil {
-		return err
-	}
-
-	// Delete the additionalMetadata of the context by key or delete all, based on the provided contextOptions.
-	err = removeContextAdditionalMetadata(node, ctx.Name, contextOptions.AdditionalMetadataKey, contextOptions.DeleteAllAdditionalMetadata)
-	if err != nil {
-		return err
-	}
-
-	// Persist the modified client configuration back to storage.
-	return persistConfig(node)
-}
-
 func getContext(node *yaml.Node, name string) (*configtypes.Context, error) {
 	// check if context name is empty
 	if name == "" {
@@ -361,11 +296,8 @@ func setContext(node *yaml.Node, ctx *configtypes.Context) (persist bool, err er
 		return false, errors.New("context name cannot be empty")
 	}
 
-	// Get Patch Strategies from config metadata
-	patchStrategies, err := GetConfigMetadataPatchStrategy()
-	if err != nil {
-		patchStrategies = make(map[string]string)
-	}
+	// Get Patch Strategies
+	patchStrategies := constructPatchStrategies()
 
 	var persistDiscoverySources bool
 
@@ -423,6 +355,22 @@ func setContext(node *yaml.Node, ctx *configtypes.Context) (persist bool, err er
 	}
 	contextsNode.Content = result
 	return persistDiscoverySources || persist, err
+}
+
+// Get Patch Strategies from config metadata
+// By default;  AdditionalMetadata field will be patched in replace strategy if there are no patch strategies
+func constructPatchStrategies() map[string]string {
+	patchStrategies, err := GetConfigMetadataPatchStrategy()
+	if err != nil {
+		patchStrategies = map[string]string{
+			"contexts.additionalMetadata": "replace",
+		}
+	}
+	// Verify if there are patch strategies defined for `contexts.additionalMetadata` if not set replace by default
+	if patchStrategies != nil && patchStrategies["contexts.additionalMetadata"] != "merge" {
+		patchStrategies["contexts.additionalMetadata"] = "replace"
+	}
+	return patchStrategies
 }
 
 func setCurrentContext(node *yaml.Node, ctx *configtypes.Context) (persist bool, err error) {
@@ -490,62 +438,6 @@ func removeContext(node *yaml.Node, name string) error {
 		}
 		contexts = append(contexts, contextNode)
 	}
-	contextsNode.Content = contexts
-	return nil
-}
-
-// removeContextAdditionalMetadata removes the additionalMetadata property of a specific context in a YAML node.
-// If removeAll is true, it removes the entire additionalMetadata property.
-// If removeAll is false, it removes a specific key from the additionalMetadata property.
-func removeContextAdditionalMetadata(node *yaml.Node, name, key string, removeAll bool) error {
-	// check if context name is empty
-	if name == "" {
-		return errors.New("context name cannot be empty")
-	}
-
-	// check if key is empty when not removing all
-	if !removeAll && key == "" {
-		return errors.New("key cannot be empty")
-	}
-
-	// Find the contexts node in the YAML node
-	keys := []nodeutils.Key{
-		{Name: KeyContexts},
-	}
-	contextsNode := nodeutils.FindNode(node.Content[0], nodeutils.WithKeys(keys))
-	if contextsNode == nil {
-		// If no contexts node is found, there is nothing to remove.
-		return nil
-	}
-
-	// Create a new list to hold modified context nodes
-	var contexts []*yaml.Node
-	for _, contextNode := range contextsNode.Content {
-		if index := nodeutils.GetNodeIndex(contextNode.Content, "name"); index != -1 && contextNode.Content[index].Value == name {
-			if removeAll {
-				// If removeAll is true, remove the entire additionalMetadata property.
-				index := nodeutils.GetNodeIndex(contextNode.Content, KeyAdditionalMetadata)
-				if index != -1 {
-					contextNode.Content = append(contextNode.Content[:index-1], contextNode.Content[index+1:]...)
-				}
-			} else {
-				// If removeAll is false, remove the specified key from additionalMetadata property.
-				additionalMetadataKey := []nodeutils.Key{{Name: KeyAdditionalMetadata}}
-				additionalMetadataNode := nodeutils.FindNode(contextNode, nodeutils.WithKeys(additionalMetadataKey))
-				if additionalMetadataNode != nil && additionalMetadataNode.Content != nil {
-					index := nodeutils.GetNodeIndex(additionalMetadataNode.Content, key)
-					if index != -1 {
-						// Remove the specific key from additionalMetadata.
-						additionalMetadataNode.Content = append(additionalMetadataNode.Content[:index-1], additionalMetadataNode.Content[index+1:]...)
-					}
-				}
-			}
-		}
-		// Add the modified context node to the new list.
-		contexts = append(contexts, contextNode)
-	}
-
-	// Update the contexts node with the modified list of contexts.
 	contextsNode.Content = contexts
 	return nil
 }

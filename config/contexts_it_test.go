@@ -260,14 +260,14 @@ currentContext:
         path: test-path-updated
         context: test-context-updated
         isManagementCluster: true
-      additionalMetadata:
-        metaToken: updated-token1
-        newToken: optional
       discoverySources:
         - gcp:
             name: test
             bucket: test-bucket-updated
             manifestPath: test-manifest-path-updated
+      additionalMetadata:
+        metaToken: updated-token1
+        newToken: optional
 currentContext:
     kubernetes: test-mc2
 `

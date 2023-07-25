@@ -3,8 +3,8 @@
 
 package types
 
-// StringToTarget converts string to Target type
-func StringToTarget(target string) Target {
+// StringToTargetString converts string to Target type
+func StringToTargetString(target string) string {
 	if target == string(targetK8s) || target == string(TargetK8s) {
 		return TargetK8s
 	} else if target == string(targetTMC) || target == string(TargetTMC) {

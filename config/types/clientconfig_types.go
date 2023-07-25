@@ -57,7 +57,7 @@ type Context struct {
 	Name string `json:"name,omitempty" yaml:"name,omitempty"`
 
 	// Target of the context.
-	Target Target `json:"target,omitempty" yaml:"target,omitempty"`
+	Target string `json:"target,omitempty" yaml:"target,omitempty"`
 
 	// GlobalOpts if the context is a global control plane (e.g., TMC).
 	GlobalOpts *GlobalServer `json:"globalOpts,omitempty" yaml:"globalOpts,omitempty"`
@@ -343,7 +343,7 @@ type ClientConfig struct {
 	KnownContexts []*Context `json:"contexts,omitempty" yaml:"contexts,omitempty"`
 
 	// CurrentContext for every type.
-	CurrentContext map[Target]string `json:"currentContext,omitempty" yaml:"currentContext,omitempty"`
+	CurrentContext map[string]string `json:"currentContext,omitempty" yaml:"currentContext,omitempty"`
 
 	// ClientOptions are client specific options like feature flags, environment variables, repositories, discoverySources, etc.
 	ClientOptions *ClientOptions `json:"clientOptions,omitempty" yaml:"clientOptions,omitempty"`

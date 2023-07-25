@@ -214,7 +214,7 @@ currentContext:
 				},
 			},
 		},
-		CurrentContext: map[types.Target]string{
+		CurrentContext: map[string]string{
 			types.TargetK8s: "test-mc",
 		},
 		ClientOptions: &types.ClientOptions{

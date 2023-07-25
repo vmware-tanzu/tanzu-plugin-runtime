@@ -140,7 +140,7 @@ func ContextExists(name string) (bool, error) {
 }
 
 // GetCurrentContext retrieves the current context for the specified target
-func GetCurrentContext(target configtypes.Target) (c *configtypes.Context, err error) {
+func GetCurrentContext(target string) (c *configtypes.Context, err error) {
 	// Retrieve client config node
 	node, err := getClientConfigNode()
 	if err != nil {
@@ -150,7 +150,7 @@ func GetCurrentContext(target configtypes.Target) (c *configtypes.Context, err e
 }
 
 // GetAllCurrentContextsMap returns all current context per Target
-func GetAllCurrentContextsMap() (map[configtypes.Target]*configtypes.Context, error) {
+func GetAllCurrentContextsMap() (map[string]*configtypes.Context, error) {
 	node, err := getClientConfigNodeNoLock()
 	if err != nil {
 		return nil, err
@@ -211,7 +211,7 @@ func SetCurrentContext(name string) error {
 }
 
 // RemoveCurrentContext removed the current context of specified context type
-func RemoveCurrentContext(target configtypes.Target) error {
+func RemoveCurrentContext(target string) error {
 	// Retrieve client config node
 	AcquireTanzuConfigLock()
 	defer ReleaseTanzuConfigLock()
@@ -264,7 +264,7 @@ func getContext(node *yaml.Node, name string) (*configtypes.Context, error) {
 	return nil, fmt.Errorf("context %v not found", name)
 }
 
-func getCurrentContext(node *yaml.Node, target configtypes.Target) (*configtypes.Context, error) {
+func getCurrentContext(node *yaml.Node, target string) (*configtypes.Context, error) {
 	cfg, err := convertNodeToClientConfig(node)
 	if err != nil {
 		return nil, err
@@ -272,7 +272,7 @@ func getCurrentContext(node *yaml.Node, target configtypes.Target) (*configtypes
 	return cfg.GetCurrentContext(target)
 }
 
-func getAllCurrentContextsMap(node *yaml.Node) (map[configtypes.Target]*configtypes.Context, error) {
+func getAllCurrentContextsMap(node *yaml.Node) (map[string]*configtypes.Context, error) {
 	cfg, err := convertNodeToClientConfig(node)
 	if err != nil {
 		return nil, err

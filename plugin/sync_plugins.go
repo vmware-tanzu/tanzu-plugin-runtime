@@ -10,8 +10,6 @@ import (
 	"os"
 	"os/exec"
 	"strings"
-
-	"github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
 
 const (
@@ -44,7 +42,7 @@ func runCommand(commandPath string, args []string) (bytes.Buffer, bytes.Buffer, 
 // provide equivalent functionality can be introduced.
 //
 // The output of the plugin syncing will be return as a string.
-func SyncPluginsForTarget(target types.Target) (string, error) {
+func SyncPluginsForTarget(target string) (string, error) {
 	// For now, the implementation expects env var TANZU_BIN to be set and
 	// pointing to the core CLI binary used to invoke the plugin sync with.
 
@@ -57,7 +55,7 @@ func SyncPluginsForTarget(target types.Target) (string, error) {
 	args := []string{"plugin", "sync"}
 
 	altCommandArgs = append(altCommandArgs, args...)
-	altCommandArgs = append(altCommandArgs, "--target", string(target))
+	altCommandArgs = append(altCommandArgs, "--target", target)
 
 	// Check if there is an alternate means to perform the plugin syncing
 	// operation, if not fall back to `plugin sync`

@@ -65,7 +65,7 @@ func TestPopulateContexts(t *testing.T) {
 						},
 					},
 				},
-				CurrentContext: map[configtypes.Target]string{
+				CurrentContext: map[string]string{
 					configtypes.TargetK8s: "test-mc",
 					configtypes.TargetTMC: "test-tmc",
 				},
@@ -109,7 +109,7 @@ func TestPopulateContexts(t *testing.T) {
 						},
 					},
 				},
-				CurrentContext: map[configtypes.Target]string{
+				CurrentContext: map[string]string{
 					configtypes.TargetK8s: "test-mc",
 					configtypes.TargetTMC: "test-tmc",
 				},
@@ -147,7 +147,7 @@ func TestPopulateContexts(t *testing.T) {
 						},
 					},
 				},
-				CurrentContext: map[configtypes.Target]string{
+				CurrentContext: map[string]string{
 					configtypes.TargetTMC: "test-tmc",
 				},
 			},
@@ -190,7 +190,7 @@ func TestPopulateContexts(t *testing.T) {
 						},
 					},
 				},
-				CurrentContext: map[configtypes.Target]string{
+				CurrentContext: map[string]string{
 					configtypes.TargetK8s: "test-mc",
 					configtypes.TargetTMC: "test-tmc",
 				},
@@ -264,7 +264,7 @@ func TestPopulateServers(t *testing.T) {
 						},
 					},
 				},
-				CurrentContext: map[configtypes.Target]string{
+				CurrentContext: map[string]string{
 					configtypes.TargetK8s: "test-mc",
 					configtypes.TargetTMC: "test-tmc",
 				},
@@ -308,7 +308,7 @@ func TestPopulateServers(t *testing.T) {
 						},
 					},
 				},
-				CurrentContext: map[configtypes.Target]string{
+				CurrentContext: map[string]string{
 					configtypes.TargetK8s: "test-mc",
 					configtypes.TargetTMC: "test-tmc",
 				},
@@ -348,7 +348,7 @@ func TestPopulateServers(t *testing.T) {
 						},
 					},
 				},
-				CurrentContext: map[configtypes.Target]string{
+				CurrentContext: map[string]string{
 					configtypes.TargetK8s: "test-mc",
 					configtypes.TargetTMC: "test-tmc",
 				},
@@ -392,7 +392,7 @@ func TestPopulateServers(t *testing.T) {
 						},
 					},
 				},
-				CurrentContext: map[configtypes.Target]string{
+				CurrentContext: map[string]string{
 					configtypes.TargetK8s: "test-mc",
 					configtypes.TargetTMC: "test-tmc",
 				},

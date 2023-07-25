@@ -3,8 +3,6 @@
 
 package plugin
 
-import "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
-
 // CmdGroup is a group of CLI commands.
 type CmdGroup string
 
@@ -65,7 +63,7 @@ type PluginDescriptor struct {
 	Description string `json:"description" yaml:"description"`
 
 	// Target is the target to which plugin is applicable.
-	Target types.Target `json:"target" yaml:"target"`
+	Target string `json:"target" yaml:"target"`
 
 	// Version of the plugin. Must be a valid semantic version https://semver.org/
 	Version string `json:"version" yaml:"version"`

@@ -260,7 +260,7 @@ func TestSetContextWithDiscoverySourceWithNewFields(t *testing.T) {
 					},
 				},
 				CurrentServer: "test-mc",
-				CurrentContext: map[configtypes.Target]string{
+				CurrentContext: map[string]string{
 					configtypes.TargetK8s: "test-mc",
 				},
 			},
@@ -387,7 +387,7 @@ func TestSetContextWithDiscoverySource(t *testing.T) {
 					},
 				},
 				CurrentServer: "test-mc",
-				CurrentContext: map[configtypes.Target]string{
+				CurrentContext: map[string]string{
 					configtypes.TargetK8s: "test-mc",
 				},
 			},
@@ -462,7 +462,7 @@ func setupForGetContext(t *testing.T) {
 				},
 			},
 		},
-		CurrentContext: map[configtypes.Target]string{
+		CurrentContext: map[string]string{
 			configtypes.TargetK8s: "test-mc-2",
 			configtypes.TargetTMC: "test-tmc",
 		},
@@ -688,7 +688,7 @@ func TestRemoveContext(t *testing.T) {
 	tcs := []struct {
 		name    string
 		ctxName string
-		target  configtypes.Target
+		target  string
 		errStr  string
 	}{
 		{
@@ -739,7 +739,7 @@ func TestSetCurrentContext(t *testing.T) {
 	}()
 	tcs := []struct {
 		name       string
-		target     configtypes.Target
+		target     string
 		ctxName    string
 		currServer string
 		errStr     string

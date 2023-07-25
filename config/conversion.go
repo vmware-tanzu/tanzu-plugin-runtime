@@ -60,7 +60,7 @@ func convertServerToContext(s *configtypes.Server) *configtypes.Context {
 	}
 }
 
-func convertServerTypeToTarget(t configtypes.ServerType) configtypes.Target {
+func convertServerTypeToTarget(t configtypes.ServerType) string {
 	switch t {
 	case configtypes.ManagementClusterServerType:
 		return configtypes.TargetK8s
@@ -68,7 +68,7 @@ func convertServerTypeToTarget(t configtypes.ServerType) configtypes.Target {
 		return configtypes.TargetTMC
 	}
 	// no other server type is supported in v0
-	return configtypes.Target(t)
+	return string(t)
 }
 
 func convertMgmtClusterOptsToClusterOpts(s *configtypes.ManagementClusterServer) *configtypes.ClusterServer {
@@ -128,7 +128,7 @@ func convertContextToServer(c *configtypes.Context) *configtypes.Server {
 	}
 }
 
-func convertTargetToServerType(t configtypes.Target) configtypes.ServerType {
+func convertTargetToServerType(t string) configtypes.ServerType {
 	switch t {
 	case configtypes.TargetK8s:
 		// This is lossy because only management cluster servers are supported by the older CLI.

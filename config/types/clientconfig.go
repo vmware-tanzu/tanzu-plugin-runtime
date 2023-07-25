@@ -10,30 +10,22 @@ import (
 	"strings"
 )
 
-// Target is the namespace of the CLI to which plugin is applicable
-type Target string
-
 const (
 	// TargetK8s is a kubernetes target of the CLI
 	// This target applies if the plugin is interacting with a Kubernetes cluster
-	TargetK8s Target = "kubernetes"
-	targetK8s Target = "k8s"
+	TargetK8s string = "kubernetes"
+	targetK8s string = "k8s"
 
 	// TargetTMC is a Tanzu Mission Control target of the CLI
 	// This target applies if the plugin is interacting with a Tanzu Mission Control endpoint
-	TargetTMC Target = "mission-control"
-	targetTMC Target = "tmc"
+	TargetTMC string = "mission-control"
+	targetTMC string = "tmc"
 
 	// TargetGlobal is used for plugins that are not associated with any target
-	TargetGlobal Target = "global"
+	TargetGlobal string = "global"
 
 	// TargetUnknown specifies that the target is not currently known
-	TargetUnknown Target = ""
-)
-
-var (
-	// SupportedTargets is a list of all supported Target
-	SupportedTargets = []Target{TargetK8s, TargetTMC}
+	TargetUnknown string = ""
 )
 
 const (
@@ -136,7 +128,7 @@ func (c *ClientConfig) HasContext(name string) bool {
 }
 
 // GetCurrentContext returns the current context for the given type.
-func (c *ClientConfig) GetCurrentContext(target Target) (*Context, error) {
+func (c *ClientConfig) GetCurrentContext(target string) (*Context, error) {
 	ctxName := c.CurrentContext[target]
 	if ctxName == "" {
 		return nil, fmt.Errorf("no current context set for target %q", target)
@@ -149,9 +141,13 @@ func (c *ClientConfig) GetCurrentContext(target Target) (*Context, error) {
 }
 
 // GetAllCurrentContextsMap returns all current context per Target
-func (c *ClientConfig) GetAllCurrentContextsMap() (map[Target]*Context, error) {
-	currentContexts := make(map[Target]*Context)
-	for _, target := range SupportedTargets {
+func (c *ClientConfig) GetAllCurrentContextsMap() (map[string]*Context, error) {
+	currentContexts := make(map[string]*Context)
+	if c.CurrentContext == nil {
+		return currentContexts, nil
+	}
+
+	for target := range c.CurrentContext {
 		context, err := c.GetCurrentContext(target)
 		if err == nil && context != nil {
 			currentContexts[target] = context
@@ -175,9 +171,9 @@ func (c *ClientConfig) GetAllCurrentContextsList() ([]string, error) {
 }
 
 // SetCurrentContext sets the current context for the given target.
-func (c *ClientConfig) SetCurrentContext(target Target, ctxName string) error {
+func (c *ClientConfig) SetCurrentContext(target string, ctxName string) error {
 	if c.CurrentContext == nil {
-		c.CurrentContext = make(map[Target]string)
+		c.CurrentContext = make(map[string]string)
 	}
 	c.CurrentContext[target] = ctxName
 	ctx, err := c.GetContext(ctxName)

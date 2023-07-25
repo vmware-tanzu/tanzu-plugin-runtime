@@ -43,7 +43,7 @@ func (suite *ClientTestSuite) SetupTest() {
 				Target: TargetK8s,
 			},
 		},
-		CurrentContext: map[Target]string{
+		CurrentContext: map[string]string{
 			TargetTMC: suite.GlobalServer.Name,
 			TargetK8s: suite.ManagementServer.Name,
 		},

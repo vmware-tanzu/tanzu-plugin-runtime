@@ -382,14 +382,14 @@ func setCurrentContext(node *yaml.Node, ctx *configtypes.Context) (persist bool,
 	if currentContextNode == nil {
 		return persist, nodeutils.ErrNodeNotFound
 	}
-	if index := nodeutils.GetNodeIndex(currentContextNode.Content, string(ctx.Target)); index != -1 {
+	if index := nodeutils.GetNodeIndex(currentContextNode.Content, ctx.Target); index != -1 {
 		if currentContextNode.Content[index].Value != ctx.Name {
 			currentContextNode.Content[index].Value = ctx.Name
 			currentContextNode.Content[index].Style = 0
 			persist = true
 		}
 	} else {
-		currentContextNode.Content = append(currentContextNode.Content, nodeutils.CreateScalarNode(string(ctx.Target), ctx.Name)...)
+		currentContextNode.Content = append(currentContextNode.Content, nodeutils.CreateScalarNode(ctx.Target, ctx.Name)...)
 		persist = true
 	}
 	return persist, err
@@ -405,7 +405,7 @@ func removeCurrentContext(node *yaml.Node, ctx *configtypes.Context) error {
 	if currentContextNode == nil {
 		return nil
 	}
-	targetNodeIndex := nodeutils.GetNodeIndex(currentContextNode.Content, string(ctx.Target))
+	targetNodeIndex := nodeutils.GetNodeIndex(currentContextNode.Content, ctx.Target)
 	if targetNodeIndex == -1 {
 		return nil
 	}

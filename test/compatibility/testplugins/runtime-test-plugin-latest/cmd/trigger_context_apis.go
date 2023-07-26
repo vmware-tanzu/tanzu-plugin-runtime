@@ -79,7 +79,7 @@ func triggerGetCurrentContextAPI(api *core.API) *core.APIResponse {
 		}
 	}
 	// Trigger GetCurrentContext API
-	return getCurrentContext(configtypes.Target(target))
+	return getCurrentContext(target)
 }
 
 // triggerRemoveCurrentContextAPI trigger Runtime RemoveCurrentContext API
@@ -93,7 +93,7 @@ func triggerRemoveCurrentContextAPI(api *core.API) *core.APIResponse {
 		}
 	}
 	// Trigger RemoveCurrentContext
-	return removeCurrentContext(configtypes.Target(target))
+	return removeCurrentContext(target)
 }
 
 func getContext(ctxName string) *core.APIResponse {
@@ -158,7 +158,7 @@ func setCurrentContext(contextName string) *core.APIResponse {
 	}
 }
 
-func getCurrentContext(target configtypes.Target) *core.APIResponse {
+func getCurrentContext(target string) *core.APIResponse {
 	ctx, err := configlib.GetCurrentContext(target)
 	if err != nil {
 		return &core.APIResponse{
@@ -178,7 +178,7 @@ func getCurrentContext(target configtypes.Target) *core.APIResponse {
 	}
 }
 
-func removeCurrentContext(target configtypes.Target) *core.APIResponse {
+func removeCurrentContext(target string) *core.APIResponse {
 	err := configlib.RemoveCurrentContext(target)
 	if err != nil {
 		return &core.APIResponse{

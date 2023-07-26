@@ -169,7 +169,7 @@ func (c *ClientConfig) GetAllCurrentContextsList() ([]string, error) {
 }
 
 // SetCurrentContext sets the current context for the given target.
-func (c *ClientConfig) SetCurrentContext(target string, ctxName string) error {
+func (c *ClientConfig) SetCurrentContext(target, ctxName string) error {
 	if c.CurrentContext == nil {
 		c.CurrentContext = make(map[string]string)
 	}

@@ -37,7 +37,7 @@ func TestCompareNodes(t *testing.T) {
 								Content: []*yaml.Node{
 									{
 										Kind:  yaml.ScalarNode,
-										Value: string(configtypes.TargetK8s),
+										Value: configtypes.TargetK8s,
 									},
 									{
 										Kind:  yaml.ScalarNode,
@@ -71,7 +71,7 @@ func TestCompareNodes(t *testing.T) {
 											},
 											{
 												Kind:  yaml.ScalarNode,
-												Value: string(configtypes.TargetK8s),
+												Value: configtypes.TargetK8s,
 											},
 											{
 												Kind:  yaml.ScalarNode,
@@ -248,7 +248,7 @@ func TestCompareNodes(t *testing.T) {
 								Content: []*yaml.Node{
 									{
 										Kind:  yaml.ScalarNode,
-										Value: string(configtypes.TargetK8s),
+										Value: configtypes.TargetK8s,
 									},
 									{
 										Kind:  yaml.ScalarNode,
@@ -282,7 +282,7 @@ func TestCompareNodes(t *testing.T) {
 											},
 											{
 												Kind:  yaml.ScalarNode,
-												Value: string(configtypes.TargetK8s),
+												Value: configtypes.TargetK8s,
 											},
 											{
 												Kind:  yaml.ScalarNode,
@@ -463,7 +463,7 @@ func TestCompareNodes(t *testing.T) {
 								Content: []*yaml.Node{
 									{
 										Kind:  yaml.ScalarNode,
-										Value: string(configtypes.TargetK8s),
+										Value: configtypes.TargetK8s,
 									},
 									{
 										Kind:  yaml.ScalarNode,
@@ -497,7 +497,7 @@ func TestCompareNodes(t *testing.T) {
 											},
 											{
 												Kind:  yaml.ScalarNode,
-												Value: string(configtypes.TargetK8s),
+												Value: configtypes.TargetK8s,
 											},
 											{
 												Kind:  yaml.ScalarNode,
@@ -674,7 +674,7 @@ func TestCompareNodes(t *testing.T) {
 								Content: []*yaml.Node{
 									{
 										Kind:  yaml.ScalarNode,
-										Value: string(configtypes.TargetK8s),
+										Value: configtypes.TargetK8s,
 									},
 									{
 										Kind:  yaml.ScalarNode,
@@ -708,7 +708,7 @@ func TestCompareNodes(t *testing.T) {
 											},
 											{
 												Kind:  yaml.ScalarNode,
-												Value: string(configtypes.TargetK8s),
+												Value: configtypes.TargetK8s,
 											},
 											{
 												Kind:  yaml.ScalarNode,

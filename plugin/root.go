@@ -26,7 +26,7 @@ func newRootCmd(descriptor *PluginDescriptor) *cobra.Command {
 			HiddenDefaultCmd: true,
 		},
 		Annotations: map[string]string{
-			"target": string(descriptor.Target),
+			"target": descriptor.Target,
 		},
 	}
 	cobra.AddTemplateFuncs(TemplateFuncs)

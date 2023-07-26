@@ -23,7 +23,6 @@ func TestValidatePlugin(t *testing.T) {
 	}
 
 	err := ValidatePlugin(&descriptor)
-	assert.ErrorContains(err, "target is not valid")
 	assert.ErrorContains(err, "version cannot be empty")
 	assert.ErrorContains(err, "description cannot be empty")
 	assert.ErrorContains(err, "group cannot be empty")

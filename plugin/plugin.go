@@ -10,8 +10,6 @@ import (
 	"github.com/spf13/cobra"
 	"go.uber.org/multierr"
 	"golang.org/x/mod/semver"
-
-	"github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
 
 // Plugin is a Tanzu CLI plugin.
@@ -86,9 +84,6 @@ func ValidatePlugin(p *PluginDescriptor) (err error) {
 	}
 	if p.Name == "" {
 		err = multierr.Append(err, fmt.Errorf("plugin name cannot be empty"))
-	}
-	if !types.IsValidTarget(string(p.Target), true, false) {
-		err = multierr.Append(err, fmt.Errorf("plugin %q: target is not valid", p.Name))
 	}
 	if p.Version == "" {
 		err = multierr.Append(err, fmt.Errorf("plugin %q: version cannot be empty", p.Name))

@@ -14,12 +14,10 @@ const (
 	// TargetK8s is a kubernetes target of the CLI
 	// This target applies if the plugin is interacting with a Kubernetes cluster
 	TargetK8s string = "kubernetes"
-	targetK8s string = "k8s"
 
 	// TargetTMC is a Tanzu Mission Control target of the CLI
 	// This target applies if the plugin is interacting with a Tanzu Mission Control endpoint
 	TargetTMC string = "mission-control"
-	targetTMC string = "tmc"
 
 	// TargetGlobal is used for plugins that are not associated with any target
 	TargetGlobal string = "global"

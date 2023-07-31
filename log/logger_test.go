@@ -28,7 +28,7 @@ func TestLogger(t *testing.T) {
 		},
 		{
 			test:                  "when TANZU_CLI_LOG_LEVEL is set to 3",
-			logLevel:              "",
+			logLevel:              "3",
 			containStrings:        []string{"log-default", "log-0", "log-1", "log-3"},
 			doesNotContainStrings: []string{"log-5", "log-8"},
 		},
@@ -37,6 +37,12 @@ func TestLogger(t *testing.T) {
 			logLevel:              "6",
 			containStrings:        []string{"log-default", "log-0", "log-1", "log-3", "log-5"},
 			doesNotContainStrings: []string{"log-8"},
+		},
+		{
+			test:                  "when TANZU_CLI_LOG_LEVEL is set to 8",
+			logLevel:              "8",
+			containStrings:        []string{"log-default", "log-0", "log-1", "log-3", "log-5", "log-8"},
+			doesNotContainStrings: []string{},
 		},
 		{
 			test:                  "when TANZU_CLI_LOG_LEVEL is set to 9",

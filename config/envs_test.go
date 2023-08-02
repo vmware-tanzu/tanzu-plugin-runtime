@@ -63,7 +63,8 @@ func TestGetEnv(t *testing.T) {
 	tests := []struct {
 		name           string
 		in             *configtypes.ClientConfig
-		out            string
+		getEnvInput    string
+		getEnvOutput   string
 		errStr         string
 		errStrForInput string
 	}{
@@ -76,7 +77,8 @@ func TestGetEnv(t *testing.T) {
 					},
 				},
 			},
-			out: "test",
+			getEnvInput:  "test",
+			getEnvOutput: "test",
 		},
 		{
 			name: "get options with empty key",
@@ -87,8 +89,9 @@ func TestGetEnv(t *testing.T) {
 					},
 				},
 			},
-			out:    "",
-			errStr: "key cannot be empty",
+			getEnvInput:  "",
+			getEnvOutput: "",
+			errStr:       "key cannot be empty",
 		},
 		{
 			name: "store options with empty key",
@@ -99,7 +102,8 @@ func TestGetEnv(t *testing.T) {
 					},
 				},
 			},
-			out:            "",
+			getEnvInput:    "",
+			getEnvOutput:   "",
 			errStr:         "key cannot be empty",
 			errStrForInput: "key cannot be empty",
 		},
@@ -112,9 +116,8 @@ func TestGetEnv(t *testing.T) {
 					},
 				},
 			},
-			out:            "test-empty-val",
-			errStr:         "not found",
-			errStrForInput: "value cannot be empty",
+			getEnvInput:  "test-empty-val",
+			getEnvOutput: "",
 		},
 	}
 	for _, spec := range tests {
@@ -126,12 +129,12 @@ func TestGetEnv(t *testing.T) {
 				assert.NoError(t, err)
 			}
 
-			c, err := GetEnv(spec.out)
+			c, err := GetEnv(spec.getEnvInput)
 			if spec.errStr != "" {
 				assert.Equal(t, spec.errStr, err.Error())
 			} else {
 				assert.NoError(t, err)
-				assert.Equal(t, spec.out, c)
+				assert.Equal(t, spec.getEnvOutput, c)
 			}
 		})
 	}

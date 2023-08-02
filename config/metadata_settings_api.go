@@ -160,7 +160,6 @@ func deleteSetting(node *yaml.Node, key string) (err error) {
 	return nil
 }
 
-//nolint:dupl
 func setSetting(node *yaml.Node, key, value string) (persist bool, err error) {
 	// check if key is empty
 	if key == "" {

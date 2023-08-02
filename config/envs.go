@@ -131,16 +131,10 @@ func SetEnv(key, value string) (err error) {
 	return err
 }
 
-//nolint:dupl
 func setEnv(node *yaml.Node, key, value string) (persist bool, err error) {
 	// check if key is empty
 	if key == "" {
 		return false, errors.New("key cannot be empty")
-	}
-
-	// check if value is empty
-	if value == "" {
-		return false, errors.New("value cannot be empty")
 	}
 
 	// find env node
@@ -160,7 +154,8 @@ func setEnv(node *yaml.Node, key, value string) (persist bool, err error) {
 	}
 
 	// add or update the envs map per specified key value pair
-	if len(envs) == 0 || envs[key] != value {
+	// value could be empty string
+	if len(envs) == 0 || envs[key] != value || value == "" {
 		envs[key] = value
 		persist = true
 	}

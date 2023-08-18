@@ -98,7 +98,7 @@ func runCommand(commandPath string, args []string, opts *cmdOptions) (bytes.Buff
 //
 //	var outBuf bytes.Buffer
 //	var errBuf bytes.Buffer
-//	SyncPluginsForTarget(types.TargetK8s, WithOutputWriter(outBuf), WithErrorWriter(errBuf))
+//	SyncPluginsForTarget(types.TargetK8s, WithOutputWriter(&outBuf), WithErrorWriter(&errBuf))
 func SyncPluginsForTarget(target types.Target, opts ...CommandOptions) (string, error) {
 	// For now, the implementation expects env var TANZU_BIN to be set and
 	// pointing to the core CLI binary used to invoke the plugin sync with.

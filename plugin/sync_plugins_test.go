@@ -4,6 +4,7 @@
 package plugin
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -132,18 +133,62 @@ func TestSyncPlugins(t *testing.T) {
 		t.Run(spec.test, func(t *testing.T) {
 			assert := assert.New(t)
 
+			// Set up stdout and stderr for our test
+			r, w, err := os.Pipe()
+			if err != nil {
+				t.Error(err)
+			}
+			c := make(chan []byte)
+			go readOutput(t, r, c)
+			stdout := os.Stdout
+			stderr := os.Stderr
+			defer func() {
+				os.Stdout = stdout
+				os.Stderr = stderr
+			}()
+			os.Stdout = w
+			os.Stderr = w
+
 			cliPath, err := setupFakeCLI(dir, spec.exitStatus, spec.newCommandExitStatus, spec.enableCustomCommand)
 			assert.Nil(err)
 			os.Setenv("TANZU_BIN", cliPath)
 
-			output, err := SyncPluginsForTarget(types.TargetK8s)
+			// Test-1:
+			// - verify correct combinedOutput string returned as part of the output
+			// - verify correct string gets printed to default stdout and stderr
+			combinedOutput, err := SyncPluginsForTarget(types.TargetK8s)
+			w.Close()
+			stdoutRecieved := <-c
 
 			if spec.expectedFailure {
 				assert.NotNil(err)
 			} else {
 				assert.Nil(err)
 			}
-			assert.Equal(spec.expectedOutput, output)
+			assert.Equal(spec.expectedOutput, combinedOutput, "incorrect combinedOutput result")
+			assert.Equal(spec.expectedOutput, string(stdoutRecieved), "incorrect combinedOutput result")
+
+			// Test-2: when external stdout and stderr are provided with WithStdout, WithStderr options,
+			// verify correct string gets printed to provided custom stdout/stderr
+			var combinedOutputBuff bytes.Buffer
+			combinedOutput, err = SyncPluginsForTarget(types.TargetK8s, WithOutputWriter(&combinedOutputBuff), WithErrorWriter(&combinedOutputBuff))
+			if spec.expectedFailure {
+				assert.NotNil(err)
+			} else {
+				assert.Nil(err)
+			}
+			assert.Equal(spec.expectedOutput, combinedOutput, "incorrect combinedOutput result when external stdout/stderr is provided")
+			assert.Equal(spec.expectedOutput, combinedOutputBuff.String(), "incorrect combinedOutputBuff result")
+
+			// Test-3: when user asks to discard the stdout and stderr, it should not print it to any stdout/stderr by default
+			// but still return the combinedOutput string as part of the function return value
+			combinedOutput, err = SyncPluginsForTarget(types.TargetK8s, WithNoStdout(), WithNoStderr())
+			if spec.expectedFailure {
+				assert.NotNil(err)
+			} else {
+				assert.Nil(err)
+			}
+			assert.Equal(spec.expectedOutput, combinedOutput, "incorrect combinedOutput result when external stdout/stderr is provided")
 
 			os.Unsetenv("TANZU_BIN")
 		})

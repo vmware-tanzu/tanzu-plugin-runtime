@@ -22,28 +22,92 @@ var UsageFunc = func(c *cobra.Command) error {
 }
 
 // CmdTemplate is the template for plugin commands.
-const CmdTemplate = `{{ bold "Usage:" }}
-  {{if .Runnable}}{{ $target := index .Annotations "target" }}{{ if or (eq $target "kubernetes") (eq $target "k8s") }}tanzu {{.UseLine}}{{ end }}{{ if and (ne $target "global") (ne $target "") }}tanzu {{ $target }} {{ else }} {{ end }}{{.UseLine}}{{end}}{{if .HasAvailableSubCommands}}{{ $target := index .Annotations "target" }}{{ if or (eq $target "kubernetes") (eq $target "k8s") }}tanzu {{.CommandPath}} [command]{{end}}{{ if and (ne $target "global") (ne $target "") }}tanzu {{ $target }} {{ else }} {{ end }}{{.CommandPath}} [command]{{end}}{{if gt (len .Aliases) 0}}
+const CmdTemplate = `
+{{- bold "Usage:" -}}
 
+{{- if .Runnable -}}
+{{- $target := index .Annotations "target" -}}
+{{- /* For kubernetes, k8s, global, or no target display tanzu command path without target*/ -}}
+{{- if or (eq $target "kubernetes") (eq $target "k8s") (eq $target "global") (eq $target "") }}
+ tanzu {{.UseLine}}
+{{- end -}}
+{{- /* For non global, or no target display tanzu command path with target*/ -}}
+{{- if and (ne $target "global") (ne $target "") }}
+ tanzu {{ $target }} {{.UseLine}}
+{{- end -}}
+{{- print "\n" -}}
+{{- end -}}
+
+{{- if .HasAvailableSubCommands -}}
+{{- $target := index .Annotations "target" -}}
+{{- /* For kubernetes, k8s, global, or no target display tanzu command path without target*/ -}}
+{{- if or (eq $target "kubernetes") (eq $target "k8s") (eq $target "global") (eq $target "") }}
+ tanzu {{.CommandPath}} [command]
+{{- end -}}
+{{- /* For non global, or no target display tanzu command path with target*/ -}}
+{{- if and (ne $target "global") (ne $target "") }}
+ tanzu {{ $target }} {{.CommandPath}} [command]
+{{- end -}}
+{{- print "\n" -}}
+{{- end -}}
+
+{{- /* Display Aliases for the plugin if specified*/ -}}
+{{ if gt (len .Aliases) 0 }}
 {{ bold "Aliases:" }}
-  {{.NameAndAliases}}{{end}}{{if .HasExample}}
+  {{.NameAndAliases}}
+{{- print "\n" -}}
+{{- end -}}
 
+{{- /* Display Examples for the plugin if specified*/ -}}
+{{ if .HasExample }}
 {{ bold "Examples:" }}
-  {{.Example}}{{end}}{{if .HasAvailableSubCommands}}
+  {{.Example}}
+{{- print "\n" -}}
+{{- end -}}
 
-{{ bold "Available Commands:" }}{{range .Commands}}{{if .IsAvailableCommand }}
-  {{rpad .Name .NamePadding }} {{.Short}}{{end}}{{end}}{{end}}{{if .HasAvailableLocalFlags}}
+{{- /* Display Available Commands for the plugin*/ -}}
+{{ if .HasAvailableSubCommands }}
+{{ bold "Available Commands:" }}{{range .Commands}}
+{{- if .IsAvailableCommand }}
+  {{rpad .Name .NamePadding }} {{.Short}}
+{{- end -}}
+{{- end -}}
+{{- print "\n" -}}
+{{- end -}}
 
+{{- /* Display Flags of the plugin*/ -}}
+{{ if .HasAvailableLocalFlags}}
 {{ bold "Flags:" }}
-{{.LocalFlags.FlagUsages | trimTrailingWhitespaces}}{{end}}{{if .HasAvailableInheritedFlags}}
+{{.LocalFlags.FlagUsages | trimTrailingWhitespaces}}
+{{- print "\n" -}}
+{{- end -}}
 
+{{- /* Display Global Flags of the plugin*/ -}}
+{{ if .HasAvailableInheritedFlags}}
 {{ bold "Global Flags:" }}
-{{.InheritedFlags.FlagUsages | trimTrailingWhitespaces}}{{end}}{{if .HasHelpSubCommands}}
+{{.InheritedFlags.FlagUsages | trimTrailingWhitespaces}}
+{{- print "\n" -}}
+{{- end -}}
 
-{{ bold "Additional help topics:" }}{{range .Commands}}{{if .IsAdditionalHelpTopicCommand}}
-  {{rpad .CommandPath .CommandPathPadding}} {{.Short}}{{end}}{{end}}{{end}}{{if .HasAvailableSubCommands}}
+{{- /* Display Additional help topics of the plugin*/ -}}
+{{ if .HasHelpSubCommands}}
+{{ bold "Additional help topics:" }}{{range .Commands}}
+{{- if .IsAdditionalHelpTopicCommand}}
+  {{rpad .CommandPath .CommandPathPadding}} {{.Short}}
+{{- end -}}
+{{- end -}}
+{{- print "\n" -}}
+{{- end -}}
 
-{{ $target := index .Annotations "target" }}{{ if or (eq $target "kubernetes") (eq $target "k8s") }}Use "{{if beginsWith .CommandPath "tanzu "}}{{.CommandPath}}{{else}}tanzu {{.CommandPath}}{{end}} [command] --help" for more information about a command.{{end}}Use "{{if beginsWith .CommandPath "tanzu "}}{{.CommandPath}}{{else}}tanzu{{ $target := index .Annotations "target" }}{{ if and (ne $target "global") (ne $target "") }} {{ $target }} {{ else }} {{ end }}{{.CommandPath}}{{end}} [command] --help" for more information about a command.{{end}}
+{{ if .HasAvailableSubCommands}}
+{{- $target := index .Annotations "target" }}
+{{- if or (eq $target "kubernetes") (eq $target "k8s") (eq $target "global") (eq $target "") }}
+Use "{{- if beginsWith .CommandPath "tanzu "}}{{.CommandPath}}{{- else}}tanzu {{.CommandPath}}{{- end}} [command] --help" for more information about a command.
+{{- end -}}
+{{- if and (ne $target "global") (ne $target "") }}
+Use "{{- if beginsWith .CommandPath "tanzu "}}{{.CommandPath}}{{- else}}tanzu {{ $target }} {{.CommandPath}}{{- end}} [command] --help" for more information about a command.
+{{- end -}}
+{{- end }}
 `
 
 // TemplateFuncs are the template usage funcs.

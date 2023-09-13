@@ -5,11 +5,13 @@ package plugin
 
 import (
 	"os"
+	"strings"
 	"text/template"
 
 	"github.com/spf13/cobra"
 
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/component"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
 
 // UsageFunc is the usage func for a plugin.
@@ -22,96 +24,120 @@ var UsageFunc = func(c *cobra.Command) error {
 }
 
 // CmdTemplate is the template for plugin commands.
-const CmdTemplate = `
-{{- bold "Usage:" -}}
+const CmdTemplate = `{{ printHelp . }}`
 
-{{- if .Runnable -}}
-{{- $target := index .Annotations "target" -}}
-{{- /* For kubernetes, k8s, global, or no target display tanzu command path without target*/ -}}
-{{- if or (eq $target "kubernetes") (eq $target "k8s") (eq $target "global") (eq $target "") }}
-  tanzu {{.UseLine}}
-{{- end -}}
-{{- /* For non global, or no target display tanzu command path with target*/ -}}
-{{- if and (ne $target "global") (ne $target "") }}
-  tanzu {{ $target }} {{.UseLine}}
-{{- end -}}
-{{- print "\n" -}}
-{{- end -}}
+func printHelp(cmd cobra.Command) string {
+	var output string
+	target := types.StringToTarget(cmd.Annotations["target"])
 
-{{- if .HasAvailableSubCommands -}}
-{{- $target := index .Annotations "target" -}}
-{{- /* For kubernetes, k8s, global, or no target display tanzu command path without target*/ -}}
-{{- if or (eq $target "kubernetes") (eq $target "k8s") (eq $target "global") (eq $target "") }}
-  tanzu {{.CommandPath}} [command]
-{{- end -}}
-{{- /* For non global, or no target display tanzu command path with target*/ -}}
-{{- if and (ne $target "global") (ne $target "") }}
-  tanzu {{ $target }} {{.CommandPath}} [command]
-{{- end -}}
-{{- print "\n" -}}
-{{- end -}}
+	output += component.Bold("Usage:") + "\n"
 
-{{- /* Display Aliases for the plugin if specified*/ -}}
-{{ if gt (len .Aliases) 0 }}
-{{ bold "Aliases:" }}
-  {{.NameAndAliases}}
-{{- print "\n" -}}
-{{- end -}}
+	// Display usage for commands that are runnable
+	if cmd.Runnable() {
+		// For kubernetes, k8s, global, or no target display tanzu command path without target
+		if target == types.TargetK8s || target == types.TargetGlobal || target == types.TargetUnknown {
+			output += "  tanzu " + cmd.UseLine() + "\n"
+		}
 
-{{- /* Display Examples for the plugin if specified*/ -}}
-{{ if .HasExample }}
-{{ bold "Examples:" }}
-  {{.Example}}
-{{- print "\n" -}}
-{{- end -}}
+		// For non global, or no target display tanzu command path with target
+		if target != types.TargetGlobal && target != types.TargetUnknown {
+			output += "  tanzu " + string(target) + " " + cmd.UseLine() + "\n"
+		}
+	}
 
-{{- /* Display Available Commands for the plugin*/ -}}
-{{ if .HasAvailableSubCommands }}
-{{ bold "Available Commands:" }}{{range .Commands}}
-{{- if .IsAvailableCommand }}
-  {{rpad .Name .NamePadding }} {{.Short}}
-{{- end -}}
-{{- end -}}
-{{- print "\n" -}}
-{{- end -}}
+	// Display usage for commands that have sub-commands
+	if cmd.HasAvailableSubCommands() {
+		if cmd.Runnable() {
+			// If the command is both Runnable and has sub-commands, let's insert an empty
+			// line between the usage for the Runnable and the one for the sub-commands
+			output += "\n"
+		}
+		// For kubernetes, k8s, global, or no target display tanzu command path without target
+		if target == types.TargetK8s || target == types.TargetGlobal || target == types.TargetUnknown {
+			output += "  tanzu " + cmd.CommandPath() + " [command]\n"
+		}
 
-{{- /* Display Flags of the plugin*/ -}}
-{{ if .HasAvailableLocalFlags}}
-{{ bold "Flags:" }}
-{{.LocalFlags.FlagUsages | trimTrailingWhitespaces}}
-{{- print "\n" -}}
-{{- end -}}
+		// For non global, or no target display tanzu command path with target
+		if target != types.TargetGlobal && target != types.TargetUnknown {
+			output += "  tanzu " + string(target) + " " + cmd.CommandPath() + " [command]\n"
+		}
+	}
 
-{{- /* Display Global Flags of the plugin*/ -}}
-{{ if .HasAvailableInheritedFlags}}
-{{ bold "Global Flags:" }}
-{{.InheritedFlags.FlagUsages | trimTrailingWhitespaces}}
-{{- print "\n" -}}
-{{- end -}}
+	// Display Aliases for the plugin if specified
+	if len(cmd.Aliases) > 0 {
+		output += "\n" + component.Bold("Aliases:") + "\n"
+		output += "  " + cmd.NameAndAliases() + "\n"
+	}
 
-{{- /* Display Additional help topics of the plugin*/ -}}
-{{ if .HasHelpSubCommands}}
-{{ bold "Additional help topics:" }}{{range .Commands}}
-{{- if .IsAdditionalHelpTopicCommand}}
-  {{rpad .CommandPath .CommandPathPadding}} {{.Short}}
-{{- end -}}
-{{- end -}}
-{{- print "\n" -}}
-{{- end -}}
+	// Display Examples for the plugin if specified
+	if cmd.HasExample() {
+		output += "\n" + component.Bold("Examples:") + "\n"
+		output += cmd.Example + "\n"
+	}
 
-{{ if .HasAvailableSubCommands}}
-{{- $target := index .Annotations "target" }}
-{{- if or (eq $target "kubernetes") (eq $target "k8s") (eq $target "global") (eq $target "") }}
-Use "{{- if beginsWith .CommandPath "tanzu "}}{{.CommandPath}}{{- else}}tanzu {{.CommandPath}}{{- end}} [command] --help" for more information about a command.
-{{- end -}}
-{{- if and (ne $target "global") (ne $target "") }}
-Use "{{- if beginsWith .CommandPath "tanzu "}}{{.CommandPath}}{{- else}}tanzu {{ $target }} {{.CommandPath}}{{- end}} [command] --help" for more information about a command.
-{{- end -}}
-{{- end }}
-`
+	// Display Available Commands for the plugin
+	if cmd.HasAvailableSubCommands() {
+		output += "\n" + component.Bold("Available Commands:") + "\n"
+		for _, c := range cmd.Commands() {
+			if c.IsAvailableCommand() {
+				output += "  " + component.Rpad(c.Name(), c.NamePadding()) + " " + c.Short + "\n"
+			}
+		}
+	}
+
+	// Display Flags of the plugin
+	if cmd.HasAvailableLocalFlags() {
+		output += "\n" + component.Bold("Flags:") + "\n"
+		output += strings.TrimRight(cmd.LocalFlags().FlagUsages(), " ")
+	}
+
+	// Display Global Flags of the plugin
+	if cmd.HasAvailableInheritedFlags() {
+		output += "\n" + component.Bold("Global Flags:") + "\n"
+		output += strings.TrimRight(cmd.InheritedFlags().FlagUsages(), " ")
+	}
+
+	// Display Additional help topics of the plugin
+	if cmd.HasHelpSubCommands() {
+		output += "\n" + component.Bold("Additional help topics:") + "\n"
+		for _, c := range cmd.Commands() {
+			if c.IsAdditionalHelpTopicCommand() {
+				output += "  " + component.Rpad(c.CommandPath(), c.CommandPathPadding()) + " " + c.Short + "\n"
+			}
+		}
+	}
+
+	// Display a note at the very bottom to indicate how to get more help
+	if cmd.HasAvailableSubCommands() {
+		output += "\n"
+
+		// For kubernetes, k8s, global, or no target display tanzu command path without target
+		if target == types.TargetK8s || target == types.TargetGlobal || target == types.TargetUnknown {
+			output += `Use "`
+			if !strings.HasSuffix(cmd.CommandPath(), "tanzu ") {
+				output += "tanzu "
+			}
+			output += cmd.CommandPath() + ` [command] --help" for more information about a command.` + "\n"
+		}
+
+		// For non global, or no target display tanzu command path with target
+		if target != types.TargetGlobal && target != types.TargetUnknown {
+			output += `Use "`
+			if !strings.HasSuffix(cmd.CommandPath(), "tanzu ") {
+				output += "tanzu "
+			}
+			output += string(target) + " " + cmd.CommandPath() + ` [command] --help" for more information about a command.` + "\n"
+		}
+	}
+
+	return output
+}
 
 // TemplateFuncs are the template usage funcs.
 var TemplateFuncs = template.FuncMap{
+	"printHelp": printHelp,
+	// The below are not needed but are kept for backwards-compatibility
+	// in case it is being used through the API
 	"rpad":                    component.Rpad,
 	"bold":                    component.Bold,
 	"underline":               component.Underline,

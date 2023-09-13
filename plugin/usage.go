@@ -87,7 +87,7 @@ func formatHelpFooter(cmd *cobra.Command, target types.Target) string {
 	// For kubernetes, k8s, global, or no target display tanzu command path without target
 	if target == types.TargetK8s || target == types.TargetGlobal || target == types.TargetUnknown {
 		footer.WriteString(`Use "`)
-		if !strings.HasSuffix(cmd.CommandPath(), "tanzu ") {
+		if !strings.HasPrefix(cmd.CommandPath(), "tanzu ") {
 			footer.WriteString("tanzu ")
 		}
 		footer.WriteString(cmd.CommandPath() + ` [command] --help" for more information about a command.` + "\n")
@@ -96,7 +96,7 @@ func formatHelpFooter(cmd *cobra.Command, target types.Target) string {
 	// For non global, or no target display tanzu command path with target
 	if target != types.TargetGlobal && target != types.TargetUnknown {
 		footer.WriteString(`Use "`)
-		if !strings.HasSuffix(cmd.CommandPath(), "tanzu ") {
+		if !strings.HasPrefix(cmd.CommandPath(), "tanzu ") {
 			footer.WriteString("tanzu ")
 		}
 		footer.WriteString(string(target) + " " + cmd.CommandPath() + ` [command] --help" for more information about a command.` + "\n")

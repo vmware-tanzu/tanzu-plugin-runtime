@@ -35,13 +35,14 @@ const (
 	flagsStr                = "Flags:"
 	globalFlagsStr          = "Global Flags:"
 	additionalHelpTopicsStr = "Additional help topics:"
+	indentStr               = "  "
 )
 
 // Helper to format the usage help section.
 func formatUsageHelpSection(cmd *cobra.Command, target types.Target) string {
 	var output strings.Builder
 
-	base := "  tanzu "
+	base := indentStr + "tanzu "
 
 	if cmd.Runnable() {
 		// For kubernetes, k8s, global, or no target display tanzu command path without target
@@ -113,7 +114,7 @@ func printHelp(cmd *cobra.Command) string {
 
 	if len(cmd.Aliases) > 0 {
 		output.WriteString("\n" + component.Bold(aliasesStr) + "\n")
-		output.WriteString("  " + cmd.NameAndAliases() + "\n")
+		output.WriteString(indentStr + cmd.NameAndAliases() + "\n")
 	}
 
 	if cmd.HasExample() {
@@ -125,7 +126,7 @@ func printHelp(cmd *cobra.Command) string {
 		output.WriteString("\n" + component.Bold(availableCommandsStr) + "\n")
 		for _, c := range cmd.Commands() {
 			if c.IsAvailableCommand() {
-				output.WriteString("  " + component.Rpad(c.Name(), c.NamePadding()) + " " + c.Short + "\n")
+				output.WriteString(indentStr + component.Rpad(c.Name(), c.NamePadding()) + " " + c.Short + "\n")
 			}
 		}
 	}
@@ -144,7 +145,7 @@ func printHelp(cmd *cobra.Command) string {
 		output.WriteString("\n" + component.Bold(additionalHelpTopicsStr) + "\n")
 		for _, c := range cmd.Commands() {
 			if c.IsAdditionalHelpTopicCommand() {
-				output.WriteString("  " + component.Rpad(c.CommandPath(), c.CommandPathPadding()) + " " + c.Short + "\n")
+				output.WriteString(indentStr + component.Rpad(c.CommandPath(), c.CommandPathPadding()) + " " + c.Short + "\n")
 			}
 		}
 	}

@@ -29,11 +29,11 @@ const CmdTemplate = `
 {{- $target := index .Annotations "target" -}}
 {{- /* For kubernetes, k8s, global, or no target display tanzu command path without target*/ -}}
 {{- if or (eq $target "kubernetes") (eq $target "k8s") (eq $target "global") (eq $target "") }}
- tanzu {{.UseLine}}
+  tanzu {{.UseLine}}
 {{- end -}}
 {{- /* For non global, or no target display tanzu command path with target*/ -}}
 {{- if and (ne $target "global") (ne $target "") }}
- tanzu {{ $target }} {{.UseLine}}
+  tanzu {{ $target }} {{.UseLine}}
 {{- end -}}
 {{- print "\n" -}}
 {{- end -}}
@@ -42,11 +42,11 @@ const CmdTemplate = `
 {{- $target := index .Annotations "target" -}}
 {{- /* For kubernetes, k8s, global, or no target display tanzu command path without target*/ -}}
 {{- if or (eq $target "kubernetes") (eq $target "k8s") (eq $target "global") (eq $target "") }}
- tanzu {{.CommandPath}} [command]
+  tanzu {{.CommandPath}} [command]
 {{- end -}}
 {{- /* For non global, or no target display tanzu command path with target*/ -}}
 {{- if and (ne $target "global") (ne $target "") }}
- tanzu {{ $target }} {{.CommandPath}} [command]
+  tanzu {{ $target }} {{.CommandPath}} [command]
 {{- end -}}
 {{- print "\n" -}}
 {{- end -}}

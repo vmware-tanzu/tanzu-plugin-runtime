@@ -26,6 +26,7 @@ var UsageFunc = func(c *cobra.Command) error {
 // CmdTemplate is the template for plugin commands.
 const CmdTemplate = `{{ printHelp . }}`
 
+//nolint:all
 func printHelp(cmd cobra.Command) string {
 	var output string
 	target := types.StringToTarget(cmd.Annotations["target"])
@@ -113,9 +114,9 @@ func printHelp(cmd cobra.Command) string {
 
 		// For kubernetes, k8s, global, or no target display tanzu command path without target
 		if target == types.TargetK8s || target == types.TargetGlobal || target == types.TargetUnknown {
-			output += `Use "`
+			output += `Use "` //nolint:goconst
 			if !strings.HasSuffix(cmd.CommandPath(), "tanzu ") {
-				output += "tanzu "
+				output += "tanzu " //nolint:goconst
 			}
 			output += cmd.CommandPath() + ` [command] --help" for more information about a command.` + "\n"
 		}

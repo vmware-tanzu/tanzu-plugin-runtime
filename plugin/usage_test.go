@@ -14,20 +14,6 @@ import (
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
 
-const expectedFetchCommandHelpText = `Fetch the plugin tests
-
-Usage:
-  tanzu test fetch [flags]
-
-Flags:
-  -h, --help           help for fetch
-  -l, --local string   path to local repository
-  -u, --url string     url to remote repository
-
-Global Flags:
-  -e, --env string   env to test
-`
-
 func TestUsageFunc(t *testing.T) {
 	r, w, err := os.Pipe()
 	if err != nil {
@@ -60,7 +46,7 @@ func TestUsageFunc(t *testing.T) {
 	assert.Contains(t, string(got), "Usage:")
 }
 
-func SampleTestCommand(t *testing.T, target types.Target) *cobra.Command {
+func SampleTestPlugin(t *testing.T, target types.Target) *Plugin {
 	var pluginsCmd = &cobra.Command{
 		Use:   "plugin",
 		Short: "Plugin tests",
@@ -115,7 +101,7 @@ func SampleTestCommand(t *testing.T, target types.Target) *cobra.Command {
 		pluginsCmd,
 	)
 
-	return p.Cmd
+	return p
 }
 
 func TestGlobalTestPluginCommandHelpText(t *testing.T) {
@@ -137,13 +123,13 @@ func TestGlobalTestPluginCommandHelpText(t *testing.T) {
 	os.Stderr = w
 
 	// Prepare the root command with Global target
-	cmd := SampleTestCommand(t, types.TargetGlobal)
+	p := SampleTestPlugin(t, types.TargetGlobal)
 
 	// Set the arguments as if the user typed them in the command line
-	cmd.SetArgs([]string{"--help"})
+	p.Cmd.SetArgs([]string{"--help"})
 
 	// Execute the command which will trigger the help
-	err = cmd.Execute()
+	err = p.Execute()
 	assert.Nil(t, err)
 
 	err = w.Close()
@@ -194,13 +180,13 @@ func TestKubernetesTestPluginCommandHelpText(t *testing.T) {
 	os.Stderr = w
 
 	// Prepare the root command with Kubernetes target
-	cmd := SampleTestCommand(t, types.TargetK8s)
+	p := SampleTestPlugin(t, types.TargetK8s)
 
 	// Set the arguments as if the user typed them in the command line
-	cmd.SetArgs([]string{"--help"})
+	p.Cmd.SetArgs([]string{"--help"})
 
 	// Execute the command which will trigger the help
-	err = cmd.Execute()
+	err = p.Execute()
 	assert.Nil(t, err)
 
 	err = w.Close()
@@ -253,13 +239,13 @@ func TestMissionControlTestPluginCommandHelpText(t *testing.T) {
 	os.Stderr = w
 
 	// Prepare the root command with MissionControl target
-	rootCmd := SampleTestCommand(t, types.TargetTMC)
+	p := SampleTestPlugin(t, types.TargetTMC)
 
 	// Set the arguments as if the user typed them in the command line
-	rootCmd.SetArgs([]string{"--help"})
+	p.Cmd.SetArgs([]string{"--help"})
 
 	// Execute the command which will trigger the help
-	err = rootCmd.Execute()
+	err = p.Execute()
 	assert.Nil(t, err)
 
 	err = w.Close()
@@ -310,21 +296,33 @@ func TestGlobalTestPluginFetchCommandHelpText(t *testing.T) {
 	os.Stderr = w
 
 	// Prepare the root command with Global target
-	cmd := SampleTestCommand(t, types.TargetGlobal)
+	p := SampleTestPlugin(t, types.TargetGlobal)
 
 	// Set the arguments as if the user typed them in the command line
-	cmd.SetArgs([]string{"fetch", "--help"})
+	p.Cmd.SetArgs([]string{"fetch", "--help"})
 
 	// Execute the command which will trigger the help
-	err = cmd.Execute()
+	err = p.Execute()
 	assert.Nil(t, err)
 
 	err = w.Close()
 	assert.Nil(t, err)
 
 	got := string(<-c)
+	expected := `Fetch the plugin tests
 
-	assert.Equal(t, expectedFetchCommandHelpText, got)
+Usage:
+  tanzu test fetch [flags]
+
+Flags:
+  -h, --help           help for fetch
+  -l, --local string   path to local repository
+  -u, --url string     url to remote repository
+
+Global Flags:
+  -e, --env string   env to test
+`
+	assert.Equal(t, expected, got)
 }
 
 func TestKubernetesTestPluginFetchCommandHelpText(t *testing.T) {
@@ -346,13 +344,13 @@ func TestKubernetesTestPluginFetchCommandHelpText(t *testing.T) {
 	os.Stderr = w
 
 	// Prepare the root command with Kubernetes target
-	cmd := SampleTestCommand(t, types.TargetK8s)
+	p := SampleTestPlugin(t, types.TargetK8s)
 
 	// Set the arguments as if the user typed them in the command line
-	cmd.SetArgs([]string{"fetch", "--help"})
+	p.Cmd.SetArgs([]string{"fetch", "--help"})
 
 	// Execute the command which will trigger the help
-	err = cmd.Execute()
+	err = p.Execute()
 	assert.Nil(t, err)
 
 	err = w.Close()
@@ -360,7 +358,21 @@ func TestKubernetesTestPluginFetchCommandHelpText(t *testing.T) {
 
 	got := string(<-c)
 
-	assert.Equal(t, expectedFetchCommandHelpText, got)
+	expected := `Fetch the plugin tests
+
+Usage:
+  tanzu test fetch [flags]
+  tanzu kubernetes test fetch [flags]
+
+Flags:
+  -h, --help           help for fetch
+  -l, --local string   path to local repository
+  -u, --url string     url to remote repository
+
+Global Flags:
+  -e, --env string   env to test
+`
+	assert.Equal(t, expected, got)
 }
 
 func TestMissionControlTestPluginFetchCommandHelpText(t *testing.T) {
@@ -382,13 +394,13 @@ func TestMissionControlTestPluginFetchCommandHelpText(t *testing.T) {
 	os.Stderr = w
 
 	// Prepare the root command with MissionControl target
-	cmd := SampleTestCommand(t, types.TargetTMC)
+	p := SampleTestPlugin(t, types.TargetTMC)
 
 	// Set the arguments as if the user typed them in the command line
-	cmd.SetArgs([]string{"fetch", "--help"})
+	p.Cmd.SetArgs([]string{"fetch", "--help"})
 
 	// Execute the command which will trigger the help
-	err = cmd.Execute()
+	err = p.Execute()
 	assert.Nil(t, err)
 
 	err = w.Close()
@@ -396,5 +408,18 @@ func TestMissionControlTestPluginFetchCommandHelpText(t *testing.T) {
 
 	got := string(<-c)
 
-	assert.Equal(t, expectedFetchCommandHelpText, got)
+	expected := `Fetch the plugin tests
+
+Usage:
+  tanzu mission-control test fetch [flags]
+
+Flags:
+  -h, --help           help for fetch
+  -l, --local string   path to local repository
+  -u, --url string     url to remote repository
+
+Global Flags:
+  -e, --env string   env to test
+`
+	assert.Equal(t, expected, got)
 }

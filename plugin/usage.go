@@ -76,33 +76,6 @@ func formatUsageHelpSection(cmd *cobra.Command, target types.Target) string {
 	return output.String()
 }
 
-// Helper to format additional help topics
-func formatAdditionalHelpTopicsSection(cmd *cobra.Command, target types.Target) string {
-	var output strings.Builder
-	if !cmd.HasHelpSubCommands() {
-		return ""
-	}
-
-	output.WriteString("\n" + component.Bold(additionalHelpTopicsStr) + "\n")
-	base := indentStr + "tanzu "
-
-	for _, c := range cmd.Commands() {
-		if c.IsAdditionalHelpTopicCommand() {
-			// For kubernetes, k8s, global, or no target display tanzu command path without target
-			if target == types.TargetK8s || target == types.TargetGlobal || target == types.TargetUnknown {
-				output.WriteString(base + component.Rpad(c.CommandPath(), c.CommandPathPadding()) + " " + c.Short + "\n")
-			}
-
-			// For non global, or no target ;display tanzu command path with target
-			if target != types.TargetGlobal && target != types.TargetUnknown {
-				output.WriteString(base + string(target) + " " + component.Rpad(c.CommandPath(), c.CommandPathPadding()) + " " + c.Short + "\n")
-			}
-		}
-	}
-
-	return output.String()
-}
-
 // Helper to format the help footer.
 func formatHelpFooter(cmd *cobra.Command, target types.Target) string {
 	var footer strings.Builder
@@ -168,8 +141,14 @@ func printHelp(cmd *cobra.Command) string {
 		output.WriteString(strings.TrimRight(cmd.InheritedFlags().FlagUsages(), " "))
 	}
 
-	output.WriteString(formatAdditionalHelpTopicsSection(cmd, target))
-
+	if cmd.HasHelpSubCommands() {
+		output.WriteString("\n" + component.Bold(additionalHelpTopicsStr) + "\n")
+		for _, c := range cmd.Commands() {
+			if c.IsAdditionalHelpTopicCommand() {
+				output.WriteString(indentStr + component.Rpad(c.CommandPath(), c.CommandPathPadding()) + " " + c.Short + "\n")
+			}
+		}
+	}
 	output.WriteString(formatHelpFooter(cmd, target))
 
 	return output.String()

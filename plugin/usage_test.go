@@ -168,7 +168,7 @@ Flags:
   -h, --help         help for test
 
 Additional help topics:
-  tanzu test plugin        Plugin tests
+  test plugin        Plugin tests
 
 Use "tanzu test [command] --help" for more information about a command.
 `
@@ -226,8 +226,7 @@ Flags:
   -h, --help         help for test
 
 Additional help topics:
-  tanzu test plugin        Plugin tests
-  tanzu kubernetes test plugin        Plugin tests
+  test plugin        Plugin tests
 
 Use "tanzu test [command] --help" for more information about a command.
 Use "tanzu kubernetes test [command] --help" for more information about a command.
@@ -285,7 +284,7 @@ Flags:
   -h, --help         help for test
 
 Additional help topics:
-  tanzu mission-control test plugin        Plugin tests
+  test plugin        Plugin tests
 
 Use "tanzu mission-control test [command] --help" for more information about a command.
 `

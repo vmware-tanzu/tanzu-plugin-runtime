@@ -89,12 +89,15 @@ func SampleTestPlugin(t *testing.T, target types.Target) *Plugin {
 	fetchCmd.PersistentFlags().StringVarP(&url, "url", "u", "", "url to remote repository")
 	_ = fetchCmd.MarkFlagRequired("url")
 
+	fetchCmd.Example = "sample example usage of the fetch command"
+
 	p, err := NewPlugin(&descriptor)
 	assert.Nil(t, err)
 
 	var env string
 	p.Cmd.PersistentFlags().StringVarP(&env, "env", "e", "", "env to test")
 
+	p.Cmd.Example = "sample example usage of the test command"
 	p.AddCommands(
 		fetchCmd,
 		pushCmd,
@@ -144,6 +147,9 @@ Usage:
 
 Aliases:
   test, t
+
+Examples:
+  sample example usage of the test command
 
 Available Commands:
   fetch         Fetch the plugin tests
@@ -203,6 +209,9 @@ Usage:
 Aliases:
   test, t
 
+Examples:
+  sample example usage of the test command
+
 Available Commands:
   fetch         Fetch the plugin tests
   push          Push the plugin tests
@@ -261,6 +270,9 @@ Usage:
 Aliases:
   test, t
 
+Examples:
+  sample example usage of the test command
+
 Available Commands:
   fetch         Fetch the plugin tests
   push          Push the plugin tests
@@ -314,6 +326,9 @@ func TestGlobalTestPluginFetchCommandHelpText(t *testing.T) {
 Usage:
   tanzu test fetch [flags]
 
+Examples:
+  sample example usage of the fetch command
+
 Flags:
   -h, --help           help for fetch
   -l, --local string   path to local repository
@@ -364,6 +379,9 @@ Usage:
   tanzu test fetch [flags]
   tanzu kubernetes test fetch [flags]
 
+Examples:
+  sample example usage of the fetch command
+
 Flags:
   -h, --help           help for fetch
   -l, --local string   path to local repository
@@ -412,6 +430,9 @@ func TestMissionControlTestPluginFetchCommandHelpText(t *testing.T) {
 
 Usage:
   tanzu mission-control test fetch [flags]
+
+Examples:
+  sample example usage of the fetch command
 
 Flags:
   -h, --help           help for fetch

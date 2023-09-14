@@ -145,7 +145,7 @@ func printHelp(cmd *cobra.Command) string {
 
 	if cmd.HasExample() {
 		output.WriteString("\n" + component.Bold(examplesStr) + "\n")
-		output.WriteString(cmd.Example + "\n")
+		output.WriteString(indentStr + cmd.Example + "\n")
 	}
 
 	if cmd.HasAvailableSubCommands() {

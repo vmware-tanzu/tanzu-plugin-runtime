@@ -461,10 +461,23 @@ func setupForGetContext(t *testing.T) {
 					Endpoint: "test-endpoint",
 				},
 			},
+			{
+				Name:   "test-ucp",
+				Target: configtypes.TargetUCP,
+				GlobalOpts: &configtypes.GlobalServer{
+					Endpoint: "test-endpoint",
+				},
+				ClusterOpts: &configtypes.ClusterServer{
+					Endpoint: "test-endpoint",
+					Path:     "test-path",
+					Context:  "test-context",
+				},
+			},
 		},
 		CurrentContext: map[configtypes.Target]string{
 			configtypes.TargetK8s: "test-mc-2",
 			configtypes.TargetTMC: "test-tmc",
+			configtypes.TargetUCP: "test-ucp",
 		},
 	}
 	func() {
@@ -493,6 +506,10 @@ func TestGetContext(t *testing.T) {
 		{
 			name:    "success tmc",
 			ctxName: "test-tmc",
+		},
+		{
+			name:    "success ucp",
+			ctxName: "test-ucp",
 		},
 		{
 			name:    "failure",
@@ -534,6 +551,11 @@ func TestContextExists(t *testing.T) {
 		{
 			name:    "success tmc",
 			ctxName: "test-tmc",
+			ok:      true,
+		},
+		{
+			name:    "success ucp",
+			ctxName: "test-ucp",
 			ok:      true,
 		},
 		{
@@ -658,6 +680,43 @@ func TestSetContext(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "success ucp current",
+			ctx: &configtypes.Context{
+				Name:   "test-ucp1",
+				Target: configtypes.TargetUCP,
+				GlobalOpts: &configtypes.GlobalServer{
+					Endpoint: "test-endpoint",
+				},
+				ClusterOpts: &configtypes.ClusterServer{
+					Endpoint: "test-endpoint",
+					Path:     "test-path",
+					Context:  "test-context",
+				},
+				AdditionalMetadata: map[string]interface{}{
+					"org": "fake-org-1",
+				},
+			},
+			current: true,
+		},
+		{
+			name: "success ucp not_current",
+			ctx: &configtypes.Context{
+				Name:   "test-ucp2",
+				Target: configtypes.TargetUCP,
+				GlobalOpts: &configtypes.GlobalServer{
+					Endpoint: "test-endpoint",
+				},
+				ClusterOpts: &configtypes.ClusterServer{
+					Endpoint: "test-endpoint",
+					Path:     "test-path",
+					Context:  "test-context",
+				},
+				AdditionalMetadata: map[string]interface{}{
+					"org": "fake-org-2",
+				},
+			},
+		},
 	}
 
 	for _, tc := range tcs {
@@ -700,6 +759,11 @@ func TestRemoveContext(t *testing.T) {
 			name:    "success tmc",
 			ctxName: "test-tmc",
 			target:  configtypes.TargetTMC,
+		},
+		{
+			name:    "success ucp",
+			ctxName: "test-ucp",
+			target:  configtypes.TargetUCP,
 		},
 		{
 			name:    "failure",
@@ -756,6 +820,11 @@ func TestSetCurrentContext(t *testing.T) {
 			currServer: "test-mc",
 		},
 		{
+			name:    "success ucp",
+			ctxName: "test-ucp",
+			target:  configtypes.TargetUCP,
+		},
+		{
 			name:    "success tmc after setting k8s",
 			ctxName: "test-tmc",
 			target:  configtypes.TargetTMC,
@@ -800,11 +869,13 @@ func TestSetCurrentContext(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "test-mc", currentContextMap[configtypes.TargetK8s].Name)
 	assert.Equal(t, "test-tmc", currentContextMap[configtypes.TargetTMC].Name)
+	assert.Equal(t, "test-ucp", currentContextMap[configtypes.TargetUCP].Name)
 
 	currentContextsList, err := GetAllCurrentContextsList()
 	assert.NoError(t, err)
 	assert.Contains(t, currentContextsList, "test-mc")
 	assert.Contains(t, currentContextsList, "test-tmc")
+	assert.Contains(t, currentContextsList, "test-ucp")
 }
 
 func TestRemoveCurrentContext(t *testing.T) {

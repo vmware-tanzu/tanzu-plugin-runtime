@@ -29,11 +29,16 @@ const (
 
 	// TargetUnknown specifies that the target is not currently known
 	TargetUnknown Target = ""
+
+	// TargetUCP is a used to indicate the type of Context used to interact with a
+	// Unified Control Plane endpoint
+	// Note!! Experimental, please expect changes
+	TargetUCP Target = "ucp"
 )
 
 var (
 	// SupportedTargets is a list of all supported Target
-	SupportedTargets = []Target{TargetK8s, TargetTMC}
+	SupportedTargets = []Target{TargetK8s, TargetTMC, TargetUCP}
 )
 
 const (

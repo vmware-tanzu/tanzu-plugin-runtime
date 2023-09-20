@@ -56,6 +56,21 @@ of the main packages that each and every plugin will need to import to
 integrate with the Tanzu CLI. For more information about
 the development process, see the [Tanzu CLI Plugin Development guide](https://github.com/vmware-tanzu/tanzu-cli/blob/main/docs/plugindev/README.md)
 
+To Manage plugin owned settings
+
+Use
+
+``` go
+// Plugin owned APIs
+// GetTanzuPluginConfigDir Retrieve the tanzu configuration directory that can be used by the plugins to
+// create a plugin specific directory to manage plugin owned configurations.
+func GetTanzuPluginConfigDir() (string, error)
+```
+
+Example: For handling settings specific to the `management-cluster` plugin:
+Utilize `GetTanzuPluginConfigDir()` to retrieve the plugin configuration directory,
+which is `.config/tanzu/plugins`. Subsequently, establish a `management-cluster` directory within the plugin configuration directory to oversee the relevant settings.
+
 ### Command Helpers
 
 This package implements command specific helper functions like command deprecation, etc.

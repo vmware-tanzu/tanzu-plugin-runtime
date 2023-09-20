@@ -28,6 +28,35 @@ func TestNewSetCLIDiscoverySourceCommand(t *testing.T) {
 		{
 			&SetCLIDiscoverySourceInputOptions{
 				RuntimeAPIVersion: &core.RuntimeAPIVersion{
+					RuntimeVersion: core.Version090,
+				},
+				PluginDiscoveryOpts: &types.PluginDiscoveryOpts{
+					OCI: &types.OCIDiscoveryOpts{
+						Name:  CompatibilityTestsSourceName,
+						Image: CompatibilityTestsSourceImage,
+					},
+				},
+			}, nil,
+			&core.Command{
+				APIs: []*core.API{
+					{
+						Name:    core.SetCLIDiscoverySourceAPI,
+						Version: core.Version090,
+						Arguments: map[core.APIArgumentType]interface{}{
+							core.DiscoverySource: source,
+						},
+						Output: &core.Output{
+							ValidationStrategy: "",
+							Result:             core.Success,
+							Content:            "",
+						},
+					},
+				},
+			}, "",
+		},
+		{
+			&SetCLIDiscoverySourceInputOptions{
+				RuntimeAPIVersion: &core.RuntimeAPIVersion{
 					RuntimeVersion: core.VersionLatest,
 				},
 				PluginDiscoveryOpts: &types.PluginDiscoveryOpts{
@@ -73,6 +102,40 @@ func TestNewGetCLIDiscoverySourceCommand(t *testing.T) {
 		cmd        *core.Command
 		err        string
 	}{
+		{
+			&GetCLIDiscoverySourceInputOptions{
+				RuntimeAPIVersion: &core.RuntimeAPIVersion{
+					RuntimeVersion: core.Version090,
+				},
+				DiscoverySourceName: CompatibilityTestsSourceName,
+			}, &GetCLIDiscoverySourceOutputOptions{
+				RuntimeAPIVersion: &core.RuntimeAPIVersion{
+					RuntimeVersion: core.Version0280,
+				},
+				PluginDiscoveryOpts: &types.PluginDiscoveryOpts{
+					OCI: &types.OCIDiscoveryOpts{
+						Name:  CompatibilityTestsSourceName,
+						Image: CompatibilityTestsSourceImage,
+					},
+				},
+			},
+			&core.Command{
+				APIs: []*core.API{
+					{
+						Name:    core.GetCLIDiscoverySourceAPI,
+						Version: core.Version090,
+						Arguments: map[core.APIArgumentType]interface{}{
+							core.Name: CompatibilityTestsSourceName,
+						},
+						Output: &core.Output{
+							ValidationStrategy: "",
+							Result:             core.Success,
+							Content:            source,
+						},
+					},
+				},
+			}, "",
+		},
 		{
 			&GetCLIDiscoverySourceInputOptions{
 				RuntimeAPIVersion: &core.RuntimeAPIVersion{
@@ -138,6 +201,30 @@ func TestNewDeleteCLIDiscoverySourceCommand(t *testing.T) {
 					{
 						Name:    core.DeleteCLIDiscoverySourceAPI,
 						Version: core.VersionLatest,
+						Arguments: map[core.APIArgumentType]interface{}{
+							core.Name: CompatibilityTestsSourceName,
+						},
+						Output: &core.Output{
+							ValidationStrategy: "",
+							Result:             core.Success,
+							Content:            "",
+						},
+					},
+				},
+			}, "",
+		},
+		{
+			&DeleteCLIDiscoverySourceInputOptions{
+				RuntimeAPIVersion: &core.RuntimeAPIVersion{
+					RuntimeVersion: core.Version090,
+				},
+				DiscoverySourceName: CompatibilityTestsSourceName,
+			}, nil,
+			&core.Command{
+				APIs: []*core.API{
+					{
+						Name:    core.DeleteCLIDiscoverySourceAPI,
+						Version: core.Version090,
 						Arguments: map[core.APIArgumentType]interface{}{
 							core.Name: CompatibilityTestsSourceName,
 						},

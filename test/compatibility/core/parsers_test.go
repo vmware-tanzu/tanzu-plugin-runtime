@@ -15,7 +15,39 @@ func TestParseRuntimeAPIsFromFile(t *testing.T) {
 		apiYaml      string
 		expectedAPIs []API
 	}{
-
+		{
+			`- name: SetContext
+  version: latest
+  arguments:
+    context: |
+        name: context-one
+        target: kubernetes
+        globalOpts:
+          endpoint: test-endpoint
+    setCurrent: false
+  output:
+    result: success
+    content: ""
+`,
+			[]API{
+				{
+					Name:    SetContextAPI,
+					Version: Version090,
+					Arguments: map[APIArgumentType]interface{}{
+						Context: `name: context-one
+target: kubernetes
+globalOpts:
+  endpoint: test-endpoint
+`,
+						SetCurrent: false,
+					},
+					Output: &Output{
+						Result:  Success,
+						Content: "",
+					},
+				},
+			},
+		},
 		{
 			`- name: SetContext
   version: latest

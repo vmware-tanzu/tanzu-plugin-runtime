@@ -29,6 +29,19 @@ func TestConstructTestPluginCmd(t *testing.T) {
 			pluginCmd: pluginLatest,
 			err:       "",
 		},
+		{
+			version: Version090,
+			apis: []*API{
+				{
+					Name:      SetContextAPI,
+					Version:   Version090,
+					Arguments: map[APIArgumentType]interface{}{},
+					Output:    nil,
+				},
+			},
+			pluginCmd: pluginV090,
+			err:       "",
+		},
 	}
 
 	for _, tt := range tests {

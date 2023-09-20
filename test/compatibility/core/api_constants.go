@@ -96,6 +96,7 @@ const (
 	Version0116   RuntimeVersion = "v0.11.6"
 	Version0254   RuntimeVersion = "v0.25.4"
 	Version0280   RuntimeVersion = "v0.28.0"
+	Version090    RuntimeVersion = "v0.90.0"
 	VersionLatest RuntimeVersion = "latest"
 )
 
@@ -104,6 +105,7 @@ var SupportedRuntimeVersions = []RuntimeVersion{
 	Version0116,
 	Version0254,
 	Version0280,
+	Version090,
 	VersionLatest,
 }
 

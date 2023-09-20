@@ -32,7 +32,7 @@ func (opts *SetContextInputOptions) Validate() (bool, error) {
 	}
 
 	switch opts.RuntimeVersion {
-	case core.VersionLatest, core.Version0280:
+	case core.VersionLatest, core.Version090, core.Version0280:
 		if !opts.ValidName() {
 			return false, fmt.Errorf("invalid 'name' for set context input options for the specified runtime version %v", opts.RuntimeVersion)
 		}
@@ -80,7 +80,7 @@ func (opts *GetContextOutputOptions) Validate() (bool, error) {
 	}
 
 	switch opts.RuntimeVersion {
-	case core.VersionLatest, core.Version0280:
+	case core.VersionLatest, core.Version090, core.Version0280:
 		if !opts.ShouldNotIncludeContextType() {
 			return false, fmt.Errorf("invalid get context output options for the specified runtime version contextType is not supported %v", opts.RuntimeVersion)
 		}
@@ -115,7 +115,7 @@ func (opts *GetCurrentContextInputOptions) Validate() (bool, error) {
 	}
 
 	switch opts.RuntimeVersion {
-	case core.VersionLatest, core.Version0280:
+	case core.VersionLatest, core.Version090, core.Version0280:
 		if !opts.ShouldNotIncludeContextType() {
 			return false, fmt.Errorf("invalid get current context input options for the specified runtime version contextType is not supported %v", opts.RuntimeVersion)
 		}
@@ -154,7 +154,7 @@ func (opts *GetCurrentContextOutputOptions) Validate() (bool, error) {
 
 	var valid bool
 	switch opts.RuntimeVersion {
-	case core.VersionLatest, core.Version0280:
+	case core.VersionLatest, core.Version090, core.Version0280:
 		valid = opts.ContextOpts.ShouldNotIncludeContextType()
 		if valid {
 			return valid, nil

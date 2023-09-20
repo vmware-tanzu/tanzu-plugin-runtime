@@ -12,5 +12,5 @@ import (
 
 func TestConfigMetadata(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Cross-version API Compatibility Test Suite for Config Metadata APIs for version latest, v0.28.0")
+	RunSpecs(t, "Cross-version API Compatibility Test Suite for Config Metadata APIs for version latest, v0.90.0, v0.28.0")
 }

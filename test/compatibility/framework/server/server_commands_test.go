@@ -23,6 +23,41 @@ func TestNewSetServerCommand(t *testing.T) {
 		{
 			&SetServerInputOptions{
 				RuntimeAPIVersion: &core.RuntimeAPIVersion{
+					RuntimeVersion: core.Version090,
+				},
+				ServerOpts: &types.ServerOpts{
+					Name: "compatibility-one",
+					Type: types.ManagementClusterServerType,
+					GlobalOpts: &types.GlobalServerOpts{
+						Endpoint: "default-compatibility-test-endpoint",
+					},
+				},
+			}, nil,
+			&core.Command{
+				APIs: []*core.API{
+					{
+						Name:    core.SetServerAPI,
+						Version: core.Version090,
+						Arguments: map[core.APIArgumentType]interface{}{
+							core.Server: `name: compatibility-one
+type: managementcluster
+globalOpts:
+    endpoint: default-compatibility-test-endpoint
+`,
+							"setCurrent": false,
+						},
+						Output: &core.Output{
+							ValidationStrategy: "",
+							Result:             core.Success,
+							Content:            "",
+						},
+					},
+				},
+			}, "",
+		},
+		{
+			&SetServerInputOptions{
+				RuntimeAPIVersion: &core.RuntimeAPIVersion{
 					RuntimeVersion: core.VersionLatest,
 				},
 				ServerOpts: &types.ServerOpts{
@@ -74,6 +109,45 @@ func TestNewGetServerCommand(t *testing.T) {
 		cmd        *core.Command
 		err        string
 	}{
+		{
+			&GetServerInputOptions{
+				RuntimeAPIVersion: &core.RuntimeAPIVersion{
+					RuntimeVersion: core.Version090,
+				},
+				ServerName: "compatibility-one",
+			}, &GetServerOutputOptions{
+				RuntimeAPIVersion: &core.RuntimeAPIVersion{
+					RuntimeVersion: core.Version0280,
+				},
+				ServerOpts: &types.ServerOpts{
+					Name: "compatibility-one",
+					Type: types.ManagementClusterServerType,
+					GlobalOpts: &types.GlobalServerOpts{
+						Endpoint: "default-compatibility-test-endpoint",
+					},
+				},
+			},
+			&core.Command{
+				APIs: []*core.API{
+					{
+						Name:    core.GetServerAPI,
+						Version: core.Version090,
+						Arguments: map[core.APIArgumentType]interface{}{
+							core.ServerName: "compatibility-one",
+						},
+						Output: &core.Output{
+							ValidationStrategy: "",
+							Result:             core.Success,
+							Content: `name: compatibility-one
+type: managementcluster
+globalOpts:
+    endpoint: default-compatibility-test-endpoint
+`,
+						},
+					},
+				},
+			}, "",
+		},
 		{
 			&GetServerInputOptions{
 				RuntimeAPIVersion: &core.RuntimeAPIVersion{
@@ -135,6 +209,30 @@ func TestNewDeleteServerCommand(t *testing.T) {
 		{
 			&DeleteServerInputOptions{
 				RuntimeAPIVersion: &core.RuntimeAPIVersion{
+					RuntimeVersion: core.Version090,
+				},
+				ServerName: "compatibility-one",
+			}, nil,
+			&core.Command{
+				APIs: []*core.API{
+					{
+						Name:    core.DeleteServerAPI,
+						Version: core.Version090,
+						Arguments: map[core.APIArgumentType]interface{}{
+							core.ServerName: "compatibility-one",
+						},
+						Output: &core.Output{
+							ValidationStrategy: "",
+							Result:             core.Success,
+							Content:            "",
+						},
+					},
+				},
+			}, "",
+		},
+		{
+			&DeleteServerInputOptions{
+				RuntimeAPIVersion: &core.RuntimeAPIVersion{
 					RuntimeVersion: core.VersionLatest,
 				},
 				ServerName: "compatibility-one",
@@ -178,6 +276,30 @@ func TestNewSetCurrentServerCommand(t *testing.T) {
 		{
 			&SetCurrentServerInputOptions{
 				RuntimeAPIVersion: &core.RuntimeAPIVersion{
+					RuntimeVersion: core.Version090,
+				},
+				ServerName: "compatibility-one",
+			}, nil,
+			&core.Command{
+				APIs: []*core.API{
+					{
+						Name:    core.SetCurrentServerAPI,
+						Version: core.Version090,
+						Arguments: map[core.APIArgumentType]interface{}{
+							core.ServerName: "compatibility-one",
+						},
+						Output: &core.Output{
+							ValidationStrategy: "",
+							Result:             core.Success,
+							Content:            "",
+						},
+					},
+				},
+			}, "",
+		},
+		{
+			&SetCurrentServerInputOptions{
+				RuntimeAPIVersion: &core.RuntimeAPIVersion{
 					RuntimeVersion: core.VersionLatest,
 				},
 				ServerName: "compatibility-one",
@@ -218,6 +340,42 @@ func TestNewGetCurrentServerCommand(t *testing.T) {
 		cmd        *core.Command
 		err        string
 	}{
+		{
+			&GetCurrentServerInputOptions{
+				RuntimeAPIVersion: &core.RuntimeAPIVersion{
+					RuntimeVersion: core.Version090,
+				},
+			}, &GetCurrentServerOutputOptions{
+				RuntimeAPIVersion: &core.RuntimeAPIVersion{
+					RuntimeVersion: core.Version0280,
+				},
+				ServerOpts: &types.ServerOpts{
+					Name: "compatibility-one",
+					Type: types.ManagementClusterServerType,
+					GlobalOpts: &types.GlobalServerOpts{
+						Endpoint: "default-compatibility-test-endpoint",
+					},
+				},
+			},
+			&core.Command{
+				APIs: []*core.API{
+					{
+						Name:      core.GetCurrentServerAPI,
+						Version:   core.Version090,
+						Arguments: map[core.APIArgumentType]interface{}{},
+						Output: &core.Output{
+							ValidationStrategy: "",
+							Result:             core.Success,
+							Content: `name: compatibility-one
+type: managementcluster
+globalOpts:
+    endpoint: default-compatibility-test-endpoint
+`,
+						},
+					},
+				},
+			}, "",
+		},
 		{
 			&GetCurrentServerInputOptions{
 				RuntimeAPIVersion: &core.RuntimeAPIVersion{
@@ -272,7 +430,30 @@ func TestNewRemoveCurrentServerCommand(t *testing.T) {
 		outputOpts *RemoveCurrentServerOutputOptions
 		cmd        *core.Command
 		err        string
-	}{
+	}{{
+		&RemoveCurrentServerInputOptions{
+			RuntimeAPIVersion: &core.RuntimeAPIVersion{
+				RuntimeVersion: core.Version090,
+			},
+			ServerName: "compatibility-one",
+		}, nil,
+		&core.Command{
+			APIs: []*core.API{
+				{
+					Name:    core.RemoveCurrentServerAPI,
+					Version: core.Version090,
+					Arguments: map[core.APIArgumentType]interface{}{
+						core.ServerName: "compatibility-one",
+					},
+					Output: &core.Output{
+						ValidationStrategy: "",
+						Result:             core.Success,
+						Content:            "",
+					},
+				},
+			},
+		}, "",
+	},
 		{
 			&RemoveCurrentServerInputOptions{
 				RuntimeAPIVersion: &core.RuntimeAPIVersion{

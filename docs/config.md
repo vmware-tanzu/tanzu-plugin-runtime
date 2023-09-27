@@ -51,6 +51,11 @@ said information in the files being manipulated.
 ### Available Runtime Config APIs
 
 ``` go
+// Plugin owned APIs
+// GetTanzuPluginConfigDir Retrieve the tanzu configuration directory that can be used by the plugins to
+// create a plugin specific directory to manage plugin owned configurations.
+func GetTanzuPluginConfigDir() (string, error)
+
 // Context APIs
 func GetContext(name string) (context Context, error)
 func AddContext(context Context, setCurrent bool) error

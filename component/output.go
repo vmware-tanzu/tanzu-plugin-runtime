@@ -44,7 +44,7 @@ const (
 type outputwriter struct {
 	out          io.Writer
 	keys         []string
-	values       [][]string
+	values       [][]interface{}
 	outputFormat OutputType
 }
 
@@ -67,12 +67,8 @@ func (ow *outputwriter) SetKeys(headerKeys ...string) {
 
 // AddRow appends a new row to our table.
 func (ow *outputwriter) AddRow(items ...interface{}) {
-	row := []string{}
-
-	// Make sure all values are ultimately strings
-	for _, item := range items {
-		row = append(row, fmt.Sprintf("%v", item))
-	}
+	row := []interface{}{}
+	row = append(row, items...)
 	ow.values = append(ow.values, row)
 }
 
@@ -90,15 +86,15 @@ func (ow *outputwriter) Render() {
 	}
 }
 
-func (ow *outputwriter) dataStruct() []map[string]string {
-	data := []map[string]string{}
+func (ow *outputwriter) dataStruct() []map[string]interface{} {
+	data := []map[string]interface{}{}
 	keys := ow.keys
 	for i, k := range keys {
 		keys[i] = strings.ToLower(strings.ReplaceAll(k, " ", "_"))
 	}
 
 	for _, itemValues := range ow.values {
-		item := map[string]string{}
+		item := map[string]interface{}{}
 		for i, value := range itemValues {
 			if i == len(keys) {
 				continue
@@ -192,7 +188,7 @@ func renderListTable(ow *outputwriter) {
 				// There are more headers than values, leave it blank
 				continue
 			}
-			row = append(row, data[i])
+			row = append(row, fmt.Sprintf("%v", data[i]))
 		}
 		headerLabel := strings.ToUpper(header) + ":"
 		values := strings.Join(row, ", ")
@@ -222,6 +218,19 @@ func renderTable(ow *outputwriter) {
 	table.SetColWidth(colWidth)
 	table.SetTablePadding("\t\t")
 	table.SetHeader(ow.keys)
-	table.AppendBulk(ow.values)
+	table.AppendBulk(convertInterfaceToString(ow.values))
 	table.Render()
+}
+
+func convertInterfaceToString(values [][]interface{}) [][]string {
+	result := [][]string{}
+	for _, valuesRow := range values {
+		row := []string{}
+		for _, field := range valuesRow {
+			row = append(row, fmt.Sprintf("%v", field))
+		}
+
+		result = append(result, row)
+	}
+	return result
 }

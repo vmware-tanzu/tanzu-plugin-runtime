@@ -276,7 +276,7 @@ func TestNewOutputWriterNonStrings(t *testing.T) {
 	output := b.String()
 	require.NotNil(t, output)
 
-	// extra leading newline for better formatting
+	// leading newline, added for readability, should be trimmed during compare
 	// note: the trailing spaces in this string are intentional
 	expected := `
   A  B                 C  
@@ -296,11 +296,13 @@ func TestNewOutputWriterYAMLNonStrings(t *testing.T) {
 	output := b.String()
 	require.NotNil(t, output)
 
-	// extra leading newline for better formatting
+	// leading newline, added for readability, should be trimmed during compare
 	expected := `
 - a: "1"
-  b: map[b:bar f:foo]
-  c: "2"
+  b:
+    b: bar
+    f: foo
+  c: 2
 `
 	require.Equal(t, expected[1:], output)
 }
@@ -315,15 +317,19 @@ func TestNewOutputWriterJSONNonStrings(t *testing.T) {
 	output := b.String()
 	require.NotNil(t, output)
 
-	// extra leading newline for better formatting
+	// leading newline, added for readability, should be trimmed during compare
 	expected := `
 [
   {
     "a": "1",
-    "b": "map[b:bar f:foo]",
-    "c": "2"
+    "b": {
+      "b": "bar",
+      "f": "foo"
+    },
+    "c": 2
   }
 ]`
+
 	require.Equal(t, expected[1:], output)
 }
 
@@ -338,7 +344,7 @@ func TestNewOutputWriterTableListNonStrings(t *testing.T) {
 	output := b.String()
 	require.NotNil(t, output)
 
-	// extra leading newline for better formatting
+	// leading newline, added for readability, should be trimmed during compare
 	expected := `
 A:           1, 3
 B:           map[b:bar f:foo], 4

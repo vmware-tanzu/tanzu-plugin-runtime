@@ -11,6 +11,11 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+var mapValue = map[string]string{
+	"f": "foo",
+	"b": "bar",
+}
+
 func TestNewOutputWriterTable(t *testing.T) {
 	var b bytes.Buffer
 	tab := NewOutputWriter(&b, string(TableOutputType), "a", "b", "c")
@@ -259,6 +264,87 @@ func TestNewOutputWriterJSON(t *testing.T) {
 	require.Contains(t, lines[9], "\"c\": \"6\"")
 	require.Contains(t, lines[10], "}")
 	require.Contains(t, lines[11], "]")
+}
+
+func TestNewOutputWriterNonStrings(t *testing.T) {
+	var b bytes.Buffer
+	tab := NewOutputWriter(&b, string(TableOutputType), "a", "b", "c")
+	require.NotNil(t, tab)
+	tab.AddRow("1", mapValue, 2)
+	tab.Render()
+
+	output := b.String()
+	require.NotNil(t, output)
+
+	// extra leading newline for better formatting
+	// note: the trailing spaces in this string are intentional
+	expected := `
+  A  B                 C  
+  1  map[b:bar f:foo]  2  
+`
+
+	require.Equal(t, expected[1:], output)
+}
+
+func TestNewOutputWriterYAMLNonStrings(t *testing.T) {
+	var b bytes.Buffer
+	tab := NewOutputWriter(&b, string(YAMLOutputType), "a", "b", "c")
+	require.NotNil(t, tab)
+	tab.AddRow("1", mapValue, 2)
+	tab.Render()
+
+	output := b.String()
+	require.NotNil(t, output)
+
+	// extra leading newline for better formatting
+	expected := `
+- a: "1"
+  b: map[b:bar f:foo]
+  c: "2"
+`
+	require.Equal(t, expected[1:], output)
+}
+
+func TestNewOutputWriterJSONNonStrings(t *testing.T) {
+	var b bytes.Buffer
+	tab := NewOutputWriter(&b, string(JSONOutputType), "a", "b", "c")
+	require.NotNil(t, tab)
+	tab.AddRow("1", mapValue, 2)
+	tab.Render()
+
+	output := b.String()
+	require.NotNil(t, output)
+
+	// extra leading newline for better formatting
+	expected := `
+[
+  {
+    "a": "1",
+    "b": "map[b:bar f:foo]",
+    "c": "2"
+  }
+]`
+	require.Equal(t, expected[1:], output)
+}
+
+func TestNewOutputWriterTableListNonStrings(t *testing.T) {
+	var b bytes.Buffer
+	tab := NewOutputWriter(&b, string(ListTableOutputType), "a", "b", "c")
+	require.NotNil(t, tab)
+	tab.AddRow("1", mapValue, 2)
+	tab.AddRow("3", "4", "5")
+	tab.Render()
+
+	output := b.String()
+	require.NotNil(t, output)
+
+	// extra leading newline for better formatting
+	expected := `
+A:           1, 3
+B:           map[b:bar f:foo], 4
+C:           2, 5
+`
+	require.Equal(t, expected[1:], output)
 }
 
 func TestOutputWriterCharactersInKeys(t *testing.T) {

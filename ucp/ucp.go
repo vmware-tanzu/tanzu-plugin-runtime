@@ -5,6 +5,12 @@
 package ucp
 
 import (
+	"bytes"
+	"io"
+	"os"
+	"os/exec"
+	"strings"
+
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v3"
 
@@ -13,9 +19,77 @@ import (
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/ucp/internal/kubeconfig"
 )
 
+// keys to Context's AdditionalMetadata map
 const (
-	OrgID = "ucpOrgID"
+	OrgIDKey       = "ucpOrgID"
+	ProjectNameKey = "ucpProjectName"
+	SpaceNameKey   = "ucpSpaceName"
 )
+
+const (
+	// customCommandName is the name of the command expected to be implemented
+	// by the CLI should there be a need to discover and alternative invocation
+	// method
+	customCommandName string = "_custom_command"
+)
+
+// cmdOptions specifies the command options
+type cmdOptions struct {
+	outWriter io.Writer
+	errWriter io.Writer
+}
+
+type CommandOptions func(o *cmdOptions)
+
+// WithOutputWriter specifies the CommandOption for configuring Stdout
+func WithOutputWriter(outWriter io.Writer) CommandOptions {
+	return func(o *cmdOptions) {
+		o.outWriter = outWriter
+	}
+}
+
+// WithErrorWriter specifies the CommandOption for configuring Stderr
+func WithErrorWriter(errWriter io.Writer) CommandOptions {
+	return func(o *cmdOptions) {
+		o.errWriter = errWriter
+	}
+}
+
+// WithNoStdout specifies to ignore stdout
+func WithNoStdout() CommandOptions {
+	return func(o *cmdOptions) {
+		o.outWriter = io.Discard
+	}
+}
+
+// WithNoStderr specifies to ignore stderr
+func WithNoStderr() CommandOptions {
+	return func(o *cmdOptions) {
+		o.errWriter = io.Discard
+	}
+}
+
+func runCommand(commandPath string, args []string, opts *cmdOptions) (bytes.Buffer, bytes.Buffer, error) {
+	command := exec.Command(commandPath, args...)
+
+	var stderr bytes.Buffer
+	var stdout bytes.Buffer
+
+	wout := io.MultiWriter(&stdout, os.Stdout)
+	werr := io.MultiWriter(&stderr, os.Stderr)
+
+	if opts.outWriter != nil {
+		wout = io.MultiWriter(&stdout, opts.outWriter)
+	}
+	if opts.errWriter != nil {
+		werr = io.MultiWriter(&stderr, opts.errWriter)
+	}
+
+	command.Stdout = wout
+	command.Stderr = werr
+
+	return stdout, stderr, command.Run()
+}
 
 // GetKubeconfigForContext returns the kubeconfig for any arbitrary UCP resource in the UCP object hierarchy
 // referred by the UCP context
@@ -78,4 +152,47 @@ func updateKubeconfigServerURL(kc *kubeconfig.Config, cliContext *configtypes.Co
 	context := kubeconfig.GetContext(kc, currentContextName)
 	cluster := kubeconfig.GetCluster(kc, context.Context.Cluster)
 	cluster.Cluster.Server = prepareClusterServerURL(cliContext, projectName, spaceName)
+}
+
+// SetUCPContextActiveResource sets the active UCP resource for the given context and also updates
+// the kubeconfig referrenced by the UCP context
+//
+// Pre-reqs: project and space names should be valid
+//
+// Note: To set
+//   - a space as active resource, both project and space names are required
+//   - a project as active resource, only project name is required (space should be empty string)
+//   - org as active resource, both project and space names should be empty strings
+func SetUCPContextActiveResource(contextName, projectName, spaceName string, opts ...CommandOptions) error {
+	// For now, the implementation expects env var TANZU_BIN to be set and
+	// pointing to the core CLI binary used to invoke setting the active UCP resource.
+
+	options := &cmdOptions{}
+	for _, opt := range opts {
+		opt(options)
+	}
+
+	cliPath := os.Getenv("TANZU_BIN")
+	if cliPath == "" {
+		return errors.New("the environment variable TANZU_BIN is not set")
+	}
+
+	altCommandArgs := []string{customCommandName}
+	args := []string{"context", "update", "ucp-active-resource", contextName, "--project", projectName, "--space", spaceName}
+
+	altCommandArgs = append(altCommandArgs, args...)
+
+	// Check if there is an alternate means to set the active UCP context active resource
+	// operation, if not fall back to `context update ucp-active-resource`
+	stdoutOutput, _, err := runCommand(cliPath, altCommandArgs, &cmdOptions{outWriter: io.Discard, errWriter: io.Discard})
+	if err == nil {
+		args = strings.Fields(stdoutOutput.String())
+	}
+
+	// Runs the actual command
+	_, stderrOutput, err := runCommand(cliPath, args, options)
+	if err != nil {
+		return errors.New(stderrOutput.String())
+	}
+	return nil
 }

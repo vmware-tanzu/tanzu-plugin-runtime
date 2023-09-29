@@ -76,6 +76,7 @@ yamllint:
 	hack/check/check-yaml.sh
 
 go-lint: $(GOLANGCI_LINT)  ## Run linting of go source
+	$(GOLANGCI_LINT) --version
 	@for i in $(GO_MODULES); do \
 		echo "-- Linting $$i --"; \
 		pushd $${i}; \

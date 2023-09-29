@@ -50,7 +50,6 @@ linters:
   disable-all: true
   enable:
     - bodyclose
-    - deadcode
     - depguard
     - dogsled
     - dupl
@@ -73,17 +72,16 @@ linters:
     - revive
     - rowserrcheck
     - staticcheck
-    - structcheck
     - stylecheck
     - typecheck
     - unconvert
     - unparam
     - unused
-    - varcheck
     - whitespace
 
   # don't enable:
   # - asciicheck
+  # - deadcock
   # - exhaustive
   # - gochecknoinits
   # - gochecknoglobals
@@ -97,6 +95,8 @@ linters:
   # - prealloc
   # - testpackage
   # - scopelint
+  # - structcheck
+  # - varcheck
   # - wsl
 
 issues:

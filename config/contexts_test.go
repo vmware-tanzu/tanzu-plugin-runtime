@@ -14,7 +14,7 @@ import (
 )
 
 func TestSetGetDeleteContext(t *testing.T) {
-	// Setup config data
+	// Setup config data dummychange
 	_, cleanUp := setupTestConfig(t, &CfgTestData{})
 
 	defer func() {

@@ -462,8 +462,8 @@ func setupForGetContext(t *testing.T) {
 				},
 			},
 			{
-				Name:   "test-ucp",
-				Target: configtypes.TargetUCP,
+				Name:   "test-tae",
+				Target: configtypes.TargetTAE,
 				GlobalOpts: &configtypes.GlobalServer{
 					Endpoint: "test-endpoint",
 				},
@@ -477,7 +477,7 @@ func setupForGetContext(t *testing.T) {
 		CurrentContext: map[configtypes.Target]string{
 			configtypes.TargetK8s: "test-mc-2",
 			configtypes.TargetTMC: "test-tmc",
-			configtypes.TargetUCP: "test-ucp",
+			configtypes.TargetTAE: "test-tae",
 		},
 	}
 	func() {
@@ -508,8 +508,8 @@ func TestGetContext(t *testing.T) {
 			ctxName: "test-tmc",
 		},
 		{
-			name:    "success ucp",
-			ctxName: "test-ucp",
+			name:    "success tae",
+			ctxName: "test-tae",
 		},
 		{
 			name:    "failure",
@@ -554,8 +554,8 @@ func TestContextExists(t *testing.T) {
 			ok:      true,
 		},
 		{
-			name:    "success ucp",
-			ctxName: "test-ucp",
+			name:    "success tae",
+			ctxName: "test-tae",
 			ok:      true,
 		},
 		{
@@ -681,10 +681,10 @@ func TestSetContext(t *testing.T) {
 			},
 		},
 		{
-			name: "success ucp current",
+			name: "success tae current",
 			ctx: &configtypes.Context{
-				Name:   "test-ucp1",
-				Target: configtypes.TargetUCP,
+				Name:   "test-tae1",
+				Target: configtypes.TargetTAE,
 				GlobalOpts: &configtypes.GlobalServer{
 					Endpoint: "test-endpoint",
 				},
@@ -700,10 +700,10 @@ func TestSetContext(t *testing.T) {
 			current: true,
 		},
 		{
-			name: "success ucp not_current",
+			name: "success tae not_current",
 			ctx: &configtypes.Context{
-				Name:   "test-ucp2",
-				Target: configtypes.TargetUCP,
+				Name:   "test-tae2",
+				Target: configtypes.TargetTAE,
 				GlobalOpts: &configtypes.GlobalServer{
 					Endpoint: "test-endpoint",
 				},
@@ -761,9 +761,9 @@ func TestRemoveContext(t *testing.T) {
 			target:  configtypes.TargetTMC,
 		},
 		{
-			name:    "success ucp",
-			ctxName: "test-ucp",
-			target:  configtypes.TargetUCP,
+			name:    "success tae",
+			ctxName: "test-tae",
+			target:  configtypes.TargetTAE,
 		},
 		{
 			name:    "failure",
@@ -820,9 +820,9 @@ func TestSetCurrentContext(t *testing.T) {
 			currServer: "test-mc",
 		},
 		{
-			name:    "success ucp",
-			ctxName: "test-ucp",
-			target:  configtypes.TargetUCP,
+			name:    "success tae",
+			ctxName: "test-tae",
+			target:  configtypes.TargetTAE,
 		},
 		{
 			name:    "success tmc after setting k8s",
@@ -869,13 +869,13 @@ func TestSetCurrentContext(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "test-mc", currentContextMap[configtypes.TargetK8s].Name)
 	assert.Equal(t, "test-tmc", currentContextMap[configtypes.TargetTMC].Name)
-	assert.Equal(t, "test-ucp", currentContextMap[configtypes.TargetUCP].Name)
+	assert.Equal(t, "test-tae", currentContextMap[configtypes.TargetTAE].Name)
 
 	currentContextsList, err := GetAllCurrentContextsList()
 	assert.NoError(t, err)
 	assert.Contains(t, currentContextsList, "test-mc")
 	assert.Contains(t, currentContextsList, "test-tmc")
-	assert.Contains(t, currentContextsList, "test-ucp")
+	assert.Contains(t, currentContextsList, "test-tae")
 }
 
 func TestRemoveCurrentContext(t *testing.T) {

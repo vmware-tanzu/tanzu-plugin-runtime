@@ -21,33 +21,33 @@ func copyFile(t *testing.T, sourceFile, destFile string) {
 }
 
 func TestReadAndMinifyKubeConfig(t *testing.T) {
-	expectedMyucpKubeconfig := `
+	expectedMytaeKubeconfig := `
 kind: Config
 apiVersion: v1
 preferences: {}
 clusters:
-    - name: tanzu-cli-myucp/current
+    - name: tanzu-cli-mytae/current
       cluster:
         server: https://api.tanzu.cloud.vmware.com:443/org/fake-org-id
         insecure-skip-tls-verify: true
 users:
-    - name: tanzu-cli-myucp-user
+    - name: tanzu-cli-mytae-user
       user:
         exec:
             command: tanzu
             args:
                 - context
                 - get-token
-                - myucp
+                - mytae
             env: []
             apiVersion: client.authentication.k8s.io/v1beta1
             provideClusterInfo: false
 contexts:
-    - name: tanzu-cli-myucp
+    - name: tanzu-cli-mytae
       context:
-        cluster: tanzu-cli-myucp/current
-        user: tanzu-cli-myucp-user
-current-context: tanzu-cli-myucp
+        cluster: tanzu-cli-mytae/current
+        user: tanzu-cli-mytae-user
+current-context: tanzu-cli-mytae
 `
 
 	expectedFooContextKubeconfig := `
@@ -97,10 +97,10 @@ current-context: foo-context
 	assert.Equal(t, minifiedKubeconfig, wantKubeConfig)
 
 	// Test reading and minifying the kubeconfig having ExecConfig as user(AuthInfo)
-	minifiedKubeconfig, err = MinifyKubeConfig(config, "tanzu-cli-myucp")
+	minifiedKubeconfig, err = MinifyKubeConfig(config, "tanzu-cli-mytae")
 	assert.NoError(t, err)
 	wantKubeConfig = &Config{}
-	err = yaml.Unmarshal([]byte(expectedMyucpKubeconfig), wantKubeConfig)
+	err = yaml.Unmarshal([]byte(expectedMytaeKubeconfig), wantKubeConfig)
 	assert.NoError(t, err)
 	assert.Equal(t, minifiedKubeconfig, wantKubeConfig)
 }

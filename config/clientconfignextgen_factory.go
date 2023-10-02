@@ -9,6 +9,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/pkg/errors"
@@ -40,6 +41,7 @@ func getClientConfigNextGenNodeNoLock() (*yaml.Node, error) {
 	var node yaml.Node
 	err = yaml.Unmarshal(bytes, &node)
 	if err != nil {
+		fmt.Printf("XXX from path: %v, bytes = [%v]\n", cfgPath, string(bytes))
 		return nil, errors.Wrap(err, "failed to construct struct from config ng data")
 	}
 	node.Content[0].Style = 0

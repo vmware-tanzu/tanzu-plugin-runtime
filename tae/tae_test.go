@@ -1,7 +1,7 @@
 // Copyright 2023 VMware, Inc. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-package ucp
+package tae
 
 import (
 	"bytes"
@@ -16,7 +16,7 @@ import (
 
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/config"
 	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
-	"github.com/vmware-tanzu/tanzu-plugin-runtime/ucp/internal/kubeconfig"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/tae/internal/kubeconfig"
 )
 
 const ConfigFilePermissions = 0o600
@@ -126,8 +126,8 @@ func setupForGetContext(t *testing.T) {
 				},
 			},
 			{
-				Name:   "test-ucp",
-				Target: configtypes.TargetUCP,
+				Name:   "test-tae",
+				Target: configtypes.TargetTAE,
 				GlobalOpts: &configtypes.GlobalServer{
 					Endpoint: "test-endpoint",
 				},
@@ -144,7 +144,7 @@ func setupForGetContext(t *testing.T) {
 		CurrentContext: map[configtypes.Target]string{
 			configtypes.TargetK8s: "test-mc-2",
 			configtypes.TargetTMC: "test-tmc",
-			configtypes.TargetUCP: "test-ucp",
+			configtypes.TargetTAE: "test-tae",
 		},
 	}
 	func() {
@@ -167,40 +167,40 @@ func TestGetKubeconfigForContext(t *testing.T) {
 		_ = os.RemoveAll(kubeconfigFilePath.Name())
 	}()
 
-	c, err := config.GetContext("test-ucp")
+	c, err := config.GetContext("test-tae")
 	assert.NoError(t, err)
 	c.ClusterOpts.Path = kubeconfigFilePath.Name()
-	c.ClusterOpts.Context = "tanzu-cli-myucp"
+	c.ClusterOpts.Context = "tanzu-cli-mytae"
 	err = config.SetContext(c, false)
 	assert.NoError(t, err)
 
-	// Test getting the kubeconfig for an arbitrary UCP resource
+	// Test getting the kubeconfig for an arbitrary TAE resource
 	kubeconfigBytes, err := GetKubeconfigForContext(c.Name, "project1", "space1")
 	assert.NoError(t, err)
-	c, err = config.GetContext("test-ucp")
+	c, err = config.GetContext("test-tae")
 	assert.NoError(t, err)
 	var kc kubeconfig.Config
 	err = yaml.Unmarshal(kubeconfigBytes, &kc)
 	assert.NoError(t, err)
-	cluster := kubeconfig.GetCluster(&kc, "tanzu-cli-myucp/current")
+	cluster := kubeconfig.GetCluster(&kc, "tanzu-cli-mytae/current")
 	assert.Equal(t, cluster.Cluster.Server, c.ClusterOpts.Endpoint+"/project/project1/space/space1")
 
-	// Test getting the kubeconfig for an arbitrary UCP resource
+	// Test getting the kubeconfig for an arbitrary TAE resource
 	kubeconfigBytes, err = GetKubeconfigForContext(c.Name, "project2", "")
 	assert.NoError(t, err)
-	c, err = config.GetContext("test-ucp")
+	c, err = config.GetContext("test-tae")
 	assert.NoError(t, err)
 	err = yaml.Unmarshal(kubeconfigBytes, &kc)
 	assert.NoError(t, err)
-	cluster = kubeconfig.GetCluster(&kc, "tanzu-cli-myucp/current")
+	cluster = kubeconfig.GetCluster(&kc, "tanzu-cli-mytae/current")
 	assert.Equal(t, cluster.Cluster.Server, c.ClusterOpts.Endpoint+"/project/project2")
 
-	// Test getting the kubeconfig for an arbitrary UCP resource for non UCP context
-	nonUCPCtx, err := config.GetContext("test-mc")
+	// Test getting the kubeconfig for an arbitrary TAE resource for non TAE context
+	nonTAECtx, err := config.GetContext("test-mc")
 	assert.NoError(t, err)
-	_, err = GetKubeconfigForContext(nonUCPCtx.Name, "project2", "")
+	_, err = GetKubeconfigForContext(nonTAECtx.Name, "project2", "")
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "context must be of type: ucp")
+	assert.ErrorContains(t, err, "context must be of type: application-engine")
 }
 
 func setupFakeCLI(dir string, exitStatus string, newCommandExitStatus string, enableCustomCommand bool) (string, error) {
@@ -224,7 +224,7 @@ func setupFakeCLI(dir string, exitStatus string, newCommandExitStatus string, en
 	return filePath, nil
 }
 
-func TestSetUCPContextActiveResource(t *testing.T) {
+func TestSetTAEContextActiveResource(t *testing.T) {
 	tests := []struct {
 		test                 string
 		exitStatus           string
@@ -234,35 +234,35 @@ func TestSetUCPContextActiveResource(t *testing.T) {
 		enableCustomCommand  bool
 	}{
 		{
-			test:            "with no alternate command and ucp active resource update successfully",
+			test:            "with no alternate command and tae active resource update successfully",
 			exitStatus:      "0",
-			expectedOutput:  "context update ucp-active-resource test-context --project projectA --space spaceA succeeded\n",
+			expectedOutput:  "context update tae-active-resource test-context --project projectA --space spaceA succeeded\n",
 			expectedFailure: false,
 		},
 		{
-			test:            "with no alternate command and ucp active resource update unsuccessfully",
+			test:            "with no alternate command and tae active resource update unsuccessfully",
 			exitStatus:      "1",
-			expectedOutput:  "context update ucp-active-resource test-context --project projectA --space spaceA failed\n",
+			expectedOutput:  "context update tae-active-resource test-context --project projectA --space spaceA failed\n",
 			expectedFailure: true,
 		},
 		{
-			test:                 "with alternate command and ucp active resource update successfully",
+			test:                 "with alternate command and tae active resource update successfully",
 			newCommandExitStatus: "0",
-			expectedOutput:       "newcommand update ucp-active-resource test-context --project projectA --space spaceA succeeded\n",
+			expectedOutput:       "newcommand update tae-active-resource test-context --project projectA --space spaceA succeeded\n",
 			expectedFailure:      false,
 			enableCustomCommand:  true,
 		},
 		{
-			test:                 "with alternate command and ucp active resource update unsuccessfully",
+			test:                 "with alternate command and tae active resource update unsuccessfully",
 			newCommandExitStatus: "1",
-			expectedOutput:       "newcommand update ucp-active-resource test-context --project projectA --space spaceA failed\n",
+			expectedOutput:       "newcommand update tae-active-resource test-context --project projectA --space spaceA failed\n",
 			expectedFailure:      true,
 			enableCustomCommand:  true,
 		},
 	}
 
 	for _, spec := range tests {
-		dir, err := os.MkdirTemp("", "tanzu-set-ucp-active-resource-api")
+		dir, err := os.MkdirTemp("", "tanzu-set-tae-active-resource-api")
 		assert.Nil(t, err)
 		defer os.RemoveAll(dir)
 		t.Run(spec.test, func(t *testing.T) {
@@ -289,9 +289,8 @@ func TestSetUCPContextActiveResource(t *testing.T) {
 			os.Setenv("TANZU_BIN", cliPath)
 
 			// Test-1:
-			// - verify correct combinedOutput string returned as part of the output
 			// - verify correct string gets printed to default stdout and stderr
-			err = SetUCPContextActiveResource("test-context", "projectA", "spaceA")
+			err = SetTAEContextActiveResource("test-context", "projectA", "spaceA")
 			w.Close()
 			stdoutRecieved := <-c
 
@@ -306,7 +305,7 @@ func TestSetUCPContextActiveResource(t *testing.T) {
 			// Test-2: when external stdout and stderr are provided with WithStdout, WithStderr options,
 			// verify correct string gets printed to provided custom stdout/stderr
 			var combinedOutputBuff bytes.Buffer
-			err = SetUCPContextActiveResource("test-context", "projectA", "spaceA", WithOutputWriter(&combinedOutputBuff), WithErrorWriter(&combinedOutputBuff))
+			err = SetTAEContextActiveResource("test-context", "projectA", "spaceA", WithOutputWriter(&combinedOutputBuff), WithErrorWriter(&combinedOutputBuff))
 			if spec.expectedFailure {
 				assert.NotNil(err)
 			} else {

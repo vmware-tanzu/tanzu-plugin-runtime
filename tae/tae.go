@@ -1,8 +1,8 @@
 // Copyright 2023 VMware, Inc. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-// Package ucp provides APIs specific to ucp
-package ucp
+// Package tae provides APIs specific to Tanzu Application Engine(TAE)
+package tae
 
 import (
 	"bytes"
@@ -16,14 +16,14 @@ import (
 
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/config"
 	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
-	"github.com/vmware-tanzu/tanzu-plugin-runtime/ucp/internal/kubeconfig"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/tae/internal/kubeconfig"
 )
 
 // keys to Context's AdditionalMetadata map
 const (
-	OrgIDKey       = "ucpOrgID"
-	ProjectNameKey = "ucpProjectName"
-	SpaceNameKey   = "ucpSpaceName"
+	OrgIDKey       = "taeOrgID"
+	ProjectNameKey = "taeProjectName"
+	SpaceNameKey   = "taeSpaceName"
 )
 
 const (
@@ -91,20 +91,20 @@ func runCommand(commandPath string, args []string, opts *cmdOptions) (bytes.Buff
 	return stdout, stderr, command.Run()
 }
 
-// GetKubeconfigForContext returns the kubeconfig for any arbitrary UCP resource in the UCP object hierarchy
-// referred by the UCP context
+// GetKubeconfigForContext returns the kubeconfig for any arbitrary TAE resource in the TAE object hierarchy
+// referred by the TAE context
 // Pre-reqs: project and space names should be valid
 //
 // Notes:
-// If projectName and spaceName is empty string the kubeconfig generated would be pointing to UCP org
+// If projectName and spaceName is empty string the kubeconfig generated would be pointing to TAE org
 //
 //	ex: kubeconfig's cluster.server URL : https://endpoint/org/orgid
 //
-// If projectName is valid projectName and spaceName is empty string the kubeconfig generated would be pointing to UCP project
+// If projectName is valid projectName and spaceName is empty string the kubeconfig generated would be pointing to TAE project
 //
 //	ex: kubeconfig's cluster.server URL : https://endpoint/org/orgid/project/<projectName>
 //
-// similarly if both project and space names are valid names the kubeconfig generated would be pointing to UCP space
+// similarly if both project and space names are valid names the kubeconfig generated would be pointing to TAE space
 //
 //	ex: kubeconfig's cluster.server URL:  https://endpoint/org/orgid/project/<projectName>/space/<spaceName>
 func GetKubeconfigForContext(contextName, projectName, spaceName string) ([]byte, error) {
@@ -112,13 +112,13 @@ func GetKubeconfigForContext(contextName, projectName, spaceName string) ([]byte
 	if err != nil {
 		return nil, err
 	}
-	if ctx.Target != configtypes.TargetUCP {
-		return nil, errors.Errorf("context must be of type: %s", configtypes.TargetUCP)
+	if ctx.Target != configtypes.TargetTAE {
+		return nil, errors.Errorf("context must be of type: %s", configtypes.TargetTAE)
 	}
 
 	kc, err := kubeconfig.ReadKubeConfig(ctx.ClusterOpts.Path)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to read the UCP context kubeconfig")
+		return nil, errors.Wrap(err, "failed to read the TAE context kubeconfig")
 	}
 
 	kc, err = kubeconfig.MinifyKubeConfig(kc, ctx.ClusterOpts.Context)
@@ -154,8 +154,8 @@ func updateKubeconfigServerURL(kc *kubeconfig.Config, cliContext *configtypes.Co
 	cluster.Cluster.Server = prepareClusterServerURL(cliContext, projectName, spaceName)
 }
 
-// SetUCPContextActiveResource sets the active UCP resource for the given context and also updates
-// the kubeconfig referrenced by the UCP context
+// SetTAEContextActiveResource sets the active TAE resource for the given context and also updates
+// the kubeconfig referrenced by the TAE context
 //
 // Pre-reqs: project and space names should be valid
 //
@@ -163,9 +163,9 @@ func updateKubeconfigServerURL(kc *kubeconfig.Config, cliContext *configtypes.Co
 //   - a space as active resource, both project and space names are required
 //   - a project as active resource, only project name is required (space should be empty string)
 //   - org as active resource, both project and space names should be empty strings
-func SetUCPContextActiveResource(contextName, projectName, spaceName string, opts ...CommandOptions) error {
+func SetTAEContextActiveResource(contextName, projectName, spaceName string, opts ...CommandOptions) error {
 	// For now, the implementation expects env var TANZU_BIN to be set and
-	// pointing to the core CLI binary used to invoke setting the active UCP resource.
+	// pointing to the core CLI binary used to invoke setting the active TAE resource.
 
 	options := &cmdOptions{}
 	for _, opt := range opts {
@@ -178,12 +178,12 @@ func SetUCPContextActiveResource(contextName, projectName, spaceName string, opt
 	}
 
 	altCommandArgs := []string{customCommandName}
-	args := []string{"context", "update", "ucp-active-resource", contextName, "--project", projectName, "--space", spaceName}
+	args := []string{"context", "update", "tae-active-resource", contextName, "--project", projectName, "--space", spaceName}
 
 	altCommandArgs = append(altCommandArgs, args...)
 
-	// Check if there is an alternate means to set the active UCP context active resource
-	// operation, if not fall back to `context update ucp-active-resource`
+	// Check if there is an alternate means to set the active TAE context active resource
+	// operation, if not fall back to `context update tae-active-resource`
 	stdoutOutput, _, err := runCommand(cliPath, altCommandArgs, &cmdOptions{outWriter: io.Discard, errWriter: io.Discard})
 	if err == nil {
 		args = strings.Fields(stdoutOutput.String())

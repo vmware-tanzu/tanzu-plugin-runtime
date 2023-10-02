@@ -141,10 +141,10 @@ func setupForGetContext(t *testing.T) {
 				},
 			},
 		},
-		CurrentContext: map[configtypes.Target]string{
-			configtypes.TargetK8s: "test-mc-2",
-			configtypes.TargetTMC: "test-tmc",
-			configtypes.TargetTAE: "test-tae",
+		CurrentContext: map[configtypes.ContextType]string{
+			configtypes.ContextTypeK8s: "test-mc-2",
+			configtypes.ContextTypeTMC: "test-tmc",
+			configtypes.ContextTypeTAE: "test-tae",
 		},
 	}
 	func() {

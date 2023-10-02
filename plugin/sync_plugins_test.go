@@ -113,14 +113,14 @@ func TestSyncPlugins(t *testing.T) {
 		{
 			test:                 "with alternate command and sync successfully",
 			newCommandExitStatus: "0",
-			expectedOutput:       "newcommand sync --target kubernetes succeeded\n",
+			expectedOutput:       "newcommand sync --type kubernetes succeeded\n",
 			expectedFailure:      false,
 			enableCustomCommand:  true,
 		},
 		{
 			test:                 "with alternate command and sync unsuccessfully",
 			newCommandExitStatus: "1",
-			expectedOutput:       "newcommand sync --target kubernetes failed\n",
+			expectedOutput:       "newcommand sync --type kubernetes failed\n",
 			expectedFailure:      true,
 			enableCustomCommand:  true,
 		},

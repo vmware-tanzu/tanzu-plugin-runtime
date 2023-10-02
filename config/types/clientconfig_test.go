@@ -43,9 +43,9 @@ func (suite *ClientTestSuite) SetupTest() {
 				Target: TargetK8s,
 			},
 		},
-		CurrentContext: map[Target]string{
-			TargetTMC: suite.GlobalServer.Name,
-			TargetK8s: suite.ManagementServer.Name,
+		CurrentContext: map[ContextType]string{
+			ContextTypeTMC: suite.GlobalServer.Name,
+			ContextTypeK8s: suite.ManagementServer.Name,
 		},
 	}
 }
@@ -126,21 +126,21 @@ func (suite *ClientTestSuite) TestGetCurrentContext_K8s() {
 func (suite *ClientTestSuite) TestGetCurrentContext_NotFound() {
 	_, err := suite.ClientConfig.GetCurrentContext("test")
 	suite.Error(err)
-	suite.EqualError(err, "no current context set for target \"test\"")
+	suite.EqualError(err, "no current context set for type \"test\"")
 }
 
 func (suite *ClientTestSuite) TestSetCurrentContext_TMC() {
-	delete(suite.ClientConfig.CurrentContext, TargetTMC)
+	delete(suite.ClientConfig.CurrentContext, ContextTypeTMC)
 	err := suite.ClientConfig.SetCurrentContext(TargetTMC, suite.GlobalServer.Name)
 	suite.NoError(err)
-	suite.Equal(suite.GlobalServer.Name, suite.ClientConfig.CurrentContext[TargetTMC])
+	suite.Equal(suite.GlobalServer.Name, suite.ClientConfig.CurrentContext[ContextTypeTMC])
 }
 
 func (suite *ClientTestSuite) TestSetCurrentContext_K8s() {
-	delete(suite.ClientConfig.CurrentContext, TargetK8s)
+	delete(suite.ClientConfig.CurrentContext, ContextTypeK8s)
 	err := suite.ClientConfig.SetCurrentContext(TargetK8s, suite.ManagementServer.Name)
 	suite.NoError(err)
-	suite.Equal(suite.ManagementServer.Name, suite.ClientConfig.CurrentContext[TargetK8s])
+	suite.Equal(suite.ManagementServer.Name, suite.ClientConfig.CurrentContext[ContextTypeK8s])
 }
 
 func (suite *ClientTestSuite) TestIsGlobal_True() {

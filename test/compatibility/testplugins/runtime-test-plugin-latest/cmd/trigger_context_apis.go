@@ -159,7 +159,7 @@ func setCurrentContext(contextName string) *core.APIResponse {
 }
 
 func getCurrentContext(target configtypes.Target) *core.APIResponse {
-	ctx, err := configlib.GetCurrentContext(target)
+	ctx, err := configlib.GetCurrentContext(target) //nolint:staticcheck // Deprecated
 	if err != nil {
 		return &core.APIResponse{
 			ResponseType: core.ErrorResponse,

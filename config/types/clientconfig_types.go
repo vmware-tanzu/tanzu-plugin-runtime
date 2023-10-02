@@ -52,12 +52,17 @@ type Server struct {
 // Context configuration for a control plane. This can one of the following,
 // 1. Kubernetes Cluster
 // 2. Tanzu Mission Control endpoint
+// 3. Unified Control Plane endpoint
 type Context struct {
 	// Name of the context.
 	Name string `json:"name,omitempty" yaml:"name,omitempty"`
 
 	// Target of the context.
+	// Deprecated: This field is deprecated. Please use ContextType
 	Target Target `json:"target,omitempty" yaml:"target,omitempty"`
+
+	// ContextType of the context.
+	ContextType ContextType `json:"contextType,omitempty" yaml:"contextType,omitempty"`
 
 	// GlobalOpts if the context is a global control plane (e.g., TMC).
 	GlobalOpts *GlobalServer `json:"globalOpts,omitempty" yaml:"globalOpts,omitempty"`
@@ -343,7 +348,7 @@ type ClientConfig struct {
 	KnownContexts []*Context `json:"contexts,omitempty" yaml:"contexts,omitempty"`
 
 	// CurrentContext for every type.
-	CurrentContext map[Target]string `json:"currentContext,omitempty" yaml:"currentContext,omitempty"`
+	CurrentContext map[ContextType]string `json:"currentContext,omitempty" yaml:"currentContext,omitempty"`
 
 	// ClientOptions are client specific options like feature flags, environment variables, repositories, discoverySources, etc.
 	ClientOptions *ClientOptions `json:"clientOptions,omitempty" yaml:"clientOptions,omitempty"`

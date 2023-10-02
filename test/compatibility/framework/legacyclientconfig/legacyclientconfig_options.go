@@ -135,7 +135,34 @@ func WithDefaultServer(version core.RuntimeVersion) CfgClientConfigArgsOption {
 func WithDefaultContextAndServer(version core.RuntimeVersion) CfgClientConfigArgsOption {
 	return func(c *CfgClientConfigArgs) {
 		switch version {
-		case core.VersionLatest, core.Version090, core.Version0280:
+		case core.VersionLatest:
+			c.ClientConfigOpts = &types.ClientConfigOpts{
+				KnownServers: []*types.ServerOpts{
+					{
+						Name: common.CompatibilityTestOne,
+						Type: types.ManagementClusterServerType,
+						GlobalOpts: &types.GlobalServerOpts{
+							Endpoint: common.DefaultEndpoint,
+						},
+					},
+				},
+				CurrentServer: common.CompatibilityTestOne,
+				CurrentContext: map[string]string{
+					string(types.TargetK8s): common.CompatibilityTestOne,
+				},
+				KnownContexts: []*types.ContextOpts{
+					{
+						Name: common.CompatibilityTestOne,
+						// Note: We are not setting Target anymore with the latest CLI because
+						// it should be automatically configured by API for backwards compatibility
+						ContextType: types.ContextTypeK8s,
+						GlobalOpts: &types.GlobalServerOpts{
+							Endpoint: "default-compatibility-test-endpoint",
+						},
+					},
+				},
+			}
+		case core.Version090, core.Version0280:
 			c.ClientConfigOpts = &types.ClientConfigOpts{
 				KnownServers: []*types.ServerOpts{
 					{

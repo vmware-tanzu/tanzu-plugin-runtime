@@ -10,6 +10,22 @@ import (
 	"strings"
 )
 
+// ContextType is a new Datatype introduced to represent the type of control plane
+type ContextType string
+
+const (
+	// ContextTypeK8s represents a type of control plane endpoint that is a Kubernetes cluster
+	ContextTypeK8s ContextType = "kubernetes"
+
+	// ContextTypeTMC represents a type of control plane endpoint that is a TMC SaaS/self-managed endpoint
+	ContextTypeTMC ContextType = "mission-control"
+
+	// ContextTypeTAE is a used to indicate the type of Context used to interact with
+	// Tanzu Application Engine (Unified Control Plane) endpoint
+	// Note!! Experimental, please expect changes
+	ContextTypeTAE ContextType = "application-engine"
+)
+
 // Target is the namespace of the CLI to which plugin is applicable
 type Target string
 
@@ -40,6 +56,8 @@ const (
 var (
 	// SupportedTargets is a list of all supported Target
 	SupportedTargets = []Target{TargetK8s, TargetTMC, TargetTAE}
+	// SupportedContextTypes is a list of all supported ContextTypes
+	SupportedContextTypes = []ContextType{ContextTypeK8s, ContextTypeTMC, ContextTypeTAE}
 )
 
 const (
@@ -103,7 +121,7 @@ func (s *Server) IsManagementCluster() bool {
 
 // GetCurrentServer returns the current server.
 //
-// Deprecated: This API is deprecated. Use GetCurrentContext() instead.
+// Deprecated: This API is deprecated. Use GetActiveContext() instead.
 func (c *ClientConfig) GetCurrentServer() (*Server, error) {
 	for _, server := range c.KnownServers {
 		if server.Name == c.CurrentServer {
@@ -142,10 +160,17 @@ func (c *ClientConfig) HasContext(name string) bool {
 }
 
 // GetCurrentContext returns the current context for the given type.
+//
+// Deprecated: GetCurrentContext is deprecated. Use GetActiveContext instead
 func (c *ClientConfig) GetCurrentContext(target Target) (*Context, error) {
-	ctxName := c.CurrentContext[target]
+	return c.GetActiveContext(ConvertTargetToContextType(target))
+}
+
+// GetActiveContext returns the current context for the given type.
+func (c *ClientConfig) GetActiveContext(context ContextType) (*Context, error) {
+	ctxName := c.CurrentContext[context]
 	if ctxName == "" {
-		return nil, fmt.Errorf("no current context set for target %q", target)
+		return nil, fmt.Errorf("no current context set for type %q", context)
 	}
 	ctx, err := c.GetContext(ctxName)
 	if err != nil {
@@ -155,12 +180,26 @@ func (c *ClientConfig) GetCurrentContext(target Target) (*Context, error) {
 }
 
 // GetAllCurrentContextsMap returns all current context per Target
+//
+// Deprecated: GetAllCurrentContextsMap is deprecated. Use GetAllActiveContextsMap instead
 func (c *ClientConfig) GetAllCurrentContextsMap() (map[Target]*Context, error) {
 	currentContexts := make(map[Target]*Context)
 	for _, target := range SupportedTargets {
 		context, err := c.GetCurrentContext(target)
 		if err == nil && context != nil {
 			currentContexts[target] = context
+		}
+	}
+	return currentContexts, nil
+}
+
+// GetAllActiveContextsMap returns all active context per ContextType
+func (c *ClientConfig) GetAllActiveContextsMap() (map[ContextType]*Context, error) {
+	currentContexts := make(map[ContextType]*Context)
+	for _, contextType := range SupportedContextTypes {
+		context, err := c.GetActiveContext(contextType)
+		if err == nil && context != nil {
+			currentContexts[contextType] = context
 		}
 	}
 	return currentContexts, nil
@@ -181,11 +220,18 @@ func (c *ClientConfig) GetAllCurrentContextsList() ([]string, error) {
 }
 
 // SetCurrentContext sets the current context for the given target.
+//
+// Deprecated: SetCurrentContext is deprecated. Use SetActiveContext instead
 func (c *ClientConfig) SetCurrentContext(target Target, ctxName string) error {
+	return c.SetActiveContext(ConvertTargetToContextType(target), ctxName)
+}
+
+// SetActiveContext sets the active context for the given contextType.
+func (c *ClientConfig) SetActiveContext(contextType ContextType, ctxName string) error {
 	if c.CurrentContext == nil {
-		c.CurrentContext = make(map[Target]string)
+		c.CurrentContext = make(map[ContextType]string)
 	}
-	c.CurrentContext[target] = ctxName
+	c.CurrentContext[contextType] = ctxName
 	ctx, err := c.GetContext(ctxName)
 	if err != nil {
 		return err
@@ -292,4 +338,36 @@ func (c *ClientConfig) SetEditionSelector(edition EditionSelector) {
 		return
 	}
 	c.ClientOptions.CLI.UnstableVersionSelector = EditionStandard
+}
+
+func SyncContextTypeAndTarget(ctx *Context) {
+	if ctx.ContextType == "" {
+		ctx.ContextType = ConvertTargetToContextType(ctx.Target)
+	} else if ctx.Target == "" {
+		ctx.Target = ConvertContextTypeToTarget(ctx.ContextType)
+	}
+}
+
+func ConvertTargetToContextType(target Target) ContextType {
+	switch target {
+	case TargetK8s:
+		return ContextTypeK8s
+	case TargetTMC:
+		return ContextTypeTMC
+	case TargetTAE:
+		return ContextTypeTAE
+	}
+	return ContextType(target)
+}
+
+func ConvertContextTypeToTarget(ctxType ContextType) Target {
+	switch ctxType {
+	case ContextTypeK8s:
+		return TargetK8s
+	case ContextTypeTMC:
+		return TargetTMC
+	case ContextTypeTAE:
+		return TargetTAE
+	}
+	return Target(ctxType)
 }

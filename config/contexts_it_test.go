@@ -256,6 +256,7 @@ currentContext:
             required: true
     - name: test-mc2
       target: kubernetes
+      contextType: kubernetes
       clusterOpts:
         path: test-path-updated
         context: test-context-updated
@@ -286,8 +287,9 @@ func TestContextsIntegration(t *testing.T) {
 	// Get Context
 	context, err := GetContext("test-mc")
 	expected := &configtypes.Context{
-		Name:   "test-mc",
-		Target: configtypes.TargetK8s,
+		Name:        "test-mc",
+		Target:      configtypes.TargetK8s,
+		ContextType: configtypes.ContextTypeK8s,
 		ClusterOpts: &configtypes.ClusterServer{
 			Endpoint:            "test-endpoint",
 			Path:                "test-path",
@@ -309,8 +311,9 @@ func TestContextsIntegration(t *testing.T) {
 
 	// Add new Context
 	newCtx := &configtypes.Context{
-		Name:   "test-mc2",
-		Target: configtypes.TargetK8s,
+		Name:        "test-mc2",
+		Target:      configtypes.TargetK8s,
+		ContextType: configtypes.ContextTypeK8s,
 		ClusterOpts: &configtypes.ClusterServer{
 			Path:                "test-path",
 			Context:             "test-context",
@@ -337,8 +340,9 @@ func TestContextsIntegration(t *testing.T) {
 
 	// Try to add context with empty name
 	contextWithEmptyName := &configtypes.Context{
-		Name:   "",
-		Target: configtypes.TargetK8s,
+		Name:        "",
+		Target:      configtypes.TargetK8s,
+		ContextType: configtypes.ContextTypeK8s,
 		ClusterOpts: &configtypes.ClusterServer{
 			Path:                "test-path",
 			Context:             "test-context",
@@ -355,15 +359,16 @@ func TestContextsIntegration(t *testing.T) {
 		},
 	}
 	err = SetContext(contextWithEmptyName, true)
-	assert.Equal(t, "context name cannot be empty", err.Error())
+	assert.Equal(t, "error while validating the Context object: context name cannot be empty", err.Error())
 	ctx, err = GetContext("")
 	assert.Equal(t, "context name cannot be empty", err.Error())
 	assert.Nil(t, ctx)
 
 	// Update existing Context
 	updatedCtx := &configtypes.Context{
-		Name:   "test-mc2",
-		Target: configtypes.TargetK8s,
+		Name:        "test-mc2",
+		Target:      configtypes.TargetK8s,
+		ContextType: configtypes.ContextTypeK8s,
 		ClusterOpts: &configtypes.ClusterServer{
 			Path:                "test-path-updated",
 			Context:             "test-context-updated",

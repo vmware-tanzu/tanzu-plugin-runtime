@@ -4,6 +4,7 @@
 package config
 
 import (
+	"os"
 	"testing"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -268,8 +269,8 @@ func TestSetContextWithDiscoverySourceWithNewFields(t *testing.T) {
 					},
 				},
 				CurrentServer: "test-mc",
-				CurrentContext: map[configtypes.Target]string{
-					configtypes.TargetK8s: "test-mc",
+				CurrentContext: map[configtypes.ContextType]string{
+					configtypes.ContextTypeK8s: "test-mc",
 				},
 			},
 			ctx: &configtypes.Context{
@@ -395,8 +396,8 @@ func TestSetContextWithDiscoverySource(t *testing.T) {
 					},
 				},
 				CurrentServer: "test-mc",
-				CurrentContext: map[configtypes.Target]string{
-					configtypes.TargetK8s: "test-mc",
+				CurrentContext: map[configtypes.ContextType]string{
+					configtypes.ContextTypeK8s: "test-mc",
 				},
 			},
 			ctx: &configtypes.Context{
@@ -482,12 +483,13 @@ func setupForGetContext() error {
 				},
 			},
 		},
-		CurrentContext: map[configtypes.Target]string{
-			configtypes.TargetK8s: "test-mc-2",
-			configtypes.TargetTMC: "test-tmc",
+		CurrentContext: map[configtypes.ContextType]string{
+			configtypes.ContextTypeK8s: "test-mc-2",
+			configtypes.ContextTypeTMC: "test-tmc",
 		},
 	}
 	return func() error {
+		os.Unsetenv(EnvConfigKey)
 		LocalDirName = TestLocalDirName
 		err := StoreClientConfig(cfg)
 		return err
@@ -627,10 +629,26 @@ func TestSetContext(t *testing.T) {
 		},
 
 		{
-			name: "should add new context but not current",
+			name: "should add new context but not current and configure missing ContextType from Target",
 			ctx: &configtypes.Context{
 				Name:   "test-mc2",
 				Target: configtypes.TargetK8s,
+				ClusterOpts: &configtypes.ClusterServer{
+					Endpoint:            "test-endpoint",
+					Path:                "test-path",
+					Context:             "test-context",
+					IsManagementCluster: true,
+				},
+				AdditionalMetadata: map[string]interface{}{
+					"metaToken": "token1",
+				},
+			},
+		},
+		{
+			name: "should add new context and configure missing Target from ContextType",
+			ctx: &configtypes.Context{
+				Name:        "test-mc2",
+				ContextType: configtypes.ContextTypeK8s,
 				ClusterOpts: &configtypes.ClusterServer{
 					Endpoint:            "test-endpoint",
 					Path:                "test-path",
@@ -656,8 +674,9 @@ func TestSetContext(t *testing.T) {
 		{
 			name: "success tmc not_current",
 			ctx: &configtypes.Context{
-				Name:   "test-tmc2",
-				Target: configtypes.TargetTMC,
+				Name:        "test-tmc2",
+				Target:      configtypes.TargetTMC,
+				ContextType: configtypes.ContextTypeTMC,
 				GlobalOpts: &configtypes.GlobalServer{
 					Endpoint: "test-endpoint",
 				},
@@ -711,8 +730,9 @@ func TestSetContext(t *testing.T) {
 		{
 			name: "success tae not_current",
 			ctx: &configtypes.Context{
-				Name:   "test-tae2",
-				Target: configtypes.TargetTAE,
+				Name:        "test-tae2",
+				Target:      configtypes.TargetTAE,
+				ContextType: configtypes.ContextTypeTAE,
 				GlobalOpts: &configtypes.GlobalServer{
 					Endpoint: "test-endpoint",
 				},
@@ -726,23 +746,45 @@ func TestSetContext(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "error target and contexttype does not match",
+			ctx: &configtypes.Context{
+				Name:        "test-error",
+				Target:      configtypes.TargetTAE,
+				ContextType: configtypes.ContextTypeK8s,
+				GlobalOpts: &configtypes.GlobalServer{
+					Endpoint: "test-endpoint",
+				},
+				ClusterOpts: &configtypes.ClusterServer{
+					Endpoint: "test-endpoint",
+					Path:     "test-path",
+					Context:  "test-context",
+				},
+			},
+			errStr: "error while validating the Context object: specified Target(application-engine) and ContextType(kubernetes) for the Context object does not match",
+		},
 	}
 
 	for _, tc := range tcs {
 		t.Run(tc.name, func(t *testing.T) {
 			// perform test
 			err := SetContext(tc.ctx, tc.current)
-			if tc.errStr == "" {
-				assert.NoError(t, err)
-			} else {
+			if tc.errStr != "" {
 				assert.EqualError(t, err, tc.errStr)
+			} else {
+				assert.NoError(t, err)
+				ctx, err := GetContext(tc.ctx.Name)
+				assert.NoError(t, err)
+				assert.Equal(t, tc.ctx.Name, ctx.Name)
+				assert.NotEmpty(t, string(ctx.Target))
+				assert.NotEmpty(t, string(ctx.ContextType))
+				// Verify that even though only Target or ContextType was provided when
+				// setting context, retrieving the Context should have both set
+				assert.Equal(t, string(ctx.Target), string(ctx.ContextType))
+				s, err := GetServer(tc.ctx.Name)
+				assert.NoError(t, err)
+				assert.Equal(t, tc.ctx.Name, s.Name)
 			}
-			ctx, err := GetContext(tc.ctx.Name)
-			assert.NoError(t, err)
-			assert.Equal(t, tc.ctx.Name, ctx.Name)
-			s, err := GetServer(tc.ctx.Name)
-			assert.NoError(t, err)
-			assert.Equal(t, tc.ctx.Name, s.Name)
 		})
 	}
 }
@@ -819,11 +861,23 @@ func TestGetAllCurrentContexts(t *testing.T) {
 	assert.Equal(t, "test-tmc", currentContextMap[configtypes.TargetTMC].Name)
 	assert.Nil(t, currentContextMap[configtypes.TargetTAE])
 
+	activeContextMap, err := GetAllActiveContextsMap()
+	assert.NoError(t, err)
+	assert.Equal(t, "test-mc-2", activeContextMap[configtypes.ContextTypeK8s].Name)
+	assert.Equal(t, "test-tmc", activeContextMap[configtypes.ContextTypeTMC].Name)
+	assert.Nil(t, activeContextMap[configtypes.ContextTypeTAE])
+
 	currentContextsList, err := GetAllCurrentContextsList()
 	assert.NoError(t, err)
 	assert.Contains(t, currentContextsList, "test-mc-2")
 	assert.Contains(t, currentContextsList, "test-tmc")
 	assert.NotContains(t, currentContextsList, "test-tae")
+
+	activeContextsList, err := GetAllActiveContextsList()
+	assert.NoError(t, err)
+	assert.Contains(t, activeContextsList, "test-mc-2")
+	assert.Contains(t, activeContextsList, "test-tmc")
+	assert.NotContains(t, activeContextsList, "test-tae")
 
 	// set the tae context (k8s and tae current contexts are mutual exclusive)
 	err = SetCurrentContext("test-tae")
@@ -868,7 +922,7 @@ func TestRemoveCurrentContext(t *testing.T) {
 	assert.NoError(t, err)
 
 	currCtx, err := GetCurrentContext(configtypes.TargetK8s)
-	assert.Equal(t, "no current context set for target \"kubernetes\"", err.Error())
+	assert.Equal(t, "no current context set for type \"kubernetes\"", err.Error())
 	assert.Nil(t, currCtx)
 
 	currSrv, err := GetCurrentServer()
@@ -937,8 +991,9 @@ func TestSetContextMultiFile(t *testing.T) {
 	}()
 
 	ctx := &configtypes.Context{
-		Name:   "test-mc",
-		Target: configtypes.TargetK8s,
+		Name:        "test-mc",
+		Target:      configtypes.TargetK8s,
+		ContextType: configtypes.ContextTypeK8s,
 		ClusterOpts: &configtypes.ClusterServer{
 			IsManagementCluster: true,
 			Endpoint:            "test-endpoint",
@@ -982,8 +1037,9 @@ func TestSetContextMultiFile(t *testing.T) {
 	}
 
 	expectedCtx2 := &configtypes.Context{
-		Name:   "test-mc2",
-		Target: configtypes.TargetK8s,
+		Name:        "test-mc2",
+		Target:      configtypes.TargetK8s,
+		ContextType: configtypes.ContextTypeK8s,
 		ClusterOpts: &configtypes.ClusterServer{
 			IsManagementCluster: true,
 			Endpoint:            "updated-test-endpoint",
@@ -1033,8 +1089,9 @@ func TestSetContextMultiFileAndMigrateToNewConfig(t *testing.T) {
 	}()
 
 	ctx := &configtypes.Context{
-		Name:   "test-mc",
-		Target: configtypes.TargetK8s,
+		Name:        "test-mc",
+		Target:      configtypes.TargetK8s,
+		ContextType: configtypes.ContextTypeK8s,
 		ClusterOpts: &configtypes.ClusterServer{
 			IsManagementCluster: true,
 			Endpoint:            "test-endpoint",
@@ -1078,8 +1135,9 @@ func TestSetContextMultiFileAndMigrateToNewConfig(t *testing.T) {
 	}
 
 	expectedCtx2 := &configtypes.Context{
-		Name:   "test-mc2",
-		Target: configtypes.TargetK8s,
+		Name:        "test-mc2",
+		Target:      configtypes.TargetK8s,
+		ContextType: configtypes.ContextTypeK8s,
 		ClusterOpts: &configtypes.ClusterServer{
 			IsManagementCluster: true,
 			Endpoint:            "updated-test-endpoint",
@@ -1234,7 +1292,7 @@ func TestSetContextWithEmptyName(t *testing.T) {
 					IsManagementCluster: true,
 				},
 			},
-			errStr: "context name cannot be empty",
+			errStr: "error while validating the Context object: context name cannot be empty",
 		},
 		{
 			name: "success re empty current",
@@ -1248,7 +1306,7 @@ func TestSetContextWithEmptyName(t *testing.T) {
 					IsManagementCluster: true,
 				},
 			},
-			errStr: "context name cannot be empty",
+			errStr: "error while validating the Context object: context name cannot be empty",
 		},
 	}
 

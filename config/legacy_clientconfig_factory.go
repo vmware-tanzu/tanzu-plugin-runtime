@@ -51,6 +51,8 @@ func StoreClientConfig(cfg *configtypes.ClientConfig) error {
 	populateServers(cfg)
 	// old plugins would be setting only servers, so populate contexts for forwards compatibility
 	PopulateContexts(cfg)
+	//ANUJ: Sync Target and Context Type
+
 	node, err := getClientConfigNodeNoLock()
 	if err != nil {
 		return err

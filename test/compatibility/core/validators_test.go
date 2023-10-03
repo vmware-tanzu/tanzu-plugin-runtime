@@ -16,6 +16,13 @@ func TestValidRuntimeVersion(t *testing.T) {
 	assert.Equal(t, true, actual)
 }
 
+func TestValidRuntimeVersionV090(t *testing.T) {
+	version090 := &RuntimeAPIVersion{RuntimeVersion: "v0.90.0"}
+	actual, err := version090.Validate()
+	assert.Nil(t, err)
+	assert.Equal(t, true, actual)
+}
+
 func TestInvalidRuntimeVersion(t *testing.T) {
 	version101 := &RuntimeAPIVersion{RuntimeVersion: "v1.0.1"}
 	actual, err := version101.Validate()

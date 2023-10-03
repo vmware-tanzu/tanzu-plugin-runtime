@@ -138,6 +138,7 @@ build-compatibility-test-plugins: ## Builds all runtime compatibility test plugi
 	cd ./test/compatibility/testplugins/runtime-test-plugin-v0_11_6 && ${GO} mod tidy && GOOS=$(OS) GOARCH=$(ARCH) ${GO} build -o ../bin
 	cd ./test/compatibility/testplugins/runtime-test-plugin-v0_25_4 && ${GO} mod tidy && GOOS=$(OS) GOARCH=$(ARCH) ${GO} build -o ../bin
 	cd ./test/compatibility/testplugins/runtime-test-plugin-v0_28_0 && ${GO} mod tidy && GOOS=$(OS) GOARCH=$(ARCH) ${GO} build -o ../bin
+	cd ./test/compatibility/testplugins/runtime-test-plugin-v0_90 && ${GO} mod tidy && GOOS=$(OS) GOARCH=$(ARCH) ${GO} build -o ../bin
 	cd ./test/compatibility/testplugins/runtime-test-plugin-latest && ${GO} mod tidy && GOOS=$(OS) GOARCH=$(ARCH) ${GO} build -o ../bin
 
 # The below command runs the compatibility tests using ginkgo and filter the logs as per regex and exit code with '0' representing success and non-zero values indicating test failures

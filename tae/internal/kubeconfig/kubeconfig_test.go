@@ -39,9 +39,13 @@ users:
                 - context
                 - get-token
                 - mytae
-            env: []
-            apiVersion: client.authentication.k8s.io/v1beta1
-            provideClusterInfo: false
+            env:
+            - name: testEnv1
+              value: testEnv1-Value
+            - name: testEnv2
+              value: testEnv2-Value
+            interactiveMode: Never
+            apiVersion: client.authentication.k8s.io/v1
 contexts:
     - name: tanzu-cli-mytae
       context:

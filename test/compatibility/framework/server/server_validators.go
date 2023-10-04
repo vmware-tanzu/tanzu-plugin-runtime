@@ -20,7 +20,7 @@ func (opts *SetServerInputOptions) Validate() (bool, error) {
 	}
 
 	switch opts.RuntimeVersion {
-	case core.VersionLatest, core.Version090, core.Version0280, core.Version0254, core.Version0116:
+	case core.VersionLatest, core.Version102, core.Version090, core.Version0280, core.Version0254, core.Version0116:
 		if !opts.ValidName() {
 			return false, fmt.Errorf("invalid 'name' for set server input options for the specified runtime version %v", opts.RuntimeVersion)
 		}

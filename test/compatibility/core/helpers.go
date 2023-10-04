@@ -21,6 +21,7 @@ const (
 	pluginV0254  = "runtime-test-plugin-v0_25_4"
 	pluginV0280  = "runtime-test-plugin-v0_28_0"
 	pluginV090   = "runtime-test-plugin-v0_90"
+	pluginV102   = "runtime-test-plugin-v1_0_2"
 	pluginLatest = "runtime-test-plugin-latest"
 )
 
@@ -55,6 +56,8 @@ func makeRuntimeTestPluginCommand(version RuntimeVersion) string {
 		return fmt.Sprintf("%v/%v test", pluginRoot, pluginV0280)
 	case Version090:
 		return fmt.Sprintf("%v/%v test", pluginRoot, pluginV090)
+	case Version102:
+		return fmt.Sprintf("%v/%v test", pluginRoot, pluginV102)
 	case VersionLatest:
 		return fmt.Sprintf("%v/%v test", pluginRoot, pluginLatest)
 	default:

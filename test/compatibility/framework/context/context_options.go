@@ -8,6 +8,42 @@ import (
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/types"
 )
 
+// CfgContextArgs used to construct input and output options
+type CfgContextArgs struct {
+	RuntimeAPIVersion  *core.RuntimeAPIVersion
+	ContextName        string
+	Target             types.Target
+	Type               types.ContextType
+	SetCurrentContext  bool
+	GlobalOpts         *types.GlobalServerOpts
+	ClusterOpts        *types.ClusterServerOpts
+	DiscoverySources   []types.PluginDiscoveryOpts
+	ValidationStrategy core.ValidationStrategy
+	Error              bool
+}
+
+type CfgContextArgsOption func(*CfgContextArgs)
+
+func WithContextName(name string) CfgContextArgsOption {
+	return func(c *CfgContextArgs) {
+		c.ContextName = name
+	}
+}
+
+func WithRuntimeVersion(version core.RuntimeVersion) CfgContextArgsOption {
+	return func(c *CfgContextArgs) {
+		c.RuntimeAPIVersion = &core.RuntimeAPIVersion{
+			RuntimeVersion: version,
+		}
+	}
+}
+
+func WithError() CfgContextArgsOption {
+	return func(c *CfgContextArgs) {
+		c.Error = true
+	}
+}
+
 // GetContextInputOptions used to generate GetContext command
 type GetContextInputOptions struct {
 	*core.RuntimeAPIVersion        // required

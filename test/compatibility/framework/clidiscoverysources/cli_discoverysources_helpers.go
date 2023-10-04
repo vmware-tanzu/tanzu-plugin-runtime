@@ -133,7 +133,7 @@ func DefaultCLIDiscoverySourcePerVersion(version core.RuntimeVersion) *CfgCLIDis
 			WithOCIDiscoveryOpts(oci),
 			WithContextType(types.CtxTypeTMC),
 		)
-	case core.VersionLatest, core.Version090, core.Version0280:
+	case core.VersionLatest, core.Version102, core.Version090, core.Version0280:
 		return NewCfgCLIDiscoverySourcesArgs(
 			WithOCIDiscoveryOpts(oci),
 		)

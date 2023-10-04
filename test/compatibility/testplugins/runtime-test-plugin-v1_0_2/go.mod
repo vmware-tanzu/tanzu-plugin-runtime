@@ -1,4 +1,4 @@
-module github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/testplugins/runtime-test-plugin-v0_90
+module github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/testplugins/runtime-test-plugin-v1_0_2
 
 go 1.18
 
@@ -6,8 +6,8 @@ replace github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core => 
 
 require (
 	github.com/spf13/cobra v1.7.0
-	github.com/vmware-tanzu/tanzu-plugin-runtime v0.90.0
-	github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core v0.90.0
+	github.com/vmware-tanzu/tanzu-plugin-runtime v1.0.2
+	github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core v1.0.2
 	gopkg.in/yaml.v3 v3.0.1
 )
 

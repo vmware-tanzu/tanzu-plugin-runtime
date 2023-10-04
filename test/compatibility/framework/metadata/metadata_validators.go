@@ -18,7 +18,7 @@ func (opts *SetConfigMetadataPatchStrategyInputOptions) Validate() (bool, error)
 	}
 
 	switch opts.RuntimeVersion {
-	case core.VersionLatest, core.Version090, core.Version0280:
+	case core.VersionLatest, core.Version102, core.Version090, core.Version0280:
 		if opts.Key == "" {
 			return false, fmt.Errorf("invalid 'key' for SetConfigMetadataPatchStrategyInputOptions for the specified runtime version %v", opts.RuntimeVersion)
 		}
@@ -40,7 +40,7 @@ func (opts *SetConfigMetadataSettingInputOptions) Validate() (bool, error) {
 	}
 
 	switch opts.RuntimeVersion {
-	case core.VersionLatest, core.Version090, core.Version0280:
+	case core.VersionLatest, core.Version102, core.Version090, core.Version0280:
 		if opts.Key == "" {
 			return false, fmt.Errorf("invalid 'key' for SetConfigMetadataSettingInputOptions for the specified runtime version %v", opts.RuntimeVersion)
 		}
@@ -61,7 +61,7 @@ func (opts *GetMetadataOutputOptions) Validate() (bool, error) {
 	}
 
 	switch opts.RuntimeVersion {
-	case core.VersionLatest, core.Version090, core.Version0280:
+	case core.VersionLatest, core.Version102, core.Version090, core.Version0280:
 		if opts.MetadataOpts != nil && opts.MetadataOpts.ConfigMetadata == nil && opts.MetadataOpts.ConfigMetadata.Settings == nil && opts.MetadataOpts.ConfigMetadata.PatchStrategy == nil {
 			return false, fmt.Errorf("invalid 'key' for GetMetadataOutputOptions for the specified runtime version %v", opts.RuntimeVersion)
 		}
@@ -79,7 +79,7 @@ func (opts *GetConfigMetadataOutputOptions) Validate() (bool, error) {
 	}
 
 	switch opts.RuntimeVersion {
-	case core.VersionLatest, core.Version090, core.Version0280:
+	case core.VersionLatest, core.Version102, core.Version090, core.Version0280:
 		if opts.ConfigMetadataOpts != nil && opts.ConfigMetadataOpts.Settings == nil && opts.ConfigMetadataOpts.PatchStrategy == nil {
 			return false, fmt.Errorf("invalid 'key' for GetConfigMetadataOutputOptions for the specified runtime version %v", opts.RuntimeVersion)
 		}
@@ -97,7 +97,7 @@ func (opts *GetConfigMetadataPatchStrategyOutputOptions) Validate() (bool, error
 	}
 
 	switch opts.RuntimeVersion {
-	case core.VersionLatest, core.Version090, core.Version0280:
+	case core.VersionLatest, core.Version102, core.Version090, core.Version0280:
 		if opts.PatchStrategy == nil {
 			return false, fmt.Errorf("invalid 'key' for GetConfigMetadataPatchStrategyOutputOptions for the specified runtime version %v", opts.RuntimeVersion)
 		}
@@ -115,7 +115,7 @@ func (opts *GetConfigMetadataSettingsOutputOptions) Validate() (bool, error) {
 	}
 
 	switch opts.RuntimeVersion {
-	case core.VersionLatest, core.Version090, core.Version0280:
+	case core.VersionLatest, core.Version102, core.Version090, core.Version0280:
 		if opts.MetadataSettings == nil {
 			return false, fmt.Errorf("invalid 'key' for GetConfigMetadataSettingsOutputOptions for the specified runtime version %v", opts.RuntimeVersion)
 		}
@@ -133,7 +133,7 @@ func (opts *GetConfigMetadataSettingInputOptions) Validate() (bool, error) {
 	}
 
 	switch opts.RuntimeVersion {
-	case core.VersionLatest, core.Version090, core.Version0280:
+	case core.VersionLatest, core.Version102, core.Version090, core.Version0280:
 		if opts.Key == "" {
 			return false, fmt.Errorf("invalid 'key' for GetConfigMetadataSettingInputOptions for the specified runtime version %v", opts.RuntimeVersion)
 		}
@@ -151,7 +151,7 @@ func (opts *GetConfigMetadataSettingOutputOptions) Validate() (bool, error) {
 	}
 
 	switch opts.RuntimeVersion {
-	case core.VersionLatest, core.Version090, core.Version0280:
+	case core.VersionLatest, core.Version102, core.Version090, core.Version0280:
 		if opts.Value == "" {
 			return false, fmt.Errorf("invalid 'key' for GetConfigMetadataSettingOutputOptions for the specified runtime version %v", opts.RuntimeVersion)
 		}
@@ -169,7 +169,7 @@ func (opts *IsConfigMetadataSettingsEnabledInputOptions) Validate() (bool, error
 	}
 
 	switch opts.RuntimeVersion {
-	case core.VersionLatest, core.Version090, core.Version0280:
+	case core.VersionLatest, core.Version102, core.Version090, core.Version0280:
 		if opts.Key == "" {
 			return false, fmt.Errorf("invalid 'key' for IsConfigMetadataSettingsEnabledInputOptions for the specified runtime version %v", opts.RuntimeVersion)
 		}
@@ -186,7 +186,7 @@ func (opts *DeleteConfigMetadataSettingInputOptions) Validate() (bool, error) {
 		return false, err
 	}
 	switch opts.RuntimeVersion {
-	case core.VersionLatest, core.Version090, core.Version0280:
+	case core.VersionLatest, core.Version102, core.Version090, core.Version0280:
 		if opts.Key == "" {
 			return false, fmt.Errorf("invalid 'key' for DeleteConfigMetadataSettingInputOptions for the specified runtime version %v", opts.RuntimeVersion)
 		}

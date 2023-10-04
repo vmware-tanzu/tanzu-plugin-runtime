@@ -20,7 +20,7 @@ func (opts *SetCLIDiscoverySourceInputOptions) Validate() (bool, error) {
 	}
 
 	switch opts.RuntimeVersion {
-	case core.VersionLatest, core.Version090, core.Version0280, core.Version0116:
+	case core.VersionLatest, core.Version102, core.Version090, core.Version0280, core.Version0116:
 		err = opts.PluginDiscoveryOpts.ValidPluginDiscovery()
 		if err != nil {
 			return false, err
@@ -65,7 +65,7 @@ func (opts *GetCLIDiscoverySourceOutputOptions) Validate() (bool, error) {
 	}
 
 	switch opts.RuntimeVersion {
-	case core.VersionLatest, core.Version090, core.Version0280, core.Version0116:
+	case core.VersionLatest, core.Version102, core.Version090, core.Version0280, core.Version0116:
 		err = opts.PluginDiscoveryOpts.ValidPluginDiscovery()
 		if err != nil {
 			return false, err

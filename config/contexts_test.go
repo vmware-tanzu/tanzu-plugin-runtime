@@ -6,12 +6,20 @@ package config
 import (
 	"testing"
 
+	. "github.com/onsi/ginkgo/v2"
+	"github.com/onsi/gomega"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v3"
 
 	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
+
+func TestCliCmdSuite(t *testing.T) {
+	gomega.RegisterFailHandler(Fail)
+	RunSpecs(t, "config suite")
+}
 
 func TestSetGetDeleteContext(t *testing.T) {
 	// Setup config data
@@ -430,7 +438,7 @@ func TestSetContextWithDiscoverySource(t *testing.T) {
 	}
 }
 
-func setupForGetContext(t *testing.T) {
+func setupForGetContext() error {
 	// setup
 	cfg := &configtypes.ClientConfig{
 		KnownContexts: []*configtypes.Context{
@@ -477,18 +485,18 @@ func setupForGetContext(t *testing.T) {
 		CurrentContext: map[configtypes.Target]string{
 			configtypes.TargetK8s: "test-mc-2",
 			configtypes.TargetTMC: "test-tmc",
-			configtypes.TargetTAE: "test-tae",
 		},
 	}
-	func() {
+	return func() error {
 		LocalDirName = TestLocalDirName
 		err := StoreClientConfig(cfg)
-		assert.NoError(t, err)
+		return err
 	}()
 }
 
 func TestGetContext(t *testing.T) {
-	setupForGetContext(t)
+	err := setupForGetContext()
+	assert.NoError(t, err)
 
 	defer func() {
 		cleanupDir(LocalDirName)
@@ -532,7 +540,8 @@ func TestGetContext(t *testing.T) {
 }
 
 func TestContextExists(t *testing.T) {
-	setupForGetContext(t)
+	err := setupForGetContext()
+	assert.NoError(t, err)
 
 	defer func() {
 		cleanupDir(LocalDirName)
@@ -740,7 +749,8 @@ func TestSetContext(t *testing.T) {
 
 func TestRemoveContext(t *testing.T) {
 	// setup
-	setupForGetContext(t)
+	err := setupForGetContext()
+	assert.NoError(t, err)
 	defer func() {
 		cleanupDir(LocalDirName)
 	}()
@@ -795,97 +805,66 @@ func TestRemoveContext(t *testing.T) {
 	}
 }
 
-func TestSetCurrentContext(t *testing.T) {
+func TestGetAllCurrentContexts(t *testing.T) {
 	// setup
-	setupForGetContext(t)
+	err := setupForGetContext()
+	assert.NoError(t, err)
 	defer func() {
 		cleanupDir(LocalDirName)
 	}()
-	tcs := []struct {
-		name       string
-		target     configtypes.Target
-		ctxName    string
-		currServer string
-		errStr     string
-	}{
-		{
-			name:    "success tmc",
-			ctxName: "test-tmc",
-			target:  configtypes.TargetTMC,
-		},
-		{
-			name:       "success k8s",
-			ctxName:    "test-mc",
-			target:     configtypes.TargetK8s,
-			currServer: "test-mc",
-		},
-		{
-			name:    "success tae",
-			ctxName: "test-tae",
-			target:  configtypes.TargetTAE,
-		},
-		{
-			name:    "success tmc after setting k8s",
-			ctxName: "test-tmc",
-			target:  configtypes.TargetTMC,
-		},
-		{
-			name:    "failure",
-			ctxName: "test",
-			errStr:  "context test not found",
-		},
-	}
-
-	for _, tc := range tcs {
-		t.Run(tc.name, func(t *testing.T) {
-			prevSrv, _ := GetCurrentServer()
-
-			err := SetCurrentContext(tc.ctxName)
-			if tc.errStr == "" {
-				assert.NoError(t, err)
-			} else {
-				assert.EqualError(t, err, tc.errStr)
-			}
-			currCtx, err := GetCurrentContext(tc.target)
-			if tc.errStr == "" {
-				assert.NoError(t, err)
-				assert.Equal(t, tc.ctxName, currCtx.Name)
-			} else {
-				assert.Error(t, err)
-			}
-			currSrv, err := GetCurrentServer()
-			assert.NoError(t, err)
-			if tc.errStr == "" {
-				if tc.currServer == "" {
-					assert.Equal(t, prevSrv.Name, currSrv.Name)
-				} else {
-					assert.Equal(t, tc.currServer, currSrv.Name)
-				}
-			}
-		})
-	}
 
 	currentContextMap, err := GetAllCurrentContextsMap()
 	assert.NoError(t, err)
-	assert.Equal(t, "test-mc", currentContextMap[configtypes.TargetK8s].Name)
+	assert.Equal(t, "test-mc-2", currentContextMap[configtypes.TargetK8s].Name)
 	assert.Equal(t, "test-tmc", currentContextMap[configtypes.TargetTMC].Name)
-	assert.Equal(t, "test-tae", currentContextMap[configtypes.TargetTAE].Name)
+	assert.Nil(t, currentContextMap[configtypes.TargetTAE])
 
 	currentContextsList, err := GetAllCurrentContextsList()
 	assert.NoError(t, err)
-	assert.Contains(t, currentContextsList, "test-mc")
+	assert.Contains(t, currentContextsList, "test-mc-2")
+	assert.Contains(t, currentContextsList, "test-tmc")
+	assert.NotContains(t, currentContextsList, "test-tae")
+
+	// set the tae context (k8s and tae current contexts are mutual exclusive)
+	err = SetCurrentContext("test-tae")
+	assert.NoError(t, err)
+	currentContextMap, err = GetAllCurrentContextsMap()
+	assert.NoError(t, err)
+	assert.Nil(t, currentContextMap[configtypes.TargetK8s])
+	assert.Equal(t, "test-tmc", currentContextMap[configtypes.TargetTMC].Name)
+	assert.Equal(t, "test-tae", currentContextMap[configtypes.TargetTAE].Name)
+
+	currentContextsList, err = GetAllCurrentContextsList()
+	assert.NoError(t, err)
+	assert.NotContains(t, currentContextsList, "test-mc2")
 	assert.Contains(t, currentContextsList, "test-tmc")
 	assert.Contains(t, currentContextsList, "test-tae")
+
+	// remove the tae current context
+	err = RemoveCurrentContext(configtypes.TargetTAE)
+	assert.NoError(t, err)
+	currentContextMap, err = GetAllCurrentContextsMap()
+	assert.NoError(t, err)
+	assert.Nil(t, currentContextMap[configtypes.TargetK8s])
+	assert.Equal(t, "test-tmc", currentContextMap[configtypes.TargetTMC].Name)
+	assert.Nil(t, currentContextMap[configtypes.TargetTAE])
+
+	currentContextsList, err = GetAllCurrentContextsList()
+	assert.NoError(t, err)
+	assert.NotContains(t, currentContextsList, "test-mc")
+	assert.Contains(t, currentContextsList, "test-tmc")
+	assert.NotContains(t, currentContextsList, "test-tae")
 }
 
 func TestRemoveCurrentContext(t *testing.T) {
 	// setup
-	setupForGetContext(t)
+	err := setupForGetContext()
+	assert.NoError(t, err)
 	defer func() {
 		cleanupDir(LocalDirName)
 	}()
 
-	err := RemoveCurrentContext(configtypes.TargetK8s)
+	err = RemoveCurrentContext(configtypes.TargetK8s)
 	assert.NoError(t, err)
 
 	currCtx, err := GetCurrentContext(configtypes.TargetK8s)
@@ -1282,5 +1261,104 @@ func TestSetContextWithEmptyName(t *testing.T) {
 				assert.EqualError(t, err, tc.errStr)
 			}
 		})
+	}
+}
+
+var _ = Describe("testing SetCurrentContext", func() {
+	var (
+		err error
+	)
+
+	BeforeEach(func() {
+		// setup
+		err := setupForGetContext()
+		gomega.Expect(err).To(gomega.BeNil())
+	})
+	AfterEach(func() {
+		cleanupDir(LocalDirName)
+	})
+
+	Context("tmc context as current context", func() {
+		It("should set tmc context as current context successfully", func() {
+			err = SetCurrentContext("test-tmc")
+			gomega.Expect(err).To(gomega.BeNil())
+			validateCurrentContext(configtypes.TargetTMC, "test-tmc", true, "test-mc-2")
+		})
+	})
+	Context("k8s context as current context", func() {
+		It("should set k8s context as current context successfully", func() {
+			err = SetCurrentContext("test-mc")
+			gomega.Expect(err).To(gomega.BeNil())
+			validateCurrentContext(configtypes.TargetK8s, "test-mc", true, "test-mc")
+
+		})
+	})
+	Context("tae context as current context", func() {
+		It("should set tae context as current context successfully", func() {
+			//Remove the k8s current context set during initial setup
+			err = RemoveCurrentContext(configtypes.TargetK8s)
+			gomega.Expect(err).To(gomega.BeNil())
+
+			err = SetCurrentContext("test-tae")
+			gomega.Expect(err).To(gomega.BeNil())
+			validateCurrentContext(configtypes.TargetTAE, "test-tae", false, "")
+
+		})
+	})
+	Context("k8s context as current context after tmc context ", func() {
+		It("should have k8s and tmc contexts as current for their respective targets", func() {
+			err = SetCurrentContext("test-tmc")
+			gomega.Expect(err).To(gomega.BeNil())
+			validateCurrentContext(configtypes.TargetTMC, "test-tmc", true, "test-mc-2")
+
+			err = SetCurrentContext("test-mc")
+			gomega.Expect(err).To(gomega.BeNil())
+			validateCurrentContext(configtypes.TargetK8s, "test-mc", true, "test-mc")
+
+		})
+	})
+	Context("k8s context as current context after tae context(mutual-exclusion test between k8s and tae) ", func() {
+		It("should have only k8s as current context and tae context should be removed from the current context", func() {
+			err = SetCurrentContext("test-tae")
+			gomega.Expect(err).To(gomega.BeNil())
+			validateCurrentContext(configtypes.TargetTAE, "test-tae", false, "")
+
+			err = SetCurrentContext("test-mc")
+			gomega.Expect(err).To(gomega.BeNil())
+			validateCurrentContext(configtypes.TargetK8s, "test-mc", true, "test-mc")
+
+			_, err = GetCurrentContext(configtypes.TargetTAE)
+			gomega.Expect(err).ToNot(gomega.BeNil())
+			gomega.Expect(err.Error()).To(gomega.ContainSubstring(`no current context set for target "application-engine"`))
+		})
+	})
+	Context("tae context as current context after k8s context(mutual-exclusion test between k8s and tae) ", func() {
+		It("should have only tae as current context and k8s context should be removed from the current context", func() {
+			err = SetCurrentContext("test-mc")
+			gomega.Expect(err).To(gomega.BeNil())
+			validateCurrentContext(configtypes.TargetK8s, "test-mc", true, "test-mc")
+
+			err = SetCurrentContext("test-tae")
+			gomega.Expect(err).To(gomega.BeNil())
+			validateCurrentContext(configtypes.TargetTAE, "test-tae", false, "")
+
+			_, err = GetCurrentContext(configtypes.TargetK8s)
+			gomega.Expect(err).ToNot(gomega.BeNil())
+			gomega.Expect(err.Error()).To(gomega.ContainSubstring(`no current context set for target "kubernetes"`))
+		})
+	})
+})
+
+func validateCurrentContext(target configtypes.Target, ctxName string, isServerExpected bool, serverName string) {
+	c, err := GetCurrentContext(target)
+	gomega.Expect(err).To(gomega.BeNil())
+	gomega.Expect(c.Name).To(gomega.Equal(ctxName))
+
+	server, err := GetCurrentServer()
+	if !isServerExpected {
+		gomega.Expect(err).ToNot(gomega.BeNil())
+	} else {
+		gomega.Expect(err).To(gomega.BeNil())
+		gomega.Expect(server.Name).To(gomega.Equal(serverName))
 	}
 }

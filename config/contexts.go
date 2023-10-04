@@ -394,6 +394,14 @@ func setCurrentContext(node *yaml.Node, ctx *configtypes.Context) (persist bool,
 		currentContextNode.Content = append(currentContextNode.Content, nodeutils.CreateScalarNode(string(ctx.Target), ctx.Name)...)
 		persist = true
 	}
+	// maintain mutual exclusive behavior among all the current context types except TMC
+	// (i.e. there can only be one active current context among all the context types except TMC.
+	//  TMC context type can still be active when other context types are active)
+	if persist {
+		if err := updateMutualExclusiveCurrentContexts(node, ctx); err != nil {
+			return persist, err
+		}
+	}
 	return persist, err
 }
 
@@ -441,5 +449,34 @@ func removeContext(node *yaml.Node, name string) error {
 		contexts = append(contexts, contextNode)
 	}
 	contextsNode.Content = contexts
+	return nil
+}
+
+// updateMutualExclusiveCurrentContexts updates the current contexts to maintain
+// mutual exclusive behavior among the current context types except TMC
+func updateMutualExclusiveCurrentContexts(node *yaml.Node, ctx *configtypes.Context) error {
+	if ctx.Target == configtypes.TargetTMC {
+		return nil
+	}
+
+	cfg, err := convertNodeToClientConfig(node)
+	if err != nil {
+		return err
+	}
+	// deactivate all the other existing current contexts that are not TMC
+	for target, contextName := range cfg.CurrentContext {
+		if target == ctx.Target || target == configtypes.TargetTMC {
+			continue
+		}
+
+		err = removeCurrentContext(node, &configtypes.Context{Target: target})
+		if err != nil {
+			return err
+		}
+		err = removeCurrentServer(node, contextName)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }

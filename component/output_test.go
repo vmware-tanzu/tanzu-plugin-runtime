@@ -16,6 +16,45 @@ var mapValue = map[string]string{
 	"b": "bar",
 }
 
+const (
+	// leading newline, added for readability, should be trimmed during compare
+
+	expectedYAMLStringified = `
+- a: "1"
+  b: map[b:bar f:foo]
+  c: "2"
+`
+
+	expectedYAML = `
+- a: "1"
+  b:
+    b: bar
+    f: foo
+  c: 2
+`
+
+	expectedJSONStringified = `
+[
+  {
+    "a": "1",
+    "b": "map[b:bar f:foo]",
+    "c": "2"
+  }
+]`
+
+	expectedJSON = `
+[
+  {
+    "a": "1",
+    "b": {
+      "b": "bar",
+      "f": "foo"
+    },
+    "c": 2
+  }
+]`
+)
+
 func TestNewOutputWriterTable(t *testing.T) {
 	var b bytes.Buffer
 	tab := NewOutputWriter(&b, string(TableOutputType), "a", "b", "c")
@@ -296,15 +335,21 @@ func TestNewOutputWriterYAMLNonStrings(t *testing.T) {
 	output := b.String()
 	require.NotNil(t, output)
 
-	// leading newline, added for readability, should be trimmed during compare
-	expected := `
-- a: "1"
-  b:
-    b: bar
-    f: foo
-  c: 2
-`
-	require.Equal(t, expected[1:], output)
+	require.Equal(t, expectedYAMLStringified[1:], output)
+}
+
+func TestNewOutputWriterWithOptionsYAML(t *testing.T) {
+	var b bytes.Buffer
+
+	tab := NewOutputWriterWithOptions(&b, string(YAMLOutputType), []OutputWriterOption{}, "a", "b", "c")
+	require.NotNil(t, tab)
+	tab.AddRow("1", mapValue, 2)
+	tab.Render()
+
+	output := b.String()
+	require.NotNil(t, output)
+
+	require.Equal(t, expectedYAML[1:], output)
 }
 
 func TestNewOutputWriterJSONNonStrings(t *testing.T) {
@@ -317,20 +362,49 @@ func TestNewOutputWriterJSONNonStrings(t *testing.T) {
 	output := b.String()
 	require.NotNil(t, output)
 
-	// leading newline, added for readability, should be trimmed during compare
-	expected := `
-[
-  {
-    "a": "1",
-    "b": {
-      "b": "bar",
-      "f": "foo"
-    },
-    "c": 2
-  }
-]`
+	require.Equal(t, expectedJSONStringified[1:], output)
+}
 
-	require.Equal(t, expected[1:], output)
+func TestNewOutputWriterWithOptionsJSON(t *testing.T) {
+	var b bytes.Buffer
+
+	tab := NewOutputWriterWithOptions(&b, string(JSONOutputType), []OutputWriterOption{}, "a", "b", "c")
+	require.NotNil(t, tab)
+	tab.AddRow("1", mapValue, 2)
+	tab.Render()
+
+	output := b.String()
+	require.NotNil(t, output)
+
+	require.Equal(t, expectedJSON[1:], output)
+}
+
+func TestNewOutputWriterWithOptionsJSONAutoStringify(t *testing.T) {
+	var b bytes.Buffer
+
+	tab := NewOutputWriterWithOptions(&b, string(JSONOutputType), []OutputWriterOption{WithAutoStringify()}, "a", "b", "c")
+	require.NotNil(t, tab)
+	tab.AddRow("1", mapValue, 2)
+	tab.Render()
+
+	output := b.String()
+	require.NotNil(t, output)
+
+	require.Equal(t, expectedJSONStringified[1:], output)
+}
+
+func TestNewOutputWriterWithOptionsYAMLAutoStringify(t *testing.T) {
+	var b bytes.Buffer
+
+	tab := NewOutputWriterWithOptions(&b, string(YAMLOutputType), []OutputWriterOption{WithAutoStringify()}, "a", "b", "c")
+	require.NotNil(t, tab)
+	tab.AddRow("1", mapValue, 2)
+	tab.Render()
+
+	output := b.String()
+	require.NotNil(t, output)
+
+	require.Equal(t, expectedYAMLStringified[1:], output)
 }
 
 func TestNewOutputWriterTableListNonStrings(t *testing.T) {
@@ -351,6 +425,65 @@ B:           map[b:bar f:foo], 4
 C:           2, 5
 `
 	require.Equal(t, expected[1:], output)
+}
+
+func TestNewOutputWriterSpinnerJSONNonStrings(t *testing.T) {
+	var b bytes.Buffer
+	tab, err := NewOutputWriterWithSpinner(&b, string(JSONOutputType), "unused", true, "a", "b", "c")
+	require.Nil(t, err)
+	require.NotNil(t, tab)
+	tab.AddRow("1", mapValue, 2)
+	tab.RenderWithSpinner()
+
+	output := b.String()
+	require.NotNil(t, output)
+
+	require.Equal(t, expectedJSONStringified[1:], output)
+}
+
+func TestNewOutputWriterSpinnerWithOptionsJSON(t *testing.T) {
+	var b bytes.Buffer
+
+	tab, err := NewOutputWriterSpinnerWithOptions(&b, string(JSONOutputType), "unused", true, []OutputWriterOption{}, "a", "b", "c")
+	require.Nil(t, err)
+	require.NotNil(t, tab)
+	tab.AddRow("1", mapValue, 2)
+	tab.RenderWithSpinner()
+
+	output := b.String()
+	require.NotNil(t, output)
+
+	require.Equal(t, expectedJSON[1:], output)
+}
+
+func TestNewOutputWriterSpinnerWithOptionsJSONAutoStringify(t *testing.T) {
+	var b bytes.Buffer
+
+	tab, err := NewOutputWriterSpinnerWithOptions(&b, string(JSONOutputType), "unused", true, []OutputWriterOption{WithAutoStringify()}, "a", "b", "c")
+	require.Nil(t, err)
+	require.NotNil(t, tab)
+	tab.AddRow("1", mapValue, 2)
+	tab.RenderWithSpinner()
+
+	output := b.String()
+	require.NotNil(t, output)
+
+	require.Equal(t, expectedJSONStringified[1:], output)
+}
+
+func TestNewOutputWriterSpinnerWithOptionsYAMLAutoStringify(t *testing.T) {
+	var b bytes.Buffer
+
+	tab, err := NewOutputWriterSpinnerWithOptions(&b, string(YAMLOutputType), "unused", true, []OutputWriterOption{WithAutoStringify()}, "a", "b", "c")
+	require.Nil(t, err)
+	require.NotNil(t, tab)
+	tab.AddRow("1", mapValue, 2)
+	tab.RenderWithSpinner()
+
+	output := b.String()
+	require.NotNil(t, output)
+
+	require.Equal(t, expectedYAMLStringified[1:], output)
 }
 
 func TestOutputWriterCharactersInKeys(t *testing.T) {

@@ -10,20 +10,23 @@ import (
 	"strings"
 )
 
-// ContextType is a new Datatype introduced to represent the type of control plane
+// ContextType defines the type of control plane endpoint a context represents
 type ContextType string
 
 const (
 	// ContextTypeK8s represents a type of control plane endpoint that is a Kubernetes cluster
 	ContextTypeK8s ContextType = "kubernetes"
+	contextTypeK8s ContextType = "k8s"
 
 	// ContextTypeTMC represents a type of control plane endpoint that is a TMC SaaS/self-managed endpoint
 	ContextTypeTMC ContextType = "mission-control"
+	contextTypeTMC ContextType = "tmc"
 
 	// ContextTypeTAE is a used to indicate the type of Context used to interact with
 	// Tanzu Application Engine (Unified Control Plane) endpoint
 	// Note!! Experimental, please expect changes
 	ContextTypeTAE ContextType = "application-engine"
+	contextTypeTAE ContextType = "tae"
 )
 
 // Target is the namespace of the CLI to which plugin is applicable
@@ -121,7 +124,7 @@ func (s *Server) IsManagementCluster() bool {
 
 // GetCurrentServer returns the current server.
 //
-// Deprecated: This API is deprecated. Use GetActiveContext() instead.
+// Deprecated: GetCurrentServer is deprecated. Use GetActiveContext() instead.
 func (c *ClientConfig) GetCurrentServer() (*Server, error) {
 	for _, server := range c.KnownServers {
 		if server.Name == c.CurrentServer {
@@ -205,10 +208,10 @@ func (c *ClientConfig) GetAllActiveContextsMap() (map[ContextType]*Context, erro
 	return currentContexts, nil
 }
 
-// GetAllCurrentContextsList returns all current context names as list
-func (c *ClientConfig) GetAllCurrentContextsList() ([]string, error) {
+// GetAllActiveContextsList returns all active context names as list
+func (c *ClientConfig) GetAllActiveContextsList() ([]string, error) {
 	var serverNames []string
-	currentContextsMap, err := c.GetAllCurrentContextsMap()
+	currentContextsMap, err := c.GetAllActiveContextsMap()
 	if err != nil {
 		return nil, err
 	}
@@ -217,6 +220,13 @@ func (c *ClientConfig) GetAllCurrentContextsList() ([]string, error) {
 		serverNames = append(serverNames, context.Name)
 	}
 	return serverNames, nil
+}
+
+// GetAllCurrentContextsList returns all current context names as list
+//
+// Deprecated: GetAllCurrentContextsList is deprecated. Use GetAllActiveContextsList instead
+func (c *ClientConfig) GetAllCurrentContextsList() ([]string, error) {
+	return c.GetAllActiveContextsList()
 }
 
 // SetCurrentContext sets the current context for the given target.
@@ -338,14 +348,6 @@ func (c *ClientConfig) SetEditionSelector(edition EditionSelector) {
 		return
 	}
 	c.ClientOptions.CLI.UnstableVersionSelector = EditionStandard
-}
-
-func SyncContextTypeAndTarget(ctx *Context) {
-	if ctx.ContextType == "" {
-		ctx.ContextType = ConvertTargetToContextType(ctx.Target)
-	} else if ctx.Target == "" {
-		ctx.Target = ConvertContextTypeToTarget(ctx.ContextType)
-	}
 }
 
 func ConvertTargetToContextType(target Target) ContextType {

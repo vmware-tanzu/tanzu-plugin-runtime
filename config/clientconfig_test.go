@@ -324,8 +324,8 @@ func TestEndpointFromContext(t *testing.T) {
 		{
 			name: "success k8s",
 			ctx: &configtypes.Context{
-				Name:   "test-mc",
-				Target: configtypes.TargetK8s,
+				Name:        "test-mc",
+				ContextType: configtypes.ContextTypeK8s,
 				ClusterOpts: &configtypes.ClusterServer{
 					Endpoint:            "test-endpoint",
 					Path:                "test-path",
@@ -337,8 +337,8 @@ func TestEndpointFromContext(t *testing.T) {
 		{
 			name: "success tmc current",
 			ctx: &configtypes.Context{
-				Name:   "test-tmc",
-				Target: configtypes.TargetTMC,
+				Name:        "test-tmc",
+				ContextType: configtypes.ContextTypeTMC,
 				GlobalOpts: &configtypes.GlobalServer{
 					Endpoint: "test-endpoint",
 				},
@@ -347,8 +347,8 @@ func TestEndpointFromContext(t *testing.T) {
 		{
 			name: "failure",
 			ctx: &configtypes.Context{
-				Name:   "test-dummy",
-				Target: "dummy",
+				Name:        "test-dummy",
+				ContextType: "dummy",
 				ClusterOpts: &configtypes.ClusterServer{
 					Endpoint:            "test-endpoint",
 					Path:                "test-path",
@@ -356,7 +356,7 @@ func TestEndpointFromContext(t *testing.T) {
 					IsManagementCluster: true,
 				},
 			},
-			errStr: "unknown server type \"dummy\"",
+			errStr: "unknown context type \"dummy\"",
 		},
 	}
 

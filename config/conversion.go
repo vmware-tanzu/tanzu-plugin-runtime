@@ -97,6 +97,9 @@ func populateServers(cfg *configtypes.ClientConfig) {
 		cfg.KnownServers = make([]*configtypes.Server, 0, len(cfg.KnownContexts))
 	}
 	for _, c := range cfg.KnownContexts {
+		fillMissingContextTypeInContext(c)
+		fillMissingTargetInContext(c)
+
 		if cfg.HasServer(c.Name) {
 			// context already present in known servers; skip
 			continue
@@ -106,7 +109,7 @@ func populateServers(cfg *configtypes.ClientConfig) {
 		s := convertContextToServer(c)
 		cfg.KnownServers = append(cfg.KnownServers, s)
 
-		if cfg.CurrentServer == "" && (c.IsManagementCluster() || c.Target == configtypes.TargetTMC) && c.Name == cfg.CurrentContext[c.ContextType] {
+		if cfg.CurrentServer == "" && (c.IsManagementCluster() || c.Target == configtypes.TargetK8s || c.Target == configtypes.TargetTMC) && c.Name == cfg.CurrentContext[c.ContextType] {
 			// This is lossy because only one server can be active at a time in the older CLI.
 			// Using the K8s context for a management cluster or TMC, since these are the two
 			// available publicly at the time of deprecation.

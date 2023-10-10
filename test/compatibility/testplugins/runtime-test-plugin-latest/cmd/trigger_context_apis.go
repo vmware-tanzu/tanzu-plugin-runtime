@@ -145,7 +145,7 @@ func deleteContext(contextName string) *core.APIResponse {
 }
 
 func setCurrentContext(contextName string) *core.APIResponse {
-	err := configlib.SetCurrentContext(contextName)
+	err := configlib.SetActiveContext(contextName)
 	if err != nil {
 		return &core.APIResponse{
 			ResponseType: core.ErrorResponse,
@@ -179,7 +179,7 @@ func getCurrentContext(target configtypes.Target) *core.APIResponse {
 }
 
 func removeCurrentContext(target configtypes.Target) *core.APIResponse {
-	err := configlib.RemoveCurrentContext(target)
+	err := configlib.RemoveCurrentContext(target) //nolint:staticcheck // Deprecated
 	if err != nil {
 		return &core.APIResponse{
 			ResponseType: core.ErrorResponse,

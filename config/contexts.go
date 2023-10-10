@@ -154,12 +154,7 @@ func validateContext(c *configtypes.Context) error {
 //
 // Deprecated: GetCurrentContext is deprecated. Use GetActiveContext instead
 func GetCurrentContext(target configtypes.Target) (c *configtypes.Context, err error) {
-	// Retrieve client config node
-	node, err := getClientConfigNode()
-	if err != nil {
-		return nil, err
-	}
-	return getActiveContext(node, configtypes.ConvertTargetToContextType(target))
+	return GetActiveContext(configtypes.ConvertTargetToContextType(target))
 }
 
 // GetActiveContext retrieves the active context for the specified contextType
@@ -194,7 +189,7 @@ func GetAllActiveContextsMap() (map[configtypes.ContextType]*configtypes.Context
 
 // GetAllActiveContextsList returns all active context names as list
 func GetAllActiveContextsList() ([]string, error) {
-	currentContextsMap, err := GetAllCurrentContextsMap()
+	currentContextsMap, err := GetAllActiveContextsMap()
 	if err != nil {
 		return nil, err
 	}
@@ -213,7 +208,14 @@ func GetAllCurrentContextsList() ([]string, error) {
 }
 
 // SetCurrentContext sets the current context to the specified name if context is present
+//
+// Deprecated: SetCurrentContext is deprecated. Use SetActiveContext instead
 func SetCurrentContext(name string) error {
+	return SetActiveContext(name)
+}
+
+// SetActiveContext sets the active context to the specified name if context is present
+func SetActiveContext(name string) error {
 	// Retrieve client config node
 	AcquireTanzuConfigLock()
 	defer ReleaseTanzuConfigLock()
@@ -252,7 +254,15 @@ func SetCurrentContext(name string) error {
 }
 
 // RemoveCurrentContext removed the current context of specified context type
+//
+// Deprecated: RemoveCurrentContext is deprecated. Use RemoveActiveContext instead
 func RemoveCurrentContext(target configtypes.Target) error {
+	return RemoveActiveContext(configtypes.ConvertTargetToContextType(target))
+}
+
+// RemoveActiveContext removed the current context of specified context type
+func RemoveActiveContext(contextType configtypes.ContextType) error {
+	target := configtypes.ConvertContextTypeToTarget(contextType)
 	// Retrieve client config node
 	AcquireTanzuConfigLock()
 	defer ReleaseTanzuConfigLock()
@@ -275,22 +285,17 @@ func RemoveCurrentContext(target configtypes.Target) error {
 	return persistConfig(node)
 }
 
-// RemoveActiveContext removed the current context of specified context type
-func RemoveActiveContext(contextType configtypes.ContextType) error {
-	return RemoveCurrentContext(configtypes.ConvertContextTypeToTarget(contextType))
-}
-
 // EndpointFromContext retrieved the endpoint from the specified context
 func EndpointFromContext(s *configtypes.Context) (endpoint string, err error) {
-	switch s.Target {
-	case configtypes.TargetK8s:
+	switch s.ContextType {
+	case configtypes.ContextTypeK8s:
 		return s.ClusterOpts.Endpoint, nil
-	case configtypes.TargetTMC:
+	case configtypes.ContextTypeTMC:
 		return s.GlobalOpts.Endpoint, nil
-	case configtypes.TargetTAE:
+	case configtypes.ContextTypeTAE:
 		return s.ClusterOpts.Endpoint, nil
 	default:
-		return endpoint, fmt.Errorf("unknown server type %q", s.Target)
+		return endpoint, fmt.Errorf("unknown context type %q", s.ContextType)
 	}
 }
 
@@ -313,11 +318,7 @@ func getContext(node *yaml.Node, name string) (*configtypes.Context, error) {
 }
 
 func getCurrentContext(node *yaml.Node, target configtypes.Target) (*configtypes.Context, error) {
-	cfg, err := convertNodeToClientConfig(node)
-	if err != nil {
-		return nil, err
-	}
-	return cfg.GetCurrentContext(target) //nolint:staticcheck // Deprecated
+	return getActiveContext(node, configtypes.ConvertTargetToContextType(target))
 }
 
 func getActiveContext(node *yaml.Node, contextType configtypes.ContextType) (*configtypes.Context, error) {

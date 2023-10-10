@@ -4,7 +4,6 @@
 package config
 
 import (
-	"os"
 	"testing"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -489,7 +488,6 @@ func setupForGetContext() error {
 		},
 	}
 	return func() error {
-		os.Unsetenv(EnvConfigKey)
 		LocalDirName = TestLocalDirName
 		err := StoreClientConfig(cfg)
 		return err
@@ -1387,7 +1385,7 @@ var _ = Describe("testing SetCurrentContext", func() {
 
 			_, err = GetCurrentContext(configtypes.TargetTAE)
 			gomega.Expect(err).ToNot(gomega.BeNil())
-			gomega.Expect(err.Error()).To(gomega.ContainSubstring(`no current context set for target "application-engine"`))
+			gomega.Expect(err.Error()).To(gomega.ContainSubstring(`no current context set for type "application-engine"`))
 		})
 	})
 	Context("tae context as current context after k8s context(mutual-exclusion test between k8s and tae) ", func() {
@@ -1402,7 +1400,7 @@ var _ = Describe("testing SetCurrentContext", func() {
 
 			_, err = GetCurrentContext(configtypes.TargetK8s)
 			gomega.Expect(err).ToNot(gomega.BeNil())
-			gomega.Expect(err.Error()).To(gomega.ContainSubstring(`no current context set for target "kubernetes"`))
+			gomega.Expect(err.Error()).To(gomega.ContainSubstring(`no current context set for type "kubernetes"`))
 		})
 	})
 })

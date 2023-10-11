@@ -167,7 +167,7 @@ func clientConfigSetCurrentContext(cfg *configtypes.ClientConfig, node *yaml.Nod
 			if contextErr != nil {
 				return contextErr
 			}
-			_, err := setCurrentContext(node, ctx)
+			_, err := setCurrentContext(node, ctx.Name, ctx.ContextType)
 			if err != nil {
 				return err
 			}

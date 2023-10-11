@@ -53,7 +53,7 @@ func SetContext(c *configtypes.Context, setCurrent bool) error {
 	}
 	// Set current context
 	if setCurrent {
-		persist, err = setCurrentContext(node, c)
+		persist, err = setCurrentContext(node, c.Name, c.ContextType)
 		if err != nil {
 			return err
 		}
@@ -114,7 +114,7 @@ func RemoveContext(name string) error {
 	if err != nil {
 		return err
 	}
-	err = removeCurrentContext(node, ctx)
+	err = removeCurrentContext(node, ctx.Name, ctx.ContextType)
 	if err != nil {
 		return err
 	}
@@ -228,7 +228,7 @@ func SetActiveContext(name string) error {
 	if err != nil {
 		return err
 	}
-	persist, err := setCurrentContext(node, ctx)
+	persist, err := setCurrentContext(node, ctx.Name, ctx.ContextType)
 	if err != nil {
 		return err
 	}
@@ -238,7 +238,7 @@ func SetActiveContext(name string) error {
 			return err
 		}
 	}
-	if ctx.Target == configtypes.TargetK8s {
+	if ctx.ContextType == configtypes.ContextTypeK8s {
 		persist, err = setCurrentServer(node, name)
 		if err != nil {
 			return err
@@ -262,7 +262,6 @@ func RemoveCurrentContext(target configtypes.Target) error {
 
 // RemoveActiveContext removed the current context of specified context type
 func RemoveActiveContext(contextType configtypes.ContextType) error {
-	target := configtypes.ConvertContextTypeToTarget(contextType)
 	// Retrieve client config node
 	AcquireTanzuConfigLock()
 	defer ReleaseTanzuConfigLock()
@@ -270,11 +269,11 @@ func RemoveActiveContext(contextType configtypes.ContextType) error {
 	if err != nil {
 		return err
 	}
-	c, err := getCurrentContext(node, target)
+	c, err := getActiveContext(node, contextType)
 	if err != nil {
 		return err
 	}
-	err = removeCurrentContext(node, &configtypes.Context{Target: target})
+	err = removeCurrentContext(node, "", contextType)
 	if err != nil {
 		return err
 	}
@@ -315,10 +314,6 @@ func getContext(node *yaml.Node, name string) (*configtypes.Context, error) {
 		}
 	}
 	return nil, fmt.Errorf("context %v not found", name)
-}
-
-func getCurrentContext(node *yaml.Node, target configtypes.Target) (*configtypes.Context, error) {
-	return getActiveContext(node, configtypes.ConvertTargetToContextType(target))
 }
 
 func getActiveContext(node *yaml.Node, contextType configtypes.ContextType) (*configtypes.Context, error) {
@@ -444,7 +439,7 @@ func constructPatchStrategies() map[string]string {
 	return patchStrategies
 }
 
-func setCurrentContext(node *yaml.Node, ctx *configtypes.Context) (persist bool, err error) {
+func setCurrentContext(node *yaml.Node, ctxName string, ctxType configtypes.ContextType) (persist bool, err error) {
 	// Find current context node in the yaml node
 	keys := []nodeutils.Key{
 		{Name: KeyCurrentContext, Type: yaml.MappingNode},
@@ -453,28 +448,28 @@ func setCurrentContext(node *yaml.Node, ctx *configtypes.Context) (persist bool,
 	if currentContextNode == nil {
 		return persist, nodeutils.ErrNodeNotFound
 	}
-	if index := nodeutils.GetNodeIndex(currentContextNode.Content, string(ctx.Target)); index != -1 {
-		if currentContextNode.Content[index].Value != ctx.Name {
-			currentContextNode.Content[index].Value = ctx.Name
+	if index := nodeutils.GetNodeIndex(currentContextNode.Content, string(ctxType)); index != -1 {
+		if currentContextNode.Content[index].Value != ctxName {
+			currentContextNode.Content[index].Value = ctxName
 			currentContextNode.Content[index].Style = 0
 			persist = true
 		}
 	} else {
-		currentContextNode.Content = append(currentContextNode.Content, nodeutils.CreateScalarNode(string(ctx.Target), ctx.Name)...)
+		currentContextNode.Content = append(currentContextNode.Content, nodeutils.CreateScalarNode(string(ctxType), ctxName)...)
 		persist = true
 	}
 	// maintain mutual exclusive behavior among all the current context types except TMC
 	// (i.e. there can only be one active current context among all the context types except TMC.
 	//  TMC context type can still be active when other context types are active)
 	if persist {
-		if err := updateMutualExclusiveCurrentContexts(node, ctx); err != nil {
+		if err := updateMutualExclusiveCurrentContexts(node, ctxType); err != nil {
 			return persist, err
 		}
 	}
 	return persist, err
 }
 
-func removeCurrentContext(node *yaml.Node, ctx *configtypes.Context) error {
+func removeCurrentContext(node *yaml.Node, ctxName string, ctxType configtypes.ContextType) error {
 	// Find current context node in the yaml node
 	keys := []nodeutils.Key{
 		{Name: KeyCurrentContext},
@@ -484,13 +479,13 @@ func removeCurrentContext(node *yaml.Node, ctx *configtypes.Context) error {
 	if currentContextNode == nil {
 		return nil
 	}
-	targetNodeIndex := nodeutils.GetNodeIndex(currentContextNode.Content, string(ctx.Target))
-	if targetNodeIndex == -1 {
+	ctNodeIndex := nodeutils.GetNodeIndex(currentContextNode.Content, string(ctxType))
+	if ctNodeIndex == -1 {
 		return nil
 	}
-	if currentContextNode.Content[targetNodeIndex].Value == ctx.Name || ctx.Name == "" {
-		targetNodeIndex--
-		currentContextNode.Content = append(currentContextNode.Content[:targetNodeIndex], currentContextNode.Content[targetNodeIndex+2:]...)
+	if currentContextNode.Content[ctNodeIndex].Value == ctxName || ctxName == "" {
+		ctNodeIndex--
+		currentContextNode.Content = append(currentContextNode.Content[:ctNodeIndex], currentContextNode.Content[ctNodeIndex+2:]...)
 	}
 	return nil
 }
@@ -523,8 +518,8 @@ func removeContext(node *yaml.Node, name string) error {
 
 // updateMutualExclusiveCurrentContexts updates the current contexts to maintain
 // mutual exclusive behavior among the current context types except TMC
-func updateMutualExclusiveCurrentContexts(node *yaml.Node, ctx *configtypes.Context) error {
-	if ctx.Target == configtypes.TargetTMC {
+func updateMutualExclusiveCurrentContexts(node *yaml.Node, setterCtxType configtypes.ContextType) error {
+	if setterCtxType == configtypes.ContextTypeTMC {
 		return nil
 	}
 
@@ -534,11 +529,11 @@ func updateMutualExclusiveCurrentContexts(node *yaml.Node, ctx *configtypes.Cont
 	}
 	// deactivate all the other existing current contexts that are not TMC
 	for contextType, contextName := range cfg.CurrentContext {
-		if contextType == ctx.ContextType || contextType == configtypes.ContextTypeTMC {
+		if contextType == setterCtxType || contextType == configtypes.ContextTypeTMC {
 			continue
 		}
 
-		err = removeCurrentContext(node, &configtypes.Context{Target: configtypes.ConvertContextTypeToTarget(contextType)})
+		err = removeCurrentContext(node, "", contextType)
 		if err != nil {
 			return err
 		}

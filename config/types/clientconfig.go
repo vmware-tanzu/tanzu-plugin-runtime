@@ -48,17 +48,11 @@ const (
 
 	// TargetUnknown specifies that the target is not currently known
 	TargetUnknown Target = ""
-
-	// TargetTAE is a used to indicate the type of Context used to interact with a
-	// Tanzu Application Engine endpoint
-	// Note!! Experimental, please expect changes
-	TargetTAE Target = "application-engine"
-	targetTAE Target = "tae"
 )
 
 var (
 	// SupportedTargets is a list of all supported Target
-	SupportedTargets = []Target{TargetK8s, TargetTMC, TargetTAE}
+	SupportedTargets = []Target{TargetK8s, TargetTMC}
 	// SupportedContextTypes is a list of all supported ContextTypes
 	SupportedContextTypes = []ContextType{ContextTypeK8s, ContextTypeTMC, ContextTypeTAE}
 )
@@ -185,6 +179,7 @@ func (c *ClientConfig) GetActiveContext(context ContextType) (*Context, error) {
 // GetAllCurrentContextsMap returns all current context per Target
 //
 // Deprecated: GetAllCurrentContextsMap is deprecated. Use GetAllActiveContextsMap instead
+// Note: This function will not return newly added ContextType `application-engine` information
 func (c *ClientConfig) GetAllCurrentContextsMap() (map[Target]*Context, error) {
 	currentContexts := make(map[Target]*Context)
 	for _, target := range SupportedTargets {
@@ -246,7 +241,7 @@ func (c *ClientConfig) SetActiveContext(contextType ContextType, ctxName string)
 	if err != nil {
 		return err
 	}
-	if ctx.IsManagementCluster() || ctx.Target == TargetTMC {
+	if ctx.IsManagementCluster() || ctx.ContextType == ContextTypeTMC {
 		c.CurrentServer = ctxName
 	}
 	return nil
@@ -356,7 +351,7 @@ func ConvertTargetToContextType(target Target) ContextType {
 		return ContextTypeK8s
 	case TargetTMC:
 		return ContextTypeTMC
-	case TargetTAE:
+	case Target(ContextTypeTAE):
 		return ContextTypeTAE
 	}
 	return ContextType(target)
@@ -369,7 +364,7 @@ func ConvertContextTypeToTarget(ctxType ContextType) Target {
 	case ContextTypeTMC:
 		return TargetTMC
 	case ContextTypeTAE:
-		return TargetTAE
+		return Target(ContextTypeTAE)
 	}
 	return Target(ctxType)
 }

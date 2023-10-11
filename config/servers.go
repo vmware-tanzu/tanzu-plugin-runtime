@@ -72,7 +72,7 @@ func SetCurrentServer(name string) error {
 	}
 	// Front fill CurrentContext
 	c := convertServerToContext(s)
-	persist, err = setCurrentContext(node, c)
+	persist, err = setCurrentContext(node, c.Name, c.ContextType)
 	if err != nil {
 		return err
 	}
@@ -110,7 +110,7 @@ func RemoveCurrentServer(name string) error {
 	if err != nil {
 		return err
 	}
-	err = removeCurrentContext(node, c)
+	err = removeCurrentContext(node, c.Name, c.ContextType)
 	if err != nil {
 		return err
 	}
@@ -187,7 +187,7 @@ func frontFillContexts(s *configtypes.Server, setCurrent bool, node *yaml.Node) 
 		}
 	}
 	if setCurrent {
-		persist, err = setCurrentContext(node, c)
+		persist, err = setCurrentContext(node, c.Name, c.ContextType)
 		if err != nil {
 			return err
 		}
@@ -235,7 +235,7 @@ func RemoveServer(name string) error {
 	if err != nil {
 		return err
 	}
-	err = removeCurrentContext(node, c)
+	err = removeCurrentContext(node, c.Name, c.ContextType)
 	if err != nil {
 		return err
 	}

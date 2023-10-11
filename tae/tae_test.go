@@ -126,8 +126,8 @@ func setupForGetContext(t *testing.T) {
 				},
 			},
 			{
-				Name:   "test-tae",
-				Target: configtypes.TargetTAE,
+				Name:        "test-tae",
+				ContextType: configtypes.ContextTypeTAE,
 				GlobalOpts: &configtypes.GlobalServer{
 					Endpoint: "test-endpoint",
 				},

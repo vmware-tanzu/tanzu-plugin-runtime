@@ -539,6 +539,62 @@ func TestGetContext(t *testing.T) {
 	}
 }
 
+func TestGetContextsByType(t *testing.T) {
+	err := setupForGetContext()
+	assert.NoError(t, err)
+
+	defer func() {
+		cleanupDir(LocalDirName)
+	}()
+
+	tcs := []struct {
+		name                    string
+		contextType             configtypes.ContextType
+		expectedNamesOfContexts []string
+		contextToDelete         string
+	}{
+		{
+			name:                    "get k8s contexts",
+			expectedNamesOfContexts: []string{"test-mc", "test-mc-2"},
+			contextType:             configtypes.ContextTypeK8s,
+		},
+		{
+			name:                    "get tmc contexts",
+			expectedNamesOfContexts: []string{"test-tmc"},
+			contextType:             configtypes.ContextTypeTMC,
+		},
+		{
+			name:                    "get tae contexts",
+			expectedNamesOfContexts: []string{"test-tae"},
+			contextType:             configtypes.ContextTypeTAE,
+		},
+		{
+			name:                    "get tae contexts",
+			contextToDelete:         "test-tae",
+			expectedNamesOfContexts: []string(nil),
+			contextType:             configtypes.ContextTypeTAE,
+		},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.name, func(t *testing.T) {
+			var ctxNames []string
+
+			if tc.contextToDelete != "" {
+				err := DeleteContext(tc.contextToDelete)
+				assert.Nil(t, err)
+			}
+			ctxs, err := GetContextsByType(tc.contextType)
+			assert.Nil(t, err)
+
+			for _, ctx := range ctxs {
+				ctxNames = append(ctxNames, ctx.Name)
+			}
+			assert.Equal(t, ctxNames, tc.expectedNamesOfContexts)
+		})
+	}
+}
+
 func TestContextExists(t *testing.T) {
 	err := setupForGetContext()
 	assert.NoError(t, err)

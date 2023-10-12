@@ -63,6 +63,7 @@ func SetContext(context Context, setCurrent bool) error
 func DeleteContext(name string) error
 func RemoveContext(name string) error
 func ContextExists(name string) (bool, error)
+func GetContextsByType(contextType ContextType) ([]*configtypes.Context, error)
 func GetActiveContext(contextType ContextType) error
 func GetAllActiveContextsMap() (map[configtypes.ContextType]*configtypes.Context, error)
 func GetAllActiveContextsList() ([]string, error)

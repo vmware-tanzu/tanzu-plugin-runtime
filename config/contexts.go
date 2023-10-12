@@ -167,6 +167,27 @@ func GetActiveContext(contextType configtypes.ContextType) (c *configtypes.Conte
 	return getActiveContext(node, contextType)
 }
 
+// GetContextsByType retrieves the contexts of a provided context type
+func GetContextsByType(contextType configtypes.ContextType) ([]*configtypes.Context, error) {
+	var results []*configtypes.Context
+
+	node, err := getClientConfigNode()
+	if err != nil {
+		return nil, err
+	}
+	cfg, err := convertNodeToClientConfig(node)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, ctx := range cfg.KnownContexts {
+		if ctx.ContextType == contextType {
+			results = append(results, ctx)
+		}
+	}
+	return results, nil
+}
+
 // GetAllCurrentContextsMap returns all current context per Target
 //
 // Deprecated: GetAllCurrentContextsMap is deprecated. Use GetAllActiveContextsMap instead

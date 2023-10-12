@@ -203,6 +203,50 @@ func TestGetKubeconfigForContext(t *testing.T) {
 	assert.ErrorContains(t, err, "context must be of type: application-engine")
 }
 
+func TestGetTAEContextActiveResource(t *testing.T) {
+	setupForGetContext(t)
+	defer cleanupTestingDir(t)
+
+	c, err := config.GetContext("test-tae")
+	assert.NoError(t, err)
+
+	// Test getting the TAE active resource of a non-existent context
+	_, err = GetTAEContextActiveResource("non-existent-context")
+	assert.Error(t, err)
+	assert.ErrorContains(t, err, "context non-existent-context not found")
+
+	// Test getting the TAE active resource of a context that is not tae context
+	_, err = GetTAEContextActiveResource("test-mc")
+	assert.Error(t, err)
+	assert.ErrorContains(t, err, "context must be of type: application-engine")
+
+	// Test getting the TAE active resource of a context with active resource as Org only
+	activeResources, err := GetTAEContextActiveResource("test-tae")
+	assert.NoError(t, err)
+	assert.Equal(t, activeResources.OrgID, "fake-org-id")
+	assert.Empty(t, activeResources.ProjectName)
+	assert.Empty(t, activeResources.SpaceName)
+
+	// Test getting the TAE active resource of a context with active resource as space
+	c.AdditionalMetadata[ProjectNameKey] = "fake-project"
+	c.AdditionalMetadata[SpaceNameKey] = "fake-space"
+	err = config.SetContext(c, false)
+	assert.NoError(t, err)
+	activeResources, err = GetTAEContextActiveResource("test-tae")
+	assert.NoError(t, err)
+	assert.Equal(t, activeResources.OrgID, "fake-org-id")
+	assert.Equal(t, activeResources.ProjectName, "fake-project")
+	assert.Equal(t, activeResources.SpaceName, "fake-space")
+
+	// If context activeMetadata is not set(error case)
+	c.AdditionalMetadata = nil
+	err = config.SetContext(c, false)
+	assert.NoError(t, err)
+	_, err = GetTAEContextActiveResource("test-tae")
+	assert.Error(t, err)
+	assert.ErrorContains(t, err, "context is missing the TAE metadata")
+}
+
 func setupFakeCLI(dir string, exitStatus string, newCommandExitStatus string, enableCustomCommand bool) (string, error) {
 	filePath := filepath.Join(dir, "tanzu")
 

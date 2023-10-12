@@ -33,6 +33,16 @@ const (
 	customCommandName string = "_custom_command"
 )
 
+// ResourceInfo resource information of the application engine
+type ResourceInfo struct {
+	// OrgID ID of the Organization
+	OrgID string
+	// ProjectName name of the Project
+	ProjectName string
+	// SpaceName name of the Space
+	SpaceName string
+}
+
 // cmdOptions specifies the command options
 type cmdOptions struct {
 	outWriter io.Writer
@@ -195,4 +205,31 @@ func SetTAEContextActiveResource(contextName, projectName, spaceName string, opt
 		return errors.New(stderrOutput.String())
 	}
 	return nil
+}
+
+// GetTAEContextActiveResource returns the application engine active resource information for the given context
+func GetTAEContextActiveResource(contextName string) (*ResourceInfo, error) {
+	ctx, err := config.GetContext(contextName)
+	if err != nil {
+		return nil, err
+	}
+	if ctx.ContextType != configtypes.ContextTypeTAE {
+		return nil, errors.Errorf("context must be of type: %s", configtypes.ContextTypeTAE)
+	}
+	if ctx.AdditionalMetadata == nil {
+		return nil, errors.New("context is missing the TAE metadata")
+	}
+	activeResourceInfo := &ResourceInfo{
+		OrgID:       stringValue(ctx.AdditionalMetadata[OrgIDKey]),
+		ProjectName: stringValue(ctx.AdditionalMetadata[ProjectNameKey]),
+		SpaceName:   stringValue(ctx.AdditionalMetadata[SpaceNameKey]),
+	}
+	return activeResourceInfo, nil
+}
+
+func stringValue(val interface{}) string {
+	if val == nil {
+		return ""
+	}
+	return val.(string)
 }

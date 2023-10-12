@@ -6,6 +6,7 @@ package plugin
 import (
 	"encoding/json"
 	"os"
+	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -51,6 +52,7 @@ func TestInfo(t *testing.T) {
 
 	expectedInfo := pluginInfo{
 		PluginDescriptor: descriptor,
+		BinaryArch:       runtime.GOARCH,
 	}
 
 	gotInfo := &pluginInfo{}
@@ -65,5 +67,6 @@ func TestInfo(t *testing.T) {
 	assert.Equal(expectedInfo.BuildSHA, gotInfo.BuildSHA)
 	assert.Equal(expectedInfo.DocURL, gotInfo.DocURL)
 	assert.Equal(expectedInfo.Hidden, gotInfo.Hidden)
+	assert.Equal(expectedInfo.BinaryArch, gotInfo.BinaryArch)
 	assert.Empty(gotInfo.PluginRuntimeVersion, "Should be empty since unit tests doesn't have the self (tanzu-plugin-runtime) module dependency")
 }

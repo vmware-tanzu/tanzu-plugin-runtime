@@ -51,6 +51,7 @@ func StoreClientConfig(cfg *configtypes.ClientConfig) error {
 	populateServers(cfg)
 	// old plugins would be setting only servers, so populate contexts for forwards compatibility
 	PopulateContexts(cfg)
+
 	node, err := getClientConfigNodeNoLock()
 	if err != nil {
 		return err
@@ -166,7 +167,7 @@ func clientConfigSetCurrentContext(cfg *configtypes.ClientConfig, node *yaml.Nod
 			if contextErr != nil {
 				return contextErr
 			}
-			_, err := setCurrentContext(node, ctx)
+			_, err := setCurrentContext(node, ctx.Name, ctx.ContextType)
 			if err != nil {
 				return err
 			}

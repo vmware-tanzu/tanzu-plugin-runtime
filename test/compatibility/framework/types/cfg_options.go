@@ -43,6 +43,15 @@ const (
 
 	// CtxTypeTMC is a Tanzu Mission Control server.
 	CtxTypeTMC ContextType = "tmc"
+
+	// ContextTypeK8s is a kubernetes type of context
+	ContextTypeK8s ContextType = "kubernetes"
+
+	// ContextTypeTMC is a Tanzu Mission Control type of context.
+	ContextTypeTMC ContextType = "misson-control"
+
+	// ContextTypeTAE is a Tanzu Application Engine type of context.
+	ContextTypeTAE ContextType = "application-engine"
 )
 
 // Target is the namespace of the CLI to which plugin is applicable
@@ -254,6 +263,9 @@ type ContextOpts struct {
 
 	// Target of the context.
 	Target Target `json:"target,omitempty" yaml:"target,omitempty"`
+
+	// ContextType of the context.
+	ContextType ContextType `json:"contextType,omitempty" yaml:"contextType,omitempty"`
 
 	// GlobalOpts if the context is a global control plane (e.g., TMC).
 	GlobalOpts *GlobalServerOpts `json:"globalOpts,omitempty" yaml:"globalOpts,omitempty"`

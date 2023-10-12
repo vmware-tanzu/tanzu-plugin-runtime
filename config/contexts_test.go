@@ -268,8 +268,8 @@ func TestSetContextWithDiscoverySourceWithNewFields(t *testing.T) {
 					},
 				},
 				CurrentServer: "test-mc",
-				CurrentContext: map[configtypes.Target]string{
-					configtypes.TargetK8s: "test-mc",
+				CurrentContext: map[configtypes.ContextType]string{
+					configtypes.ContextTypeK8s: "test-mc",
 				},
 			},
 			ctx: &configtypes.Context{
@@ -395,8 +395,8 @@ func TestSetContextWithDiscoverySource(t *testing.T) {
 					},
 				},
 				CurrentServer: "test-mc",
-				CurrentContext: map[configtypes.Target]string{
-					configtypes.TargetK8s: "test-mc",
+				CurrentContext: map[configtypes.ContextType]string{
+					configtypes.ContextTypeK8s: "test-mc",
 				},
 			},
 			ctx: &configtypes.Context{
@@ -470,8 +470,8 @@ func setupForGetContext() error {
 				},
 			},
 			{
-				Name:   "test-tae",
-				Target: configtypes.TargetTAE,
+				Name:        "test-tae",
+				ContextType: configtypes.ContextTypeTAE,
 				GlobalOpts: &configtypes.GlobalServer{
 					Endpoint: "test-endpoint",
 				},
@@ -482,9 +482,9 @@ func setupForGetContext() error {
 				},
 			},
 		},
-		CurrentContext: map[configtypes.Target]string{
-			configtypes.TargetK8s: "test-mc-2",
-			configtypes.TargetTMC: "test-tmc",
+		CurrentContext: map[configtypes.ContextType]string{
+			configtypes.ContextTypeK8s: "test-mc-2",
+			configtypes.ContextTypeTMC: "test-tmc",
 		},
 	}
 	return func() error {
@@ -627,10 +627,26 @@ func TestSetContext(t *testing.T) {
 		},
 
 		{
-			name: "should add new context but not current",
+			name: "should add new context but not current and configure missing ContextType from Target",
 			ctx: &configtypes.Context{
 				Name:   "test-mc2",
 				Target: configtypes.TargetK8s,
+				ClusterOpts: &configtypes.ClusterServer{
+					Endpoint:            "test-endpoint",
+					Path:                "test-path",
+					Context:             "test-context",
+					IsManagementCluster: true,
+				},
+				AdditionalMetadata: map[string]interface{}{
+					"metaToken": "token1",
+				},
+			},
+		},
+		{
+			name: "should add new context and configure missing Target from ContextType",
+			ctx: &configtypes.Context{
+				Name:        "test-mc2",
+				ContextType: configtypes.ContextTypeK8s,
 				ClusterOpts: &configtypes.ClusterServer{
 					Endpoint:            "test-endpoint",
 					Path:                "test-path",
@@ -656,8 +672,9 @@ func TestSetContext(t *testing.T) {
 		{
 			name: "success tmc not_current",
 			ctx: &configtypes.Context{
-				Name:   "test-tmc2",
-				Target: configtypes.TargetTMC,
+				Name:        "test-tmc2",
+				Target:      configtypes.TargetTMC,
+				ContextType: configtypes.ContextTypeTMC,
 				GlobalOpts: &configtypes.GlobalServer{
 					Endpoint: "test-endpoint",
 				},
@@ -692,8 +709,8 @@ func TestSetContext(t *testing.T) {
 		{
 			name: "success tae current",
 			ctx: &configtypes.Context{
-				Name:   "test-tae1",
-				Target: configtypes.TargetTAE,
+				Name:        "test-tae1",
+				ContextType: configtypes.ContextTypeTAE,
 				GlobalOpts: &configtypes.GlobalServer{
 					Endpoint: "test-endpoint",
 				},
@@ -711,8 +728,8 @@ func TestSetContext(t *testing.T) {
 		{
 			name: "success tae not_current",
 			ctx: &configtypes.Context{
-				Name:   "test-tae2",
-				Target: configtypes.TargetTAE,
+				Name:        "test-tae2",
+				ContextType: configtypes.ContextTypeTAE,
 				GlobalOpts: &configtypes.GlobalServer{
 					Endpoint: "test-endpoint",
 				},
@@ -726,23 +743,45 @@ func TestSetContext(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "error target and contexttype does not match",
+			ctx: &configtypes.Context{
+				Name:        "test-error",
+				Target:      configtypes.TargetTMC,
+				ContextType: configtypes.ContextTypeK8s,
+				GlobalOpts: &configtypes.GlobalServer{
+					Endpoint: "test-endpoint",
+				},
+				ClusterOpts: &configtypes.ClusterServer{
+					Endpoint: "test-endpoint",
+					Path:     "test-path",
+					Context:  "test-context",
+				},
+			},
+			errStr: "error while validating the Context object: specified Target(mission-control) and ContextType(kubernetes) for the Context object does not match",
+		},
 	}
 
 	for _, tc := range tcs {
 		t.Run(tc.name, func(t *testing.T) {
 			// perform test
 			err := SetContext(tc.ctx, tc.current)
-			if tc.errStr == "" {
-				assert.NoError(t, err)
-			} else {
+			if tc.errStr != "" {
 				assert.EqualError(t, err, tc.errStr)
+			} else {
+				assert.NoError(t, err)
+				ctx, err := GetContext(tc.ctx.Name)
+				assert.NoError(t, err)
+				assert.Equal(t, tc.ctx.Name, ctx.Name)
+				assert.NotEmpty(t, string(ctx.Target))
+				assert.NotEmpty(t, string(ctx.ContextType))
+				// Verify that even though only Target or ContextType was provided when
+				// setting context, retrieving the Context should have both set
+				assert.Equal(t, string(ctx.Target), string(ctx.ContextType))
+				s, err := GetServer(tc.ctx.Name)
+				assert.NoError(t, err)
+				assert.Equal(t, tc.ctx.Name, s.Name)
 			}
-			ctx, err := GetContext(tc.ctx.Name)
-			assert.NoError(t, err)
-			assert.Equal(t, tc.ctx.Name, ctx.Name)
-			s, err := GetServer(tc.ctx.Name)
-			assert.NoError(t, err)
-			assert.Equal(t, tc.ctx.Name, s.Name)
 		})
 	}
 }
@@ -757,23 +796,19 @@ func TestRemoveContext(t *testing.T) {
 	tcs := []struct {
 		name    string
 		ctxName string
-		target  configtypes.Target
 		errStr  string
 	}{
 		{
 			name:    "success k8s",
 			ctxName: "test-mc",
-			target:  configtypes.TargetK8s,
 		},
 		{
 			name:    "success tmc",
 			ctxName: "test-tmc",
-			target:  configtypes.TargetTMC,
 		},
 		{
 			name:    "success tae",
 			ctxName: "test-tae",
-			target:  configtypes.TargetTAE,
 		},
 		{
 			name:    "failure",
@@ -817,7 +852,13 @@ func TestGetAllCurrentContexts(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "test-mc-2", currentContextMap[configtypes.TargetK8s].Name)
 	assert.Equal(t, "test-tmc", currentContextMap[configtypes.TargetTMC].Name)
-	assert.Nil(t, currentContextMap[configtypes.TargetTAE])
+	assert.Nil(t, currentContextMap[configtypes.Target(configtypes.ContextTypeTAE)])
+
+	activeContextMap, err := GetAllActiveContextsMap()
+	assert.NoError(t, err)
+	assert.Equal(t, "test-mc-2", activeContextMap[configtypes.ContextTypeK8s].Name)
+	assert.Equal(t, "test-tmc", activeContextMap[configtypes.ContextTypeTMC].Name)
+	assert.Nil(t, activeContextMap[configtypes.ContextTypeTAE])
 
 	currentContextsList, err := GetAllCurrentContextsList()
 	assert.NoError(t, err)
@@ -825,14 +866,28 @@ func TestGetAllCurrentContexts(t *testing.T) {
 	assert.Contains(t, currentContextsList, "test-tmc")
 	assert.NotContains(t, currentContextsList, "test-tae")
 
+	activeContextsList, err := GetAllActiveContextsList()
+	assert.NoError(t, err)
+	assert.Contains(t, activeContextsList, "test-mc-2")
+	assert.Contains(t, activeContextsList, "test-tmc")
+	assert.NotContains(t, activeContextsList, "test-tae")
+
 	// set the tae context (k8s and tae current contexts are mutual exclusive)
 	err = SetCurrentContext("test-tae")
 	assert.NoError(t, err)
+	// GetAllCurrentContextsMap does not return TAE context
 	currentContextMap, err = GetAllCurrentContextsMap()
 	assert.NoError(t, err)
 	assert.Nil(t, currentContextMap[configtypes.TargetK8s])
 	assert.Equal(t, "test-tmc", currentContextMap[configtypes.TargetTMC].Name)
-	assert.Equal(t, "test-tae", currentContextMap[configtypes.TargetTAE].Name)
+	assert.Nil(t, currentContextMap[configtypes.Target(configtypes.ContextTypeTAE)])
+	// GetAllActiveContextsMap should return TAE context and should match
+	activeContextMap, err = GetAllActiveContextsMap()
+	assert.NoError(t, err)
+	assert.Nil(t, activeContextMap[configtypes.ContextTypeK8s])
+	assert.Equal(t, "test-tmc", activeContextMap[configtypes.ContextTypeTMC].Name)
+	assert.NotNil(t, activeContextMap[configtypes.ContextTypeTAE])
+	assert.Equal(t, "test-tae", activeContextMap[configtypes.ContextTypeTAE].Name)
 
 	currentContextsList, err = GetAllCurrentContextsList()
 	assert.NoError(t, err)
@@ -841,13 +896,13 @@ func TestGetAllCurrentContexts(t *testing.T) {
 	assert.Contains(t, currentContextsList, "test-tae")
 
 	// remove the tae current context
-	err = RemoveCurrentContext(configtypes.TargetTAE)
+	err = RemoveCurrentContext(configtypes.Target(configtypes.ContextTypeTAE))
 	assert.NoError(t, err)
 	currentContextMap, err = GetAllCurrentContextsMap()
 	assert.NoError(t, err)
 	assert.Nil(t, currentContextMap[configtypes.TargetK8s])
 	assert.Equal(t, "test-tmc", currentContextMap[configtypes.TargetTMC].Name)
-	assert.Nil(t, currentContextMap[configtypes.TargetTAE])
+	assert.Nil(t, currentContextMap[configtypes.Target(configtypes.ContextTypeTAE)])
 
 	currentContextsList, err = GetAllCurrentContextsList()
 	assert.NoError(t, err)
@@ -868,7 +923,7 @@ func TestRemoveCurrentContext(t *testing.T) {
 	assert.NoError(t, err)
 
 	currCtx, err := GetCurrentContext(configtypes.TargetK8s)
-	assert.Equal(t, "no current context set for target \"kubernetes\"", err.Error())
+	assert.Equal(t, "no current context set for type \"kubernetes\"", err.Error())
 	assert.Nil(t, currCtx)
 
 	currSrv, err := GetCurrentServer()
@@ -937,8 +992,9 @@ func TestSetContextMultiFile(t *testing.T) {
 	}()
 
 	ctx := &configtypes.Context{
-		Name:   "test-mc",
-		Target: configtypes.TargetK8s,
+		Name:        "test-mc",
+		Target:      configtypes.TargetK8s,
+		ContextType: configtypes.ContextTypeK8s,
 		ClusterOpts: &configtypes.ClusterServer{
 			IsManagementCluster: true,
 			Endpoint:            "test-endpoint",
@@ -982,8 +1038,9 @@ func TestSetContextMultiFile(t *testing.T) {
 	}
 
 	expectedCtx2 := &configtypes.Context{
-		Name:   "test-mc2",
-		Target: configtypes.TargetK8s,
+		Name:        "test-mc2",
+		Target:      configtypes.TargetK8s,
+		ContextType: configtypes.ContextTypeK8s,
 		ClusterOpts: &configtypes.ClusterServer{
 			IsManagementCluster: true,
 			Endpoint:            "updated-test-endpoint",
@@ -1033,8 +1090,9 @@ func TestSetContextMultiFileAndMigrateToNewConfig(t *testing.T) {
 	}()
 
 	ctx := &configtypes.Context{
-		Name:   "test-mc",
-		Target: configtypes.TargetK8s,
+		Name:        "test-mc",
+		Target:      configtypes.TargetK8s,
+		ContextType: configtypes.ContextTypeK8s,
 		ClusterOpts: &configtypes.ClusterServer{
 			IsManagementCluster: true,
 			Endpoint:            "test-endpoint",
@@ -1078,8 +1136,9 @@ func TestSetContextMultiFileAndMigrateToNewConfig(t *testing.T) {
 	}
 
 	expectedCtx2 := &configtypes.Context{
-		Name:   "test-mc2",
-		Target: configtypes.TargetK8s,
+		Name:        "test-mc2",
+		Target:      configtypes.TargetK8s,
+		ContextType: configtypes.ContextTypeK8s,
 		ClusterOpts: &configtypes.ClusterServer{
 			IsManagementCluster: true,
 			Endpoint:            "updated-test-endpoint",
@@ -1234,7 +1293,7 @@ func TestSetContextWithEmptyName(t *testing.T) {
 					IsManagementCluster: true,
 				},
 			},
-			errStr: "context name cannot be empty",
+			errStr: "error while validating the Context object: context name cannot be empty",
 		},
 		{
 			name: "success re empty current",
@@ -1248,7 +1307,7 @@ func TestSetContextWithEmptyName(t *testing.T) {
 					IsManagementCluster: true,
 				},
 			},
-			errStr: "context name cannot be empty",
+			errStr: "error while validating the Context object: context name cannot be empty",
 		},
 	}
 
@@ -1264,7 +1323,30 @@ func TestSetContextWithEmptyName(t *testing.T) {
 	}
 }
 
-var _ = Describe("testing SetCurrentContext", func() {
+func TestSetCurrentContext(t *testing.T) {
+	// setup
+	func() {
+		err := setupForGetContext()
+		assert.NoError(t, err)
+	}()
+	defer func() {
+		cleanupDir(LocalDirName)
+	}()
+
+	err := SetCurrentContext("test-tae")
+	assert.NoError(t, err)
+	validateActiveContextV2(t, configtypes.ContextTypeTAE, "test-tae", false, "")
+
+	err = SetCurrentContext("test-mc")
+	assert.NoError(t, err)
+	validateActiveContextV2(t, configtypes.ContextTypeK8s, "test-mc", true, "test-mc")
+
+	_, err = GetCurrentContext(configtypes.Target(configtypes.ContextTypeTAE))
+	assert.Error(t, err)
+	assert.ErrorContains(t, err, `no current context set for type "application-engine"`)
+}
+
+var _ = Describe("testing SetCurrentContext & SetActiveContext", func() {
 	var (
 		err error
 	)
@@ -1282,15 +1364,28 @@ var _ = Describe("testing SetCurrentContext", func() {
 		It("should set tmc context as current context successfully", func() {
 			err = SetCurrentContext("test-tmc")
 			gomega.Expect(err).To(gomega.BeNil())
-			validateCurrentContext(configtypes.TargetTMC, "test-tmc", true, "test-mc-2")
+			validateActiveContext(configtypes.ContextTypeTMC, "test-tmc", true, "test-mc-2")
+		})
+		It("should set tmc context as active context successfully", func() {
+			err = RemoveActiveContext(configtypes.ContextTypeTMC)
+			gomega.Expect(err).To(gomega.BeNil())
+			err = SetActiveContext("test-tmc")
+			gomega.Expect(err).To(gomega.BeNil())
+			validateActiveContext(configtypes.ContextTypeTMC, "test-tmc", true, "test-mc-2")
 		})
 	})
 	Context("k8s context as current context", func() {
 		It("should set k8s context as current context successfully", func() {
 			err = SetCurrentContext("test-mc")
 			gomega.Expect(err).To(gomega.BeNil())
-			validateCurrentContext(configtypes.TargetK8s, "test-mc", true, "test-mc")
-
+			validateActiveContext(configtypes.ContextTypeK8s, "test-mc", true, "test-mc")
+		})
+		It("should set k8s context as active context successfully", func() {
+			err = RemoveActiveContext(configtypes.ContextTypeK8s)
+			gomega.Expect(err).To(gomega.BeNil())
+			err = SetActiveContext("test-mc")
+			gomega.Expect(err).To(gomega.BeNil())
+			validateActiveContext(configtypes.ContextTypeK8s, "test-mc", true, "test-mc")
 		})
 	})
 	Context("tae context as current context", func() {
@@ -1301,7 +1396,17 @@ var _ = Describe("testing SetCurrentContext", func() {
 
 			err = SetCurrentContext("test-tae")
 			gomega.Expect(err).To(gomega.BeNil())
-			validateCurrentContext(configtypes.TargetTAE, "test-tae", false, "")
+			validateActiveContext(configtypes.ContextTypeTAE, "test-tae", false, "")
+
+		})
+		It("should set tae context as active context successfully", func() {
+			//Remove the k8s current context set during initial setup
+			err = RemoveActiveContext(configtypes.ContextTypeK8s)
+			gomega.Expect(err).To(gomega.BeNil())
+
+			err = SetActiveContext("test-tae")
+			gomega.Expect(err).To(gomega.BeNil())
+			validateActiveContext(configtypes.ContextTypeTAE, "test-tae", false, "")
 
 		})
 	})
@@ -1309,11 +1414,21 @@ var _ = Describe("testing SetCurrentContext", func() {
 		It("should have k8s and tmc contexts as current for their respective targets", func() {
 			err = SetCurrentContext("test-tmc")
 			gomega.Expect(err).To(gomega.BeNil())
-			validateCurrentContext(configtypes.TargetTMC, "test-tmc", true, "test-mc-2")
+			validateActiveContext(configtypes.ContextTypeTMC, "test-tmc", true, "test-mc-2")
 
 			err = SetCurrentContext("test-mc")
 			gomega.Expect(err).To(gomega.BeNil())
-			validateCurrentContext(configtypes.TargetK8s, "test-mc", true, "test-mc")
+			validateActiveContext(configtypes.ContextTypeK8s, "test-mc", true, "test-mc")
+
+		})
+		It("should have k8s and tmc contexts as active for their respective context types", func() {
+			err = SetActiveContext("test-tmc")
+			gomega.Expect(err).To(gomega.BeNil())
+			validateActiveContext(configtypes.ContextTypeTMC, "test-tmc", true, "test-mc-2")
+
+			err = SetActiveContext("test-mc")
+			gomega.Expect(err).To(gomega.BeNil())
+			validateActiveContext(configtypes.ContextTypeK8s, "test-mc", true, "test-mc")
 
 		})
 	})
@@ -1321,36 +1436,62 @@ var _ = Describe("testing SetCurrentContext", func() {
 		It("should have only k8s as current context and tae context should be removed from the current context", func() {
 			err = SetCurrentContext("test-tae")
 			gomega.Expect(err).To(gomega.BeNil())
-			validateCurrentContext(configtypes.TargetTAE, "test-tae", false, "")
+			validateActiveContext(configtypes.ContextTypeTAE, "test-tae", false, "")
 
 			err = SetCurrentContext("test-mc")
 			gomega.Expect(err).To(gomega.BeNil())
-			validateCurrentContext(configtypes.TargetK8s, "test-mc", true, "test-mc")
+			validateActiveContext(configtypes.ContextTypeK8s, "test-mc", true, "test-mc")
 
-			_, err = GetCurrentContext(configtypes.TargetTAE)
+			_, err = GetCurrentContext(configtypes.Target(configtypes.ContextTypeTAE))
 			gomega.Expect(err).ToNot(gomega.BeNil())
-			gomega.Expect(err.Error()).To(gomega.ContainSubstring(`no current context set for target "application-engine"`))
+			gomega.Expect(err.Error()).To(gomega.ContainSubstring(`no current context set for type "application-engine"`))
+		})
+		It("should have only k8s as current context and tae context should be removed from the active context", func() {
+			err = SetActiveContext("test-tae")
+			gomega.Expect(err).To(gomega.BeNil())
+			validateActiveContext(configtypes.ContextTypeTAE, "test-tae", false, "")
+
+			err = SetActiveContext("test-mc")
+			gomega.Expect(err).To(gomega.BeNil())
+			validateActiveContext(configtypes.ContextTypeK8s, "test-mc", true, "test-mc")
+
+			_, err = GetActiveContext(configtypes.ContextTypeTAE)
+			gomega.Expect(err).ToNot(gomega.BeNil())
+			gomega.Expect(err.Error()).To(gomega.ContainSubstring(`no current context set for type "application-engine"`))
 		})
 	})
 	Context("tae context as current context after k8s context(mutual-exclusion test between k8s and tae) ", func() {
 		It("should have only tae as current context and k8s context should be removed from the current context", func() {
 			err = SetCurrentContext("test-mc")
 			gomega.Expect(err).To(gomega.BeNil())
-			validateCurrentContext(configtypes.TargetK8s, "test-mc", true, "test-mc")
+			validateActiveContext(configtypes.ContextTypeK8s, "test-mc", true, "test-mc")
 
 			err = SetCurrentContext("test-tae")
 			gomega.Expect(err).To(gomega.BeNil())
-			validateCurrentContext(configtypes.TargetTAE, "test-tae", false, "")
+			validateActiveContext(configtypes.ContextTypeTAE, "test-tae", false, "")
 
 			_, err = GetCurrentContext(configtypes.TargetK8s)
 			gomega.Expect(err).ToNot(gomega.BeNil())
-			gomega.Expect(err.Error()).To(gomega.ContainSubstring(`no current context set for target "kubernetes"`))
+			gomega.Expect(err.Error()).To(gomega.ContainSubstring(`no current context set for type "kubernetes"`))
+		})
+		It("should have only tae as current context and k8s context should be removed from the active context", func() {
+			err = SetActiveContext("test-mc")
+			gomega.Expect(err).To(gomega.BeNil())
+			validateActiveContext(configtypes.ContextTypeK8s, "test-mc", true, "test-mc")
+
+			err = SetActiveContext("test-tae")
+			gomega.Expect(err).To(gomega.BeNil())
+			validateActiveContext(configtypes.ContextTypeTAE, "test-tae", false, "")
+
+			_, err = GetActiveContext(configtypes.ContextTypeK8s)
+			gomega.Expect(err).ToNot(gomega.BeNil())
+			gomega.Expect(err.Error()).To(gomega.ContainSubstring(`no current context set for type "kubernetes"`))
 		})
 	})
 })
 
-func validateCurrentContext(target configtypes.Target, ctxName string, isServerExpected bool, serverName string) {
-	c, err := GetCurrentContext(target)
+func validateActiveContext(contextType configtypes.ContextType, ctxName string, isServerExpected bool, serverName string) {
+	c, err := GetActiveContext(contextType)
 	gomega.Expect(err).To(gomega.BeNil())
 	gomega.Expect(c.Name).To(gomega.Equal(ctxName))
 
@@ -1360,5 +1501,19 @@ func validateCurrentContext(target configtypes.Target, ctxName string, isServerE
 	} else {
 		gomega.Expect(err).To(gomega.BeNil())
 		gomega.Expect(server.Name).To(gomega.Equal(serverName))
+	}
+}
+
+func validateActiveContextV2(t *testing.T, contextType configtypes.ContextType, ctxName string, isServerExpected bool, serverName string) {
+	c, err := GetActiveContext(contextType)
+	assert.NoError(t, err)
+	assert.Equal(t, c.Name, ctxName)
+
+	server, err := GetCurrentServer()
+	if !isServerExpected {
+		assert.Error(t, err)
+	} else {
+		assert.NoError(t, err)
+		assert.Equal(t, server.Name, serverName)
 	}
 }

@@ -252,8 +252,9 @@ func TestGetClientConfigWithLockAndWithoutLock(t *testing.T) {
 		assert.NoError(t, err)
 
 		expectedCtx := &configtypes.Context{
-			Name:   "test-mc",
-			Target: configtypes.TargetK8s,
+			Name:        "test-mc",
+			Target:      configtypes.TargetK8s,
+			ContextType: configtypes.ContextTypeK8s,
 			ClusterOpts: &configtypes.ClusterServer{
 				Endpoint:            "test-endpoint",
 				Path:                "test-path",
@@ -324,8 +325,9 @@ func TestGetClientConfigWithLockAndMigratedToNewConfig(t *testing.T) {
 	assert.NoError(t, err)
 
 	expectedCtx := &configtypes.Context{
-		Name:   "test-mc",
-		Target: configtypes.TargetK8s,
+		Name:        "test-mc",
+		Target:      configtypes.TargetK8s,
+		ContextType: configtypes.ContextTypeK8s,
 		ClusterOpts: &configtypes.ClusterServer{
 			Endpoint:            "test-endpoint",
 			Path:                "test-path",
@@ -378,8 +380,9 @@ func TestGetClientConfigWithoutLockAndMigratedToNewConfig(t *testing.T) {
 	assert.NoError(t, err)
 
 	expectedCtx := &configtypes.Context{
-		Name:   "test-mc",
-		Target: configtypes.TargetK8s,
+		Name:        "test-mc",
+		Target:      configtypes.TargetK8s,
+		ContextType: configtypes.ContextTypeK8s,
 		ClusterOpts: &configtypes.ClusterServer{
 			Endpoint:            "test-endpoint",
 			Path:                "test-path",

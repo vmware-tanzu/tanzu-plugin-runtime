@@ -13,7 +13,7 @@ import (
 )
 
 func TestStoreClientConfig(t *testing.T) {
-	cfg, expectedCfg, cfg2, expectedCfg2, c := setupStoreClientConfigData()
+	cfg, expectedCfg, cfg2, expectedCfg2, c, c2 := setupStoreClientConfigData()
 
 	// Setup config data
 	cfgTestFiles, cleanUp := setupTestConfig(t, &CfgTestData{cfg: cfg, cfgNextGen: cfg2})
@@ -33,9 +33,26 @@ func TestStoreClientConfig(t *testing.T) {
 	file, err = os.ReadFile(cfgTestFiles[1].Name())
 	assert.NoError(t, err)
 	assert.Equal(t, expectedCfg2, string(file))
+
+	cleanUp()
+
+	// Setup config data
+	cfgTestFiles, cleanUp = setupTestConfig(t, &CfgTestData{cfg: cfg, cfgNextGen: cfg2})
+
+	// Action
+	err = StoreClientConfig(c2)
+	assert.NoError(t, err)
+
+	file, err = os.ReadFile(cfgTestFiles[0].Name())
+	assert.NoError(t, err)
+	assert.Equal(t, expectedCfg, string(file))
+
+	file, err = os.ReadFile(cfgTestFiles[1].Name())
+	assert.NoError(t, err)
+	assert.Equal(t, expectedCfg2, string(file))
 }
 
-func setupStoreClientConfigData() (string, string, string, string, *types.ClientConfig) {
+func setupStoreClientConfigData() (string, string, string, string, *types.ClientConfig, *types.ClientConfig) {
 	cfg := `clientOptions:
   cli:
     discoverySources:
@@ -161,6 +178,7 @@ current: test-mc
         - local:
             name: test
             path: test-local-path
+      contextType: kubernetes
 currentContext:
     kubernetes: test-mc
 `
@@ -214,8 +232,8 @@ currentContext:
 				},
 			},
 		},
-		CurrentContext: map[types.Target]string{
-			types.TargetK8s: "test-mc",
+		CurrentContext: map[types.ContextType]string{
+			types.ContextTypeK8s: "test-mc",
 		},
 		ClientOptions: &types.ClientOptions{
 			CLI: &types.CLIOptions{
@@ -244,5 +262,9 @@ currentContext:
 			},
 		},
 	}
-	return cfg, expectedCfg, cfg2, expectedCfg2, c
+
+	c2 := *c
+	c2.KnownContexts[0].Target = ""
+	c2.KnownContexts[0].ContextType = types.ContextTypeK8s
+	return cfg, expectedCfg, cfg2, expectedCfg2, c, &c2
 }

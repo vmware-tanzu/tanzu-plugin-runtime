@@ -53,7 +53,7 @@ func SetContext(c *configtypes.Context, setCurrent bool) error {
 	}
 	// Set current context
 	if setCurrent {
-		persist, err = setCurrentContext(node, c)
+		persist, err = setCurrentContext(node, c.Name, c.ContextType)
 		if err != nil {
 			return err
 		}
@@ -114,7 +114,7 @@ func RemoveContext(name string) error {
 	if err != nil {
 		return err
 	}
-	err = removeCurrentContext(node, ctx)
+	err = removeCurrentContext(node, ctx.Name, ctx.ContextType)
 	if err != nil {
 		return err
 	}
@@ -139,17 +139,37 @@ func ContextExists(name string) (bool, error) {
 	return exists != nil, nil
 }
 
+func validateContext(c *configtypes.Context) error {
+	// Check if ctx.Name is empty
+	if c.Name == "" {
+		return errors.New("context name cannot be empty")
+	}
+	if c.Target != "" && c.ContextType != "" && c.ContextType != configtypes.ConvertTargetToContextType(c.Target) {
+		return errors.Errorf("specified Target(%s) and ContextType(%s) for the Context object does not match", c.Target, c.ContextType)
+	}
+	return nil
+}
+
 // GetCurrentContext retrieves the current context for the specified target
+//
+// Deprecated: GetCurrentContext is deprecated. Use GetActiveContext instead
 func GetCurrentContext(target configtypes.Target) (c *configtypes.Context, err error) {
+	return GetActiveContext(configtypes.ConvertTargetToContextType(target))
+}
+
+// GetActiveContext retrieves the active context for the specified contextType
+func GetActiveContext(contextType configtypes.ContextType) (c *configtypes.Context, err error) {
 	// Retrieve client config node
 	node, err := getClientConfigNode()
 	if err != nil {
 		return nil, err
 	}
-	return getCurrentContext(node, target)
+	return getActiveContext(node, contextType)
 }
 
 // GetAllCurrentContextsMap returns all current context per Target
+//
+// Deprecated: GetAllCurrentContextsMap is deprecated. Use GetAllActiveContextsMap instead
 func GetAllCurrentContextsMap() (map[configtypes.Target]*configtypes.Context, error) {
 	node, err := getClientConfigNodeNoLock()
 	if err != nil {
@@ -158,9 +178,18 @@ func GetAllCurrentContextsMap() (map[configtypes.Target]*configtypes.Context, er
 	return getAllCurrentContextsMap(node)
 }
 
-// GetAllCurrentContextsList returns all current context names as list
-func GetAllCurrentContextsList() ([]string, error) {
-	currentContextsMap, err := GetAllCurrentContextsMap()
+// GetAllActiveContextsMap returns all active context per ContextType
+func GetAllActiveContextsMap() (map[configtypes.ContextType]*configtypes.Context, error) {
+	node, err := getClientConfigNodeNoLock()
+	if err != nil {
+		return nil, err
+	}
+	return getAllActiveContextsMap(node)
+}
+
+// GetAllActiveContextsList returns all active context names as list
+func GetAllActiveContextsList() ([]string, error) {
+	currentContextsMap, err := GetAllActiveContextsMap()
 	if err != nil {
 		return nil, err
 	}
@@ -171,8 +200,22 @@ func GetAllCurrentContextsList() ([]string, error) {
 	return serverNames, nil
 }
 
+// GetAllCurrentContextsList returns all current context names as list
+//
+// Deprecated: GetAllCurrentContextsList is deprecated. Use GetAllActiveContextsList instead
+func GetAllCurrentContextsList() ([]string, error) {
+	return GetAllActiveContextsList()
+}
+
 // SetCurrentContext sets the current context to the specified name if context is present
+//
+// Deprecated: SetCurrentContext is deprecated. Use SetActiveContext instead
 func SetCurrentContext(name string) error {
+	return SetActiveContext(name)
+}
+
+// SetActiveContext sets the active context to the specified name if context is present
+func SetActiveContext(name string) error {
 	// Retrieve client config node
 	AcquireTanzuConfigLock()
 	defer ReleaseTanzuConfigLock()
@@ -185,7 +228,7 @@ func SetCurrentContext(name string) error {
 	if err != nil {
 		return err
 	}
-	persist, err := setCurrentContext(node, ctx)
+	persist, err := setCurrentContext(node, ctx.Name, ctx.ContextType)
 	if err != nil {
 		return err
 	}
@@ -195,7 +238,7 @@ func SetCurrentContext(name string) error {
 			return err
 		}
 	}
-	if ctx.Target == configtypes.TargetK8s {
+	if ctx.ContextType == configtypes.ContextTypeK8s {
 		persist, err = setCurrentServer(node, name)
 		if err != nil {
 			return err
@@ -211,7 +254,14 @@ func SetCurrentContext(name string) error {
 }
 
 // RemoveCurrentContext removed the current context of specified context type
+//
+// Deprecated: RemoveCurrentContext is deprecated. Use RemoveActiveContext instead
 func RemoveCurrentContext(target configtypes.Target) error {
+	return RemoveActiveContext(configtypes.ConvertTargetToContextType(target))
+}
+
+// RemoveActiveContext removed the current context of specified context type
+func RemoveActiveContext(contextType configtypes.ContextType) error {
 	// Retrieve client config node
 	AcquireTanzuConfigLock()
 	defer ReleaseTanzuConfigLock()
@@ -219,11 +269,11 @@ func RemoveCurrentContext(target configtypes.Target) error {
 	if err != nil {
 		return err
 	}
-	c, err := getCurrentContext(node, target)
+	c, err := getActiveContext(node, contextType)
 	if err != nil {
 		return err
 	}
-	err = removeCurrentContext(node, &configtypes.Context{Target: target})
+	err = removeCurrentContext(node, "", contextType)
 	if err != nil {
 		return err
 	}
@@ -236,15 +286,15 @@ func RemoveCurrentContext(target configtypes.Target) error {
 
 // EndpointFromContext retrieved the endpoint from the specified context
 func EndpointFromContext(s *configtypes.Context) (endpoint string, err error) {
-	switch s.Target {
-	case configtypes.TargetK8s:
+	switch s.ContextType {
+	case configtypes.ContextTypeK8s:
 		return s.ClusterOpts.Endpoint, nil
-	case configtypes.TargetTMC:
+	case configtypes.ContextTypeTMC:
 		return s.GlobalOpts.Endpoint, nil
-	case configtypes.TargetTAE:
+	case configtypes.ContextTypeTAE:
 		return s.ClusterOpts.Endpoint, nil
 	default:
-		return endpoint, fmt.Errorf("unknown server type %q", s.Target)
+		return endpoint, fmt.Errorf("unknown context type %q", s.ContextType)
 	}
 }
 
@@ -266,20 +316,29 @@ func getContext(node *yaml.Node, name string) (*configtypes.Context, error) {
 	return nil, fmt.Errorf("context %v not found", name)
 }
 
-func getCurrentContext(node *yaml.Node, target configtypes.Target) (*configtypes.Context, error) {
+func getActiveContext(node *yaml.Node, contextType configtypes.ContextType) (*configtypes.Context, error) {
 	cfg, err := convertNodeToClientConfig(node)
 	if err != nil {
 		return nil, err
 	}
-	return cfg.GetCurrentContext(target)
+	return cfg.GetActiveContext(contextType)
 }
 
+// Deprecated: getAllCurrentContextsMap is deprecated. Use getAllActiveContextsMap instead
 func getAllCurrentContextsMap(node *yaml.Node) (map[configtypes.Target]*configtypes.Context, error) {
 	cfg, err := convertNodeToClientConfig(node)
 	if err != nil {
 		return nil, err
 	}
 	return cfg.GetAllCurrentContextsMap()
+}
+
+func getAllActiveContextsMap(node *yaml.Node) (map[configtypes.ContextType]*configtypes.Context, error) {
+	cfg, err := convertNodeToClientConfig(node)
+	if err != nil {
+		return nil, err
+	}
+	return cfg.GetAllActiveContextsMap()
 }
 
 func setContexts(node *yaml.Node, contexts []*configtypes.Context) (err error) {
@@ -293,10 +352,15 @@ func setContexts(node *yaml.Node, contexts []*configtypes.Context) (err error) {
 }
 
 func setContext(node *yaml.Node, ctx *configtypes.Context) (persist bool, err error) {
-	// Check if ctx.Name is empty
-	if ctx.Name == "" {
-		return false, errors.New("context name cannot be empty")
+	// validate ctx object
+	err = validateContext(ctx)
+	if err != nil {
+		return false, errors.Wrap(err, "error while validating the Context object")
 	}
+
+	// Fill missing ContextType or Target in the Context object
+	fillMissingContextTypeInContext(ctx)
+	fillMissingTargetInContext(ctx)
 
 	// Get Patch Strategies
 	patchStrategies := constructPatchStrategies()
@@ -375,7 +439,7 @@ func constructPatchStrategies() map[string]string {
 	return patchStrategies
 }
 
-func setCurrentContext(node *yaml.Node, ctx *configtypes.Context) (persist bool, err error) {
+func setCurrentContext(node *yaml.Node, ctxName string, ctxType configtypes.ContextType) (persist bool, err error) {
 	// Find current context node in the yaml node
 	keys := []nodeutils.Key{
 		{Name: KeyCurrentContext, Type: yaml.MappingNode},
@@ -384,28 +448,28 @@ func setCurrentContext(node *yaml.Node, ctx *configtypes.Context) (persist bool,
 	if currentContextNode == nil {
 		return persist, nodeutils.ErrNodeNotFound
 	}
-	if index := nodeutils.GetNodeIndex(currentContextNode.Content, string(ctx.Target)); index != -1 {
-		if currentContextNode.Content[index].Value != ctx.Name {
-			currentContextNode.Content[index].Value = ctx.Name
+	if index := nodeutils.GetNodeIndex(currentContextNode.Content, string(ctxType)); index != -1 {
+		if currentContextNode.Content[index].Value != ctxName {
+			currentContextNode.Content[index].Value = ctxName
 			currentContextNode.Content[index].Style = 0
 			persist = true
 		}
 	} else {
-		currentContextNode.Content = append(currentContextNode.Content, nodeutils.CreateScalarNode(string(ctx.Target), ctx.Name)...)
+		currentContextNode.Content = append(currentContextNode.Content, nodeutils.CreateScalarNode(string(ctxType), ctxName)...)
 		persist = true
 	}
 	// maintain mutual exclusive behavior among all the current context types except TMC
 	// (i.e. there can only be one active current context among all the context types except TMC.
 	//  TMC context type can still be active when other context types are active)
 	if persist {
-		if err := updateMutualExclusiveCurrentContexts(node, ctx); err != nil {
+		if err := updateMutualExclusiveCurrentContexts(node, ctxType); err != nil {
 			return persist, err
 		}
 	}
 	return persist, err
 }
 
-func removeCurrentContext(node *yaml.Node, ctx *configtypes.Context) error {
+func removeCurrentContext(node *yaml.Node, ctxName string, ctxType configtypes.ContextType) error {
 	// Find current context node in the yaml node
 	keys := []nodeutils.Key{
 		{Name: KeyCurrentContext},
@@ -415,13 +479,13 @@ func removeCurrentContext(node *yaml.Node, ctx *configtypes.Context) error {
 	if currentContextNode == nil {
 		return nil
 	}
-	targetNodeIndex := nodeutils.GetNodeIndex(currentContextNode.Content, string(ctx.Target))
-	if targetNodeIndex == -1 {
+	ctNodeIndex := nodeutils.GetNodeIndex(currentContextNode.Content, string(ctxType))
+	if ctNodeIndex == -1 {
 		return nil
 	}
-	if currentContextNode.Content[targetNodeIndex].Value == ctx.Name || ctx.Name == "" {
-		targetNodeIndex--
-		currentContextNode.Content = append(currentContextNode.Content[:targetNodeIndex], currentContextNode.Content[targetNodeIndex+2:]...)
+	if currentContextNode.Content[ctNodeIndex].Value == ctxName || ctxName == "" {
+		ctNodeIndex--
+		currentContextNode.Content = append(currentContextNode.Content[:ctNodeIndex], currentContextNode.Content[ctNodeIndex+2:]...)
 	}
 	return nil
 }
@@ -454,8 +518,8 @@ func removeContext(node *yaml.Node, name string) error {
 
 // updateMutualExclusiveCurrentContexts updates the current contexts to maintain
 // mutual exclusive behavior among the current context types except TMC
-func updateMutualExclusiveCurrentContexts(node *yaml.Node, ctx *configtypes.Context) error {
-	if ctx.Target == configtypes.TargetTMC {
+func updateMutualExclusiveCurrentContexts(node *yaml.Node, setterCtxType configtypes.ContextType) error {
+	if setterCtxType == configtypes.ContextTypeTMC {
 		return nil
 	}
 
@@ -464,12 +528,12 @@ func updateMutualExclusiveCurrentContexts(node *yaml.Node, ctx *configtypes.Cont
 		return err
 	}
 	// deactivate all the other existing current contexts that are not TMC
-	for target, contextName := range cfg.CurrentContext {
-		if target == ctx.Target || target == configtypes.TargetTMC {
+	for contextType, contextName := range cfg.CurrentContext {
+		if contextType == setterCtxType || contextType == configtypes.ContextTypeTMC {
 			continue
 		}
 
-		err = removeCurrentContext(node, &configtypes.Context{Target: target})
+		err = removeCurrentContext(node, "", contextType)
 		if err != nil {
 			return err
 		}

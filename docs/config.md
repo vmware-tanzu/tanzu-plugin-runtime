@@ -63,11 +63,11 @@ func SetContext(context Context, setCurrent bool) error
 func DeleteContext(name string) error
 func RemoveContext(name string) error
 func ContextExists(name string) (bool, error)
-func GetCurrentContext(contextType ContextType) error
-func GetAllCurrentContextsMap() (map[configtypes.Target]*configtypes.Context, error)
-func GetAllCurrentContextsList() ([]string, error)
-func SetCurrentContext(context Context) error
-func RemoveCurrentContext(contextType ContextType) error
+func GetActiveContext(contextType ContextType) error
+func GetAllActiveContextsMap() (map[configtypes.ContextType]*configtypes.Context, error)
+func GetAllActiveContextsList() ([]string, error)
+func SetActiveContext(context Context) error
+func RemoveActiveContext(contextType ContextType) error
 func EndpointFromContext(s *configtypes.Context) (endpoint string, err error)
 
 // Feature APIs
@@ -188,7 +188,7 @@ import configapi "github.com/vmware-tanzu/tanzu-framework/cli/runtime/apis/confi
 err := configapi.DeleteContext(name)
 ```
 
-##### Example: Retrieve context information for a specific target
+##### Example: Retrieve context information for a specific context-type
 
 If a plugin wants to access the context it should use the GetCurrentContext API
 [context-related APIs](https://github.com/vmware-tanzu/tanzu-plugin-runtime/blob/main/config/contexts.go)
@@ -201,12 +201,12 @@ import (
   cfgtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
 
-ctx, err := config.GetCurrentContext(cfgtypes.TargetK8s)
+ctx, err := config.GetActiveContext(cfgtypes.ContextTypeK8s)
 ```
 
-##### Example: Set current context - context if present will be set as current active for a specific target
+##### Example: Set current context - context if present will be set as current active for a specific context-type
 
-If a plugin wants to set the current context it should use the SetCurrentContext API
+If a plugin wants to set the current context it should use the SetActiveContext API
 [context-related APIs](https://github.com/vmware-tanzu/tanzu-plugin-runtime/blob/main/config/contexts.go)
 in the Tanzu Plugin Runtime library to ensure forward compatibility. For
 example, to add/update the current active context use the below snippet:
@@ -216,5 +216,5 @@ import (
   config "github.com/vmware-tanzu/tanzu-plugin-runtime/config"
 )
 
-err := config.SetCurrentContext(name string)
+err := config.SetActiveContext(name string)
 ```

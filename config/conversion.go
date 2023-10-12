@@ -36,7 +36,7 @@ func PopulateContexts(cfg *configtypes.ClientConfig) bool {
 		cfg.KnownContexts = append(cfg.KnownContexts, c)
 
 		if s.Name == cfg.CurrentServer {
-			err := cfg.SetCurrentContext(c.Target, c.Name)
+			err := cfg.SetActiveContext(c.ContextType, c.Name)
 			if err != nil {
 				log.Warningf(err.Error())
 			}
@@ -50,10 +50,11 @@ func convertServerToContext(s *configtypes.Server) *configtypes.Context {
 	if s == nil {
 		return nil
 	}
-
+	target := convertServerTypeToTarget(s.Type)
 	return &configtypes.Context{
 		Name:             s.Name,
-		Target:           convertServerTypeToTarget(s.Type),
+		Target:           target,
+		ContextType:      configtypes.ConvertTargetToContextType(target),
 		GlobalOpts:       s.GlobalOpts,
 		ClusterOpts:      convertMgmtClusterOptsToClusterOpts(s.ManagementClusterOpts),
 		DiscoverySources: s.DiscoverySources,
@@ -96,6 +97,9 @@ func populateServers(cfg *configtypes.ClientConfig) {
 		cfg.KnownServers = make([]*configtypes.Server, 0, len(cfg.KnownContexts))
 	}
 	for _, c := range cfg.KnownContexts {
+		fillMissingContextTypeInContext(c)
+		fillMissingTargetInContext(c)
+
 		if cfg.HasServer(c.Name) {
 			// context already present in known servers; skip
 			continue
@@ -105,11 +109,11 @@ func populateServers(cfg *configtypes.ClientConfig) {
 		s := convertContextToServer(c)
 		cfg.KnownServers = append(cfg.KnownServers, s)
 
-		if cfg.CurrentServer == "" && (c.IsManagementCluster() || c.Target == configtypes.TargetTMC) && c.Name == cfg.CurrentContext[c.Target] {
+		if cfg.CurrentServer == "" && (c.IsManagementCluster() || c.ContextType == configtypes.ContextTypeK8s || c.ContextType == configtypes.ContextTypeTMC) && c.Name == cfg.CurrentContext[c.ContextType] {
 			// This is lossy because only one server can be active at a time in the older CLI.
 			// Using the K8s context for a management cluster or TMC, since these are the two
 			// available publicly at the time of deprecation.
-			cfg.CurrentServer = cfg.CurrentContext[configtypes.TargetK8s]
+			cfg.CurrentServer = cfg.CurrentContext[configtypes.ContextTypeK8s]
 		}
 	}
 }
@@ -161,7 +165,28 @@ func convertNodeToClientConfig(node *yaml.Node) (obj *configtypes.ClientConfig, 
 	if obj == nil {
 		return &configtypes.ClientConfig{}, err
 	}
+	fillContextTypeIfMissingInConfig(obj)
 	return obj, err
+}
+
+func fillContextTypeIfMissingInConfig(obj *configtypes.ClientConfig) {
+	for i := range obj.KnownContexts {
+		if obj.KnownContexts[i].ContextType == "" {
+			obj.KnownContexts[i].ContextType = configtypes.ConvertTargetToContextType(obj.KnownContexts[i].Target)
+		}
+	}
+}
+
+func fillMissingContextTypeInContext(obj *configtypes.Context) {
+	if obj.ContextType == "" {
+		obj.ContextType = configtypes.ConvertTargetToContextType(obj.Target)
+	}
+}
+
+func fillMissingTargetInContext(obj *configtypes.Context) {
+	if obj.Target == "" {
+		obj.Target = configtypes.ConvertContextTypeToTarget(obj.ContextType)
+	}
 }
 
 // convertNodeToMetadata converts yaml node to client config type

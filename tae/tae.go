@@ -112,8 +112,8 @@ func GetKubeconfigForContext(contextName, projectName, spaceName string) ([]byte
 	if err != nil {
 		return nil, err
 	}
-	if ctx.Target != configtypes.TargetTAE {
-		return nil, errors.Errorf("context must be of type: %s", configtypes.TargetTAE)
+	if ctx.ContextType != configtypes.ContextTypeTAE {
+		return nil, errors.Errorf("context must be of type: %s", configtypes.ContextTypeTAE)
 	}
 
 	kc, err := kubeconfig.ReadKubeConfig(ctx.ClusterOpts.Path)

@@ -137,6 +137,7 @@ currentContext:
           contextType: tmc
     - name: test-mc2
       target: kubernetes
+      contextType: kubernetes
       clusterOpts:
         endpoint: test-endpoint-updated
         path: test-path
@@ -275,6 +276,7 @@ func TestServersIntegrationAndMigratedToNewConfig(t *testing.T) {
           contextType: tmc
     - name: test-mc2
       target: kubernetes
+      contextType: kubernetes
       clusterOpts:
         endpoint: test-endpoint-updated
         path: test-path

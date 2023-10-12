@@ -65,9 +65,9 @@ func TestPopulateContexts(t *testing.T) {
 						},
 					},
 				},
-				CurrentContext: map[configtypes.Target]string{
-					configtypes.TargetK8s: "test-mc",
-					configtypes.TargetTMC: "test-tmc",
+				CurrentContext: map[configtypes.ContextType]string{
+					configtypes.ContextTypeK8s: "test-mc",
+					configtypes.ContextTypeTMC: "test-tmc",
 				},
 			},
 			op: &configtypes.ClientConfig{
@@ -109,9 +109,9 @@ func TestPopulateContexts(t *testing.T) {
 						},
 					},
 				},
-				CurrentContext: map[configtypes.Target]string{
-					configtypes.TargetK8s: "test-mc",
-					configtypes.TargetTMC: "test-tmc",
+				CurrentContext: map[configtypes.ContextType]string{
+					configtypes.ContextTypeK8s: "test-mc",
+					configtypes.ContextTypeTMC: "test-tmc",
 				},
 			},
 			delta: false,
@@ -147,8 +147,8 @@ func TestPopulateContexts(t *testing.T) {
 						},
 					},
 				},
-				CurrentContext: map[configtypes.Target]string{
-					configtypes.TargetTMC: "test-tmc",
+				CurrentContext: map[configtypes.ContextType]string{
+					configtypes.ContextTypeTMC: "test-tmc",
 				},
 			},
 			op: &configtypes.ClientConfig{
@@ -190,9 +190,9 @@ func TestPopulateContexts(t *testing.T) {
 						},
 					},
 				},
-				CurrentContext: map[configtypes.Target]string{
-					configtypes.TargetK8s: "test-mc",
-					configtypes.TargetTMC: "test-tmc",
+				CurrentContext: map[configtypes.ContextType]string{
+					configtypes.ContextTypeK8s: "test-mc",
+					configtypes.ContextTypeTMC: "test-tmc",
 				},
 			},
 			delta: true,
@@ -264,9 +264,9 @@ func TestPopulateServers(t *testing.T) {
 						},
 					},
 				},
-				CurrentContext: map[configtypes.Target]string{
-					configtypes.TargetK8s: "test-mc",
-					configtypes.TargetTMC: "test-tmc",
+				CurrentContext: map[configtypes.ContextType]string{
+					configtypes.ContextTypeK8s: "test-mc",
+					configtypes.ContextTypeTMC: "test-tmc",
 				},
 			},
 			op: &configtypes.ClientConfig{
@@ -308,9 +308,9 @@ func TestPopulateServers(t *testing.T) {
 						},
 					},
 				},
-				CurrentContext: map[configtypes.Target]string{
-					configtypes.TargetK8s: "test-mc",
-					configtypes.TargetTMC: "test-tmc",
+				CurrentContext: map[configtypes.ContextType]string{
+					configtypes.ContextTypeK8s: "test-mc",
+					configtypes.ContextTypeTMC: "test-tmc",
 				},
 			},
 		},
@@ -348,9 +348,9 @@ func TestPopulateServers(t *testing.T) {
 						},
 					},
 				},
-				CurrentContext: map[configtypes.Target]string{
-					configtypes.TargetK8s: "test-mc",
-					configtypes.TargetTMC: "test-tmc",
+				CurrentContext: map[configtypes.ContextType]string{
+					configtypes.ContextTypeK8s: "test-mc",
+					configtypes.ContextTypeTMC: "test-tmc",
 				},
 			},
 			op: &configtypes.ClientConfig{
@@ -392,9 +392,9 @@ func TestPopulateServers(t *testing.T) {
 						},
 					},
 				},
-				CurrentContext: map[configtypes.Target]string{
-					configtypes.TargetK8s: "test-mc",
-					configtypes.TargetTMC: "test-tmc",
+				CurrentContext: map[configtypes.ContextType]string{
+					configtypes.ContextTypeK8s: "test-mc",
+					configtypes.ContextTypeTMC: "test-tmc",
 				},
 			},
 		},

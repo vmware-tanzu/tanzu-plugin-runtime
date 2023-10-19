@@ -22,11 +22,10 @@ const (
 	ContextTypeTMC ContextType = "mission-control"
 	contextTypeTMC ContextType = "tmc"
 
-	// ContextTypeTAE is a used to indicate the type of Context used to interact with
-	// Tanzu Application Engine (Unified Control Plane) endpoint
+	// ContextTypeTanzu represents the type of context used to interact with
+	// Tanzu control plane endpoint
 	// Note!! Experimental, please expect changes
-	ContextTypeTAE ContextType = "application-engine"
-	contextTypeTAE ContextType = "tae"
+	ContextTypeTanzu ContextType = "tanzu"
 )
 
 // Target is the namespace of the CLI to which plugin is applicable
@@ -54,7 +53,7 @@ var (
 	// SupportedTargets is a list of all supported Target
 	SupportedTargets = []Target{TargetK8s, TargetTMC}
 	// SupportedContextTypes is a list of all supported ContextTypes
-	SupportedContextTypes = []ContextType{ContextTypeK8s, ContextTypeTMC, ContextTypeTAE}
+	SupportedContextTypes = []ContextType{ContextTypeK8s, ContextTypeTMC, ContextTypeTanzu}
 )
 
 const (
@@ -179,7 +178,7 @@ func (c *ClientConfig) GetActiveContext(context ContextType) (*Context, error) {
 // GetAllCurrentContextsMap returns all current context per Target
 //
 // Deprecated: GetAllCurrentContextsMap is deprecated. Use GetAllActiveContextsMap instead
-// Note: This function will not return newly added ContextType `application-engine` information
+// Note: This function will not return information for tanzu ContextType
 func (c *ClientConfig) GetAllCurrentContextsMap() (map[Target]*Context, error) {
 	currentContexts := make(map[Target]*Context)
 	for _, target := range SupportedTargets {
@@ -351,8 +350,8 @@ func ConvertTargetToContextType(target Target) ContextType {
 		return ContextTypeK8s
 	case TargetTMC:
 		return ContextTypeTMC
-	case Target(ContextTypeTAE):
-		return ContextTypeTAE
+	case Target(ContextTypeTanzu):
+		return ContextTypeTanzu
 	}
 	return ContextType(target)
 }
@@ -363,8 +362,8 @@ func ConvertContextTypeToTarget(ctxType ContextType) Target {
 		return TargetK8s
 	case ContextTypeTMC:
 		return TargetTMC
-	case ContextTypeTAE:
-		return Target(ContextTypeTAE)
+	case ContextTypeTanzu:
+		return Target(ContextTypeTanzu)
 	}
 	return Target(ctxType)
 }

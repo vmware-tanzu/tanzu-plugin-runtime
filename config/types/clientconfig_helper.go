@@ -38,8 +38,8 @@ func StringToContextType(contextType string) ContextType {
 		return ContextTypeK8s
 	} else if contextType == string(contextTypeTMC) || contextType == string(ContextTypeTMC) {
 		return ContextTypeTMC
-	} else if contextType == string(contextTypeTAE) || contextType == string(ContextTypeTAE) {
-		return ContextTypeTAE
+	} else if contextType == string(ContextTypeTanzu) {
+		return ContextTypeTanzu
 	}
 	return ""
 }

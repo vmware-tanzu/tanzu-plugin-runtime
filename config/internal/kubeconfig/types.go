@@ -3,7 +3,7 @@
 
 package kubeconfig
 
-// Note-IMPORTANT!! The below types are copied from the client-go library and modified a bit(removed fields like extensions not necessary for TAE kubeconfig)
+// Note-IMPORTANT!! The below types are copied from the client-go library and modified a bit(removed fields like extensions not necessary for Tanzu control plane endpoint kubeconfig)
 // to provide kubeconfig access functionality without copying the k8s.io/client-go library which would bring in the other kubernetes dependencies
 // and would impose dependency constraints on the plugin developers using the tanzu-plugin-runtime library
 

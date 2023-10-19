@@ -312,7 +312,7 @@ func EndpointFromContext(s *configtypes.Context) (endpoint string, err error) {
 		return s.ClusterOpts.Endpoint, nil
 	case configtypes.ContextTypeTMC:
 		return s.GlobalOpts.Endpoint, nil
-	case configtypes.ContextTypeTAE:
+	case configtypes.ContextTypeTanzu:
 		return s.ClusterOpts.Endpoint, nil
 	default:
 		return endpoint, fmt.Errorf("unknown context type %q", s.ContextType)

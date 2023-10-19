@@ -52,7 +52,7 @@ type Server struct {
 // Context configuration for a control plane. This can one of the following,
 // 1. Kubernetes Cluster
 // 2. Tanzu Mission Control endpoint
-// 3. Tanzu Application Engine endpoint
+// 3. Tanzu control plane endpoint
 type Context struct {
 	// Name of the context.
 	Name string `json:"name,omitempty" yaml:"name,omitempty"`

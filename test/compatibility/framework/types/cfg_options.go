@@ -50,8 +50,8 @@ const (
 	// ContextTypeTMC is a Tanzu Mission Control type of context.
 	ContextTypeTMC ContextType = "misson-control"
 
-	// ContextTypeTAE is a Tanzu Application Engine type of context.
-	ContextTypeTAE ContextType = "application-engine"
+	// ContextTypeTanzu is a Tanzu control plane type of context.
+	ContextTypeTanzu ContextType = "tanzu"
 )
 
 // Target is the namespace of the CLI to which plugin is applicable

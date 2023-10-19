@@ -1,7 +1,7 @@
 // Copyright 2023 VMware, Inc. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-package tae
+package config
 
 import (
 	"bytes"
@@ -14,12 +14,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v3"
 
-	"github.com/vmware-tanzu/tanzu-plugin-runtime/config"
-	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
-	"github.com/vmware-tanzu/tanzu-plugin-runtime/tae/internal/kubeconfig"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/config/internal/kubeconfig"
 )
 
-const ConfigFilePermissions = 0o600
 const (
 	fakePluginScriptFmtString string = `#!/bin/bash
 # Fake tanzu core binary
@@ -74,18 +71,12 @@ esac
 )
 
 func cleanupTestingDir(t *testing.T) {
-	p, err := config.LocalDir()
+	p, err := LocalDir()
 	assert.NoError(t, err)
 	err = os.RemoveAll(p)
 	assert.NoError(t, err)
 }
 
-func copyFile(t *testing.T, sourceFile, destFile string) {
-	input, err := os.ReadFile(sourceFile)
-	assert.NoError(t, err)
-	err = os.WriteFile(destFile, input, ConfigFilePermissions)
-	assert.NoError(t, err)
-}
 func readOutput(t *testing.T, r io.Reader, c chan<- []byte) {
 	data, err := io.ReadAll(r)
 	if err != nil {
@@ -94,145 +85,89 @@ func readOutput(t *testing.T, r io.Reader, c chan<- []byte) {
 	c <- data
 }
 
-func setupForGetContext(t *testing.T) {
-	// setup
-	cfg := &configtypes.ClientConfig{
-		KnownContexts: []*configtypes.Context{
-			{
-				Name:   "test-mc",
-				Target: configtypes.TargetK8s,
-				ClusterOpts: &configtypes.ClusterServer{
-					Endpoint:            "test-endpoint",
-					Path:                "test-path",
-					Context:             "test-context",
-					IsManagementCluster: true,
-				},
-			},
-			{
-				Name:   "test-mc-2",
-				Target: configtypes.TargetK8s,
-				ClusterOpts: &configtypes.ClusterServer{
-					Endpoint:            "test-endpoint-2",
-					Path:                "test-path-2",
-					Context:             "test-context-2",
-					IsManagementCluster: true,
-				},
-			},
-			{
-				Name:   "test-tmc",
-				Target: configtypes.TargetTMC,
-				GlobalOpts: &configtypes.GlobalServer{
-					Endpoint: "test-endpoint",
-				},
-			},
-			{
-				Name:        "test-tae",
-				ContextType: configtypes.ContextTypeTAE,
-				GlobalOpts: &configtypes.GlobalServer{
-					Endpoint: "test-endpoint",
-				},
-				ClusterOpts: &configtypes.ClusterServer{
-					Endpoint: "https://api.tanzu.cloud.vmware.com:443/org/fake-org-id",
-					Path:     "test-path",
-					Context:  "test-context",
-				},
-				AdditionalMetadata: map[string]interface{}{
-					OrgIDKey: "fake-org-id",
-				},
-			},
-		},
-		CurrentContext: map[configtypes.ContextType]string{
-			configtypes.ContextTypeK8s: "test-mc-2",
-			configtypes.ContextTypeTMC: "test-tmc",
-			configtypes.ContextTypeTAE: "test-tae",
-		},
-	}
-	func() {
-		config.LocalDirName = config.TestLocalDirName
-		err := config.StoreClientConfig(cfg)
-		assert.NoError(t, err)
-	}()
-}
-
 func TestGetKubeconfigForContext(t *testing.T) {
-	setupForGetContext(t)
+	err := setupForGetContext()
+	assert.NoError(t, err)
 
 	testKubeconfiFilePath := "../fakes/config/kubeconfig-1.yaml"
 	kubeconfigFilePath, err := os.CreateTemp("", "config")
 	assert.NoError(t, err)
-	copyFile(t, testKubeconfiFilePath, kubeconfigFilePath.Name())
+	err = copyFile(testKubeconfiFilePath, kubeconfigFilePath.Name())
+	assert.NoError(t, err)
 
 	defer func() {
 		cleanupTestingDir(t)
 		_ = os.RemoveAll(kubeconfigFilePath.Name())
 	}()
 
-	c, err := config.GetContext("test-tae")
+	c, err := GetContext("test-tanzu")
 	assert.NoError(t, err)
 	c.ClusterOpts.Path = kubeconfigFilePath.Name()
-	c.ClusterOpts.Context = "tanzu-cli-mytae"
-	err = config.SetContext(c, false)
+	c.ClusterOpts.Context = "tanzu-cli-mytanzu"
+	err = SetContext(c, false)
 	assert.NoError(t, err)
 
-	// Test getting the kubeconfig for an arbitrary TAE resource
+	// Test getting the kubeconfig for an arbitrary Tanzu resource
 	kubeconfigBytes, err := GetKubeconfigForContext(c.Name, "project1", "space1")
 	assert.NoError(t, err)
-	c, err = config.GetContext("test-tae")
+	c, err = GetContext("test-tanzu")
 	assert.NoError(t, err)
 	var kc kubeconfig.Config
 	err = yaml.Unmarshal(kubeconfigBytes, &kc)
 	assert.NoError(t, err)
-	cluster := kubeconfig.GetCluster(&kc, "tanzu-cli-mytae/current")
+	cluster := kubeconfig.GetCluster(&kc, "tanzu-cli-mytanzu/current")
 	assert.Equal(t, cluster.Cluster.Server, c.ClusterOpts.Endpoint+"/project/project1/space/space1")
 
-	// Test getting the kubeconfig for an arbitrary TAE resource
+	// Test getting the kubeconfig for an arbitrary Tanzu resource
 	kubeconfigBytes, err = GetKubeconfigForContext(c.Name, "project2", "")
 	assert.NoError(t, err)
-	c, err = config.GetContext("test-tae")
+	c, err = GetContext("test-tanzu")
 	assert.NoError(t, err)
 	err = yaml.Unmarshal(kubeconfigBytes, &kc)
 	assert.NoError(t, err)
-	cluster = kubeconfig.GetCluster(&kc, "tanzu-cli-mytae/current")
+	cluster = kubeconfig.GetCluster(&kc, "tanzu-cli-mytanzu/current")
 	assert.Equal(t, cluster.Cluster.Server, c.ClusterOpts.Endpoint+"/project/project2")
 
-	// Test getting the kubeconfig for an arbitrary TAE resource for non TAE context
-	nonTAECtx, err := config.GetContext("test-mc")
+	// Test getting the kubeconfig for an arbitrary Tanzu resource for non Tanzu context
+	nonTanzuCtx, err := GetContext("test-mc")
 	assert.NoError(t, err)
-	_, err = GetKubeconfigForContext(nonTAECtx.Name, "project2", "")
+	_, err = GetKubeconfigForContext(nonTanzuCtx.Name, "project2", "")
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "context must be of type: application-engine")
+	assert.ErrorContains(t, err, "context must be of type: tanzu")
 }
 
-func TestGetTAEContextActiveResource(t *testing.T) {
-	setupForGetContext(t)
-	defer cleanupTestingDir(t)
-
-	c, err := config.GetContext("test-tae")
+func TestGetTanzuContextActiveResource(t *testing.T) {
+	err := setupForGetContext()
 	assert.NoError(t, err)
 
-	// Test getting the TAE active resource of a non-existent context
-	_, err = GetTAEContextActiveResource("non-existent-context")
+	defer cleanupTestingDir(t)
+
+	c, err := GetContext("test-tanzu")
+	assert.NoError(t, err)
+
+	// Test getting the Tanzu active resource of a non-existent context
+	_, err = GetTanzuContextActiveResource("non-existent-context")
 	assert.Error(t, err)
 	assert.ErrorContains(t, err, "context non-existent-context not found")
 
-	// Test getting the TAE active resource of a context that is not tae context
-	_, err = GetTAEContextActiveResource("test-mc")
+	// Test getting the Tanzu active resource of a context that is not Tanzu context
+	_, err = GetTanzuContextActiveResource("test-mc")
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "context must be of type: application-engine")
+	assert.ErrorContains(t, err, "context must be of type: tanzu")
 
-	// Test getting the TAE active resource of a context with active resource as Org only
-	activeResources, err := GetTAEContextActiveResource("test-tae")
+	// Test getting the Tanzu active resource of a context with active resource as Org only
+	activeResources, err := GetTanzuContextActiveResource("test-tanzu")
 	assert.NoError(t, err)
 	assert.Equal(t, activeResources.OrgID, "fake-org-id")
 	assert.Empty(t, activeResources.ProjectName)
 	assert.Empty(t, activeResources.SpaceName)
 
-	// Test getting the TAE active resource of a context with active resource as space
+	// Test getting the Tanzu active resource of a context with active resource as space
 	c.AdditionalMetadata[ProjectNameKey] = "fake-project"
 	c.AdditionalMetadata[SpaceNameKey] = "fake-space"
-	err = config.SetContext(c, false)
+	err = SetContext(c, false)
 	assert.NoError(t, err)
-	activeResources, err = GetTAEContextActiveResource("test-tae")
+	activeResources, err = GetTanzuContextActiveResource("test-tanzu")
 	assert.NoError(t, err)
 	assert.Equal(t, activeResources.OrgID, "fake-org-id")
 	assert.Equal(t, activeResources.ProjectName, "fake-project")
@@ -240,11 +175,11 @@ func TestGetTAEContextActiveResource(t *testing.T) {
 
 	// If context activeMetadata is not set(error case)
 	c.AdditionalMetadata = nil
-	err = config.SetContext(c, false)
+	err = SetContext(c, false)
 	assert.NoError(t, err)
-	_, err = GetTAEContextActiveResource("test-tae")
+	_, err = GetTanzuContextActiveResource("test-tanzu")
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "context is missing the TAE metadata")
+	assert.ErrorContains(t, err, "context is missing the Tanzu metadata")
 }
 
 func setupFakeCLI(dir string, exitStatus string, newCommandExitStatus string, enableCustomCommand bool) (string, error) {
@@ -268,7 +203,7 @@ func setupFakeCLI(dir string, exitStatus string, newCommandExitStatus string, en
 	return filePath, nil
 }
 
-func TestSetTAEContextActiveResource(t *testing.T) {
+func TestSetTanzuContextActiveResource(t *testing.T) {
 	tests := []struct {
 		test                 string
 		exitStatus           string
@@ -278,35 +213,35 @@ func TestSetTAEContextActiveResource(t *testing.T) {
 		enableCustomCommand  bool
 	}{
 		{
-			test:            "with no alternate command and tae active resource update successfully",
+			test:            "with no alternate command and Tanzu active resource update successfully",
 			exitStatus:      "0",
-			expectedOutput:  "context update tae-active-resource test-context --project projectA --space spaceA succeeded\n",
+			expectedOutput:  "context update tanzu-active-resource test-context --project projectA --space spaceA succeeded\n",
 			expectedFailure: false,
 		},
 		{
-			test:            "with no alternate command and tae active resource update unsuccessfully",
+			test:            "with no alternate command and Tanzu active resource update unsuccessfully",
 			exitStatus:      "1",
-			expectedOutput:  "context update tae-active-resource test-context --project projectA --space spaceA failed\n",
+			expectedOutput:  "context update tanzu-active-resource test-context --project projectA --space spaceA failed\n",
 			expectedFailure: true,
 		},
 		{
-			test:                 "with alternate command and tae active resource update successfully",
+			test:                 "with alternate command and Tanzu active resource update successfully",
 			newCommandExitStatus: "0",
-			expectedOutput:       "newcommand update tae-active-resource test-context --project projectA --space spaceA succeeded\n",
+			expectedOutput:       "newcommand update tanzu-active-resource test-context --project projectA --space spaceA succeeded\n",
 			expectedFailure:      false,
 			enableCustomCommand:  true,
 		},
 		{
-			test:                 "with alternate command and tae active resource update unsuccessfully",
+			test:                 "with alternate command and Tanzu active resource update unsuccessfully",
 			newCommandExitStatus: "1",
-			expectedOutput:       "newcommand update tae-active-resource test-context --project projectA --space spaceA failed\n",
+			expectedOutput:       "newcommand update tanzu-active-resource test-context --project projectA --space spaceA failed\n",
 			expectedFailure:      true,
 			enableCustomCommand:  true,
 		},
 	}
 
 	for _, spec := range tests {
-		dir, err := os.MkdirTemp("", "tanzu-set-tae-active-resource-api")
+		dir, err := os.MkdirTemp("", "tanzu-set-tanzu-active-resource-api")
 		assert.Nil(t, err)
 		defer os.RemoveAll(dir)
 		t.Run(spec.test, func(t *testing.T) {
@@ -334,7 +269,7 @@ func TestSetTAEContextActiveResource(t *testing.T) {
 
 			// Test-1:
 			// - verify correct string gets printed to default stdout and stderr
-			err = SetTAEContextActiveResource("test-context", "projectA", "spaceA")
+			err = SetTanzuContextActiveResource("test-context", "projectA", "spaceA")
 			w.Close()
 			stdoutRecieved := <-c
 
@@ -349,7 +284,7 @@ func TestSetTAEContextActiveResource(t *testing.T) {
 			// Test-2: when external stdout and stderr are provided with WithStdout, WithStderr options,
 			// verify correct string gets printed to provided custom stdout/stderr
 			var combinedOutputBuff bytes.Buffer
-			err = SetTAEContextActiveResource("test-context", "projectA", "spaceA", WithOutputWriter(&combinedOutputBuff), WithErrorWriter(&combinedOutputBuff))
+			err = SetTanzuContextActiveResource("test-context", "projectA", "spaceA", WithOutputWriter(&combinedOutputBuff), WithErrorWriter(&combinedOutputBuff))
 			if spec.expectedFailure {
 				assert.NotNil(err)
 			} else {

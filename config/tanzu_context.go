@@ -1,8 +1,7 @@
 // Copyright 2023 VMware, Inc. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-// Package tae provides APIs specific to Tanzu Application Engine(TAE)
-package tae
+package config
 
 import (
 	"bytes"
@@ -14,16 +13,15 @@ import (
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v3"
 
-	"github.com/vmware-tanzu/tanzu-plugin-runtime/config"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/config/internal/kubeconfig"
 	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
-	"github.com/vmware-tanzu/tanzu-plugin-runtime/tae/internal/kubeconfig"
 )
 
 // keys to Context's AdditionalMetadata map
 const (
-	OrgIDKey       = "taeOrgID"
-	ProjectNameKey = "taeProjectName"
-	SpaceNameKey   = "taeSpaceName"
+	OrgIDKey       = "tanzuOrgID"
+	ProjectNameKey = "tanzuProjectName"
+	SpaceNameKey   = "tanzuSpaceName"
 )
 
 const (
@@ -33,7 +31,7 @@ const (
 	customCommandName string = "_custom_command"
 )
 
-// ResourceInfo resource information of the application engine
+// ResourceInfo contains information identifying the Tanzu resource associated with the Context
 type ResourceInfo struct {
 	// OrgID ID of the Organization
 	OrgID string
@@ -101,34 +99,34 @@ func runCommand(commandPath string, args []string, opts *cmdOptions) (bytes.Buff
 	return stdout, stderr, command.Run()
 }
 
-// GetKubeconfigForContext returns the kubeconfig for any arbitrary TAE resource in the TAE object hierarchy
-// referred by the TAE context
+// GetKubeconfigForContext returns the kubeconfig for any arbitrary Tanzu resource in the Tanzu object hierarchy
+// referred by the Tanzu context
 // Pre-reqs: project and space names should be valid
 //
 // Notes:
-// If projectName and spaceName is empty string the kubeconfig generated would be pointing to TAE org
+// If projectName and spaceName is empty string the kubeconfig generated would be pointing to Tanzu org
 //
 //	ex: kubeconfig's cluster.server URL : https://endpoint/org/orgid
 //
-// If projectName is valid projectName and spaceName is empty string the kubeconfig generated would be pointing to TAE project
+// If projectName is valid projectName and spaceName is empty string the kubeconfig generated would be pointing to Tanzu project
 //
 //	ex: kubeconfig's cluster.server URL : https://endpoint/org/orgid/project/<projectName>
 //
-// similarly if both project and space names are valid names the kubeconfig generated would be pointing to TAE space
+// similarly if both project and space names are valid names the kubeconfig generated would be pointing to Tanzu space
 //
 //	ex: kubeconfig's cluster.server URL:  https://endpoint/org/orgid/project/<projectName>/space/<spaceName>
 func GetKubeconfigForContext(contextName, projectName, spaceName string) ([]byte, error) {
-	ctx, err := config.GetContext(contextName)
+	ctx, err := GetContext(contextName)
 	if err != nil {
 		return nil, err
 	}
-	if ctx.ContextType != configtypes.ContextTypeTAE {
-		return nil, errors.Errorf("context must be of type: %s", configtypes.ContextTypeTAE)
+	if ctx.ContextType != configtypes.ContextTypeTanzu {
+		return nil, errors.Errorf("context must be of type: %s", configtypes.ContextTypeTanzu)
 	}
 
 	kc, err := kubeconfig.ReadKubeConfig(ctx.ClusterOpts.Path)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to read the TAE context kubeconfig")
+		return nil, errors.Wrap(err, "failed to read the Tanzu context kubeconfig")
 	}
 
 	kc, err = kubeconfig.MinifyKubeConfig(kc, ctx.ClusterOpts.Context)
@@ -164,8 +162,8 @@ func updateKubeconfigServerURL(kc *kubeconfig.Config, cliContext *configtypes.Co
 	cluster.Cluster.Server = prepareClusterServerURL(cliContext, projectName, spaceName)
 }
 
-// SetTAEContextActiveResource sets the active TAE resource for the given context and also updates
-// the kubeconfig referrenced by the TAE context
+// SetTanzuContextActiveResource sets the active Tanzu resource for the given context and also updates
+// the kubeconfig referenced by the context of type Tanzu
 //
 // Pre-reqs: project and space names should be valid
 //
@@ -173,9 +171,9 @@ func updateKubeconfigServerURL(kc *kubeconfig.Config, cliContext *configtypes.Co
 //   - a space as active resource, both project and space names are required
 //   - a project as active resource, only project name is required (space should be empty string)
 //   - org as active resource, both project and space names should be empty strings
-func SetTAEContextActiveResource(contextName, projectName, spaceName string, opts ...CommandOptions) error {
+func SetTanzuContextActiveResource(contextName, projectName, spaceName string, opts ...CommandOptions) error {
 	// For now, the implementation expects env var TANZU_BIN to be set and
-	// pointing to the core CLI binary used to invoke setting the active TAE resource.
+	// pointing to the core CLI binary used to invoke setting the active Tanzu resource.
 
 	options := &cmdOptions{}
 	for _, opt := range opts {
@@ -188,12 +186,12 @@ func SetTAEContextActiveResource(contextName, projectName, spaceName string, opt
 	}
 
 	altCommandArgs := []string{customCommandName}
-	args := []string{"context", "update", "tae-active-resource", contextName, "--project", projectName, "--space", spaceName}
+	args := []string{"context", "update", "tanzu-active-resource", contextName, "--project", projectName, "--space", spaceName}
 
 	altCommandArgs = append(altCommandArgs, args...)
 
-	// Check if there is an alternate means to set the active TAE context active resource
-	// operation, if not fall back to `context update tae-active-resource`
+	// Check if there is an alternate means to set the active Tanzu context active resource
+	// operation, if not fall back to `context update tanzu-active-resource`
 	stdoutOutput, _, err := runCommand(cliPath, altCommandArgs, &cmdOptions{outWriter: io.Discard, errWriter: io.Discard})
 	if err == nil {
 		args = strings.Fields(stdoutOutput.String())
@@ -207,17 +205,17 @@ func SetTAEContextActiveResource(contextName, projectName, spaceName string, opt
 	return nil
 }
 
-// GetTAEContextActiveResource returns the application engine active resource information for the given context
-func GetTAEContextActiveResource(contextName string) (*ResourceInfo, error) {
-	ctx, err := config.GetContext(contextName)
+// GetTanzuContextActiveResource returns the Tanzu active resource information for the given context
+func GetTanzuContextActiveResource(contextName string) (*ResourceInfo, error) {
+	ctx, err := GetContext(contextName)
 	if err != nil {
 		return nil, err
 	}
-	if ctx.ContextType != configtypes.ContextTypeTAE {
-		return nil, errors.Errorf("context must be of type: %s", configtypes.ContextTypeTAE)
+	if ctx.ContextType != configtypes.ContextTypeTanzu {
+		return nil, errors.Errorf("context must be of type: %s", configtypes.ContextTypeTanzu)
 	}
 	if ctx.AdditionalMetadata == nil {
-		return nil, errors.New("context is missing the TAE metadata")
+		return nil, errors.New("context is missing the Tanzu metadata")
 	}
 	activeResourceInfo := &ResourceInfo{
 		OrgID:       stringValue(ctx.AdditionalMetadata[OrgIDKey]),
@@ -231,5 +229,9 @@ func stringValue(val interface{}) string {
 	if val == nil {
 		return ""
 	}
-	return val.(string)
+	str, valid := val.(string)
+	if !valid {
+		return ""
+	}
+	return str
 }

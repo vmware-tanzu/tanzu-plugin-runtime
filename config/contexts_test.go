@@ -470,15 +470,18 @@ func setupForGetContext() error {
 				},
 			},
 			{
-				Name:        "test-tae",
-				ContextType: configtypes.ContextTypeTAE,
+				Name:        "test-tanzu",
+				ContextType: configtypes.ContextTypeTanzu,
 				GlobalOpts: &configtypes.GlobalServer{
 					Endpoint: "test-endpoint",
 				},
 				ClusterOpts: &configtypes.ClusterServer{
-					Endpoint: "test-endpoint",
+					Endpoint: "https://api.tanzu.cloud.vmware.com:443/org/fake-org-id",
 					Path:     "test-path",
 					Context:  "test-context",
+				},
+				AdditionalMetadata: map[string]interface{}{
+					OrgIDKey: "fake-org-id",
 				},
 			},
 		},
@@ -516,8 +519,8 @@ func TestGetContext(t *testing.T) {
 			ctxName: "test-tmc",
 		},
 		{
-			name:    "success tae",
-			ctxName: "test-tae",
+			name:    "success tanzu",
+			ctxName: "test-tanzu",
 		},
 		{
 			name:    "failure",
@@ -564,15 +567,15 @@ func TestGetContextsByType(t *testing.T) {
 			contextType:             configtypes.ContextTypeTMC,
 		},
 		{
-			name:                    "get tae contexts",
-			expectedNamesOfContexts: []string{"test-tae"},
-			contextType:             configtypes.ContextTypeTAE,
+			name:                    "get tanzu contexts",
+			expectedNamesOfContexts: []string{"test-tanzu"},
+			contextType:             configtypes.ContextTypeTanzu,
 		},
 		{
-			name:                    "get tae contexts",
-			contextToDelete:         "test-tae",
+			name:                    "get tanzu contexts",
+			contextToDelete:         "test-tanzu",
 			expectedNamesOfContexts: []string(nil),
-			contextType:             configtypes.ContextTypeTAE,
+			contextType:             configtypes.ContextTypeTanzu,
 		},
 	}
 
@@ -619,8 +622,8 @@ func TestContextExists(t *testing.T) {
 			ok:      true,
 		},
 		{
-			name:    "success tae",
-			ctxName: "test-tae",
+			name:    "success tanzu",
+			ctxName: "test-tanzu",
 			ok:      true,
 		},
 		{
@@ -763,10 +766,10 @@ func TestSetContext(t *testing.T) {
 			},
 		},
 		{
-			name: "success tae current",
+			name: "success tanzu current",
 			ctx: &configtypes.Context{
-				Name:        "test-tae1",
-				ContextType: configtypes.ContextTypeTAE,
+				Name:        "test-tanzu1",
+				ContextType: configtypes.ContextTypeTanzu,
 				GlobalOpts: &configtypes.GlobalServer{
 					Endpoint: "test-endpoint",
 				},
@@ -782,10 +785,10 @@ func TestSetContext(t *testing.T) {
 			current: true,
 		},
 		{
-			name: "success tae not_current",
+			name: "success tanzu not_current",
 			ctx: &configtypes.Context{
-				Name:        "test-tae2",
-				ContextType: configtypes.ContextTypeTAE,
+				Name:        "test-tanzu2",
+				ContextType: configtypes.ContextTypeTanzu,
 				GlobalOpts: &configtypes.GlobalServer{
 					Endpoint: "test-endpoint",
 				},
@@ -863,8 +866,8 @@ func TestRemoveContext(t *testing.T) {
 			ctxName: "test-tmc",
 		},
 		{
-			name:    "success tae",
-			ctxName: "test-tae",
+			name:    "success tanzu",
+			ctxName: "test-tanzu",
 		},
 		{
 			name:    "failure",
@@ -908,63 +911,63 @@ func TestGetAllCurrentContexts(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "test-mc-2", currentContextMap[configtypes.TargetK8s].Name)
 	assert.Equal(t, "test-tmc", currentContextMap[configtypes.TargetTMC].Name)
-	assert.Nil(t, currentContextMap[configtypes.Target(configtypes.ContextTypeTAE)])
+	assert.Nil(t, currentContextMap[configtypes.Target(configtypes.ContextTypeTanzu)])
 
 	activeContextMap, err := GetAllActiveContextsMap()
 	assert.NoError(t, err)
 	assert.Equal(t, "test-mc-2", activeContextMap[configtypes.ContextTypeK8s].Name)
 	assert.Equal(t, "test-tmc", activeContextMap[configtypes.ContextTypeTMC].Name)
-	assert.Nil(t, activeContextMap[configtypes.ContextTypeTAE])
+	assert.Nil(t, activeContextMap[configtypes.ContextTypeTanzu])
 
 	currentContextsList, err := GetAllCurrentContextsList()
 	assert.NoError(t, err)
 	assert.Contains(t, currentContextsList, "test-mc-2")
 	assert.Contains(t, currentContextsList, "test-tmc")
-	assert.NotContains(t, currentContextsList, "test-tae")
+	assert.NotContains(t, currentContextsList, "test-tanzu")
 
 	activeContextsList, err := GetAllActiveContextsList()
 	assert.NoError(t, err)
 	assert.Contains(t, activeContextsList, "test-mc-2")
 	assert.Contains(t, activeContextsList, "test-tmc")
-	assert.NotContains(t, activeContextsList, "test-tae")
+	assert.NotContains(t, activeContextsList, "test-tanzu")
 
-	// set the tae context (k8s and tae current contexts are mutual exclusive)
-	err = SetCurrentContext("test-tae")
+	// set the tanzu context (k8s and tanzu current contexts are mutual exclusive)
+	err = SetCurrentContext("test-tanzu")
 	assert.NoError(t, err)
-	// GetAllCurrentContextsMap does not return TAE context
+	// GetAllCurrentContextsMap does not return tanzu context
 	currentContextMap, err = GetAllCurrentContextsMap()
 	assert.NoError(t, err)
 	assert.Nil(t, currentContextMap[configtypes.TargetK8s])
 	assert.Equal(t, "test-tmc", currentContextMap[configtypes.TargetTMC].Name)
-	assert.Nil(t, currentContextMap[configtypes.Target(configtypes.ContextTypeTAE)])
-	// GetAllActiveContextsMap should return TAE context and should match
+	assert.Nil(t, currentContextMap[configtypes.Target(configtypes.ContextTypeTanzu)])
+	// GetAllActiveContextsMap should return tanzu context and should match
 	activeContextMap, err = GetAllActiveContextsMap()
 	assert.NoError(t, err)
 	assert.Nil(t, activeContextMap[configtypes.ContextTypeK8s])
 	assert.Equal(t, "test-tmc", activeContextMap[configtypes.ContextTypeTMC].Name)
-	assert.NotNil(t, activeContextMap[configtypes.ContextTypeTAE])
-	assert.Equal(t, "test-tae", activeContextMap[configtypes.ContextTypeTAE].Name)
+	assert.NotNil(t, activeContextMap[configtypes.ContextTypeTanzu])
+	assert.Equal(t, "test-tanzu", activeContextMap[configtypes.ContextTypeTanzu].Name)
 
 	currentContextsList, err = GetAllCurrentContextsList()
 	assert.NoError(t, err)
 	assert.NotContains(t, currentContextsList, "test-mc2")
 	assert.Contains(t, currentContextsList, "test-tmc")
-	assert.Contains(t, currentContextsList, "test-tae")
+	assert.Contains(t, currentContextsList, "test-tanzu")
 
-	// remove the tae current context
-	err = RemoveCurrentContext(configtypes.Target(configtypes.ContextTypeTAE))
+	// remove the tanzu current context
+	err = RemoveCurrentContext(configtypes.Target(configtypes.ContextTypeTanzu))
 	assert.NoError(t, err)
 	currentContextMap, err = GetAllCurrentContextsMap()
 	assert.NoError(t, err)
 	assert.Nil(t, currentContextMap[configtypes.TargetK8s])
 	assert.Equal(t, "test-tmc", currentContextMap[configtypes.TargetTMC].Name)
-	assert.Nil(t, currentContextMap[configtypes.Target(configtypes.ContextTypeTAE)])
+	assert.Nil(t, currentContextMap[configtypes.Target(configtypes.ContextTypeTanzu)])
 
 	currentContextsList, err = GetAllCurrentContextsList()
 	assert.NoError(t, err)
 	assert.NotContains(t, currentContextsList, "test-mc")
 	assert.Contains(t, currentContextsList, "test-tmc")
-	assert.NotContains(t, currentContextsList, "test-tae")
+	assert.NotContains(t, currentContextsList, "test-tanzu")
 }
 
 func TestRemoveCurrentContext(t *testing.T) {
@@ -1389,17 +1392,17 @@ func TestSetCurrentContext(t *testing.T) {
 		cleanupDir(LocalDirName)
 	}()
 
-	err := SetCurrentContext("test-tae")
+	err := SetCurrentContext("test-tanzu")
 	assert.NoError(t, err)
-	validateActiveContextV2(t, configtypes.ContextTypeTAE, "test-tae", false, "")
+	validateActiveContextV2(t, configtypes.ContextTypeTanzu, "test-tanzu", false, "")
 
 	err = SetCurrentContext("test-mc")
 	assert.NoError(t, err)
 	validateActiveContextV2(t, configtypes.ContextTypeK8s, "test-mc", true, "test-mc")
 
-	_, err = GetCurrentContext(configtypes.Target(configtypes.ContextTypeTAE))
+	_, err = GetCurrentContext(configtypes.Target(configtypes.ContextTypeTanzu))
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, `no current context set for type "application-engine"`)
+	assert.ErrorContains(t, err, `no current context set for type "tanzu"`)
 }
 
 var _ = Describe("testing SetCurrentContext & SetActiveContext", func() {
@@ -1444,25 +1447,25 @@ var _ = Describe("testing SetCurrentContext & SetActiveContext", func() {
 			validateActiveContext(configtypes.ContextTypeK8s, "test-mc", true, "test-mc")
 		})
 	})
-	Context("tae context as current context", func() {
-		It("should set tae context as current context successfully", func() {
+	Context("tanzu context as current context", func() {
+		It("should set tanzu context as current context successfully", func() {
 			//Remove the k8s current context set during initial setup
 			err = RemoveCurrentContext(configtypes.TargetK8s)
 			gomega.Expect(err).To(gomega.BeNil())
 
-			err = SetCurrentContext("test-tae")
+			err = SetCurrentContext("test-tanzu")
 			gomega.Expect(err).To(gomega.BeNil())
-			validateActiveContext(configtypes.ContextTypeTAE, "test-tae", false, "")
+			validateActiveContext(configtypes.ContextTypeTanzu, "test-tanzu", false, "")
 
 		})
-		It("should set tae context as active context successfully", func() {
+		It("should set tanzu context as active context successfully", func() {
 			//Remove the k8s current context set during initial setup
 			err = RemoveActiveContext(configtypes.ContextTypeK8s)
 			gomega.Expect(err).To(gomega.BeNil())
 
-			err = SetActiveContext("test-tae")
+			err = SetActiveContext("test-tanzu")
 			gomega.Expect(err).To(gomega.BeNil())
-			validateActiveContext(configtypes.ContextTypeTAE, "test-tae", false, "")
+			validateActiveContext(configtypes.ContextTypeTanzu, "test-tanzu", false, "")
 
 		})
 	})
@@ -1488,56 +1491,56 @@ var _ = Describe("testing SetCurrentContext & SetActiveContext", func() {
 
 		})
 	})
-	Context("k8s context as current context after tae context(mutual-exclusion test between k8s and tae) ", func() {
-		It("should have only k8s as current context and tae context should be removed from the current context", func() {
-			err = SetCurrentContext("test-tae")
+	Context("k8s context as current context after tanzu context(mutual-exclusion test between k8s and tanzu) ", func() {
+		It("should have only k8s as current context and tanzu context should be removed from the current context", func() {
+			err = SetCurrentContext("test-tanzu")
 			gomega.Expect(err).To(gomega.BeNil())
-			validateActiveContext(configtypes.ContextTypeTAE, "test-tae", false, "")
+			validateActiveContext(configtypes.ContextTypeTanzu, "test-tanzu", false, "")
 
 			err = SetCurrentContext("test-mc")
 			gomega.Expect(err).To(gomega.BeNil())
 			validateActiveContext(configtypes.ContextTypeK8s, "test-mc", true, "test-mc")
 
-			_, err = GetCurrentContext(configtypes.Target(configtypes.ContextTypeTAE))
+			_, err = GetCurrentContext(configtypes.Target(configtypes.ContextTypeTanzu))
 			gomega.Expect(err).ToNot(gomega.BeNil())
-			gomega.Expect(err.Error()).To(gomega.ContainSubstring(`no current context set for type "application-engine"`))
+			gomega.Expect(err.Error()).To(gomega.ContainSubstring(`no current context set for type "tanzu"`))
 		})
-		It("should have only k8s as current context and tae context should be removed from the active context", func() {
-			err = SetActiveContext("test-tae")
+		It("should have only k8s as current context and tanzu context should be removed from the active context", func() {
+			err = SetActiveContext("test-tanzu")
 			gomega.Expect(err).To(gomega.BeNil())
-			validateActiveContext(configtypes.ContextTypeTAE, "test-tae", false, "")
+			validateActiveContext(configtypes.ContextTypeTanzu, "test-tanzu", false, "")
 
 			err = SetActiveContext("test-mc")
 			gomega.Expect(err).To(gomega.BeNil())
 			validateActiveContext(configtypes.ContextTypeK8s, "test-mc", true, "test-mc")
 
-			_, err = GetActiveContext(configtypes.ContextTypeTAE)
+			_, err = GetActiveContext(configtypes.ContextTypeTanzu)
 			gomega.Expect(err).ToNot(gomega.BeNil())
-			gomega.Expect(err.Error()).To(gomega.ContainSubstring(`no current context set for type "application-engine"`))
+			gomega.Expect(err.Error()).To(gomega.ContainSubstring(`no current context set for type "tanzu"`))
 		})
 	})
-	Context("tae context as current context after k8s context(mutual-exclusion test between k8s and tae) ", func() {
-		It("should have only tae as current context and k8s context should be removed from the current context", func() {
+	Context("tanzu context as current context after k8s context(mutual-exclusion test between k8s and tanzu) ", func() {
+		It("should have only tanzu as current context and k8s context should be removed from the current context", func() {
 			err = SetCurrentContext("test-mc")
 			gomega.Expect(err).To(gomega.BeNil())
 			validateActiveContext(configtypes.ContextTypeK8s, "test-mc", true, "test-mc")
 
-			err = SetCurrentContext("test-tae")
+			err = SetCurrentContext("test-tanzu")
 			gomega.Expect(err).To(gomega.BeNil())
-			validateActiveContext(configtypes.ContextTypeTAE, "test-tae", false, "")
+			validateActiveContext(configtypes.ContextTypeTanzu, "test-tanzu", false, "")
 
 			_, err = GetCurrentContext(configtypes.TargetK8s)
 			gomega.Expect(err).ToNot(gomega.BeNil())
 			gomega.Expect(err.Error()).To(gomega.ContainSubstring(`no current context set for type "kubernetes"`))
 		})
-		It("should have only tae as current context and k8s context should be removed from the active context", func() {
+		It("should have only tanzu as current context and k8s context should be removed from the active context", func() {
 			err = SetActiveContext("test-mc")
 			gomega.Expect(err).To(gomega.BeNil())
 			validateActiveContext(configtypes.ContextTypeK8s, "test-mc", true, "test-mc")
 
-			err = SetActiveContext("test-tae")
+			err = SetActiveContext("test-tanzu")
 			gomega.Expect(err).To(gomega.BeNil())
-			validateActiveContext(configtypes.ContextTypeTAE, "test-tae", false, "")
+			validateActiveContext(configtypes.ContextTypeTanzu, "test-tanzu", false, "")
 
 			_, err = GetActiveContext(configtypes.ContextTypeK8s)
 			gomega.Expect(err).ToNot(gomega.BeNil())

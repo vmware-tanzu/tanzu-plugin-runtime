@@ -4,7 +4,10 @@
 package config
 
 import (
+	"strings"
+
 	"github.com/pkg/errors"
+	"golang.org/x/mod/semver"
 	"gopkg.in/yaml.v3"
 
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/config/nodeutils"
@@ -109,6 +112,62 @@ func getEULAStatus(node *yaml.Node) (EULAStatus, error) {
 		return EULAStatus(cfg.CoreCliOptions.EULAStatus), nil
 	}
 	return "", errors.New("eulaStatus not found")
+}
+
+// SetEULAAcceptedVersions updates the list of EULA versions accepted
+func SetEULAAcceptedVersions(acceptedVersions []string) (err error) {
+	for _, v := range acceptedVersions {
+		if !semver.IsValid(v) {
+			return errors.Errorf("invalid eula version: %v", v)
+		}
+	}
+
+	// Retrieve client config node
+	AcquireTanzuConfigLock()
+	defer ReleaseTanzuConfigLock()
+	node, err := getClientConfigNodeNoLock()
+	if err != nil {
+		return err
+	}
+
+	var valueToSet string
+	if len(acceptedVersions) > 0 {
+		semver.Sort(acceptedVersions)
+		valueToSet = strings.Join(acceptedVersions, ",")
+	}
+
+	// Add or update EULA accepted versions list in the yaml node
+	persist := setCLIOptionsString(node, KeyEULAVersions, valueToSet)
+
+	// Persist the config node to the file
+	if persist {
+		return persistConfig(node)
+	}
+	return err
+}
+
+func getEULAAcceptedVersions(node *yaml.Node) ([]string, error) {
+	cfg, err := convertNodeToClientConfig(node)
+	if err != nil {
+		return nil, err
+	}
+	if cfg != nil && cfg.CoreCliOptions != nil {
+		if cfg.CoreCliOptions.EULAAcceptedVersions == "" {
+			return []string{}, nil
+		}
+		return strings.Split(cfg.CoreCliOptions.EULAAcceptedVersions, ","), nil
+	}
+	return nil, errors.New("unable to find accepted eula versions")
+}
+
+// GetEULAAcceptedVersions returns the list of EULA versions accepted
+func GetEULAAcceptedVersions() ([]string, error) {
+	// Retrieve client config node
+	node, err := getClientConfigNode()
+	if err != nil {
+		return nil, err
+	}
+	return getEULAAcceptedVersions(node)
 }
 
 // GetCLIId retrieves cliId

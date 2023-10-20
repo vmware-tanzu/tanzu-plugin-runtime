@@ -303,6 +303,8 @@ type CoreCliOptions struct {
 	CEIPOptIn string `json:"ceipOptIn,omitempty" yaml:"ceipOptIn,omitempty"`
 	// EULAStatus is the EULA acceptance status.
 	EULAStatus string `json:"eulaStatus,omitempty" yaml:"eulaStatus,omitempty"`
+	// EULAAcceptedVersions is comma-separated list of EULA versions accepted.
+	EULAAcceptedVersions string `json:"eulaAcceptedVersions,omitempty" yaml:"eulaAcceptedVersions,omitempty"`
 	// DiscoverySources determine where to discover plugins
 	DiscoverySources []PluginDiscovery `json:"discoverySources,omitempty" yaml:"discoverySources,omitempty"`
 	// CliID is the uuid uniquely identifying the CLI instance

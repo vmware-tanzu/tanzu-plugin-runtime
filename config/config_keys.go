@@ -24,6 +24,7 @@ const (
 	KeyCompatibilityFilePath   = "compatibilityFilePath"
 	KeyCEIPOptIn               = "ceipOptIn"
 	KeyEULAStatus              = "eulaStatus"
+	KeyEULAVersions            = "eulaAcceptedVersions"
 	KeyCerts                   = "certs"
 	KeyTelemetry               = "telemetry"
 	KeyCLIId                   = "cliId"

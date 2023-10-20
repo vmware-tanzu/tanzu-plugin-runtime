@@ -96,6 +96,67 @@ func TestSetEULAStatus(t *testing.T) {
 	}
 }
 
+func TestSetEULAAcceptedVersions(t *testing.T) {
+	// Setup config test data
+	_, cleanUp := setupTestConfig(t, &CfgTestData{})
+
+	defer func() {
+		cleanUp()
+	}()
+
+	tests := []struct {
+		name                  string
+		acceptedVersionsToSet []string
+		expectedVersions      []string
+		expectSetError        bool
+		expectGetError        bool
+	}{
+		{
+			name:                  "should persist accepted versions on valid input",
+			acceptedVersionsToSet: []string{"v1.0.0"},
+			expectedVersions:      []string{"v1.0.0"},
+		},
+		{
+			name:                  "should persist accepted versions on valid input in sorted semver order",
+			acceptedVersionsToSet: []string{"v1.0.0", "v0.9.0", "v1.10.0", "v1.9.1"},
+			expectedVersions:      []string{"v0.9.0", "v1.0.0", "v1.9.1", "v1.10.0"},
+		},
+		{
+			name:                  "does not set accepted versions with given nil list",
+			acceptedVersionsToSet: nil,
+			expectedVersions:      nil,
+			expectGetError:        true,
+		},
+		{
+			name:                  "does not set accepted versions with given empty list",
+			acceptedVersionsToSet: []string{},
+			expectedVersions:      nil,
+			expectGetError:        true,
+		},
+		{
+			name:                  "error when version is not valid semver",
+			acceptedVersionsToSet: []string{"1.0.0"},
+			expectSetError:        true,
+		},
+	}
+
+	for _, spec := range tests {
+		t.Run(spec.name, func(t *testing.T) {
+			err := SetEULAAcceptedVersions(spec.acceptedVersionsToSet)
+			if spec.expectSetError {
+				assert.Contains(t, err.Error(), "invalid eula version")
+			} else {
+				assert.NoError(t, err)
+				vers, err := GetEULAAcceptedVersions()
+				if !spec.expectGetError {
+					assert.Equal(t, spec.expectedVersions, vers)
+					assert.NoError(t, err)
+				}
+			}
+		})
+	}
+}
+
 func TestSetCLIId(t *testing.T) {
 	// Setup config test data
 	_, cleanUp := setupTestConfig(t, &CfgTestData{})

@@ -106,7 +106,11 @@ modules: ## Runs go mod to ensure modules are up to date.
 	@for i in $(GO_MODULES); do \
 		echo "-- Tidying $$i --"; \
 		pushd $${i}; \
-		$(GO) mod tidy || exit 1; \
+		if echo "$$i" | grep -q "runtime-test-plugin-v0_25_4"; then \
+			$(GO) mod tidy -compat=1.17 || exit 1; \
+		else \
+			$(GO) mod tidy || exit 1; \
+		fi; \
 		popd; \
 	done
 
@@ -136,7 +140,7 @@ compatibility-tests: tools build-compatibility-test-plugins run-compatibility-te
 build-compatibility-test-plugins: ## Builds all runtime compatibility test plugins
 	cd ./test/compatibility/testplugins && mkdir -p bin
 	cd ./test/compatibility/testplugins/runtime-test-plugin-v0_11_6 && ${GO} mod tidy && GOOS=$(OS) GOARCH=$(ARCH) ${GO} build -o ../bin
-	cd ./test/compatibility/testplugins/runtime-test-plugin-v0_25_4 && ${GO} mod tidy && GOOS=$(OS) GOARCH=$(ARCH) ${GO} build -o ../bin
+	cd ./test/compatibility/testplugins/runtime-test-plugin-v0_25_4 && ${GO} mod tidy -compat=1.17 && GOOS=$(OS) GOARCH=$(ARCH) ${GO} build -o ../bin
 	cd ./test/compatibility/testplugins/runtime-test-plugin-v0_28_0 && ${GO} mod tidy && GOOS=$(OS) GOARCH=$(ARCH) ${GO} build -o ../bin
 	cd ./test/compatibility/testplugins/runtime-test-plugin-v0_90 && ${GO} mod tidy && GOOS=$(OS) GOARCH=$(ARCH) ${GO} build -o ../bin
 	cd ./test/compatibility/testplugins/runtime-test-plugin-latest && ${GO} mod tidy && GOOS=$(OS) GOARCH=$(ARCH) ${GO} build -o ../bin

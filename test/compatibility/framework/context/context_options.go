@@ -14,6 +14,7 @@ type CfgContextArgs struct {
 	ContextName        string
 	Target             types.Target
 	Type               types.ContextType
+	ContextType        types.ContextType
 	SetCurrentContext  bool
 	GlobalOpts         *types.GlobalServerOpts
 	ClusterOpts        *types.ClusterServerOpts
@@ -27,6 +28,24 @@ type CfgContextArgsOption func(*CfgContextArgs)
 func WithContextName(name string) CfgContextArgsOption {
 	return func(c *CfgContextArgs) {
 		c.ContextName = name
+	}
+}
+
+func WithTarget(target types.Target) CfgContextArgsOption {
+	return func(c *CfgContextArgs) {
+		c.Target = target
+	}
+}
+
+func WithContextType(contextType types.ContextType) CfgContextArgsOption {
+	return func(c *CfgContextArgs) {
+		c.ContextType = contextType
+	}
+}
+
+func WithLegacyContextType(contextType types.ContextType) CfgContextArgsOption {
+	return func(c *CfgContextArgs) {
+		c.Type = contextType
 	}
 }
 

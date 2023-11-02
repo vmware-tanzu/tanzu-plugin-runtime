@@ -21,6 +21,7 @@ func SetContextCommand(opts ...CfgContextArgsOption) *core.Command {
 		},
 		ContextName: common.CompatibilityTestOne,
 		Target:      types.TargetK8s,
+		ContextType: types.ContextTypeK8s,
 		Type:        types.CtxTypeK8s,
 		GlobalOpts: &types.GlobalServerOpts{
 			Endpoint: common.DefaultEndpoint,
@@ -41,7 +42,7 @@ func SetContextCommand(opts ...CfgContextArgsOption) *core.Command {
 			ContextOpts: &types.ContextOpts{
 				Name:        args.ContextName,
 				Target:      args.Target,
-				ContextType: types.ContextTypeK8s,
+				ContextType: args.ContextType,
 				GlobalOpts:  args.GlobalOpts,
 			},
 		}
@@ -79,6 +80,7 @@ func GetContextCommand(opts ...CfgContextArgsOption) *core.Command {
 		ContextName: common.CompatibilityTestOne,
 		Target:      types.TargetK8s,
 		Type:        types.CtxTypeK8s,
+		ContextType: types.ContextTypeK8s,
 		GlobalOpts: &types.GlobalServerOpts{
 			Endpoint: common.DefaultEndpoint,
 		},
@@ -109,7 +111,7 @@ func GetContextCommand(opts ...CfgContextArgsOption) *core.Command {
 				ContextOpts: &types.ContextOpts{
 					Name:        args.ContextName,
 					Target:      args.Target,
-					ContextType: types.ContextTypeK8s,
+					ContextType: args.ContextType,
 					GlobalOpts:  args.GlobalOpts,
 				},
 				ValidationStrategy: core.ValidationStrategyStrict,
@@ -165,6 +167,7 @@ func DeleteContextCommand(opts ...CfgContextArgsOption) *core.Command {
 		ContextName: common.CompatibilityTestOne,
 		Target:      types.TargetK8s,
 		Type:        types.CtxTypeK8s,
+		ContextType: types.ContextTypeK8s,
 		GlobalOpts: &types.GlobalServerOpts{
 			Endpoint: common.DefaultEndpoint,
 		},
@@ -210,6 +213,7 @@ func RemoveCurrentContextCommand(opts ...CfgContextArgsOption) *core.Command {
 		ContextName: common.CompatibilityTestOne,
 		Target:      types.TargetK8s,
 		Type:        types.CtxTypeK8s,
+		ContextType: types.ContextTypeK8s,
 		GlobalOpts: &types.GlobalServerOpts{
 			Endpoint: common.DefaultEndpoint,
 		},
@@ -260,6 +264,7 @@ func GetCurrentContextCommand(opts ...CfgContextArgsOption) *core.Command {
 		ContextName: common.CompatibilityTestOne,
 		Target:      types.TargetK8s,
 		Type:        types.CtxTypeK8s,
+		ContextType: types.ContextTypeK8s,
 		GlobalOpts: &types.GlobalServerOpts{
 			Endpoint: common.DefaultEndpoint,
 		},
@@ -289,7 +294,7 @@ func GetCurrentContextCommand(opts ...CfgContextArgsOption) *core.Command {
 				ContextOpts: &types.ContextOpts{
 					Name:        args.ContextName,
 					Target:      args.Target,
-					ContextType: types.ContextTypeK8s,
+					ContextType: args.ContextType,
 					GlobalOpts:  args.GlobalOpts,
 				},
 				ValidationStrategy: core.ValidationStrategyStrict,
@@ -355,6 +360,7 @@ func SetCurrentContextCommand(opts ...CfgContextArgsOption) *core.Command {
 		ContextName: common.CompatibilityTestOne,
 		Target:      types.TargetK8s,
 		Type:        types.CtxTypeK8s,
+		ContextType: types.ContextTypeK8s,
 		GlobalOpts: &types.GlobalServerOpts{
 			Endpoint: common.DefaultEndpoint,
 		},

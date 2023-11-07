@@ -301,6 +301,71 @@ func NewGetCurrentContextCommand(inputOpts *GetCurrentContextInputOptions, outpu
 	return c, nil
 }
 
+// NewGetActiveContextCommand constructs a command to make a call to specific runtime version GetActiveContext API
+// Input Parameter inputOpts has all input parameters which are required for Runtime GetActiveContext API
+// Input Parameter: outputOpts has details about expected output from Runtime GetActiveContext API call
+// Return: command to execute or error if any validations fails for GetActiveContextInputOptions or GetActiveContextOutputOptions
+// This method does validate the input parameters  GetActiveContextInputOptions or GetActiveContextOutputOptions based on Runtime API Version
+// For more details about supported parameters refer to GetActiveContextInputOptions or GetActiveContextOutputOptions definition(and ContextOpts struct, which is embedded)
+func NewGetActiveContextCommand(inputOpts *GetActiveContextInputOptions, outputOpts *GetActiveContextOutputOptions) (*core.Command, error) {
+	// Init the Command object
+	c := &core.Command{}
+	// Init the API object
+	api := &core.API{Name: core.GetActiveContextAPI}
+
+	// Validate the Input Options
+	_, err := inputOpts.Validate()
+	if err != nil {
+		return nil, err
+	}
+
+	// Set API version
+	api.Version = inputOpts.RuntimeVersion
+
+	// Construct the context api arguments and output
+	api.Arguments = make(map[core.APIArgumentType]interface{})
+
+	if inputOpts.ContextType != "" {
+		api.Arguments[core.ContextType] = inputOpts.ContextType
+	}
+
+	// Construct Output parameters
+	var res = core.Success
+	var content = ""
+
+	if outputOpts.ContextOpts != nil {
+		// Validate the Output Options
+		_, err = outputOpts.Validate()
+		if err != nil {
+			return nil, err
+		}
+
+		// Construct get active context output context opts
+		bytes, err := yaml.Marshal(outputOpts.ContextOpts)
+		if err != nil {
+			return nil, err
+		}
+
+		content = string(bytes)
+		res = core.Success
+	} else if outputOpts.Error != "" {
+		res = core.Failed
+		content = outputOpts.Error
+	}
+
+	api.Output = &core.Output{
+		Result:  res,
+		Content: content,
+	}
+
+	if outputOpts.ValidationStrategy != "" {
+		api.Output.ValidationStrategy = outputOpts.ValidationStrategy
+	}
+
+	c.APIs = append(c.APIs, api)
+	return c, nil
+}
+
 // NewRemoveCurrentContextCommand constructs a command to make a call to specific runtime version RemoveCurrentContext API
 // Input Parameter inputOpts has all input parameters which are required for Runtime RemoveCurrentContext API
 // Input Parameter: outputOpts has details about expected output from Runtime RemoveCurrentContext API call

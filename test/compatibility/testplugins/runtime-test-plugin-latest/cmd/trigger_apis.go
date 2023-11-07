@@ -19,6 +19,7 @@ var apiHandlers = map[core.RuntimeAPIName]func(*core.API) *core.APIResponse{
 	core.SetCurrentContextAPI:    triggerSetCurrentContextAPI,
 	core.GetCurrentContextAPI:    triggerGetCurrentContextAPI,
 	core.RemoveCurrentContextAPI: triggerRemoveCurrentContextAPI,
+	core.GetActiveContextAPI:     triggerGetActiveContextAPI,
 
 	// Server APIs
 	core.SetServerAPI:           triggerSetServerAPI,

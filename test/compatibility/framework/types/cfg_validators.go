@@ -55,8 +55,12 @@ func (opts *ContextOpts) ValidTarget() bool {
 	return opts.Target != "" && (opts.Target == TargetK8s || opts.Target == TargetTMC)
 }
 
-func (opts *ContextOpts) ValidContextType() bool {
+// ValidType validates legacy context type
+func (opts *ContextOpts) ValidType() bool {
 	return opts.Type != "" && (opts.Type == CtxTypeK8s || opts.Type == CtxTypeTMC)
+}
+func (opts *ContextOpts) ValidContextType() bool {
+	return opts.ContextType != "" && (opts.ContextType == ContextTypeK8s || opts.ContextType == ContextTypeTMC || opts.ContextType == ContextTypeTanzu)
 }
 
 func (opts *ContextOpts) ValidGlobalOptsOrClusterOpts() bool {

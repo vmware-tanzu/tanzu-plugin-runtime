@@ -16,6 +16,7 @@ const (
 	SetCurrentContextAPI    RuntimeAPIName = "SetCurrentContext"
 	GetCurrentContextAPI    RuntimeAPIName = "GetCurrentContext"
 	RemoveCurrentContextAPI RuntimeAPIName = "RemoveCurrentContext"
+	GetActiveContextAPI     RuntimeAPIName = "GetActiveContext"
 
 	SetServerAPI           RuntimeAPIName = "SetServer"
 	AddServerAPI           RuntimeAPIName = "AddServer"

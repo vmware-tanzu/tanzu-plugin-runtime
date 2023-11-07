@@ -382,3 +382,60 @@ func SetCurrentContextCommand(opts ...CfgContextArgsOption) *core.Command {
 
 	return cmd
 }
+
+func GetActiveContextCommand(opts ...CfgContextArgsOption) *core.Command {
+	args := &CfgContextArgs{
+		RuntimeAPIVersion: &core.RuntimeAPIVersion{
+			RuntimeVersion: core.VersionLatest,
+		},
+		ContextName: common.CompatibilityTestOne,
+		Target:      types.TargetK8s,
+		ContextType: types.ContextTypeK8s,
+		GlobalOpts: &types.GlobalServerOpts{
+			Endpoint: common.DefaultEndpoint,
+		},
+	}
+
+	for _, opt := range opts {
+		opt(args)
+	}
+
+	var inputOpts *GetActiveContextInputOptions
+	var outputOpts *GetActiveContextOutputOptions
+
+	switch args.RuntimeAPIVersion.RuntimeVersion {
+	case core.VersionLatest:
+		inputOpts = &GetActiveContextInputOptions{
+			RuntimeAPIVersion: args.RuntimeAPIVersion,
+			ContextType:       args.ContextType,
+		}
+		if args.Error {
+			outputOpts = &GetActiveContextOutputOptions{
+				RuntimeAPIVersion: args.RuntimeAPIVersion,
+				Error:             fmt.Sprintf("no current context set for type \"%v\"", args.ContextType),
+			}
+		} else {
+			outputOpts = &GetActiveContextOutputOptions{
+				RuntimeAPIVersion: args.RuntimeAPIVersion,
+				ContextOpts: &types.ContextOpts{
+					Name:        args.ContextName,
+					Target:      types.Target(args.ContextType),
+					ContextType: args.ContextType,
+					GlobalOpts:  args.GlobalOpts,
+				},
+				ValidationStrategy: core.ValidationStrategyStrict,
+			}
+		}
+	default:
+		// add runtime version and context type for unsupported versions
+		inputOpts = &GetActiveContextInputOptions{
+			RuntimeAPIVersion: args.RuntimeAPIVersion,
+			ContextType:       args.ContextType,
+		}
+	}
+
+	cmd, err := NewGetActiveContextCommand(inputOpts, outputOpts)
+	gomega.Expect(err).To(gomega.BeNil())
+
+	return cmd
+}

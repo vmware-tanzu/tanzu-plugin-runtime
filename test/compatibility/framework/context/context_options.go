@@ -40,6 +40,13 @@ func WithTarget(target types.Target) CfgContextArgsOption {
 func WithContextType(contextType types.ContextType) CfgContextArgsOption {
 	return func(c *CfgContextArgs) {
 		c.ContextType = contextType
+		c.Target = ""
+	}
+}
+
+func WithSetCurrentContext() CfgContextArgsOption {
+	return func(c *CfgContextArgs) {
+		c.SetCurrentContext = true
 	}
 }
 
@@ -124,6 +131,20 @@ type GetCurrentContextInputOptions struct {
 
 // GetCurrentContextOutputOptions used to generate GetCurrentContext command
 type GetCurrentContextOutputOptions struct {
+	*core.RuntimeAPIVersion                         // required
+	*types.ContextOpts                              // For specific version options look into ContextOpts definition
+	ValidationStrategy      core.ValidationStrategy // Type of validation to be performed i.e. exact or partial. default is partial
+	Error                   string                  // expected error message could be the sub string of actual error message
+}
+
+// GetActiveContextInputOptions used to generate GetActiveContext command
+type GetActiveContextInputOptions struct {
+	*core.RuntimeAPIVersion                   // required
+	ContextType             types.ContextType // required for v1.1.0
+}
+
+// GetActiveContextOutputOptions used to generate GetActiveContext command
+type GetActiveContextOutputOptions struct {
 	*core.RuntimeAPIVersion                         // required
 	*types.ContextOpts                              // For specific version options look into ContextOpts definition
 	ValidationStrategy      core.ValidationStrategy // Type of validation to be performed i.e. exact or partial. default is partial

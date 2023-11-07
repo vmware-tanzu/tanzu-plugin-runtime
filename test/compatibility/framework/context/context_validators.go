@@ -19,6 +19,10 @@ func (opts *GetCurrentContextInputOptions) ShouldNotIncludeContextType() bool {
 	return opts.ContextType == ""
 }
 
+func (opts *GetActiveContextInputOptions) ShouldIncludeContextType() bool {
+	return opts.ContextType != ""
+}
+
 func (opts *RemoveCurrentContextInputOptions) ShouldNotIncludeTarget() bool {
 	return opts.Target == ""
 }
@@ -32,7 +36,19 @@ func (opts *SetContextInputOptions) Validate() (bool, error) {
 	}
 
 	switch opts.RuntimeVersion {
-	case core.VersionLatest, core.Version102, core.Version090, core.Version0280:
+	case core.VersionLatest:
+		if !opts.ValidName() {
+			return false, fmt.Errorf("invalid 'name' for set context input options for the specified runtime version %v", opts.RuntimeVersion)
+		}
+		if !opts.ValidContextType() {
+			return false, fmt.Errorf("invalid 'ContextType' for set context input options for the specified runtime version %v", opts.RuntimeVersion)
+		}
+		if !opts.ValidGlobalOptsOrClusterOpts() {
+			return false, fmt.Errorf("invalid 'global or clusterOpts' for set context input options for the specified runtime version %v", opts.RuntimeVersion)
+		}
+		return true, nil
+
+	case core.Version102, core.Version090, core.Version0280:
 		if !opts.ValidName() {
 			return false, fmt.Errorf("invalid 'name' for set context input options for the specified runtime version %v", opts.RuntimeVersion)
 		}
@@ -47,7 +63,7 @@ func (opts *SetContextInputOptions) Validate() (bool, error) {
 		if !opts.ValidName() {
 			return false, fmt.Errorf("invalid 'Name' for set context input options for the specified runtime version %v", opts.RuntimeVersion)
 		}
-		if !opts.ValidContextType() {
+		if !opts.ValidType() {
 			return false, fmt.Errorf("invalid 'ContextType' for set context input options for the specified runtime version %v", opts.RuntimeVersion)
 		}
 		if !opts.ValidGlobalOptsOrClusterOpts() {
@@ -173,5 +189,23 @@ func (opts *GetCurrentContextOutputOptions) Validate() (bool, error) {
 
 	default:
 		return false, errors.New("GetCurrentContext API is not supported for the specified runtime version")
+	}
+}
+
+// Validate the opts as per runtime version i.e. check whether the expected fields are supported for the runtime version specified
+func (opts *GetActiveContextInputOptions) Validate() (bool, error) {
+	_, err := opts.RuntimeAPIVersion.Validate()
+	if err != nil {
+		return false, err
+	}
+
+	switch opts.RuntimeVersion {
+	case core.VersionLatest:
+		if !opts.ShouldIncludeContextType() {
+			return false, fmt.Errorf("invalid get current context input options for the specified runtime version contextType is not provided %v", opts.RuntimeVersion)
+		}
+		return true, nil
+	default:
+		return false, fmt.Errorf("GetActiveContext API is not supported for the specified runtime version %v", opts.RuntimeVersion)
 	}
 }

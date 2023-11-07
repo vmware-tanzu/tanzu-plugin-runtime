@@ -12,6 +12,7 @@ import (
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/context"
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/executer"
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/legacyclientconfig"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/types"
 )
 
 var _ = ginkgo.Describe("Cross-version Context APIs compatibility tests", func() {
@@ -1254,6 +1255,39 @@ var _ = ginkgo.Describe("Cross-version Context APIs compatibility tests", func()
 
 			executer.Execute(testCase)
 		})
+	})
+	ginkgo.Context("Using tanzu and k8s context types objects on supported Runtime API versions to validate mutual exclusion behavior", func() {
+		ginkgo.It("Run SetContext, SetCurrentContext, GetActiveContext latest then SetContext,SetCurrentContext, GetCurrentContext ,GetActiveContext, v1.0.2 then DeleteContext latest then SetContext, SetCurrentContext, GetCurrentContext v1.0.2 then SetContext, SetCurrentContext, GetActiveContext latest then GetCurrentContextCommand v1.0.2", func() {
+			testCase := core.NewTestCase()
+			// When latest plugin version sets tanzu context as current and later old plugin API version sets k8s context as active,
+			// the k8s context type and tanzu context types should be active which CLI would inspect and remove the tanzu context type from current contexts
+			testCase.Add(context.SetContextCommand(context.WithContextType(types.ContextTypeTanzu)))
+			testCase.Add(context.SetCurrentContextCommand())
+			testCase.Add(context.GetActiveContextCommand(context.WithContextType(types.ContextTypeTanzu)))
 
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version102), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102), context.WithContextName(common.CompatibilityTestTwo)))
+
+			testCase.Add(context.GetActiveContextCommand(context.WithContextType(types.ContextTypeTanzu)))
+			testCase.Add(context.GetActiveContextCommand(context.WithContextName(common.CompatibilityTestTwo)))
+
+			// When old plugin API version sets k8s context as active and later if latest plugin version sets tanzu context as current,
+			// the k8s context type should be removed from the current context list automatically
+			testCase.Add(context.DeleteContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.DeleteContextCommand(context.WithRuntimeVersion(core.Version102), context.WithContextName(common.CompatibilityTestTwo)))
+
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version102), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102), context.WithContextName(common.CompatibilityTestTwo)))
+
+			testCase.Add(context.SetContextCommand(context.WithContextType(types.ContextTypeTanzu)))
+			testCase.Add(context.SetCurrentContextCommand())
+			testCase.Add(context.GetActiveContextCommand(context.WithContextType(types.ContextTypeTanzu)))
+			testCase.Add(context.GetActiveContextCommand(context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+
+			executer.Execute(testCase)
+		})
 	})
 })

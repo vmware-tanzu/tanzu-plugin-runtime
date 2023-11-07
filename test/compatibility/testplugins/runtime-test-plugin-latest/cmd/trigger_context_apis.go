@@ -82,6 +82,20 @@ func triggerGetCurrentContextAPI(api *core.API) *core.APIResponse {
 	return getCurrentContext(configtypes.Target(target))
 }
 
+// triggerGetActiveContextAPI trigger Runtime GetActiveContext API
+func triggerGetActiveContextAPI(api *core.API) *core.APIResponse {
+	// Parse arguments needed to trigger the Runtime GetActiveContext API
+	ctxTypeStr, err := core.ParseStr(api.Arguments[core.ContextType])
+	if err != nil {
+		return &core.APIResponse{
+			ResponseType: core.ErrorResponse,
+			ResponseBody: fmt.Errorf("failed to parse string from argument %v with error %v ", core.ContextType, err.Error()),
+		}
+	}
+	// Trigger GetActiveContext API
+	return getActiveContext(configtypes.ContextType(ctxTypeStr))
+}
+
 // triggerRemoveCurrentContextAPI trigger Runtime RemoveCurrentContext API
 func triggerRemoveCurrentContextAPI(api *core.API) *core.APIResponse {
 	// Parse arguments needed to trigger the Runtime RemoveCurrentContext API
@@ -170,6 +184,26 @@ func getCurrentContext(target configtypes.Target) *core.APIResponse {
 		return &core.APIResponse{
 			ResponseType: core.ErrorResponse,
 			ResponseBody: fmt.Errorf("context %s not found", target),
+		}
+	}
+	return &core.APIResponse{
+		ResponseType: core.MapResponse,
+		ResponseBody: ctx,
+	}
+}
+
+func getActiveContext(contextType configtypes.ContextType) *core.APIResponse {
+	ctx, err := configlib.GetActiveContext(contextType)
+	if err != nil {
+		return &core.APIResponse{
+			ResponseType: core.ErrorResponse,
+			ResponseBody: err.Error(),
+		}
+	}
+	if ctx == nil {
+		return &core.APIResponse{
+			ResponseType: core.ErrorResponse,
+			ResponseBody: fmt.Errorf("context %s not found", contextType),
 		}
 	}
 	return &core.APIResponse{

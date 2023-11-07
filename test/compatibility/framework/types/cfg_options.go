@@ -48,7 +48,7 @@ const (
 	ContextTypeK8s ContextType = "kubernetes"
 
 	// ContextTypeTMC is a Tanzu Mission Control type of context.
-	ContextTypeTMC ContextType = "misson-control"
+	ContextTypeTMC ContextType = "mission-control"
 
 	// ContextTypeTanzu is a Tanzu control plane type of context.
 	ContextTypeTanzu ContextType = "tanzu"

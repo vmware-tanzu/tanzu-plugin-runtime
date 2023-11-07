@@ -6,950 +6,646 @@ package contextserver_test
 import (
 	"github.com/onsi/ginkgo/v2"
 
-	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/legacyclientconfig"
-
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
-	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/compatibilitytests/context"
-	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/compatibilitytests/server"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/compatibilitytests/common"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/context"
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/executer"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/legacyclientconfig"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/server"
 )
 
-var _ = ginkgo.Describe("Combination Tests for Context and Server APIs", func() {
+var _ = ginkgo.Describe("Combination Tests for Context - Server APIs", func() {
 	// Description on the Tests
 	ginkgo.GinkgoWriter.Println("Get/Set/Delete Context, CurrentContext, Server and CurrentServer API methods are tested for cross-version API compatibility with supported Runtime versions v0.25.4, v0.28.0, latest")
 
 	// Setup Data
-	var contextTestHelper context.Helper
-	var serverTestHelper server.Helper
 	ginkgo.BeforeEach(func() {
 		// Setup mock temporary config files for testing
 		_, cleanup := core.SetupTempCfgFiles()
 		ginkgo.DeferCleanup(func() {
 			cleanup()
 		})
-		serverTestHelper.SetUpDefaultData()
-		contextTestHelper.SetUpDefaultData()
 	})
 
-	ginkgo.Context("using single context and server", func() {
+	ginkgo.Context("using single context- Server", func() {
 
-		ginkgo.It("Set Context with Runtime v0.90.0 and Set Server with Runtime latest", func() {
+		ginkgo.It("Set Context@latest - Set Server@v1.0.2", func() {
 			testCase := core.NewTestCase()
 
-			// Add SetContext and SetCurrentContext v0.90.0 Commands
-			testCase.Add(contextTestHelper.SetContextCmdForRuntime090).Add(contextTestHelper.SetCurrentContextCmdForRuntime090)
+			testCase.Add(context.SetContextCommand())
+			testCase.Add(context.SetCurrentContextCommand())
 
-			// Add SetServer and SetCurrentServer latest Commands
-			testCase.Add(serverTestHelper.SetServerCmdForRuntimeLatest).Add(serverTestHelper.SetCurrentServerCmdForRuntimeLatest)
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
 
-			// Add GetClientConfig Commands on all supported runtime versions
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.VersionLatest, legacyclientconfig.WithDefaultContextAndServer(core.VersionLatest)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version090, legacyclientconfig.WithDefaultContextAndServer(core.Version090)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0280, legacyclientconfig.WithDefaultContextAndServer(core.Version0280)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0254, legacyclientconfig.WithDefaultContextAndServer(core.Version0254)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0116, legacyclientconfig.WithDefaultContextAndServer(core.Version0116)))
+			addTestCasesToVerifyContextAndServer(testCase)
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest).Add(contextTestHelper.GetContextCmdForRuntime090).Add(contextTestHelper.GetContextCmdForRuntime0280).Add(contextTestHelper.GetContextCmdForRuntime0254)
-
-			// Add GetServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest).Add(serverTestHelper.GetServerCmdForRuntime090).Add(serverTestHelper.GetServerCmdForRuntime0280).Add(serverTestHelper.GetServerCmdForRuntime0254)
-
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest)
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntime090)
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntime0280).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
-
-			// Add GetCurrentServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest).Add(serverTestHelper.GetCurrentServerCmdForRuntime090).Add(serverTestHelper.GetCurrentServerCmdForRuntime0280).Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-
-			// Run all the commands
 			executer.Execute(testCase)
 		})
-
-		ginkgo.It("Set Context with Runtime v0.90.0 and Set Server with Runtime v0.90.0", func() {
+		ginkgo.It("Set Context@latest - Set Server@v0.90.0", func() {
 			testCase := core.NewTestCase()
 
-			// Add SetContext and SetCurrentContext Commands
-			testCase.Add(contextTestHelper.SetContextCmdForRuntime090).Add(contextTestHelper.SetCurrentContextCmdForRuntime090)
+			testCase.Add(context.SetContextCommand())
+			testCase.Add(context.SetCurrentContextCommand())
 
-			// Add SetServer and SetCurrentServer Commands
-			testCase.Add(serverTestHelper.SetServerCmdForRuntime090).Add(serverTestHelper.SetCurrentServerCmdForRuntime090)
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
 
-			// Add GetClientConfig Commands on all supported runtime versions
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.VersionLatest, legacyclientconfig.WithDefaultContextAndServer(core.VersionLatest)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version090, legacyclientconfig.WithDefaultContextAndServer(core.Version090)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0280, legacyclientconfig.WithDefaultContextAndServer(core.Version0280)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0254, legacyclientconfig.WithDefaultContextAndServer(core.Version0254)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0116, legacyclientconfig.WithDefaultContextAndServer(core.Version0116)))
+			addTestCasesToVerifyContextAndServer(testCase)
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest).Add(contextTestHelper.GetContextCmdForRuntime090).Add(contextTestHelper.GetContextCmdForRuntime0280).Add(contextTestHelper.GetContextCmdForRuntime0254)
-
-			// Add GetServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest).Add(serverTestHelper.GetServerCmdForRuntime090).Add(serverTestHelper.GetServerCmdForRuntime0280).Add(serverTestHelper.GetServerCmdForRuntime0254)
-
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest)
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntime090)
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntime0280).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
-
-			// Add GetCurrentServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest).Add(serverTestHelper.GetCurrentServerCmdForRuntime090).Add(serverTestHelper.GetCurrentServerCmdForRuntime0280).Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-
-			// Run all the commands
 			executer.Execute(testCase)
 		})
-
-		ginkgo.It("Set Context with Runtime v0.90.0 and Set Server with Runtime v0.25.4", func() {
-			// Add SetContext and SetCurrentContext Commands
-			testCase := core.NewTestCase().Add(contextTestHelper.SetContextCmdForRuntime090).Add(contextTestHelper.SetCurrentContextCmdForRuntime090)
-
-			// Add SetServer and SetCurrentServer Commands
-			testCase.Add(serverTestHelper.SetServerCmdForRuntime0254).Add(serverTestHelper.SetCurrentServerCmdForRuntime0254)
-
-			// Add GetClientConfig Commands on all supported runtime versions
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.VersionLatest, legacyclientconfig.WithDefaultContextAndServer(core.VersionLatest)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version090, legacyclientconfig.WithDefaultContextAndServer(core.Version090)))
-
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0280, legacyclientconfig.WithDefaultContextAndServer(core.Version0280)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0254, legacyclientconfig.WithDefaultContextAndServer(core.Version0254)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0116, legacyclientconfig.WithDefaultContextAndServer(core.Version0116)))
-
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest)
-			testCase.Add(contextTestHelper.GetContextCmdForRuntime090)
-			testCase.Add(contextTestHelper.GetContextCmdForRuntime0280)
-			testCase.Add(contextTestHelper.GetContextCmdForRuntime0254)
-
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest).Add(contextTestHelper.GetCurrentContextCmdForRuntime090).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
-
-			// Add GetServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest).Add(serverTestHelper.GetServerCmdForRuntime090).Add(serverTestHelper.GetServerCmdForRuntime0280).Add(serverTestHelper.GetServerCmdForRuntime0254)
-
-			// Add GetCurrentServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest).Add(serverTestHelper.GetCurrentServerCmdForRuntime090).Add(serverTestHelper.GetCurrentServerCmdForRuntime0280).Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-
-			// Run all the commands
-			executer.Execute(testCase)
-		})
-		ginkgo.It("Set Context with Runtime v0.90.0 and Set Server with Runtime v0.28.0", func() {
-			// Add SetContext and SetCurrentContext Commands
-			testCase := core.NewTestCase().Add(contextTestHelper.SetContextCmdForRuntime090).Add(contextTestHelper.SetCurrentContextCmdForRuntime090)
-
-			// Add SetServer and SetCurrentServer Commands
-			testCase.Add(serverTestHelper.SetServerCmdForRuntime0280).Add(serverTestHelper.SetCurrentServerCmdForRuntime0280)
-
-			// Add GetClientConfig Commands on all supported runtime versions
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.VersionLatest, legacyclientconfig.WithDefaultContextAndServer(core.VersionLatest)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version090, legacyclientconfig.WithDefaultContextAndServer(core.Version090)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0280, legacyclientconfig.WithDefaultContextAndServer(core.Version0280)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0254, legacyclientconfig.WithDefaultContextAndServer(core.Version0254)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0116, legacyclientconfig.WithDefaultContextAndServer(core.Version0116)))
-
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest).Add(contextTestHelper.GetContextCmdForRuntime090).Add(contextTestHelper.GetContextCmdForRuntime0280).Add(contextTestHelper.GetContextCmdForRuntime0254)
-
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest).Add(contextTestHelper.GetCurrentContextCmdForRuntime090).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
-
-			// Add GetServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest).Add(serverTestHelper.GetServerCmdForRuntime090).Add(serverTestHelper.GetServerCmdForRuntime0280).Add(serverTestHelper.GetServerCmdForRuntime0254)
-
-			// Add GetCurrentServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest).Add(serverTestHelper.GetCurrentServerCmdForRuntime090).Add(serverTestHelper.GetCurrentServerCmdForRuntime0280).Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-
-			// Run all the commands
-			executer.Execute(testCase)
-		})
-
-		ginkgo.It("Set Context with Runtime Latest and Set Server with Runtime latest", func() {
+		ginkgo.It("Set Context@latest - Set Server@v0.25.4", func() {
 			testCase := core.NewTestCase()
 
-			// Add SetContext and SetCurrentContext Commands
-			testCase.Add(contextTestHelper.SetContextCmdForRuntimeLatest).Add(contextTestHelper.SetCurrentContextCmdForRuntimeLatest)
+			testCase.Add(context.SetContextCommand())
+			testCase.Add(context.SetCurrentContextCommand())
 
-			// Add SetServer and SetCurrentServer Commands
-			testCase.Add(serverTestHelper.SetServerCmdForRuntimeLatest).Add(serverTestHelper.SetCurrentServerCmdForRuntimeLatest)
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
 
-			// Add GetClientConfig Commands on all supported runtime versions
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.VersionLatest, legacyclientconfig.WithDefaultContextAndServer(core.VersionLatest)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version090, legacyclientconfig.WithDefaultContextAndServer(core.Version090)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0280, legacyclientconfig.WithDefaultContextAndServer(core.Version0280)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0254, legacyclientconfig.WithDefaultContextAndServer(core.Version0254)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0116, legacyclientconfig.WithDefaultContextAndServer(core.Version0116)))
+			addTestCasesToVerifyContextAndServer(testCase)
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest).Add(contextTestHelper.GetContextCmdForRuntime090).Add(contextTestHelper.GetContextCmdForRuntime0280).Add(contextTestHelper.GetContextCmdForRuntime0254)
-
-			// Add GetServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest).Add(serverTestHelper.GetServerCmdForRuntime090).Add(serverTestHelper.GetServerCmdForRuntime0280).Add(serverTestHelper.GetServerCmdForRuntime0254)
-
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest)
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntime090)
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntime0280).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
-
-			// Add GetCurrentServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest).Add(serverTestHelper.GetCurrentServerCmdForRuntime090).Add(serverTestHelper.GetCurrentServerCmdForRuntime0280).Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-
-			// Run all the commands
 			executer.Execute(testCase)
 		})
-		ginkgo.It("Set Context with Runtime Latest and Set Server with Runtime v0.90.0", func() {
+		ginkgo.It("Set Context@latest - Set Server@v0.28.0", func() {
 			testCase := core.NewTestCase()
 
-			// Add SetContext and SetCurrentContext Commands
-			testCase.Add(contextTestHelper.SetContextCmdForRuntimeLatest).Add(contextTestHelper.SetCurrentContextCmdForRuntimeLatest)
+			testCase.Add(context.SetContextCommand())
+			testCase.Add(context.SetCurrentContextCommand())
 
-			// Add SetServer and SetCurrentServer Commands
-			testCase.Add(serverTestHelper.SetServerCmdForRuntime090).Add(serverTestHelper.SetCurrentServerCmdForRuntime090)
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
 
-			// Add GetClientConfig Commands on all supported runtime versions
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.VersionLatest, legacyclientconfig.WithDefaultContextAndServer(core.VersionLatest)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version090, legacyclientconfig.WithDefaultContextAndServer(core.Version090)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0280, legacyclientconfig.WithDefaultContextAndServer(core.Version0280)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0254, legacyclientconfig.WithDefaultContextAndServer(core.Version0254)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0116, legacyclientconfig.WithDefaultContextAndServer(core.Version0116)))
+			addTestCasesToVerifyContextAndServer(testCase)
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest).Add(contextTestHelper.GetContextCmdForRuntime090).Add(contextTestHelper.GetContextCmdForRuntime0280).Add(contextTestHelper.GetContextCmdForRuntime0254)
-
-			// Add GetServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest).Add(serverTestHelper.GetServerCmdForRuntime090).Add(serverTestHelper.GetServerCmdForRuntime0280).Add(serverTestHelper.GetServerCmdForRuntime0254)
-
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest)
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntime090)
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntime0280).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
-
-			// Add GetCurrentServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest).Add(serverTestHelper.GetCurrentServerCmdForRuntime090).Add(serverTestHelper.GetCurrentServerCmdForRuntime0280).Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-
-			// Run all the commands
-			executer.Execute(testCase)
-		})
-		ginkgo.It("Set Context with Runtime Latest and Set Server with Runtime v0.25.4", func() {
-			// Add SetContext and SetCurrentContext Commands
-			testCase := core.NewTestCase().Add(contextTestHelper.SetContextCmdForRuntimeLatest).Add(contextTestHelper.SetCurrentContextCmdForRuntimeLatest)
-
-			// Add SetServer and SetCurrentServer Commands
-			testCase.Add(serverTestHelper.SetServerCmdForRuntime0254).Add(serverTestHelper.SetCurrentServerCmdForRuntime0254)
-
-			// Add GetClientConfig Commands on all supported runtime versions
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.VersionLatest, legacyclientconfig.WithDefaultContextAndServer(core.VersionLatest)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version090, legacyclientconfig.WithDefaultContextAndServer(core.Version090)))
-
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0280, legacyclientconfig.WithDefaultContextAndServer(core.Version0280)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0254, legacyclientconfig.WithDefaultContextAndServer(core.Version0254)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0116, legacyclientconfig.WithDefaultContextAndServer(core.Version0116)))
-
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest)
-			testCase.Add(contextTestHelper.GetContextCmdForRuntime090)
-			testCase.Add(contextTestHelper.GetContextCmdForRuntime0280)
-			testCase.Add(contextTestHelper.GetContextCmdForRuntime0254)
-
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest).Add(contextTestHelper.GetCurrentContextCmdForRuntime090).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
-
-			// Add GetServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest).Add(serverTestHelper.GetServerCmdForRuntime090).Add(serverTestHelper.GetServerCmdForRuntime0280).Add(serverTestHelper.GetServerCmdForRuntime0254)
-
-			// Add GetCurrentServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest).Add(serverTestHelper.GetCurrentServerCmdForRuntime090).Add(serverTestHelper.GetCurrentServerCmdForRuntime0280).Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-
-			// Run all the commands
-			executer.Execute(testCase)
-		})
-		ginkgo.It("Set Context with Runtime Latest and Set Server with Runtime v0.28.0", func() {
-			// Add SetContext and SetCurrentContext Commands
-			testCase := core.NewTestCase().Add(contextTestHelper.SetContextCmdForRuntimeLatest).Add(contextTestHelper.SetCurrentContextCmdForRuntimeLatest)
-
-			// Add SetServer and SetCurrentServer Commands
-			testCase.Add(serverTestHelper.SetServerCmdForRuntime0280).Add(serverTestHelper.SetCurrentServerCmdForRuntime0280)
-
-			// Add GetClientConfig Commands on all supported runtime versions
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.VersionLatest, legacyclientconfig.WithDefaultContextAndServer(core.VersionLatest)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version090, legacyclientconfig.WithDefaultContextAndServer(core.Version090)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0280, legacyclientconfig.WithDefaultContextAndServer(core.Version0280)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0254, legacyclientconfig.WithDefaultContextAndServer(core.Version0254)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0116, legacyclientconfig.WithDefaultContextAndServer(core.Version0116)))
-
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest).Add(contextTestHelper.GetContextCmdForRuntime090).Add(contextTestHelper.GetContextCmdForRuntime0280).Add(contextTestHelper.GetContextCmdForRuntime0254)
-
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest).Add(contextTestHelper.GetCurrentContextCmdForRuntime090).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
-
-			// Add GetServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest).Add(serverTestHelper.GetServerCmdForRuntime090).Add(serverTestHelper.GetServerCmdForRuntime0280).Add(serverTestHelper.GetServerCmdForRuntime0254)
-
-			// Add GetCurrentServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest).Add(serverTestHelper.GetCurrentServerCmdForRuntime090).Add(serverTestHelper.GetCurrentServerCmdForRuntime0280).Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-
-			// Run all the commands
 			executer.Execute(testCase)
 		})
 
-		ginkgo.It("Set Context with Runtime v0.28.0 and Set Server with Runtime latest", func() {
-			// Add SetContext and SetCurrentContext Commands
-			testCase := core.NewTestCase().Add(contextTestHelper.SetContextCmdForRuntime0280).Add(contextTestHelper.SetCurrentContextCmdForRuntime0280)
+		ginkgo.It("Set Context@v1.0.2 - Set Server@latest", func() {
+			testCase := core.NewTestCase()
 
-			// Add SetServer and SetCurrentServer Commands
-			testCase.Add(serverTestHelper.SetServerCmdForRuntimeLatest).Add(serverTestHelper.SetCurrentServerCmdForRuntimeLatest)
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version102)))
 
-			// Add GetClientConfig Commands on all supported runtime versions
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.VersionLatest, legacyclientconfig.WithDefaultContextAndServer(core.VersionLatest)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version090, legacyclientconfig.WithDefaultContextAndServer(core.Version090)))
+			testCase.Add(server.SetServerCommand())
+			testCase.Add(server.SetCurrentServerCommand())
 
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0280, legacyclientconfig.WithDefaultContextAndServer(core.Version0280)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0254, legacyclientconfig.WithDefaultContextAndServer(core.Version0254)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0116, legacyclientconfig.WithDefaultContextAndServer(core.Version0116)))
+			addTestCasesToVerifyContextAndServer(testCase)
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest).Add(contextTestHelper.GetContextCmdForRuntime090).Add(contextTestHelper.GetContextCmdForRuntime0280).Add(contextTestHelper.GetContextCmdForRuntime0254)
-
-			// Add GetServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest).Add(serverTestHelper.GetServerCmdForRuntime090).Add(serverTestHelper.GetServerCmdForRuntime0280).Add(serverTestHelper.GetServerCmdForRuntime0254)
-
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest).Add(contextTestHelper.GetCurrentContextCmdForRuntime090).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
-
-			// Add GetCurrentServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest).Add(serverTestHelper.GetCurrentServerCmdForRuntime090).Add(serverTestHelper.GetCurrentServerCmdForRuntime0280).Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-
-			// Run all the commands
 			executer.Execute(testCase)
 		})
-		ginkgo.It("Set Context with Runtime v0.28.0 and Set Server with Runtime v0.90.0", func() {
-			// Add SetContext and SetCurrentContext Commands
-			testCase := core.NewTestCase().Add(contextTestHelper.SetContextCmdForRuntime0280).Add(contextTestHelper.SetCurrentContextCmdForRuntime0280)
+		ginkgo.It("Set Context@v1.0.2 - Set Server@v0.90.0", func() {
+			testCase := core.NewTestCase()
 
-			// Add SetServer and SetCurrentServer Commands
-			testCase.Add(serverTestHelper.SetServerCmdForRuntime090).Add(serverTestHelper.SetCurrentServerCmdForRuntime090)
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version102)))
 
-			// Add GetClientConfig Commands on all supported runtime versions
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.VersionLatest, legacyclientconfig.WithDefaultContextAndServer(core.VersionLatest)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version090, legacyclientconfig.WithDefaultContextAndServer(core.Version090)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0280, legacyclientconfig.WithDefaultContextAndServer(core.Version0280)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0254, legacyclientconfig.WithDefaultContextAndServer(core.Version0254)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0116, legacyclientconfig.WithDefaultContextAndServer(core.Version0116)))
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest).Add(contextTestHelper.GetContextCmdForRuntime090).Add(contextTestHelper.GetContextCmdForRuntime0280).Add(contextTestHelper.GetContextCmdForRuntime0254)
+			addTestCasesToVerifyContextAndServer(testCase)
 
-			// Add GetServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest).Add(serverTestHelper.GetServerCmdForRuntime090).Add(serverTestHelper.GetServerCmdForRuntime0280).Add(serverTestHelper.GetServerCmdForRuntime0254)
-
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest).Add(contextTestHelper.GetCurrentContextCmdForRuntime090).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
-
-			// Add GetCurrentServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest).Add(serverTestHelper.GetCurrentServerCmdForRuntime090).Add(serverTestHelper.GetCurrentServerCmdForRuntime0280).Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-
-			// Run all the commands
 			executer.Execute(testCase)
 		})
-		ginkgo.It("Set Context with Runtime v0.28.0 and Set Server with Runtime v0.25.4", func() {
-			// Add SetContext and SetCurrentContext Commands
-			testCase := core.NewTestCase().Add(contextTestHelper.SetContextCmdForRuntime0280).Add(contextTestHelper.SetCurrentContextCmdForRuntime0280)
+		ginkgo.It("Set Context@v1.0.2 - Set Server@v0.25.4", func() {
+			testCase := core.NewTestCase()
 
-			// Add SetServer and SetCurrentServer Commands
-			testCase.Add(serverTestHelper.SetServerCmdForRuntime0254).Add(serverTestHelper.SetCurrentServerCmdForRuntime0254)
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version102)))
 
-			// Add GetClientConfig Commands on all supported runtime versions
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.VersionLatest, legacyclientconfig.WithDefaultContextAndServer(core.VersionLatest)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version090, legacyclientconfig.WithDefaultContextAndServer(core.Version090)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0280, legacyclientconfig.WithDefaultContextAndServer(core.Version0280)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0254, legacyclientconfig.WithDefaultContextAndServer(core.Version0254)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0116, legacyclientconfig.WithDefaultContextAndServer(core.Version0116)))
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest).Add(contextTestHelper.GetContextCmdForRuntime090).Add(contextTestHelper.GetContextCmdForRuntime0280).Add(contextTestHelper.GetContextCmdForRuntime0254)
+			addTestCasesToVerifyContextAndServer(testCase)
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest).Add(contextTestHelper.GetCurrentContextCmdForRuntime090).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
-
-			// Add GetServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest).Add(serverTestHelper.GetServerCmdForRuntime090).Add(serverTestHelper.GetServerCmdForRuntime0280).Add(serverTestHelper.GetServerCmdForRuntime0254)
-
-			// Add GetCurrentServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest).Add(serverTestHelper.GetCurrentServerCmdForRuntime090).Add(serverTestHelper.GetCurrentServerCmdForRuntime0280).Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-
-			// Run all the commands
 			executer.Execute(testCase)
 		})
-		ginkgo.It("Set Context with Runtime v0.28.0 and Set Server with Runtime v0.28.0", func() {
-			// Add SetContext and SetCurrentContext Commands
-			testCase := core.NewTestCase().Add(contextTestHelper.SetContextCmdForRuntime0280).Add(contextTestHelper.SetCurrentContextCmdForRuntime0280)
+		ginkgo.It("Set Context@v1.0.2 - Set Server@v0.28.0", func() {
+			testCase := core.NewTestCase()
 
-			// Add SetServer and SetCurrentServer Commands
-			testCase.Add(serverTestHelper.SetServerCmdForRuntime0280).Add(serverTestHelper.SetCurrentServerCmdForRuntime0280)
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version102)))
 
-			// Add GetClientConfig Commands on all supported runtime versions
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.VersionLatest, legacyclientconfig.WithDefaultContextAndServer(core.VersionLatest)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version090, legacyclientconfig.WithDefaultContextAndServer(core.Version090)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0280, legacyclientconfig.WithDefaultContextAndServer(core.Version0280)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0254, legacyclientconfig.WithDefaultContextAndServer(core.Version0254)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0116, legacyclientconfig.WithDefaultContextAndServer(core.Version0116)))
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest).Add(contextTestHelper.GetContextCmdForRuntime090).Add(contextTestHelper.GetContextCmdForRuntime0280).Add(contextTestHelper.GetContextCmdForRuntime0254)
+			addTestCasesToVerifyContextAndServer(testCase)
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest).Add(contextTestHelper.GetCurrentContextCmdForRuntime090).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
-
-			// Add GetServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest).Add(serverTestHelper.GetServerCmdForRuntime090).Add(serverTestHelper.GetServerCmdForRuntime0280).Add(serverTestHelper.GetServerCmdForRuntime0254)
-
-			// Add GetCurrentServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest).Add(serverTestHelper.GetCurrentServerCmdForRuntime090).Add(serverTestHelper.GetCurrentServerCmdForRuntime0280).Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-
-			// Run all the commands
 			executer.Execute(testCase)
 		})
 
-		ginkgo.It("Set Context with Runtime v0.25.4 and Set Server with Runtime latest", func() {
-			// Add SetContext and SetCurrentContext Commands
-			testCase := core.NewTestCase().Add(contextTestHelper.SetContextCmdForRuntime0254).Add(contextTestHelper.SetCurrentContextCmdForRuntime0254)
+		ginkgo.It("Set Context@v0.90.0 - Set Server@latest", func() {
+			testCase := core.NewTestCase()
 
-			// Add SetServer and SetCurrentServer Commands
-			testCase.Add(serverTestHelper.SetServerCmdForRuntimeLatest).Add(serverTestHelper.SetCurrentServerCmdForRuntimeLatest)
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version090)))
 
-			// Add GetClientConfig Commands on all supported runtime versions
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.VersionLatest, legacyclientconfig.WithDefaultContextAndServer(core.VersionLatest)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version090, legacyclientconfig.WithDefaultContextAndServer(core.Version090)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0280, legacyclientconfig.WithDefaultContextAndServer(core.Version0280)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0254, legacyclientconfig.WithDefaultContextAndServer(core.Version0254)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0116, legacyclientconfig.WithDefaultContextAndServer(core.Version0116)))
+			testCase.Add(server.SetServerCommand())
+			testCase.Add(server.SetCurrentServerCommand())
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest).Add(contextTestHelper.GetContextCmdForRuntime090).Add(contextTestHelper.GetContextCmdForRuntime0280).Add(contextTestHelper.GetContextCmdForRuntime0254)
+			addTestCasesToVerifyContextAndServer(testCase)
 
-			// Add GetServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest).Add(serverTestHelper.GetServerCmdForRuntime090).Add(serverTestHelper.GetServerCmdForRuntime0280).Add(serverTestHelper.GetServerCmdForRuntime0254)
-
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest).Add(contextTestHelper.GetCurrentContextCmdForRuntime090).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
-
-			// Add GetCurrentServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest).Add(serverTestHelper.GetCurrentServerCmdForRuntime090).Add(serverTestHelper.GetCurrentServerCmdForRuntime0280).Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-
-			// Run all the commands
 			executer.Execute(testCase)
 		})
-		ginkgo.It("Set Context with Runtime v0.25.4 and Set Server with Runtime v0.90.0", func() {
-			// Add SetContext and SetCurrentContext Commands
-			testCase := core.NewTestCase().Add(contextTestHelper.SetContextCmdForRuntime0254).Add(contextTestHelper.SetCurrentContextCmdForRuntime0254)
+		ginkgo.It("Set Context@v0.90.0 - Set Server@v1.0.2", func() {
+			testCase := core.NewTestCase()
 
-			// Add SetServer and SetCurrentServer Commands
-			testCase.Add(serverTestHelper.SetServerCmdForRuntime090).Add(serverTestHelper.SetCurrentServerCmdForRuntime090)
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version090)))
 
-			// Add GetClientConfig Commands on all supported runtime versions
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.VersionLatest, legacyclientconfig.WithDefaultContextAndServer(core.VersionLatest)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version090, legacyclientconfig.WithDefaultContextAndServer(core.Version090)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0280, legacyclientconfig.WithDefaultContextAndServer(core.Version0280)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0254, legacyclientconfig.WithDefaultContextAndServer(core.Version0254)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0116, legacyclientconfig.WithDefaultContextAndServer(core.Version0116)))
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest).Add(contextTestHelper.GetContextCmdForRuntime090).Add(contextTestHelper.GetContextCmdForRuntime0280).Add(contextTestHelper.GetContextCmdForRuntime0254)
+			addTestCasesToVerifyContextAndServer(testCase)
 
-			// Add GetServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest).Add(serverTestHelper.GetServerCmdForRuntime090).Add(serverTestHelper.GetServerCmdForRuntime0280).Add(serverTestHelper.GetServerCmdForRuntime0254)
-
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest).Add(contextTestHelper.GetCurrentContextCmdForRuntime090).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
-
-			// Add GetCurrentServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest).Add(serverTestHelper.GetCurrentServerCmdForRuntime090).Add(serverTestHelper.GetCurrentServerCmdForRuntime0280).Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-
-			// Run all the commands
 			executer.Execute(testCase)
 		})
-		ginkgo.It("Set Context with Runtime v0.25.4 and Set Server with Runtime v0.25.4", func() {
-			// Add SetContext and SetCurrentContext Commands
-			testCase := core.NewTestCase().Add(contextTestHelper.SetContextCmdForRuntime0254).Add(contextTestHelper.SetCurrentContextCmdForRuntime0254)
+		ginkgo.It("Set Context@v0.90.0 - Set Server@v0.25.4", func() {
+			testCase := core.NewTestCase()
 
-			// Add SetServer and SetCurrentServer Commands
-			testCase.Add(serverTestHelper.SetServerCmdForRuntime0254).Add(serverTestHelper.SetCurrentServerCmdForRuntime0254)
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version090)))
 
-			// Add GetClientConfig Commands on all supported runtime versions
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.VersionLatest, legacyclientconfig.WithDefaultServer(core.VersionLatest)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version090, legacyclientconfig.WithDefaultServer(core.Version090)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0280, legacyclientconfig.WithDefaultServer(core.Version0280)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0254, legacyclientconfig.WithDefaultContextAndServer(core.Version0254)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0116, legacyclientconfig.WithDefaultContextAndServer(core.Version0116)))
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatestWithError).Add(contextTestHelper.GetContextCmdForRuntime090WithError).Add(contextTestHelper.GetContextCmdForRuntime0280WithError).Add(contextTestHelper.GetContextCmdForRuntime0254)
+			addTestCasesToVerifyContextAndServer(testCase)
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatestWithError).Add(contextTestHelper.GetCurrentContextCmdForRuntime090WithError).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280WithError).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
-
-			// Add GetServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest).Add(serverTestHelper.GetServerCmdForRuntime090).Add(serverTestHelper.GetServerCmdForRuntime0280).Add(serverTestHelper.GetServerCmdForRuntime0254)
-
-			// Add GetCurrentServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest).Add(serverTestHelper.GetCurrentServerCmdForRuntime090).Add(serverTestHelper.GetCurrentServerCmdForRuntime0280).Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-
-			// Run all the commands
 			executer.Execute(testCase)
 		})
-		ginkgo.It("Set Context with Runtime v0.25.4 and Set Server with Runtime v0.28.0", func() {
-			// Add SetContext and SetCurrentContext Commands
-			testCase := core.NewTestCase().Add(contextTestHelper.SetContextCmdForRuntime0254).Add(contextTestHelper.SetCurrentContextCmdForRuntime0254)
+		ginkgo.It("Set Context@v0.90.0 - Set Server@v0.28.0", func() {
+			testCase := core.NewTestCase()
 
-			// Add SetServer and SetCurrentServer Commands
-			testCase.Add(serverTestHelper.SetServerCmdForRuntime0280).Add(serverTestHelper.SetCurrentServerCmdForRuntime0280)
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version090)))
 
-			// Add GetClientConfig Commands on all supported runtime versions
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.VersionLatest, legacyclientconfig.WithDefaultContextAndServer(core.VersionLatest)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version090, legacyclientconfig.WithDefaultContextAndServer(core.Version090)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0280, legacyclientconfig.WithDefaultContextAndServer(core.Version0280)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0254, legacyclientconfig.WithDefaultContextAndServer(core.Version0254)))
-			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0116, legacyclientconfig.WithDefaultContextAndServer(core.Version0116)))
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest).Add(contextTestHelper.GetContextCmdForRuntime090).Add(contextTestHelper.GetContextCmdForRuntime0280).Add(contextTestHelper.GetContextCmdForRuntime0254)
+			addTestCasesToVerifyContextAndServer(testCase)
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest).Add(contextTestHelper.GetCurrentContextCmdForRuntime090).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
+			executer.Execute(testCase)
+		})
 
-			// Add GetServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest).Add(serverTestHelper.GetServerCmdForRuntime090).Add(serverTestHelper.GetServerCmdForRuntime0280).Add(serverTestHelper.GetServerCmdForRuntime0254)
+		ginkgo.It("Set Context@v0.28.0 - Set Server@latest", func() {
+			testCase := core.NewTestCase()
 
-			// Add GetCurrentServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest).Add(serverTestHelper.GetCurrentServerCmdForRuntime090).Add(serverTestHelper.GetCurrentServerCmdForRuntime0280).Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
 
-			// Run all the commands
+			testCase.Add(server.SetServerCommand())
+			testCase.Add(server.SetCurrentServerCommand())
+
+			addTestCasesToVerifyContextAndServer(testCase)
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Set Context@v0.28.0 - Set Server@v0.90.0", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+
+			addTestCasesToVerifyContextAndServer(testCase)
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Set Context@v0.28.0 - Set Server@v0.25.4", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+
+			addTestCasesToVerifyContextAndServer(testCase)
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Set Context@v0.28.0 - Set Server@v1.0.2", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+
+			addTestCasesToVerifyContextAndServer(testCase)
+
+			executer.Execute(testCase)
+		})
+
+		ginkgo.It("Set Context@v0.25.4 - Set Server@latest", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(server.SetServerCommand())
+			testCase.Add(server.SetCurrentServerCommand())
+
+			addTestCasesToVerifyContextAndServer(testCase)
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Set Context@v0.25.4 - Set Server@v0.90.0", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+
+			addTestCasesToVerifyContextAndServer(testCase)
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Set Context@v0.25.4 - Set Server@v1.0.2", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+
+			addTestCasesToVerifyContextAndServer(testCase)
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Set Context@v0.25.4 - Set Server@v0.28.0", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+
+			addTestCasesToVerifyContextAndServer(testCase)
+
 			executer.Execute(testCase)
 		})
 	})
 
-	ginkgo.Context("using two different contexts and servers", func() {
+	ginkgo.Context("using two different contexts- Servers", func() {
 
-		ginkgo.It("Set Context with Runtime v0.90.0 and Set Server with Runtime latest", func() {
+		ginkgo.It("Set Context@v0.90.0 - Set Server@latest", func() {
 			testCase := core.NewTestCase()
 
-			// Add SetContext and SetCurrentContext Commands
-			testCase.Add(contextTestHelper.SetContextCmdForRuntime090).Add(contextTestHelper.SetContextTwoCmdForRuntime090).Add(contextTestHelper.SetCurrentContextCmdForRuntime090)
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithContextName(common.CompatibilityTestTwo)))
 
-			// Add SetServer and SetCurrentServer Commands
-			testCase.Add(serverTestHelper.SetServerCmdForRuntimeLatest).Add(serverTestHelper.SetServerTwoCmdForRuntimeLatest).Add(serverTestHelper.SetCurrentServerCmdForRuntimeLatest)
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version090)))
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest).Add(contextTestHelper.GetContextCmdForRuntime090).Add(contextTestHelper.GetContextCmdForRuntime0280).Add(contextTestHelper.GetContextCmdForRuntime0254)
-			testCase.Add(contextTestHelper.GetContextTwoCmdForRuntimeLatest).Add(contextTestHelper.GetContextTwoCmdForRuntime090).Add(contextTestHelper.GetContextTwoCmdForRuntime0280).Add(contextTestHelper.GetContextTwoCmdForRuntime0254)
+			testCase.Add(server.SetServerCommand())
+			testCase.Add(server.SetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
 
-			// Add GetServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest).Add(serverTestHelper.GetServerCmdForRuntime090).Add(serverTestHelper.GetServerCmdForRuntime0280).Add(serverTestHelper.GetServerCmdForRuntime0254)
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntimeLatest).Add(serverTestHelper.GetServerTwoCmdForRuntime090).Add(serverTestHelper.GetServerTwoCmdForRuntime0280).Add(serverTestHelper.GetServerTwoCmdForRuntime0254)
+			testCase.Add(server.SetCurrentServerCommand())
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest).Add(contextTestHelper.GetCurrentContextCmdForRuntime090).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
+			addTestCasesToVerifyTwoContextsAndServers(testCase)
 
-			// Add GetCurrentServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest).Add(serverTestHelper.GetCurrentServerCmdForRuntime090).Add(serverTestHelper.GetCurrentServerCmdForRuntime0280).Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-
-			// Run all the commands
 			executer.Execute(testCase)
 		})
-		ginkgo.It("Set Context with Runtime v0.90.0 and Set Server with Runtime v0.90.0", func() {
+		ginkgo.It("Set Context@v0.90.0 - Set Server@v1.0.2", func() {
 			testCase := core.NewTestCase()
 
-			// Add SetContext and SetCurrentContext Commands
-			testCase.Add(contextTestHelper.SetContextCmdForRuntimeLatest).Add(contextTestHelper.SetContextTwoCmdForRuntimeLatest).Add(contextTestHelper.SetCurrentContextCmdForRuntimeLatest)
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithContextName(common.CompatibilityTestTwo)))
 
-			// Add SetServer and SetCurrentServer Commands
-			testCase.Add(serverTestHelper.SetServerCmdForRuntime090).Add(serverTestHelper.SetServerTwoCmdForRuntime090).Add(serverTestHelper.SetCurrentServerCmdForRuntime090)
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version090)))
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest).Add(contextTestHelper.GetContextCmdForRuntime090).Add(contextTestHelper.GetContextCmdForRuntime0280).Add(contextTestHelper.GetContextCmdForRuntime0254)
-			testCase.Add(contextTestHelper.GetContextTwoCmdForRuntimeLatest).Add(contextTestHelper.GetContextTwoCmdForRuntime090).Add(contextTestHelper.GetContextTwoCmdForRuntime0280).Add(contextTestHelper.GetContextTwoCmdForRuntime0254)
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
 
-			// Add GetServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest).Add(serverTestHelper.GetServerCmdForRuntime090).Add(serverTestHelper.GetServerCmdForRuntime0280).Add(serverTestHelper.GetServerCmdForRuntime0254)
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntimeLatest).Add(serverTestHelper.GetServerTwoCmdForRuntime090).Add(serverTestHelper.GetServerTwoCmdForRuntime0280).Add(serverTestHelper.GetServerTwoCmdForRuntime0254)
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest).Add(contextTestHelper.GetCurrentContextCmdForRuntime090).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
+			addTestCasesToVerifyTwoContextsAndServers(testCase)
 
-			// Add GetCurrentServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest).Add(serverTestHelper.GetCurrentServerCmdForRuntime090).Add(serverTestHelper.GetCurrentServerCmdForRuntime0280).Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-
-			// Run all the commands
 			executer.Execute(testCase)
 		})
-		ginkgo.It("Set Context with Runtime v0.90.0 and Set Server with Runtime v0.25.4", func() {
+		ginkgo.It("Set Context@v0.90.0 - Set Server@v0.25.4", func() {
 			testCase := core.NewTestCase()
 
-			// Add SetContext and SetCurrentContext Commands
-			testCase.Add(contextTestHelper.SetContextCmdForRuntime090).Add(contextTestHelper.SetContextTwoCmdForRuntime090).Add(contextTestHelper.SetCurrentContextCmdForRuntime090)
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithContextName(common.CompatibilityTestTwo)))
 
-			// Add SetServer and SetCurrentServer Commands
-			testCase.Add(serverTestHelper.SetServerCmdForRuntime0254).Add(serverTestHelper.SetServerTwoCmdForRuntime0254).Add(serverTestHelper.SetCurrentServerCmdForRuntime0254)
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version090)))
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest).Add(contextTestHelper.GetContextCmdForRuntime090).Add(contextTestHelper.GetContextCmdForRuntime0280).Add(contextTestHelper.GetContextCmdForRuntime0254)
-			testCase.Add(contextTestHelper.GetContextTwoCmdForRuntimeLatest).Add(contextTestHelper.GetContextTwoCmdForRuntime090).Add(contextTestHelper.GetContextTwoCmdForRuntime0280).Add(contextTestHelper.GetContextTwoCmdForRuntime0254)
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
 
-			// Add GetServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest).Add(serverTestHelper.GetServerCmdForRuntime090).Add(serverTestHelper.GetServerCmdForRuntime0280).Add(serverTestHelper.GetServerCmdForRuntime0254)
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntimeLatest).Add(serverTestHelper.GetServerTwoCmdForRuntime090).Add(serverTestHelper.GetServerTwoCmdForRuntime0280).Add(serverTestHelper.GetServerTwoCmdForRuntime0254)
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest).Add(contextTestHelper.GetCurrentContextCmdForRuntime090).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
+			addTestCasesToVerifyTwoContextsAndServers(testCase)
 
-			// Add GetCurrentServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest).Add(serverTestHelper.GetCurrentServerCmdForRuntime090).Add(serverTestHelper.GetCurrentServerCmdForRuntime0280).Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-
-			// Run all the commands
 			executer.Execute(testCase)
 		})
-		ginkgo.It("Set Context with Runtime v0.90.0 and Set Server with Runtime v0.28.0", func() {
+		ginkgo.It("Set Context@v0.90.0 - Set Server@v0.28.0", func() {
 			testCase := core.NewTestCase()
 
-			// Add SetContext and SetCurrentContext Commands
-			testCase.Add(contextTestHelper.SetContextCmdForRuntime090).Add(contextTestHelper.SetContextTwoCmdForRuntime090).Add(contextTestHelper.SetCurrentContextCmdForRuntime090)
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithContextName(common.CompatibilityTestTwo)))
 
-			// Add SetServer and SetCurrentServer Commands
-			testCase.Add(serverTestHelper.SetServerCmdForRuntime0280).Add(serverTestHelper.SetServerTwoCmdForRuntime0280).Add(serverTestHelper.SetCurrentServerCmdForRuntime0280)
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version090)))
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest).Add(contextTestHelper.GetContextCmdForRuntime090).Add(contextTestHelper.GetContextCmdForRuntime0280).Add(contextTestHelper.GetContextCmdForRuntime0254)
-			testCase.Add(contextTestHelper.GetContextTwoCmdForRuntimeLatest).Add(contextTestHelper.GetContextTwoCmdForRuntime090).Add(contextTestHelper.GetContextTwoCmdForRuntime0280).Add(contextTestHelper.GetContextTwoCmdForRuntime0254)
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
 
-			// Add GetServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest).Add(serverTestHelper.GetServerCmdForRuntime090).Add(serverTestHelper.GetServerCmdForRuntime0280).Add(serverTestHelper.GetServerCmdForRuntime0254)
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntimeLatest).Add(serverTestHelper.GetServerTwoCmdForRuntime090).Add(serverTestHelper.GetServerTwoCmdForRuntime0280).Add(serverTestHelper.GetServerTwoCmdForRuntime0254)
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest).Add(contextTestHelper.GetCurrentContextCmdForRuntime090).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
+			addTestCasesToVerifyTwoContextsAndServers(testCase)
 
-			// Add GetCurrentServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest).Add(serverTestHelper.GetCurrentServerCmdForRuntime090).Add(serverTestHelper.GetCurrentServerCmdForRuntime0280).Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-
-			// Run all the commands
 			executer.Execute(testCase)
 		})
 
-		ginkgo.It("Set Context with Runtime Latest and Set Server with Runtime latest", func() {
+		ginkgo.It("Set Context@latest - Set Server@latest", func() {
 			testCase := core.NewTestCase()
 
-			// Add SetContext and SetCurrentContext Commands
-			testCase.Add(contextTestHelper.SetContextCmdForRuntimeLatest).Add(contextTestHelper.SetContextTwoCmdForRuntimeLatest).Add(contextTestHelper.SetCurrentContextCmdForRuntimeLatest)
+			testCase.Add(context.SetContextCommand())
+			testCase.Add(context.SetContextCommand(context.WithContextName(common.CompatibilityTestTwo)))
 
-			// Add SetServer and SetCurrentServer Commands
-			testCase.Add(serverTestHelper.SetServerCmdForRuntimeLatest).Add(serverTestHelper.SetServerTwoCmdForRuntimeLatest).Add(serverTestHelper.SetCurrentServerCmdForRuntimeLatest)
+			testCase.Add(context.SetCurrentContextCommand())
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest).Add(contextTestHelper.GetContextCmdForRuntime090).Add(contextTestHelper.GetContextCmdForRuntime0280).Add(contextTestHelper.GetContextCmdForRuntime0254)
-			testCase.Add(contextTestHelper.GetContextTwoCmdForRuntimeLatest).Add(contextTestHelper.GetContextTwoCmdForRuntime090).Add(contextTestHelper.GetContextTwoCmdForRuntime0280).Add(contextTestHelper.GetContextTwoCmdForRuntime0254)
+			testCase.Add(server.SetServerCommand())
+			testCase.Add(server.SetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
 
-			// Add GetServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest).Add(serverTestHelper.GetServerCmdForRuntime090).Add(serverTestHelper.GetServerCmdForRuntime0280).Add(serverTestHelper.GetServerCmdForRuntime0254)
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntimeLatest).Add(serverTestHelper.GetServerTwoCmdForRuntime090).Add(serverTestHelper.GetServerTwoCmdForRuntime0280).Add(serverTestHelper.GetServerTwoCmdForRuntime0254)
+			testCase.Add(server.SetCurrentServerCommand())
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest).Add(contextTestHelper.GetCurrentContextCmdForRuntime090).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
+			addTestCasesToVerifyTwoContextsAndServers(testCase)
 
-			// Add GetCurrentServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest).Add(serverTestHelper.GetCurrentServerCmdForRuntime090).Add(serverTestHelper.GetCurrentServerCmdForRuntime0280).Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-
-			// Run all the commands
 			executer.Execute(testCase)
 		})
-		ginkgo.It("Set Context with Runtime Latest and Set Server with Runtime v0.90.0", func() {
+		ginkgo.It("Set Context@latest - Set Server@v0.90.0", func() {
 			testCase := core.NewTestCase()
 
-			// Add SetContext and SetCurrentContext Commands
-			testCase.Add(contextTestHelper.SetContextCmdForRuntimeLatest).Add(contextTestHelper.SetContextTwoCmdForRuntimeLatest).Add(contextTestHelper.SetCurrentContextCmdForRuntimeLatest)
+			testCase.Add(context.SetContextCommand())
+			testCase.Add(context.SetContextCommand(context.WithContextName(common.CompatibilityTestTwo)))
 
-			// Add SetServer and SetCurrentServer Commands
-			testCase.Add(serverTestHelper.SetServerCmdForRuntime090).Add(serverTestHelper.SetServerTwoCmdForRuntime090).Add(serverTestHelper.SetCurrentServerCmdForRuntime090)
+			testCase.Add(context.SetCurrentContextCommand())
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest).Add(contextTestHelper.GetContextCmdForRuntime090).Add(contextTestHelper.GetContextCmdForRuntime0280).Add(contextTestHelper.GetContextCmdForRuntime0254)
-			testCase.Add(contextTestHelper.GetContextTwoCmdForRuntimeLatest).Add(contextTestHelper.GetContextTwoCmdForRuntime090).Add(contextTestHelper.GetContextTwoCmdForRuntime0280).Add(contextTestHelper.GetContextTwoCmdForRuntime0254)
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
 
-			// Add GetServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest).Add(serverTestHelper.GetServerCmdForRuntime090).Add(serverTestHelper.GetServerCmdForRuntime0280).Add(serverTestHelper.GetServerCmdForRuntime0254)
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntimeLatest).Add(serverTestHelper.GetServerTwoCmdForRuntime090).Add(serverTestHelper.GetServerTwoCmdForRuntime0280).Add(serverTestHelper.GetServerTwoCmdForRuntime0254)
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest).Add(contextTestHelper.GetCurrentContextCmdForRuntime090).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
+			addTestCasesToVerifyTwoContextsAndServers(testCase)
 
-			// Add GetCurrentServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest).Add(serverTestHelper.GetCurrentServerCmdForRuntime090).Add(serverTestHelper.GetCurrentServerCmdForRuntime0280).Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-
-			// Run all the commands
 			executer.Execute(testCase)
 		})
-		ginkgo.It("Set Context with Runtime Latest and Set Server with Runtime v0.25.4", func() {
+		ginkgo.It("Set Context@latest - Set Server@v0.25.4", func() {
 			testCase := core.NewTestCase()
 
-			// Add SetContext and SetCurrentContext Commands
-			testCase.Add(contextTestHelper.SetContextCmdForRuntimeLatest).Add(contextTestHelper.SetContextTwoCmdForRuntimeLatest).Add(contextTestHelper.SetCurrentContextCmdForRuntimeLatest)
+			testCase.Add(context.SetContextCommand())
+			testCase.Add(context.SetContextCommand(context.WithContextName(common.CompatibilityTestTwo)))
 
-			// Add SetServer and SetCurrentServer Commands
-			testCase.Add(serverTestHelper.SetServerCmdForRuntime0254).Add(serverTestHelper.SetServerTwoCmdForRuntime0254).Add(serverTestHelper.SetCurrentServerCmdForRuntime0254)
+			testCase.Add(context.SetCurrentContextCommand())
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest).Add(contextTestHelper.GetContextCmdForRuntime090).Add(contextTestHelper.GetContextCmdForRuntime0280).Add(contextTestHelper.GetContextCmdForRuntime0254)
-			testCase.Add(contextTestHelper.GetContextTwoCmdForRuntimeLatest).Add(contextTestHelper.GetContextTwoCmdForRuntime090).Add(contextTestHelper.GetContextTwoCmdForRuntime0280).Add(contextTestHelper.GetContextTwoCmdForRuntime0254)
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
 
-			// Add GetServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest).Add(serverTestHelper.GetServerCmdForRuntime090).Add(serverTestHelper.GetServerCmdForRuntime0280).Add(serverTestHelper.GetServerCmdForRuntime0254)
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntimeLatest).Add(serverTestHelper.GetServerTwoCmdForRuntime090).Add(serverTestHelper.GetServerTwoCmdForRuntime0280).Add(serverTestHelper.GetServerTwoCmdForRuntime0254)
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest).Add(contextTestHelper.GetCurrentContextCmdForRuntime090).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
+			addTestCasesToVerifyTwoContextsAndServers(testCase)
 
-			// Add GetCurrentServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest).Add(serverTestHelper.GetCurrentServerCmdForRuntime090).Add(serverTestHelper.GetCurrentServerCmdForRuntime0280).Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-
-			// Run all the commands
 			executer.Execute(testCase)
 		})
-		ginkgo.It("Set Context with Runtime Latest and Set Server with Runtime v0.28.0", func() {
+		ginkgo.It("Set Context@latest - Set Server@v0.28.0", func() {
 			testCase := core.NewTestCase()
 
-			// Add SetContext and SetCurrentContext Commands
-			testCase.Add(contextTestHelper.SetContextCmdForRuntimeLatest).Add(contextTestHelper.SetContextTwoCmdForRuntimeLatest).Add(contextTestHelper.SetCurrentContextCmdForRuntimeLatest)
+			testCase.Add(context.SetContextCommand())
+			testCase.Add(context.SetContextCommand(context.WithContextName(common.CompatibilityTestTwo)))
 
-			// Add SetServer and SetCurrentServer Commands
-			testCase.Add(serverTestHelper.SetServerCmdForRuntime0280).Add(serverTestHelper.SetServerTwoCmdForRuntime0280).Add(serverTestHelper.SetCurrentServerCmdForRuntime0280)
+			testCase.Add(context.SetCurrentContextCommand())
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest).Add(contextTestHelper.GetContextCmdForRuntime090).Add(contextTestHelper.GetContextCmdForRuntime0280).Add(contextTestHelper.GetContextCmdForRuntime0254)
-			testCase.Add(contextTestHelper.GetContextTwoCmdForRuntimeLatest).Add(contextTestHelper.GetContextTwoCmdForRuntime090).Add(contextTestHelper.GetContextTwoCmdForRuntime0280).Add(contextTestHelper.GetContextTwoCmdForRuntime0254)
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
 
-			// Add GetServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest).Add(serverTestHelper.GetServerCmdForRuntime090).Add(serverTestHelper.GetServerCmdForRuntime0280).Add(serverTestHelper.GetServerCmdForRuntime0254)
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntimeLatest).Add(serverTestHelper.GetServerTwoCmdForRuntime090).Add(serverTestHelper.GetServerTwoCmdForRuntime0280).Add(serverTestHelper.GetServerTwoCmdForRuntime0254)
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest).Add(contextTestHelper.GetCurrentContextCmdForRuntime090).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
+			addTestCasesToVerifyTwoContextsAndServers(testCase)
 
-			// Add GetCurrentServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest).Add(serverTestHelper.GetCurrentServerCmdForRuntime090).Add(serverTestHelper.GetCurrentServerCmdForRuntime0280).Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-
-			// Run all the commands
 			executer.Execute(testCase)
 		})
 
-		ginkgo.It("Set Context with Runtime v0.28.0 and Set Server with Runtime latest", func() {
+		ginkgo.It("Set Context@v0.28.0 - Set Server@latest", func() {
 			testCase := core.NewTestCase()
 
-			// Add SetContext and SetCurrentContext Commands
-			testCase.Add(contextTestHelper.SetContextCmdForRuntime0280).Add(contextTestHelper.SetContextTwoCmdForRuntime0280).Add(contextTestHelper.SetCurrentContextCmdForRuntime0280)
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithContextName(common.CompatibilityTestTwo)))
 
-			// Add SetServer and SetCurrentServer Commands
-			testCase.Add(serverTestHelper.SetServerCmdForRuntimeLatest).Add(serverTestHelper.SetServerTwoCmdForRuntimeLatest).Add(serverTestHelper.SetCurrentServerCmdForRuntimeLatest)
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest).Add(contextTestHelper.GetContextCmdForRuntime090).Add(contextTestHelper.GetContextCmdForRuntime0280).Add(contextTestHelper.GetContextCmdForRuntime0254)
-			testCase.Add(contextTestHelper.GetContextTwoCmdForRuntimeLatest).Add(contextTestHelper.GetContextTwoCmdForRuntime090).Add(contextTestHelper.GetContextTwoCmdForRuntime0280).Add(contextTestHelper.GetContextTwoCmdForRuntime0254)
+			testCase.Add(server.SetServerCommand())
+			testCase.Add(server.SetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
 
-			// Add GetServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest).Add(serverTestHelper.GetServerCmdForRuntime090).Add(serverTestHelper.GetServerCmdForRuntime0280).Add(serverTestHelper.GetServerCmdForRuntime0254)
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntimeLatest).Add(serverTestHelper.GetServerTwoCmdForRuntime090).Add(serverTestHelper.GetServerTwoCmdForRuntime0280).Add(serverTestHelper.GetServerTwoCmdForRuntime0254)
+			testCase.Add(server.SetCurrentServerCommand())
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest).Add(contextTestHelper.GetCurrentContextCmdForRuntime090).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
+			addTestCasesToVerifyTwoContextsAndServers(testCase)
 
-			// Add GetCurrentServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest).Add(serverTestHelper.GetCurrentServerCmdForRuntime090).Add(serverTestHelper.GetCurrentServerCmdForRuntime0280).Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-
-			// Run all the commands
 			executer.Execute(testCase)
 		})
-		ginkgo.It("Set Context with Runtime v0.28.0 and Set Server with Runtime v0.90.0", func() {
+		ginkgo.It("Set Context@v0.28.0 - Set Server@v0.90.0", func() {
 			testCase := core.NewTestCase()
 
-			// Add SetContext and SetCurrentContext Commands
-			testCase.Add(contextTestHelper.SetContextCmdForRuntime0280).Add(contextTestHelper.SetContextTwoCmdForRuntime0280).Add(contextTestHelper.SetCurrentContextCmdForRuntime0280)
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithContextName(common.CompatibilityTestTwo)))
 
-			// Add SetServer and SetCurrentServer Commands
-			testCase.Add(serverTestHelper.SetServerCmdForRuntime090).Add(serverTestHelper.SetServerTwoCmdForRuntime090).Add(serverTestHelper.SetCurrentServerCmdForRuntime090)
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest).Add(contextTestHelper.GetContextCmdForRuntime090).Add(contextTestHelper.GetContextCmdForRuntime0280).Add(contextTestHelper.GetContextCmdForRuntime0254)
-			testCase.Add(contextTestHelper.GetContextTwoCmdForRuntimeLatest).Add(contextTestHelper.GetContextTwoCmdForRuntime090).Add(contextTestHelper.GetContextTwoCmdForRuntime0280).Add(contextTestHelper.GetContextTwoCmdForRuntime0254)
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
 
-			// Add GetServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest).Add(serverTestHelper.GetServerCmdForRuntime090).Add(serverTestHelper.GetServerCmdForRuntime0280).Add(serverTestHelper.GetServerCmdForRuntime0254)
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntimeLatest).Add(serverTestHelper.GetServerTwoCmdForRuntime090).Add(serverTestHelper.GetServerTwoCmdForRuntime0280).Add(serverTestHelper.GetServerTwoCmdForRuntime0254)
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest).Add(contextTestHelper.GetCurrentContextCmdForRuntime090).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
+			addTestCasesToVerifyTwoContextsAndServers(testCase)
 
-			// Add GetCurrentServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest).Add(serverTestHelper.GetCurrentServerCmdForRuntime090).Add(serverTestHelper.GetCurrentServerCmdForRuntime0280).Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-
-			// Run all the commands
 			executer.Execute(testCase)
 		})
-		ginkgo.It("Set Context with Runtime v0.28.0 and Set Server with Runtime v0.25.4", func() {
+		ginkgo.It("Set Context@v0.28.0 - Set Server@v0.25.4", func() {
 			testCase := core.NewTestCase()
 
-			// Add SetContext and SetCurrentContext Commands
-			testCase.Add(contextTestHelper.SetContextCmdForRuntime0280).Add(contextTestHelper.SetContextTwoCmdForRuntime0280).Add(contextTestHelper.SetCurrentContextCmdForRuntime0280)
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithContextName(common.CompatibilityTestTwo)))
 
-			// Add SetServer and SetCurrentServer Commands
-			testCase.Add(serverTestHelper.SetServerCmdForRuntime0254).Add(serverTestHelper.SetServerTwoCmdForRuntime0254).Add(serverTestHelper.SetCurrentServerCmdForRuntime0254)
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest).Add(contextTestHelper.GetContextCmdForRuntime090).Add(contextTestHelper.GetContextCmdForRuntime0280).Add(contextTestHelper.GetContextCmdForRuntime0254)
-			testCase.Add(contextTestHelper.GetContextTwoCmdForRuntimeLatest).Add(contextTestHelper.GetContextTwoCmdForRuntime090).Add(contextTestHelper.GetContextTwoCmdForRuntime0280).Add(contextTestHelper.GetContextTwoCmdForRuntime0254)
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
 
-			// Add GetServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest).Add(serverTestHelper.GetServerCmdForRuntime090).Add(serverTestHelper.GetServerCmdForRuntime0280).Add(serverTestHelper.GetServerCmdForRuntime0254)
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntimeLatest).Add(serverTestHelper.GetServerTwoCmdForRuntime090).Add(serverTestHelper.GetServerTwoCmdForRuntime0280).Add(serverTestHelper.GetServerTwoCmdForRuntime0254)
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest).Add(contextTestHelper.GetCurrentContextCmdForRuntime090).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
+			addTestCasesToVerifyTwoContextsAndServers(testCase)
 
-			// Add GetCurrentServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest).Add(serverTestHelper.GetCurrentServerCmdForRuntime090).Add(serverTestHelper.GetCurrentServerCmdForRuntime0280).Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-
-			// Run all the commands
 			executer.Execute(testCase)
 		})
-		ginkgo.It("Set Context with Runtime v0.28.0 and Set Server with Runtime v0.28.0", func() {
+		ginkgo.It("Set Context@v0.28.0 - Set Server@v1.0.2", func() {
 			testCase := core.NewTestCase()
 
-			// Add SetContext and SetCurrentContext Commands
-			testCase.Add(contextTestHelper.SetContextCmdForRuntime0280).Add(contextTestHelper.SetContextTwoCmdForRuntime0280).Add(contextTestHelper.SetCurrentContextCmdForRuntime0280)
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithContextName(common.CompatibilityTestTwo)))
 
-			// Add SetServer and SetCurrentServer Commands
-			testCase.Add(serverTestHelper.SetServerCmdForRuntime0280).Add(serverTestHelper.SetServerTwoCmdForRuntime0280).Add(serverTestHelper.SetCurrentServerCmdForRuntime0280)
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest).Add(contextTestHelper.GetContextCmdForRuntime090).Add(contextTestHelper.GetContextCmdForRuntime0280).Add(contextTestHelper.GetContextCmdForRuntime0254)
-			testCase.Add(contextTestHelper.GetContextTwoCmdForRuntimeLatest).Add(contextTestHelper.GetContextTwoCmdForRuntime090).Add(contextTestHelper.GetContextTwoCmdForRuntime0280).Add(contextTestHelper.GetContextTwoCmdForRuntime0254)
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
 
-			// Add GetServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest).Add(serverTestHelper.GetServerCmdForRuntime090).Add(serverTestHelper.GetServerCmdForRuntime0280).Add(serverTestHelper.GetServerCmdForRuntime0254)
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntimeLatest).Add(serverTestHelper.GetServerTwoCmdForRuntime090).Add(serverTestHelper.GetServerTwoCmdForRuntime0280).Add(serverTestHelper.GetServerTwoCmdForRuntime0254)
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest).Add(contextTestHelper.GetCurrentContextCmdForRuntime090).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
+			addTestCasesToVerifyTwoContextsAndServers(testCase)
 
-			// Add GetCurrentServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest).Add(serverTestHelper.GetCurrentServerCmdForRuntime090).Add(serverTestHelper.GetCurrentServerCmdForRuntime0280).Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-
-			// Run all the commands
 			executer.Execute(testCase)
 		})
 
-		ginkgo.It("Set Context with Runtime v0.25.4 and Set Server with Runtime latest", func() {
+		ginkgo.It("Set Context@v0.25.4 - Set Server@latest", func() {
 			testCase := core.NewTestCase()
 
-			// Add SetContext and SetCurrentContext Commands
-			testCase.Add(contextTestHelper.SetContextCmdForRuntime0254).Add(contextTestHelper.SetContextTwoCmdForRuntime0254).Add(contextTestHelper.SetCurrentContextCmdForRuntime0254)
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithContextName(common.CompatibilityTestTwo)))
 
-			// Add SetServer and SetCurrentServer Commands
-			testCase.Add(serverTestHelper.SetServerCmdForRuntimeLatest).Add(serverTestHelper.SetServerTwoCmdForRuntimeLatest).Add(serverTestHelper.SetCurrentServerCmdForRuntimeLatest)
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest).Add(contextTestHelper.GetContextCmdForRuntime090).Add(contextTestHelper.GetContextCmdForRuntime0280).Add(contextTestHelper.GetContextCmdForRuntime0254)
-			testCase.Add(contextTestHelper.GetContextTwoCmdForRuntimeLatest).Add(contextTestHelper.GetContextTwoCmdForRuntime090).Add(contextTestHelper.GetContextTwoCmdForRuntime0280).Add(contextTestHelper.GetContextTwoCmdForRuntime0254)
+			testCase.Add(server.SetServerCommand())
+			testCase.Add(server.SetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
 
-			// Add GetServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest).Add(serverTestHelper.GetServerCmdForRuntime090).Add(serverTestHelper.GetServerCmdForRuntime0280).Add(serverTestHelper.GetServerCmdForRuntime0254)
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntimeLatest).Add(serverTestHelper.GetServerTwoCmdForRuntime090).Add(serverTestHelper.GetServerTwoCmdForRuntime0280).Add(serverTestHelper.GetServerTwoCmdForRuntime0254)
+			testCase.Add(server.SetCurrentServerCommand())
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest).Add(contextTestHelper.GetCurrentContextCmdForRuntime090).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
+			addTestCasesToVerifyTwoContextsAndServers(testCase)
 
-			// Add GetCurrentServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest).Add(serverTestHelper.GetCurrentServerCmdForRuntime090).Add(serverTestHelper.GetCurrentServerCmdForRuntime0280).Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-
-			// Run all the commands
 			executer.Execute(testCase)
 		})
-		ginkgo.It("Set Context with Runtime v0.25.4 and Set Server with Runtime v0.90.0", func() {
+		ginkgo.It("Set Context@v0.25.4 - Set Server@v0.90.0", func() {
 			testCase := core.NewTestCase()
 
-			// Add SetContext and SetCurrentContext Commands
-			testCase.Add(contextTestHelper.SetContextCmdForRuntime0254).Add(contextTestHelper.SetContextTwoCmdForRuntime0254).Add(contextTestHelper.SetCurrentContextCmdForRuntime0254)
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithContextName(common.CompatibilityTestTwo)))
 
-			// Add SetServer and SetCurrentServer Commands
-			testCase.Add(serverTestHelper.SetServerCmdForRuntime090).Add(serverTestHelper.SetServerTwoCmdForRuntime090).Add(serverTestHelper.SetCurrentServerCmdForRuntime090)
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest).Add(contextTestHelper.GetContextCmdForRuntime090).Add(contextTestHelper.GetContextCmdForRuntime0280).Add(contextTestHelper.GetContextCmdForRuntime0254)
-			testCase.Add(contextTestHelper.GetContextTwoCmdForRuntimeLatest).Add(contextTestHelper.GetContextTwoCmdForRuntime090).Add(contextTestHelper.GetContextTwoCmdForRuntime0280).Add(contextTestHelper.GetContextTwoCmdForRuntime0254)
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
 
-			// Add GetServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest).Add(serverTestHelper.GetServerCmdForRuntime090).Add(serverTestHelper.GetServerCmdForRuntime0280).Add(serverTestHelper.GetServerCmdForRuntime0254)
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntimeLatest).Add(serverTestHelper.GetServerTwoCmdForRuntime090).Add(serverTestHelper.GetServerTwoCmdForRuntime0280).Add(serverTestHelper.GetServerTwoCmdForRuntime0254)
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest).Add(contextTestHelper.GetCurrentContextCmdForRuntime090).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
+			addTestCasesToVerifyTwoContextsAndServers(testCase)
 
-			// Add GetCurrentServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest).Add(serverTestHelper.GetCurrentServerCmdForRuntime090).Add(serverTestHelper.GetCurrentServerCmdForRuntime0280).Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-
-			// Run all the commands
 			executer.Execute(testCase)
 		})
-		ginkgo.It("Set Context with Runtime v0.25.4 and Set Server with Runtime v0.25.4", func() {
+		ginkgo.It("Set Context@v0.25.4 - Set Server@v1.0.2", func() {
 			testCase := core.NewTestCase()
 
-			// Add SetContext and SetCurrentContext Commands
-			testCase.Add(contextTestHelper.SetContextCmdForRuntime0254).Add(contextTestHelper.SetContextTwoCmdForRuntime0254).Add(contextTestHelper.SetCurrentContextCmdForRuntime0254)
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
 
-			// Add SetServer and SetCurrentServer Commands
-			testCase.Add(serverTestHelper.SetServerCmdForRuntime0254).Add(serverTestHelper.SetServerTwoCmdForRuntime0254).Add(serverTestHelper.SetCurrentServerCmdForRuntime0254)
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatestWithError).Add(contextTestHelper.GetContextCmdForRuntime090WithError).Add(contextTestHelper.GetContextCmdForRuntime0280WithError).Add(contextTestHelper.GetContextCmdForRuntime0254)
-			testCase.Add(contextTestHelper.GetContextTwoCmdForRuntimeLatestWithError).Add(contextTestHelper.GetContextTwoCmdForRuntime090WithError).Add(contextTestHelper.GetContextTwoCmdForRuntime0280WithError).Add(contextTestHelper.GetContextTwoCmdForRuntime0254)
+			addTestCasesToVerifyTwoContextsAndServers(testCase)
 
-			// Add GetServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest).Add(serverTestHelper.GetServerCmdForRuntime090).Add(serverTestHelper.GetServerCmdForRuntime0280).Add(serverTestHelper.GetServerCmdForRuntime0254)
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntimeLatest).Add(serverTestHelper.GetServerTwoCmdForRuntime090).Add(serverTestHelper.GetServerTwoCmdForRuntime0280).Add(serverTestHelper.GetServerTwoCmdForRuntime0254)
-
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatestWithError).Add(contextTestHelper.GetCurrentContextCmdForRuntime090WithError).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280WithError).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
-
-			// Add GetCurrentServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest).Add(serverTestHelper.GetCurrentServerCmdForRuntime090).Add(serverTestHelper.GetCurrentServerCmdForRuntime0280).Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-
-			// Run all the commands
 			executer.Execute(testCase)
 		})
-		ginkgo.It("Set Context with Runtime v0.25.4 and Set Server with Runtime v0.28.0", func() {
+		ginkgo.It("Set Context@v0.25.4 - Set Server@v0.28.0", func() {
 			testCase := core.NewTestCase()
 
-			// Add SetContext and SetCurrentContext Commands
-			testCase.Add(contextTestHelper.SetContextCmdForRuntime0254).Add(contextTestHelper.SetContextTwoCmdForRuntime0254).Add(contextTestHelper.SetCurrentContextCmdForRuntime0254)
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithContextName(common.CompatibilityTestTwo)))
 
-			// Add SetServer and SetCurrentServer Commands
-			testCase.Add(serverTestHelper.SetServerCmdForRuntime0280).Add(serverTestHelper.SetServerTwoCmdForRuntime0280).Add(serverTestHelper.SetCurrentServerCmdForRuntime0280)
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest).Add(contextTestHelper.GetContextCmdForRuntime090).Add(contextTestHelper.GetContextCmdForRuntime0280).Add(contextTestHelper.GetContextCmdForRuntime0254)
-			testCase.Add(contextTestHelper.GetContextTwoCmdForRuntimeLatest).Add(contextTestHelper.GetContextTwoCmdForRuntime090).Add(contextTestHelper.GetContextTwoCmdForRuntime0280).Add(contextTestHelper.GetContextTwoCmdForRuntime0254)
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
 
-			// Add GetServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest).Add(serverTestHelper.GetServerCmdForRuntime090).Add(serverTestHelper.GetServerCmdForRuntime0280).Add(serverTestHelper.GetServerCmdForRuntime0254)
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntimeLatest).Add(serverTestHelper.GetServerTwoCmdForRuntime090).Add(serverTestHelper.GetServerTwoCmdForRuntime0280).Add(serverTestHelper.GetServerTwoCmdForRuntime0254)
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest).Add(contextTestHelper.GetCurrentContextCmdForRuntime090).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
+			addTestCasesToVerifyTwoContextsAndServers(testCase)
 
-			// Add GetCurrentServer latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest).Add(serverTestHelper.GetCurrentServerCmdForRuntime090).Add(serverTestHelper.GetCurrentServerCmdForRuntime0280).Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-
-			// Run all the commands
 			executer.Execute(testCase)
 		})
 	})
 
 })
+
+func addTestCasesToVerifyContextAndServer(testCase *core.TestCase) {
+	testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.VersionLatest, legacyclientconfig.WithDefaultContextAndServer(core.VersionLatest)))
+	testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version102, legacyclientconfig.WithDefaultContextAndServer(core.Version102)))
+	testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version090, legacyclientconfig.WithDefaultContextAndServer(core.Version090)))
+	testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0280, legacyclientconfig.WithDefaultContextAndServer(core.Version0280)))
+	testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0254, legacyclientconfig.WithDefaultContextAndServer(core.Version0254)))
+	testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0116, legacyclientconfig.WithDefaultContextAndServer(core.Version0116)))
+
+	testCase.Add(context.GetContextCommand())
+	testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102)))
+	testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090)))
+	testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280)))
+	testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+	testCase.Add(context.GetCurrentContextCommand())
+	testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102)))
+	testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090)))
+	testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
+	testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+	testCase.Add(server.GetServerCommand())
+	testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+	testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+	testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+	testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+	testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+	testCase.Add(server.GetCurrentServerCommand())
+	testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+	testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+	testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+	testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+	testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+}
+
+func addTestCasesToVerifyTwoContextsAndServers(testCase *core.TestCase) {
+	testCase.Add(context.GetContextCommand())
+	testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102)))
+	testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090)))
+	testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280)))
+	testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+	testCase.Add(context.GetContextCommand(context.WithContextName(common.CompatibilityTestTwo)))
+	testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithContextName(common.CompatibilityTestTwo)))
+	testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithContextName(common.CompatibilityTestTwo)))
+	testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithContextName(common.CompatibilityTestTwo)))
+	testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithContextName(common.CompatibilityTestTwo)))
+
+	testCase.Add(context.GetCurrentContextCommand())
+	testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102)))
+	testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090)))
+	testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
+	testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+	testCase.Add(server.GetServerCommand())
+	testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+	testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+	testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+	testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+	testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+	testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+	testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+	testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+	testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+	testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+	testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+	testCase.Add(server.GetCurrentServerCommand())
+	testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+	testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+	testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+	testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+	testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+}

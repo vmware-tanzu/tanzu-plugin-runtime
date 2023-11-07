@@ -6,28 +6,23 @@ package context_test
 import (
 	"github.com/onsi/ginkgo/v2"
 
-	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/compatibilitytests/context"
-
-	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/legacyclientconfig"
-
-	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/executer"
-
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
+
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/compatibilitytests/common"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/context"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/executer"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/legacyclientconfig"
 )
 
 var _ = ginkgo.Describe("Cross-version Context APIs compatibility tests", func() {
-	// Description on the Tests
 	ginkgo.GinkgoWriter.Println("GetContext, SetContext, DeleteContext, GetCurrentContext, SetCurrentContext, RemoveCurrentContext methods are tested for cross-version API compatibility with supported Runtime versions v0.25.4, v0.28.0, v0.90.0, latest")
 
-	// Setup Data
-	var contextTestHelper context.Helper
 	ginkgo.BeforeEach(func() {
 		// Setup mock temporary config files for testing
 		_, cleanup := core.SetupTempCfgFiles()
 		ginkgo.DeferCleanup(func() {
 			cleanup()
 		})
-		contextTestHelper.SetUpDefaultData()
 	})
 
 	ginkgo.Context("using single context object on supported Runtime API versions", func() {
@@ -35,269 +30,542 @@ var _ = ginkgo.Describe("Cross-version Context APIs compatibility tests", func()
 		ginkgo.It("Run SetContext, SetCurrentContext latest then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest then DeleteContext, RemoveCurrentContext v0.28.0 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest", func() {
 			testCase := core.NewTestCase()
 
-			// Add SetContext and SetCurrentContext Commands for Runtime latest
-			testCase.Add(contextTestHelper.SetContextCmdForRuntimeLatest)
-			testCase.Add(contextTestHelper.SetCurrentContextCmdForRuntimeLatest)
+			testCase.Add(context.SetContextCommand())
+			testCase.Add(context.SetCurrentContextCommand())
 
-			// Add GetClientConfig Commands on all supported runtime versions
 			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.VersionLatest, legacyclientconfig.WithDefaultContextAndServer(core.VersionLatest)))
+			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version102, legacyclientconfig.WithDefaultContextAndServer(core.Version102)))
 			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version090, legacyclientconfig.WithDefaultContextAndServer(core.Version090)))
 			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0280, legacyclientconfig.WithDefaultContextAndServer(core.Version0280)))
 			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0254, legacyclientconfig.WithDefaultContextAndServer(core.Version0254)))
 			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0116, legacyclientconfig.WithDefaultContextAndServer(core.Version0116)))
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest).Add(contextTestHelper.GetContextCmdForRuntime090).Add(contextTestHelper.GetContextCmdForRuntime0280).Add(contextTestHelper.GetContextCmdForRuntime0254)
+			testCase.Add(context.GetContextCommand())
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254)))
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest).Add(contextTestHelper.GetCurrentContextCmdForRuntime090).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
+			testCase.Add(context.GetCurrentContextCommand())
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
 
-			// Add RemoveCurrentContext v0.28.0 Command
-			testCase.Add(contextTestHelper.RemoveCurrentContextCmdForRuntime0280)
+			testCase.Add(context.RemoveCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.DeleteContextCommand(context.WithRuntimeVersion(core.Version0280)))
 
-			// Add DeleteContext v0.28.0 Command
-			testCase.Add(contextTestHelper.DeleteContextCmdForRuntime0280)
+			testCase.Add(context.GetContextCommand(context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithError()))
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatestWithError).Add(contextTestHelper.GetContextCmdForRuntime090WithError).Add(contextTestHelper.GetContextCmdForRuntime0280WithError).Add(contextTestHelper.GetContextCmdForRuntime0254WithError)
+			testCase.Add(context.GetCurrentContextCommand(context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithError()))
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatestWithError).Add(contextTestHelper.GetCurrentContextCmdForRuntime090WithError).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280WithError).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254WithError)
-
-			// Run all the commands
 			executer.Execute(testCase)
 		})
 
 		ginkgo.It("Run SetContext, SetCurrentContext latest then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest then DeleteContext, RemoveCurrentContext v0.90.0 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest", func() {
-			// Add SetContext and SetCurrentContext Commands for Runtime latest
 			testCase := core.NewTestCase()
 
-			testCase.Add(contextTestHelper.SetContextCmdForRuntimeLatest)
-			testCase.Add(contextTestHelper.SetCurrentContextCmdForRuntimeLatest)
+			testCase.Add(context.SetContextCommand())
+			testCase.Add(context.SetCurrentContextCommand())
 
-			// Add GetClientConfig Commands on all supported runtime versions
 			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.VersionLatest, legacyclientconfig.WithDefaultContextAndServer(core.VersionLatest)))
 			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version090, legacyclientconfig.WithDefaultContextAndServer(core.Version090)))
 			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0280, legacyclientconfig.WithDefaultContextAndServer(core.Version0280)))
 			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0254, legacyclientconfig.WithDefaultContextAndServer(core.Version0254)))
 			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0116, legacyclientconfig.WithDefaultContextAndServer(core.Version0116)))
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest).Add(contextTestHelper.GetContextCmdForRuntime090).Add(contextTestHelper.GetContextCmdForRuntime0280).Add(contextTestHelper.GetContextCmdForRuntime0254)
+			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.VersionLatest, legacyclientconfig.WithDefaultContextAndServer(core.VersionLatest)))
+			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version090, legacyclientconfig.WithDefaultContextAndServer(core.Version090)))
+			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0280, legacyclientconfig.WithDefaultContextAndServer(core.Version0280)))
+			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0254, legacyclientconfig.WithDefaultContextAndServer(core.Version0254)))
+			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0116, legacyclientconfig.WithDefaultContextAndServer(core.Version0116)))
 
-			// Add GetCurrentContext latest, v0.90.0,  v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest).Add(contextTestHelper.GetCurrentContextCmdForRuntime090).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
+			testCase.Add(context.GetContextCommand())
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254)))
 
-			// Add RemoveCurrentContext v0.90.0 Command
-			testCase.Add(contextTestHelper.RemoveCurrentContextCmdForRuntime090)
+			testCase.Add(context.GetCurrentContextCommand())
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
 
-			// Add DeleteContext v0.90.0 Command
-			testCase.Add(contextTestHelper.DeleteContextCmdForRuntime090)
+			testCase.Add(context.RemoveCurrentContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.DeleteContextCommand(context.WithRuntimeVersion(core.Version090)))
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatestWithError).Add(contextTestHelper.GetContextCmdForRuntime090WithError).Add(contextTestHelper.GetContextCmdForRuntime0280WithError).Add(contextTestHelper.GetContextCmdForRuntime0254WithError)
+			testCase.Add(context.GetContextCommand(context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithError()))
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatestWithError).Add(contextTestHelper.GetCurrentContextCmdForRuntime090WithError).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280WithError).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254WithError)
+			testCase.Add(context.GetCurrentContextCommand(context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithError()))
 
-			// Run all the commands
+			executer.Execute(testCase)
+		})
+
+		ginkgo.It("Run SetContext, SetCurrentContext latest then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest then DeleteContext, RemoveCurrentContext v1.0 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(context.SetContextCommand())
+			testCase.Add(context.SetCurrentContextCommand())
+
+			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.VersionLatest, legacyclientconfig.WithDefaultContextAndServer(core.VersionLatest)))
+			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version102, legacyclientconfig.WithDefaultContextAndServer(core.Version102)))
+			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version090, legacyclientconfig.WithDefaultContextAndServer(core.Version090)))
+			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0280, legacyclientconfig.WithDefaultContextAndServer(core.Version0280)))
+			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0254, legacyclientconfig.WithDefaultContextAndServer(core.Version0254)))
+			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0116, legacyclientconfig.WithDefaultContextAndServer(core.Version0116)))
+
+			testCase.Add(context.GetContextCommand())
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.GetCurrentContextCommand())
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.RemoveCurrentContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.DeleteContextCommand(context.WithRuntimeVersion(core.Version102)))
+
+			testCase.Add(context.GetContextCommand(context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithError()))
+
+			testCase.Add(context.GetCurrentContextCommand(context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithError()))
+
 			executer.Execute(testCase)
 		})
 
 		ginkgo.It("Run SetContext, SetCurrentContext v0.90.0 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest then DeleteContext, RemoveCurrentContext v0.28.0 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest", func() {
-			// Add SetContext and SetCurrentContext Commands for Runtime latest
 			testCase := core.NewTestCase()
-			testCase.Add(contextTestHelper.SetContextCmdForRuntime090)
-			testCase.Add(contextTestHelper.SetCurrentContextCmdForRuntime090)
 
-			// Add GetClientConfig Commands on all supported runtime versions
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version090)))
+
 			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.VersionLatest, legacyclientconfig.WithDefaultContextAndServer(core.VersionLatest)))
+			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version102, legacyclientconfig.WithDefaultContextAndServer(core.Version102)))
 			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version090, legacyclientconfig.WithDefaultContextAndServer(core.Version090)))
 			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0280, legacyclientconfig.WithDefaultContextAndServer(core.Version0280)))
 			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0254, legacyclientconfig.WithDefaultContextAndServer(core.Version0254)))
 			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0116, legacyclientconfig.WithDefaultContextAndServer(core.Version0116)))
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest).Add(contextTestHelper.GetContextCmdForRuntime090).Add(contextTestHelper.GetContextCmdForRuntime0280).Add(contextTestHelper.GetContextCmdForRuntime0254)
+			testCase.Add(context.GetContextCommand())
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254)))
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest).Add(contextTestHelper.GetCurrentContextCmdForRuntime090).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
+			testCase.Add(context.GetCurrentContextCommand())
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
 
-			// Add RemoveCurrentContext v0.28.0 Command
-			testCase.Add(contextTestHelper.RemoveCurrentContextCmdForRuntime0280)
+			testCase.Add(context.RemoveCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.DeleteContextCommand(context.WithRuntimeVersion(core.Version0280)))
 
-			// Add DeleteContext v0.28.0 Command
-			testCase.Add(contextTestHelper.DeleteContextCmdForRuntime0280)
+			testCase.Add(context.GetContextCommand(context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithError()))
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatestWithError).Add(contextTestHelper.GetContextCmdForRuntime090WithError).Add(contextTestHelper.GetContextCmdForRuntime0280WithError).Add(contextTestHelper.GetContextCmdForRuntime0254WithError)
+			testCase.Add(context.GetCurrentContextCommand(context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithError()))
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatestWithError).Add(contextTestHelper.GetCurrentContextCmdForRuntime090WithError).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280WithError).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254WithError)
+			executer.Execute(testCase)
+		})
 
-			// Run all the commands
+		ginkgo.It("Run SetContext, SetCurrentContext v0.90.0 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest then DeleteContext, RemoveCurrentContext v1.0.2 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version090)))
+
+			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.VersionLatest, legacyclientconfig.WithDefaultContextAndServer(core.VersionLatest)))
+			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version102, legacyclientconfig.WithDefaultContextAndServer(core.Version102)))
+			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version090, legacyclientconfig.WithDefaultContextAndServer(core.Version090)))
+			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0280, legacyclientconfig.WithDefaultContextAndServer(core.Version0280)))
+			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0254, legacyclientconfig.WithDefaultContextAndServer(core.Version0254)))
+			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0116, legacyclientconfig.WithDefaultContextAndServer(core.Version0116)))
+
+			testCase.Add(context.GetContextCommand())
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.GetCurrentContextCommand())
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.RemoveCurrentContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.DeleteContextCommand(context.WithRuntimeVersion(core.Version102)))
+
+			testCase.Add(context.GetContextCommand(context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithError()))
+
+			testCase.Add(context.GetCurrentContextCommand(context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithError()))
+
 			executer.Execute(testCase)
 		})
 
 		ginkgo.It("Run SetContext, SetCurrentContext v0.90.0 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest then DeleteContext, RemoveCurrentContext latest then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest", func() {
-			// Add SetContext and SetCurrentContext Commands for Runtime latest
 			testCase := core.NewTestCase()
-			testCase.Add(contextTestHelper.SetContextCmdForRuntime090)
-			testCase.Add(contextTestHelper.SetCurrentContextCmdForRuntime090)
 
-			// Add GetClientConfig Commands on all supported runtime versions
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version090)))
+
 			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.VersionLatest, legacyclientconfig.WithDefaultContextAndServer(core.VersionLatest)))
+			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version102, legacyclientconfig.WithDefaultContextAndServer(core.Version102)))
 			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version090, legacyclientconfig.WithDefaultContextAndServer(core.Version090)))
 			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0280, legacyclientconfig.WithDefaultContextAndServer(core.Version0280)))
 			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0254, legacyclientconfig.WithDefaultContextAndServer(core.Version0254)))
 			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0116, legacyclientconfig.WithDefaultContextAndServer(core.Version0116)))
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest).Add(contextTestHelper.GetContextCmdForRuntime090).Add(contextTestHelper.GetContextCmdForRuntime0280).Add(contextTestHelper.GetContextCmdForRuntime0254)
+			testCase.Add(context.GetContextCommand())
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254)))
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest).Add(contextTestHelper.GetCurrentContextCmdForRuntime090).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
+			testCase.Add(context.GetCurrentContextCommand())
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
 
-			// Add RemoveCurrentContext latest Command
-			testCase.Add(contextTestHelper.RemoveCurrentContextCmdForRuntimeLatest)
+			testCase.Add(context.RemoveCurrentContextCommand())
+			testCase.Add(context.DeleteContextCommand())
 
-			// Add DeleteContext latest Command
-			testCase.Add(contextTestHelper.DeleteContextCmdForRuntimeLatest)
+			testCase.Add(context.GetContextCommand(context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithError()))
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatestWithError).Add(contextTestHelper.GetContextCmdForRuntime090WithError).Add(contextTestHelper.GetContextCmdForRuntime0280WithError).Add(contextTestHelper.GetContextCmdForRuntime0254WithError)
+			testCase.Add(context.GetCurrentContextCommand(context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithError()))
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatestWithError).Add(contextTestHelper.GetCurrentContextCmdForRuntime090WithError).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280WithError).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254WithError)
-
-			// Run all the commands
 			executer.Execute(testCase)
 		})
 
 		ginkgo.It("Run SetContext, SetCurrentContext v0.28.0 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest then DeleteContext, RemoveCurrentContext latest then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest", func() {
-			// Add SetContext and SetCurrentContext Commands for Runtime v0.28.0
-			testCase := core.NewTestCase().Add(contextTestHelper.SetContextCmdForRuntimeLatest).Add(contextTestHelper.SetCurrentContextCmdForRuntimeLatest)
+			testCase := core.NewTestCase()
 
-			// Add GetClientConfig Commands on all supported runtime versions
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
+
 			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.VersionLatest, legacyclientconfig.WithDefaultContextAndServer(core.VersionLatest)))
+			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version102, legacyclientconfig.WithDefaultContextAndServer(core.Version102)))
 			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version090, legacyclientconfig.WithDefaultContextAndServer(core.Version090)))
 			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0280, legacyclientconfig.WithDefaultContextAndServer(core.Version0280)))
 			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0254, legacyclientconfig.WithDefaultContextAndServer(core.Version0254)))
 			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0116, legacyclientconfig.WithDefaultContextAndServer(core.Version0116)))
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest)
-			testCase.Add(contextTestHelper.GetContextCmdForRuntime090)
-			testCase.Add(contextTestHelper.GetContextCmdForRuntime0280)
-			testCase.Add(contextTestHelper.GetContextCmdForRuntime0254)
+			testCase.Add(context.GetContextCommand())
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254)))
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest)
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntime090)
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntime0280)
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
+			testCase.Add(context.GetCurrentContextCommand())
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
 
-			// Add RemoveCurrentContext latest Command
-			testCase.Add(contextTestHelper.RemoveCurrentContextCmdForRuntimeLatest)
+			testCase.Add(context.RemoveCurrentContextCommand())
+			testCase.Add(context.DeleteContextCommand())
 
-			// Add DeleteContext latest Command
-			testCase.Add(contextTestHelper.DeleteContextCmdForRuntimeLatest)
+			testCase.Add(context.GetContextCommand(context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithError()))
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatestWithError)
-			testCase.Add(contextTestHelper.GetContextCmdForRuntime090WithError)
-			testCase.Add(contextTestHelper.GetContextCmdForRuntime0280WithError)
-			testCase.Add(contextTestHelper.GetContextCmdForRuntime0254WithError)
+			testCase.Add(context.GetCurrentContextCommand(context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithError()))
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatestWithError)
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntime090WithError)
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntime0280WithError)
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntime0254WithError)
-
-			// Run all the commands
 			executer.Execute(testCase)
 		})
 
-		ginkgo.It("Run SetContext, SetCurrentContext v0.25.4 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest then DeleteContext, RemoveCurrentContext latest then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest", func() {
-			// Add SetContext and SetCurrentContext Commands
+		ginkgo.It("Run SetContext, SetCurrentContext v0.28.0 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest then DeleteContext, RemoveCurrentContext v1.0.2 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest", func() {
 			testCase := core.NewTestCase()
 
-			testCase.Add(contextTestHelper.SetContextCmdForRuntime0254)
-			testCase.Add(contextTestHelper.SetCurrentContextCmdForRuntime0254)
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatestWithError)
-			testCase.Add(contextTestHelper.GetContextCmdForRuntime090WithError)
-			testCase.Add(contextTestHelper.GetContextCmdForRuntime0280WithError)
-			testCase.Add(contextTestHelper.GetContextCmdForRuntime0254)
+			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.VersionLatest, legacyclientconfig.WithDefaultContextAndServer(core.VersionLatest)))
+			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version102, legacyclientconfig.WithDefaultContextAndServer(core.Version102)))
+			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version090, legacyclientconfig.WithDefaultContextAndServer(core.Version090)))
+			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0280, legacyclientconfig.WithDefaultContextAndServer(core.Version0280)))
+			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0254, legacyclientconfig.WithDefaultContextAndServer(core.Version0254)))
+			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0116, legacyclientconfig.WithDefaultContextAndServer(core.Version0116)))
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatestWithError)
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntime090WithError)
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntime0280WithError)
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
+			testCase.Add(context.GetContextCommand())
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254)))
 
-			// Add RemoveCurrentContext latest Command
-			testCase.Add(contextTestHelper.RemoveCurrentContextCmdForRuntimeLatestWithError)
+			testCase.Add(context.GetCurrentContextCommand())
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
 
-			// Add DeleteContext latest Command
-			testCase.Add(contextTestHelper.DeleteContextCmdForRuntimeLatestWithError)
+			testCase.Add(context.RemoveCurrentContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.DeleteContextCommand(context.WithRuntimeVersion(core.Version102)))
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatestWithError)
-			testCase.Add(contextTestHelper.GetContextCmdForRuntime090WithError)
-			testCase.Add(contextTestHelper.GetContextCmdForRuntime0280WithError)
-			testCase.Add(contextTestHelper.GetContextCmdForRuntime0254)
+			testCase.Add(context.GetContextCommand(context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithError()))
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatestWithError)
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntime090WithError)
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntime0280WithError)
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
+			testCase.Add(context.GetCurrentContextCommand(context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithError()))
 
-			// Run all the commands
+			executer.Execute(testCase)
+		})
+
+		ginkgo.It("Run SetContext, SetCurrentContext v0.28.0 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest then DeleteContext, RemoveCurrentContext v0.90 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
+
+			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.VersionLatest, legacyclientconfig.WithDefaultContextAndServer(core.VersionLatest)))
+			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version102, legacyclientconfig.WithDefaultContextAndServer(core.Version102)))
+			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version090, legacyclientconfig.WithDefaultContextAndServer(core.Version090)))
+			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0280, legacyclientconfig.WithDefaultContextAndServer(core.Version0280)))
+			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0254, legacyclientconfig.WithDefaultContextAndServer(core.Version0254)))
+			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0116, legacyclientconfig.WithDefaultContextAndServer(core.Version0116)))
+
+			testCase.Add(context.GetContextCommand())
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.GetCurrentContextCommand())
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.RemoveCurrentContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.DeleteContextCommand(context.WithRuntimeVersion(core.Version090)))
+
+			testCase.Add(context.GetContextCommand(context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithError()))
+
+			testCase.Add(context.GetCurrentContextCommand(context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithError()))
+
 			executer.Execute(testCase)
 		})
 
 		ginkgo.It("Run SetContext, SetCurrentContext v0.28.0 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest then DeleteContext v0.25.4 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest", func() {
-			// Add SetContext and SetCurrentContext Commands
-			testCase := core.NewTestCase().Add(contextTestHelper.SetContextCmdForRuntime0280).Add(contextTestHelper.SetCurrentContextCmdForRuntime0280)
+			testCase := core.NewTestCase()
+
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
 
 			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.VersionLatest, legacyclientconfig.WithDefaultContextAndServer(core.VersionLatest)))
+			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version102, legacyclientconfig.WithDefaultContextAndServer(core.Version102)))
 			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version090, legacyclientconfig.WithDefaultContextAndServer(core.Version090)))
 			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0280, legacyclientconfig.WithDefaultContextAndServer(core.Version0280)))
 			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0254, legacyclientconfig.WithDefaultContextAndServer(core.Version0254)))
 			testCase.Add(legacyclientconfig.DefaultGetClientConfigCommand(core.Version0116, legacyclientconfig.WithDefaultContextAndServer(core.Version0116)))
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest)
-			testCase.Add(contextTestHelper.GetContextCmdForRuntime090)
-			testCase.Add(contextTestHelper.GetContextCmdForRuntime0280)
-			testCase.Add(contextTestHelper.GetContextCmdForRuntime0254)
+			testCase.Add(context.GetContextCommand())
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254)))
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest)
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntime090)
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntime0280)
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
+			testCase.Add(context.GetCurrentContextCommand())
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
 
-			// Add DeleteContext v0.25.4 Command
-			testCase.Add(contextTestHelper.DeleteContextCmdForRuntime0254)
+			testCase.Add(context.DeleteContextCommand(context.WithRuntimeVersion(core.Version0254)))
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest)
-			testCase.Add(contextTestHelper.GetContextCmdForRuntime090)
-			testCase.Add(contextTestHelper.GetContextCmdForRuntime0280)
-			testCase.Add(contextTestHelper.GetContextCmdForRuntime0254WithError)
+			testCase.Add(context.GetContextCommand())
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithError()))
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest)
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntime090)
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntime0280)
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntime0254WithError)
+			testCase.Add(context.GetCurrentContextCommand())
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithError()))
 
-			// Run all the commands
+			executer.Execute(testCase)
+		})
+
+		ginkgo.It("Run SetContext, SetCurrentContext v0.25.4 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest then DeleteContext, RemoveCurrentContext latest then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.GetContextCommand(context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.GetCurrentContextCommand(context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.RemoveCurrentContextCommand(context.WithError()))
+			testCase.Add(context.DeleteContextCommand(context.WithError()))
+
+			testCase.Add(context.GetContextCommand(context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.GetCurrentContextCommand(context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			executer.Execute(testCase)
+		})
+
+		ginkgo.It("Run SetContext, SetCurrentContext v0.25.4 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest then DeleteContext, RemoveCurrentContext v1.0.2 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.GetContextCommand(context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.GetCurrentContextCommand(context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.RemoveCurrentContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.DeleteContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+
+			testCase.Add(context.GetContextCommand(context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.GetCurrentContextCommand(context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			executer.Execute(testCase)
+		})
+
+		ginkgo.It("Run SetContext, SetCurrentContext v0.25.4 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest then DeleteContext, RemoveCurrentContext v0.90 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.GetContextCommand(context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.GetCurrentContextCommand(context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.RemoveCurrentContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.DeleteContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+
+			testCase.Add(context.GetContextCommand(context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.GetCurrentContextCommand(context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
 			executer.Execute(testCase)
 		})
 
@@ -306,166 +574,684 @@ var _ = ginkgo.Describe("Cross-version Context APIs compatibility tests", func()
 	ginkgo.Context("using multiple context objects on supported Runtime API versions", func() {
 
 		ginkgo.It("Run SetContext, SetCurrentContext latest then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest then DeleteContext, RemoveCurrentContext v0.90.0 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest", func() {
-			// Add SetContext and SetCurrentContext latest Commands
-			testCase := core.NewTestCase().Add(contextTestHelper.SetContextCmdForRuntimeLatest).Add(contextTestHelper.SetContextTwoCmdForRuntimeLatest).Add(contextTestHelper.SetCurrentContextCmdForRuntimeLatest)
+			testCase := core.NewTestCase()
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.90.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest).Add(contextTestHelper.GetContextCmdForRuntime090).Add(contextTestHelper.GetContextCmdForRuntime0280).Add(contextTestHelper.GetContextCmdForRuntime0254)
-			testCase.Add(contextTestHelper.GetContextTwoCmdForRuntimeLatest).Add(contextTestHelper.GetContextTwoCmdForRuntime090).Add(contextTestHelper.GetContextTwoCmdForRuntime0280).Add(contextTestHelper.GetContextTwoCmdForRuntime0254)
+			testCase.Add(context.SetContextCommand())
+			testCase.Add(context.SetContextCommand(context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.SetCurrentContextCommand())
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest).Add(contextTestHelper.GetCurrentContextCmdForRuntime090).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
+			testCase.Add(context.GetContextCommand())
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254)))
 
-			// Add RemoveCurrentContext v0.90.0 Command
-			testCase.Add(contextTestHelper.RemoveCurrentContextCmdForRuntime090)
+			testCase.Add(context.GetContextCommand(context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithContextName(common.CompatibilityTestTwo)))
 
-			// Add DeleteContext v0.90.0 Command
-			testCase.Add(contextTestHelper.DeleteContextCmdForRuntime090)
+			testCase.Add(context.GetCurrentContextCommand())
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatestWithError).Add(contextTestHelper.GetContextCmdForRuntime090WithError).Add(contextTestHelper.GetContextCmdForRuntime0280WithError).Add(contextTestHelper.GetContextCmdForRuntime0254WithError)
-			testCase.Add(contextTestHelper.GetContextTwoCmdForRuntimeLatest).Add(contextTestHelper.GetContextTwoCmdForRuntime090).Add(contextTestHelper.GetContextTwoCmdForRuntime0280).Add(contextTestHelper.GetContextTwoCmdForRuntime0254)
+			testCase.Add(context.RemoveCurrentContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.DeleteContextCommand(context.WithRuntimeVersion(core.Version090)))
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatestWithError).Add(contextTestHelper.GetCurrentContextCmdForRuntime090WithError).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280WithError).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254WithError)
+			testCase.Add(context.GetContextCommand(context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithError()))
 
-			// Run all the commands
+			testCase.Add(context.GetContextCommand(context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithContextName(common.CompatibilityTestTwo)))
+
+			testCase.Add(context.GetCurrentContextCommand(context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithError()))
+
 			executer.Execute(testCase)
 		})
 
-		ginkgo.It("Run SetContext, SetCurrentContext v0.90.0 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0 latest then DeleteContext, RemoveCurrentContext latest then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest", func() {
-			// Add SetContext and SetCurrentContext Commands
-			testCase := core.NewTestCase().Add(contextTestHelper.SetContextCmdForRuntime090).Add(contextTestHelper.SetContextTwoCmdForRuntime090).Add(contextTestHelper.SetCurrentContextCmdForRuntime090)
+		ginkgo.It("Run SetContext, SetCurrentContext latest then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest then DeleteContext, RemoveCurrentContext v1.0.2 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest", func() {
+			testCase := core.NewTestCase()
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest).Add(contextTestHelper.GetContextCmdForRuntime090).Add(contextTestHelper.GetContextCmdForRuntime0280).Add(contextTestHelper.GetContextCmdForRuntime0254)
-			testCase.Add(contextTestHelper.GetContextTwoCmdForRuntimeLatest).Add(contextTestHelper.GetContextTwoCmdForRuntime090).Add(contextTestHelper.GetContextTwoCmdForRuntime0280).Add(contextTestHelper.GetContextTwoCmdForRuntime0254)
+			testCase.Add(context.SetContextCommand())
+			testCase.Add(context.SetContextCommand(context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.SetCurrentContextCommand())
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest).Add(contextTestHelper.GetCurrentContextCmdForRuntime090).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
+			testCase.Add(context.GetContextCommand())
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254)))
 
-			// Add RemoveCurrentContext latest Command
-			testCase.Add(contextTestHelper.RemoveCurrentContextCmdForRuntimeLatest)
+			testCase.Add(context.GetContextCommand(context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithContextName(common.CompatibilityTestTwo)))
 
-			// Add DeleteContext latest Command
-			testCase.Add(contextTestHelper.DeleteContextCmdForRuntimeLatest)
+			testCase.Add(context.GetCurrentContextCommand())
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatestWithError).Add(contextTestHelper.GetContextCmdForRuntime090WithError).Add(contextTestHelper.GetContextCmdForRuntime0280WithError).Add(contextTestHelper.GetContextCmdForRuntime0254WithError)
-			testCase.Add(contextTestHelper.GetContextTwoCmdForRuntimeLatest).Add(contextTestHelper.GetContextTwoCmdForRuntime090).Add(contextTestHelper.GetContextTwoCmdForRuntime0280).Add(contextTestHelper.GetContextTwoCmdForRuntime0254)
+			testCase.Add(context.RemoveCurrentContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.DeleteContextCommand(context.WithRuntimeVersion(core.Version102)))
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatestWithError).Add(contextTestHelper.GetCurrentContextCmdForRuntime090WithError).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280WithError).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254WithError)
+			testCase.Add(context.GetContextCommand(context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithError()))
 
-			// Run all the commands
+			testCase.Add(context.GetContextCommand(context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithContextName(common.CompatibilityTestTwo)))
+
+			testCase.Add(context.GetCurrentContextCommand(context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithError()))
+
 			executer.Execute(testCase)
 		})
 
 		ginkgo.It("Run SetContext, SetCurrentContext latest then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest then DeleteContext, RemoveCurrentContext v0.28.0 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest", func() {
-			// Add SetContext and SetCurrentContext Commands
-			testCase := core.NewTestCase().Add(contextTestHelper.SetContextCmdForRuntimeLatest).Add(contextTestHelper.SetContextTwoCmdForRuntimeLatest).Add(contextTestHelper.SetCurrentContextCmdForRuntimeLatest)
+			testCase := core.NewTestCase()
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest).Add(contextTestHelper.GetContextCmdForRuntime090).Add(contextTestHelper.GetContextCmdForRuntime0280).Add(contextTestHelper.GetContextCmdForRuntime0254)
-			testCase.Add(contextTestHelper.GetContextTwoCmdForRuntimeLatest).Add(contextTestHelper.GetContextTwoCmdForRuntime090).Add(contextTestHelper.GetContextTwoCmdForRuntime0280).Add(contextTestHelper.GetContextTwoCmdForRuntime0254)
+			testCase.Add(context.SetContextCommand())
+			testCase.Add(context.SetContextCommand(context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.SetCurrentContextCommand())
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest).Add(contextTestHelper.GetCurrentContextCmdForRuntime090).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
+			testCase.Add(context.GetContextCommand())
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254)))
 
-			// Add RemoveCurrentContext v0.28.0 Command
-			testCase.Add(contextTestHelper.RemoveCurrentContextCmdForRuntime0280)
+			testCase.Add(context.GetContextCommand(context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithContextName(common.CompatibilityTestTwo)))
 
-			// Add DeleteContext v0.28.0 Command
-			testCase.Add(contextTestHelper.DeleteContextCmdForRuntime0280)
+			testCase.Add(context.GetCurrentContextCommand())
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatestWithError).Add(contextTestHelper.GetContextCmdForRuntime090WithError).Add(contextTestHelper.GetContextCmdForRuntime0280WithError).Add(contextTestHelper.GetContextCmdForRuntime0254WithError)
-			testCase.Add(contextTestHelper.GetContextTwoCmdForRuntimeLatest).Add(contextTestHelper.GetContextTwoCmdForRuntime090).Add(contextTestHelper.GetContextTwoCmdForRuntime0280).Add(contextTestHelper.GetContextTwoCmdForRuntime0254)
+			testCase.Add(context.RemoveCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.DeleteContextCommand(context.WithRuntimeVersion(core.Version0280)))
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatestWithError).Add(contextTestHelper.GetCurrentContextCmdForRuntime090WithError).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280WithError).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254WithError)
+			testCase.Add(context.GetContextCommand(context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithError()))
 
-			// Run all the commands
+			testCase.Add(context.GetContextCommand(context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithContextName(common.CompatibilityTestTwo)))
+
+			testCase.Add(context.GetCurrentContextCommand(context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithError()))
+
+			executer.Execute(testCase)
+		})
+
+		ginkgo.It("Run SetContext, SetCurrentContext v0.90.0 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0 latest then DeleteContext, RemoveCurrentContext latest then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.SetCurrentContextCommand())
+
+			testCase.Add(context.GetContextCommand())
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.GetContextCommand(context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithContextName(common.CompatibilityTestTwo)))
+
+			testCase.Add(context.GetCurrentContextCommand())
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.RemoveCurrentContextCommand())
+			testCase.Add(context.DeleteContextCommand())
+
+			testCase.Add(context.GetContextCommand(context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithError()))
+
+			testCase.Add(context.GetContextCommand(context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithContextName(common.CompatibilityTestTwo)))
+
+			testCase.Add(context.GetCurrentContextCommand(context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithError()))
+
+			executer.Execute(testCase)
+		})
+
+		ginkgo.It("Run SetContext, SetCurrentContext v0.90.0 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0 latest then DeleteContext, RemoveCurrentContext v1.0.2 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.SetCurrentContextCommand())
+
+			testCase.Add(context.GetContextCommand())
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.GetContextCommand(context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithContextName(common.CompatibilityTestTwo)))
+
+			testCase.Add(context.GetCurrentContextCommand())
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.RemoveCurrentContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.DeleteContextCommand(context.WithRuntimeVersion(core.Version102)))
+
+			testCase.Add(context.GetContextCommand(context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithError()))
+
+			testCase.Add(context.GetContextCommand(context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithContextName(common.CompatibilityTestTwo)))
+
+			testCase.Add(context.GetCurrentContextCommand(context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithError()))
+
 			executer.Execute(testCase)
 		})
 
 		ginkgo.It("Run SetContext, SetCurrentContext v0.90.0 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0 latest then DeleteContext, RemoveCurrentContext v0.28.0 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest", func() {
-			// Add SetContext and SetCurrentContext v0.90.0 Commands
-			testCase := core.NewTestCase().Add(contextTestHelper.SetContextCmdForRuntime090).Add(contextTestHelper.SetContextTwoCmdForRuntime090).Add(contextTestHelper.SetCurrentContextCmdForRuntime090)
+			testCase := core.NewTestCase()
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest).Add(contextTestHelper.GetContextCmdForRuntime090).Add(contextTestHelper.GetContextCmdForRuntime0280).Add(contextTestHelper.GetContextCmdForRuntime0254)
-			testCase.Add(contextTestHelper.GetContextTwoCmdForRuntimeLatest).Add(contextTestHelper.GetContextTwoCmdForRuntime090).Add(contextTestHelper.GetContextTwoCmdForRuntime0280).Add(contextTestHelper.GetContextTwoCmdForRuntime0254)
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version090)))
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest).Add(contextTestHelper.GetCurrentContextCmdForRuntime090).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
+			testCase.Add(context.GetContextCommand())
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254)))
 
-			// Add RemoveCurrentContext v0.28.0 Command
-			testCase.Add(contextTestHelper.RemoveCurrentContextCmdForRuntime0280)
+			testCase.Add(context.GetContextCommand(context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithContextName(common.CompatibilityTestTwo)))
 
-			// Add DeleteContext v0.28.0 Command
-			testCase.Add(contextTestHelper.DeleteContextCmdForRuntime0280)
+			testCase.Add(context.GetCurrentContextCommand())
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatestWithError).Add(contextTestHelper.GetContextCmdForRuntime090WithError).Add(contextTestHelper.GetContextCmdForRuntime0280WithError).Add(contextTestHelper.GetContextCmdForRuntime0254WithError)
-			testCase.Add(contextTestHelper.GetContextTwoCmdForRuntimeLatest).Add(contextTestHelper.GetContextTwoCmdForRuntime090).Add(contextTestHelper.GetContextTwoCmdForRuntime0280).Add(contextTestHelper.GetContextTwoCmdForRuntime0254)
+			testCase.Add(context.RemoveCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.DeleteContextCommand(context.WithRuntimeVersion(core.Version0280)))
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatestWithError).Add(contextTestHelper.GetCurrentContextCmdForRuntime090WithError).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280WithError).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254WithError)
+			testCase.Add(context.GetContextCommand(context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithError()))
 
-			// Run all the commands
-			executer.Execute(testCase)
-		})
+			testCase.Add(context.GetContextCommand(context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithContextName(common.CompatibilityTestTwo)))
 
-		ginkgo.It("Run SetContext, SetCurrentContext v0.25.4 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0 latest then DeleteContext, RemoveCurrentContext v0.28.0 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest", func() {
-			// Add SetContext and SetCurrentContext v0.25.4 Commands
-			testCase := core.NewTestCase().Add(contextTestHelper.SetContextCmdForRuntime0254).Add(contextTestHelper.SetContextTwoCmdForRuntime0254).Add(contextTestHelper.SetCurrentContextCmdForRuntime0254)
+			testCase.Add(context.GetCurrentContextCommand(context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithError()))
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatestWithError).Add(contextTestHelper.GetContextCmdForRuntime090WithError).Add(contextTestHelper.GetContextCmdForRuntime0280WithError).Add(contextTestHelper.GetContextCmdForRuntime0254)
-
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatestWithError).Add(contextTestHelper.GetCurrentContextCmdForRuntime090WithError).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280WithError).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
-
-			// Add RemoveCurrentContext v0.28.0 Command
-			testCase.Add(contextTestHelper.RemoveCurrentContextCmdForRuntime0280WithError)
-
-			// Add DeleteContext v0.28.0 Command
-			testCase.Add(contextTestHelper.DeleteContextCmdForRuntime0280WithError)
-
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatestWithError).Add(contextTestHelper.GetContextCmdForRuntime090WithError).Add(contextTestHelper.GetContextCmdForRuntime0280WithError).Add(contextTestHelper.GetContextCmdForRuntime0254)
-			testCase.Add(contextTestHelper.GetContextTwoCmdForRuntimeLatestWithError).Add(contextTestHelper.GetContextTwoCmdForRuntime090WithError).Add(contextTestHelper.GetContextTwoCmdForRuntime0280WithError).Add(contextTestHelper.GetContextTwoCmdForRuntime0254)
-
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatestWithError).Add(contextTestHelper.GetCurrentContextCmdForRuntime090WithError).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280WithError).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
-
-			// Run all the commands
 			executer.Execute(testCase)
 		})
 
 		ginkgo.It("Run SetContext, SetCurrentContext v0.28.0 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0 latest then DeleteContext v0.25.4 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest", func() {
-			// Add SetContext and SetCurrentContext Commands
-			testCase := core.NewTestCase().Add(contextTestHelper.SetContextCmdForRuntime0280).Add(contextTestHelper.SetContextTwoCmdForRuntime0280).Add(contextTestHelper.SetCurrentContextCmdForRuntime0280)
+			testCase := core.NewTestCase()
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest).Add(contextTestHelper.GetContextCmdForRuntime090).Add(contextTestHelper.GetContextCmdForRuntime0280).Add(contextTestHelper.GetContextCmdForRuntime0254)
-			testCase.Add(contextTestHelper.GetContextTwoCmdForRuntimeLatest).Add(contextTestHelper.GetContextTwoCmdForRuntime090).Add(contextTestHelper.GetContextTwoCmdForRuntime0280).Add(contextTestHelper.GetContextTwoCmdForRuntime0254)
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
 
-			// Add GetCurrentContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest).Add(contextTestHelper.GetCurrentContextCmdForRuntime090).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254)
+			testCase.Add(context.GetContextCommand())
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254)))
 
-			// Add DeleteContext v0.25.4 Command
-			testCase.Add(contextTestHelper.DeleteContextCmdForRuntime0254)
+			testCase.Add(context.GetContextCommand(context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithContextName(common.CompatibilityTestTwo)))
 
-			// Add GetContext latest, v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetContextCmdForRuntimeLatest).Add(contextTestHelper.GetContextCmdForRuntime090).Add(contextTestHelper.GetContextCmdForRuntime0280).Add(contextTestHelper.GetContextCmdForRuntime0254WithError)
-			testCase.Add(contextTestHelper.GetContextTwoCmdForRuntimeLatest).Add(contextTestHelper.GetContextTwoCmdForRuntime090).Add(contextTestHelper.GetContextTwoCmdForRuntime0280).Add(contextTestHelper.GetContextTwoCmdForRuntime0254)
+			testCase.Add(context.GetCurrentContextCommand())
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
 
-			// Add GetCurrentContext latest,v0.90.0, v0.28.0, v0.25.4 Commands
-			testCase.Add(contextTestHelper.GetCurrentContextCmdForRuntimeLatest).Add(contextTestHelper.GetCurrentContextCmdForRuntime090).Add(contextTestHelper.GetCurrentContextCmdForRuntime0280).Add(contextTestHelper.GetCurrentContextCmdForRuntime0254WithError)
+			testCase.Add(context.DeleteContextCommand(context.WithRuntimeVersion(core.Version0254)))
 
-			// Run all the commands
+			testCase.Add(context.GetContextCommand())
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithError()))
+
+			testCase.Add(context.GetContextCommand(context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithContextName(common.CompatibilityTestTwo)))
+
+			testCase.Add(context.GetCurrentContextCommand())
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithError()))
+
+			executer.Execute(testCase)
+		})
+
+		ginkgo.It("Run SetContext, SetCurrentContext v0.28.0 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0 latest then DeleteContext latest then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
+
+			testCase.Add(context.GetContextCommand())
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.GetContextCommand(context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithContextName(common.CompatibilityTestTwo)))
+
+			testCase.Add(context.GetCurrentContextCommand())
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.DeleteContextCommand())
+
+			testCase.Add(context.GetContextCommand(context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithError()))
+
+			testCase.Add(context.GetContextCommand(context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithContextName(common.CompatibilityTestTwo)))
+
+			testCase.Add(context.GetCurrentContextCommand(context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithError()))
+
+			executer.Execute(testCase)
+		})
+
+		ginkgo.It("Run SetContext, SetCurrentContext v0.28.0 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0 latest then DeleteContext v1.0.2 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
+
+			testCase.Add(context.GetContextCommand())
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.GetContextCommand(context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithContextName(common.CompatibilityTestTwo)))
+
+			testCase.Add(context.GetCurrentContextCommand())
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.DeleteContextCommand(context.WithRuntimeVersion(core.Version102)))
+
+			testCase.Add(context.GetContextCommand(context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithError()))
+
+			testCase.Add(context.GetContextCommand(context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithContextName(common.CompatibilityTestTwo)))
+
+			testCase.Add(context.GetCurrentContextCommand(context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithError()))
+
+			executer.Execute(testCase)
+		})
+
+		ginkgo.It("Run SetContext, SetCurrentContext v0.28.0 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0 latest then DeleteContext v0.90.0 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
+
+			testCase.Add(context.GetContextCommand())
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.GetContextCommand(context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithContextName(common.CompatibilityTestTwo)))
+
+			testCase.Add(context.GetCurrentContextCommand())
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.DeleteContextCommand(context.WithRuntimeVersion(core.Version090)))
+
+			testCase.Add(context.GetContextCommand(context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithError()))
+
+			testCase.Add(context.GetContextCommand(context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithContextName(common.CompatibilityTestTwo)))
+
+			testCase.Add(context.GetCurrentContextCommand(context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithError()))
+
+			executer.Execute(testCase)
+		})
+
+		ginkgo.It("Run SetContext, SetCurrentContext v0.25.4 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0 latest then DeleteContext, RemoveCurrentContext v0.28.0 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.GetContextCommand(context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.GetContextCommand(context.WithContextName(common.CompatibilityTestTwo), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithContextName(common.CompatibilityTestTwo), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithContextName(common.CompatibilityTestTwo), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithContextName(common.CompatibilityTestTwo), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithContextName(common.CompatibilityTestTwo)))
+
+			testCase.Add(context.GetCurrentContextCommand(context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.RemoveCurrentContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.DeleteContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+
+			testCase.Add(context.GetContextCommand(context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.GetContextCommand(context.WithContextName(common.CompatibilityTestTwo), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithContextName(common.CompatibilityTestTwo), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithContextName(common.CompatibilityTestTwo), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithContextName(common.CompatibilityTestTwo), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithContextName(common.CompatibilityTestTwo)))
+
+			testCase.Add(context.GetCurrentContextCommand(context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			executer.Execute(testCase)
+		})
+
+		ginkgo.It("Run SetContext, SetCurrentContext v0.25.4 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0 latest then DeleteContext, RemoveCurrentContext v0.90.0 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.GetContextCommand(context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.GetContextCommand(context.WithContextName(common.CompatibilityTestTwo), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithContextName(common.CompatibilityTestTwo), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithContextName(common.CompatibilityTestTwo), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithContextName(common.CompatibilityTestTwo), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithContextName(common.CompatibilityTestTwo)))
+
+			testCase.Add(context.GetCurrentContextCommand(context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.RemoveCurrentContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.DeleteContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+
+			testCase.Add(context.GetContextCommand(context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.GetContextCommand(context.WithContextName(common.CompatibilityTestTwo), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithContextName(common.CompatibilityTestTwo), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithContextName(common.CompatibilityTestTwo), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithContextName(common.CompatibilityTestTwo), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithContextName(common.CompatibilityTestTwo)))
+
+			testCase.Add(context.GetCurrentContextCommand(context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			executer.Execute(testCase)
+		})
+
+		ginkgo.It("Run SetContext, SetCurrentContext v0.25.4 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0 latest then DeleteContext, RemoveCurrentContext v1.0.2 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.GetContextCommand(context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.GetContextCommand(context.WithContextName(common.CompatibilityTestTwo), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithContextName(common.CompatibilityTestTwo), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithContextName(common.CompatibilityTestTwo), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithContextName(common.CompatibilityTestTwo), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithContextName(common.CompatibilityTestTwo)))
+
+			testCase.Add(context.GetCurrentContextCommand(context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.RemoveCurrentContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.DeleteContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+
+			testCase.Add(context.GetContextCommand(context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.GetContextCommand(context.WithContextName(common.CompatibilityTestTwo), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithContextName(common.CompatibilityTestTwo), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithContextName(common.CompatibilityTestTwo), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithContextName(common.CompatibilityTestTwo), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithContextName(common.CompatibilityTestTwo)))
+
+			testCase.Add(context.GetCurrentContextCommand(context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			executer.Execute(testCase)
+		})
+
+		ginkgo.It("Run SetContext, SetCurrentContext v0.25.4 then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0 latest then DeleteContext, RemoveCurrentContext latest then GetContext, GetCurrentContext v0.25.4, v0.28.0, v0.90.0, latest", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(context.SetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithContextName(common.CompatibilityTestTwo)))
+			testCase.Add(context.SetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.GetContextCommand(context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.GetContextCommand(context.WithContextName(common.CompatibilityTestTwo), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithContextName(common.CompatibilityTestTwo), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithContextName(common.CompatibilityTestTwo), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithContextName(common.CompatibilityTestTwo), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithContextName(common.CompatibilityTestTwo)))
+
+			testCase.Add(context.GetCurrentContextCommand(context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.RemoveCurrentContextCommand(context.WithError()))
+			testCase.Add(context.DeleteContextCommand(context.WithError()))
+
+			testCase.Add(context.GetContextCommand(context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(context.GetContextCommand(context.WithContextName(common.CompatibilityTestTwo), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version102), context.WithContextName(common.CompatibilityTestTwo), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version090), context.WithContextName(common.CompatibilityTestTwo), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithContextName(common.CompatibilityTestTwo), context.WithError()))
+			testCase.Add(context.GetContextCommand(context.WithRuntimeVersion(core.Version0254), context.WithContextName(common.CompatibilityTestTwo)))
+
+			testCase.Add(context.GetCurrentContextCommand(context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version102), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version090), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0280), context.WithError()))
+			testCase.Add(context.GetCurrentContextCommand(context.WithRuntimeVersion(core.Version0254)))
+
 			executer.Execute(testCase)
 		})
 

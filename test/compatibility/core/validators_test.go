@@ -24,8 +24,8 @@ func TestValidRuntimeVersionV090(t *testing.T) {
 }
 
 func TestInvalidRuntimeVersion(t *testing.T) {
-	version101 := &RuntimeAPIVersion{RuntimeVersion: "v1.0.1"}
-	actual, err := version101.Validate()
-	assert.Equal(t, "runtime version v1.0.1 is not supported", err.Error())
+	Version103 := &RuntimeAPIVersion{RuntimeVersion: "v1.0.3"}
+	actual, err := Version103.Validate()
+	assert.Equal(t, "runtime version v1.0.3 is not supported", err.Error())
 	assert.Equal(t, false, actual)
 }

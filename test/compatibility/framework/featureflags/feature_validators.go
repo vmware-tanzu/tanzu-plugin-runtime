@@ -18,7 +18,7 @@ func (opts *SetFeatureInputOptions) Validate() (bool, error) {
 	}
 
 	switch opts.RuntimeVersion {
-	case core.VersionLatest, core.Version090, core.Version0280:
+	case core.VersionLatest, core.Version102, core.Version090, core.Version0280:
 		if opts.Plugin == "" {
 			return false, fmt.Errorf("invalid 'plugin' for set context input options for the specified runtime version %v", opts.RuntimeVersion)
 		}
@@ -42,7 +42,7 @@ func (opts *IsFeatureEnabledInputOptions) Validate() (bool, error) {
 	}
 
 	switch opts.RuntimeVersion {
-	case core.VersionLatest, core.Version090, core.Version0280, core.Version0254, core.Version0116:
+	case core.VersionLatest, core.Version102, core.Version090, core.Version0280, core.Version0254, core.Version0116:
 		if opts.Plugin == "" {
 			return false, fmt.Errorf("invalid 'plugin' for set context input options for the specified runtime version %v", opts.RuntimeVersion)
 		}
@@ -62,7 +62,7 @@ func (opts *DeleteFeatureInputOptions) Validate() (bool, error) {
 		return false, err
 	}
 	switch opts.RuntimeVersion {
-	case core.VersionLatest, core.Version090, core.Version0280:
+	case core.VersionLatest, core.Version102, core.Version090, core.Version0280:
 		if opts.Plugin == "" {
 			return false, fmt.Errorf("invalid 'plugin' for set context input options for the specified runtime version %v", opts.RuntimeVersion)
 		}

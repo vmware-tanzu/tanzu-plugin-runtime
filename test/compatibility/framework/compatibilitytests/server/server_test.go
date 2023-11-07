@@ -6,19 +6,17 @@ package server_test
 import (
 	"github.com/onsi/ginkgo/v2"
 
-	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/compatibilitytests/server"
-
-	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/executer"
-
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/compatibilitytests/common"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/executer"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/framework/server"
 )
 
-var _ = ginkgo.Describe("Cross-version Server APIs Compatibility Tests for supported Runtime versions v0.11.6, v0.25.4, v0.28.0, latest", func() {
+var _ = ginkgo.Describe("Cross-version Server APIs Compatibility Tests", func() {
 	// Description on the Tests
-	ginkgo.GinkgoWriter.Println("Get/Set/Delete Server and CurrentServer API methods are tested for cross-version API compatibility with supported Runtime versions v0.11.6, v0.25.4, v0.28.0, latest")
+	ginkgo.GinkgoWriter.Println("Get/Set/Delete Server and CurrentServer API methods are tested for cross-version API compatibility with supported Runtime versions v0.11.6, v0.25.4, v0.28.0, v0.90.0, v1.0.2, latest")
 
 	// Setup Data
-	var serverTestHelper server.Helper
 	ginkgo.BeforeEach(func() {
 		// Setup mock temporary config files for testing
 		_, cleanup := core.SetupTempCfgFiles()
@@ -26,447 +24,2563 @@ var _ = ginkgo.Describe("Cross-version Server APIs Compatibility Tests for suppo
 			cleanup()
 		})
 
-		serverTestHelper.SetUpDefaultData()
 	})
 
 	ginkgo.Context("using single server", func() {
 
-		ginkgo.It("Run SetServer, SetCurrentServer of Runtime latest then GetServer, GetCurrentServer on all supported Runtime library versions and then DeleteServer, RemoveCurrentServer of Runtime v0.28.0 then GetServer, GetCurrentServer on all supported Runtime library versions", func() {
-			// Add SetServer and SetCurrentServer Commands of Runtime Latest version
-			testCase := core.NewTestCase().Add(serverTestHelper.SetServerCmdForRuntimeLatest).Add(serverTestHelper.SetCurrentServerCmdForRuntimeLatest)
+		ginkgo.It("Run SetServer, SetCurrentServer of Runtime latest - DeleteServer, RemoveCurrentServer of Runtime v0.28.0", func() {
+			testCase := core.NewTestCase()
 
-			// Add GetServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime090)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0280)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0254)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0116)
+			testCase.Add(server.SetServerCommand())
+			testCase.Add(server.SetCurrentServerCommand())
 
-			// Add GetCurrentServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime090)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0280)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0116)
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
 
-			// Add RemoveCurrentServer v0.28.0 Command
-			testCase.Add(serverTestHelper.RemoveCurrentServerCmdForRuntime0280)
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
 
-			// Add DeleteServer v0.28.0 Command
-			testCase.Add(serverTestHelper.DeleteServerCmdForRuntime0280)
+			testCase.Add(server.RemoveCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version0280)))
 
-			// Add GetServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatestWithError)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime090WithError)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0280WithError)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0254WithError)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0116WithError)
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
 
-			// Add GetCurrentServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime090WithError)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0280WithError)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0254WithError)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0116WithError)
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
 
-			// Run all the commands
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run SetServer, SetCurrentServer of Runtime latest - DeleteServer, RemoveCurrentServer of Runtime v0.90.0", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand())
+			testCase.Add(server.SetCurrentServerCommand())
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.RemoveCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version090)))
+
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run SetServer, SetCurrentServer of Runtime latest - DeleteServer, RemoveCurrentServer of Runtime v1.0.2", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand())
+			testCase.Add(server.SetCurrentServerCommand())
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.RemoveCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version102)))
+
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run SetServer, SetCurrentServer of Runtime latest - DeleteServer of Runtime v0.25.4", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand())
+			testCase.Add(server.SetCurrentServerCommand())
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run SetServer, SetCurrentServer of Runtime latest - DeleteServer of Runtime v0.11.6", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand())
+			testCase.Add(server.SetCurrentServerCommand())
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
 			executer.Execute(testCase)
 		})
 
-		ginkgo.It("Run SetServer, SetCurrentServer of Runtime latest then GetServer, GetCurrentServer on all supported Runtime library versions and then DeleteServer of Runtime v0.11.6 then GetServer, GetCurrentServer on all supported Runtime library versions", func() {
-			// Add SetServer and SetCurrentServer Commands of Runtime Latest version
-			testCase := core.NewTestCase().Add(serverTestHelper.SetServerCmdForRuntimeLatest).Add(serverTestHelper.SetCurrentServerCmdForRuntimeLatest)
+		ginkgo.It("Run SetServer, SetCurrentServer of Runtime v1.0.2 - DeleteServer, RemoveCurrentServer of Runtime v0.28.0", func() {
+			testCase := core.NewTestCase()
 
-			// Add GetServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime090)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0280)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0254)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0116)
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
 
-			// Add GetCurrentServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime090)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0280)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0116)
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
 
-			// Add DeleteServer v0.11.6 Command
-			testCase.Add(serverTestHelper.DeleteServerCmdForRuntime0116)
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
 
-			// Add GetServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatestWithError)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime090WithError)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0280WithError)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0254WithError)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0116WithError)
+			testCase.Add(server.RemoveCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version0280)))
 
-			// Add GetCurrentServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatestWithError)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime090WithError)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0280WithError)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0254WithError)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0116WithError)
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
 
-			// Run all the commands
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run SetServer, SetCurrentServer of Runtime v1.0.2 - DeleteServer, RemoveCurrentServer of Runtime v0.90.0", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.RemoveCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version090)))
+
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run SetServer, SetCurrentServer of Runtime v1.0.2 - DeleteServer, RemoveCurrentServer of Runtime latest", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.RemoveCurrentServerCommand())
+			testCase.Add(server.DeleteServerCommand())
+
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run SetServer, SetCurrentServer of Runtime v1.0.2 - DeleteServer of Runtime v0.25.4", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run SetServer, SetCurrentServer of Runtime v1.0.2 - DeleteServer of Runtime v0.11.6", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
 			executer.Execute(testCase)
 		})
 
-		ginkgo.It("Run SetServer, SetCurrentServer of Runtime v0.28.0 then GetServer, GetCurrentServer on all supported Runtime library versions and then DeleteServer of Runtime v0.25.4 then GetServer, GetCurrentServer on all supported Runtime library versions", func() {
-			// Add SetServer and SetCurrentServer Commands of Runtime v0.28.0
-			testCase := core.NewTestCase().Add(serverTestHelper.SetServerCmdForRuntime0280).Add(serverTestHelper.SetCurrentServerCmdForRuntime0280)
+		ginkgo.It("Run SetServer, SetCurrentServer of Runtime v0.90.0 - DeleteServer, RemoveCurrentServer of Runtime v0.28.0", func() {
+			testCase := core.NewTestCase()
 
-			// Add GetServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime090)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0280)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0254)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0116)
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
 
-			// Add GetCurrentServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime090)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0280)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0116)
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
 
-			// Add DeleteServer v0.25.4 Command
-			testCase.Add(serverTestHelper.DeleteServerCmdForRuntime0254)
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
 
-			// Add GetServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatestWithError)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime090WithError)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0280WithError)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0254WithError)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0116WithError)
+			testCase.Add(server.RemoveCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version0280)))
 
-			// Add GetCurrentServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatestWithError)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime090WithError)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0280WithError)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0254WithError)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0116WithError)
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
 
-			// Run all the commands
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run SetServer, SetCurrentServer of Runtime v0.90.0 - DeleteServer, RemoveCurrentServer of Runtime v1.0.2", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.RemoveCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version102)))
+
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run SetServer, SetCurrentServer of Runtime v0.90.0 - DeleteServer, RemoveCurrentServer of Runtime latest", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.RemoveCurrentServerCommand())
+			testCase.Add(server.DeleteServerCommand())
+
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run SetServer, SetCurrentServer of Runtime v0.90.0 - DeleteServer of Runtime v0.25.4", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run SetServer, SetCurrentServer of Runtime v0.90.0 - DeleteServer of Runtime v0.11.6", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
 			executer.Execute(testCase)
 		})
 
-		ginkgo.It("Run SetServer, SetCurrentServer of Runtime v0.25.4 then GetServer, GetCurrentServer on all supported Runtime library versions and then DeleteServer, RemoveCurrentServer of Runtime v0.28.0 then GetServer, GetCurrentServer on all supported Runtime library versions", func() {
-			// Add SetServer and SetCurrentServer Commands of Runtime v0.25.4
-			testCase := core.NewTestCase().Add(serverTestHelper.SetServerCmdForRuntime0254).Add(serverTestHelper.SetCurrentServerCmdForRuntime0254)
+		ginkgo.It("Run SetServer, SetCurrentServer of Runtime v0.28.0 - DeleteServer,RemoveCurrentServer of Runtime latest", func() {
+			testCase := core.NewTestCase()
 
-			// Add GetServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime090)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0280)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0254)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0116)
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
 
-			// Add GetCurrentServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime090)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0280)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0116)
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
 
-			// Add RemoveCurrentServer v0.28.0 Command
-			testCase.Add(serverTestHelper.RemoveCurrentServerCmdForRuntime0280WithError)
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
 
-			// Add DeleteServer v0.28.0 Command
-			testCase.Add(serverTestHelper.DeleteServerCmdForRuntime0280WithError)
+			testCase.Add(server.RemoveCurrentServerCommand())
+			testCase.Add(server.DeleteServerCommand())
 
-			// Add GetServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime090)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0280)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0254)
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
 
-			// Add GetCurrentServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime090)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0280)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
 
-			// Run all the commands
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run SetServer, SetCurrentServer of Runtime v0.28.0 - DeleteServer,RemoveCurrentServer of Runtime v0.90.0", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.RemoveCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version090)))
+
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run SetServer, SetCurrentServer of Runtime v0.28.0 - DeleteServer,RemoveCurrentServer of Runtime v1.0.2", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.RemoveCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version102)))
+
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run SetServer, SetCurrentServer of Runtime v0.28.0 - DeleteServer of Runtime v0.25.4", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run SetServer, SetCurrentServer of Runtime v0.28.0 - DeleteServer of Runtime v0.11.6", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
 			executer.Execute(testCase)
 		})
 
-		ginkgo.It("Run SetServer, SetCurrentServer of Runtime v0.11.6 then GetServer, GetCurrentServer on all supported Runtime library versions and then DeleteServer of Runtime 0.25.4 then GetServer, GetCurrentServer on all supported Runtime library versions", func() {
-			// Add SetServer and SetCurrentServer Commands of Runtime v0.11.6
-			testCase := core.NewTestCase().Add(serverTestHelper.SetServerCmdForRuntime0116).Add(serverTestHelper.SetCurrentServerCmdForRuntime0116)
+		ginkgo.It("Run SetServer, SetCurrentServer of Runtime v0.25.4 - DeleteServer, RemoveCurrentServer of Runtime latest", func() {
+			testCase := core.NewTestCase()
 
-			// Add GetServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime090)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0280)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0254)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0116)
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
 
-			// Add GetCurrentServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime090)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0280)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0116)
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
 
-			// Add DeleteServer v0.25.4 Command
-			testCase.Add(serverTestHelper.DeleteServerCmdForRuntime0254)
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
 
-			// Add GetServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatestWithError)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime090WithError)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0280WithError)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0254WithError)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0116WithError)
+			testCase.Add(server.RemoveCurrentServerCommand(server.WithError()))
+			testCase.Add(server.DeleteServerCommand(server.WithError()))
 
-			// Add GetCurrentServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatestWithError)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime090WithError)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0280WithError)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0254WithError)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0116WithError)
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
 
-			// Run all the commands
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run SetServer, SetCurrentServer of Runtime v0.25.4 - DeleteServer, RemoveCurrentServer of Runtime v1.0.2", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.RemoveCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run SetServer, SetCurrentServer of Runtime v0.25.4 - DeleteServer, RemoveCurrentServer of Runtime v0.90.0", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.RemoveCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run SetServer, SetCurrentServer of Runtime v0.25.4 - DeleteServer, RemoveCurrentServer of Runtime v0.28.0", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.RemoveCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run SetServer, SetCurrentServer of Runtime v0.25.4 - DeleteServer of Runtime v0.11.6", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
 			executer.Execute(testCase)
 		})
 
-		ginkgo.It("Run SetServer, SetCurrentServer of Runtime v0.11.6 then GetServer, GetCurrentServer on all supported Runtime library versions and then DeleteServer of Runtime latest then GetServer, GetCurrentServer on all supported Runtime library versions", func() {
-			// Add SetServer and SetCurrentServer Commands of Runtime v0.11.6
-			testCase := core.NewTestCase().Add(serverTestHelper.SetServerCmdForRuntime0116).Add(serverTestHelper.SetCurrentServerCmdForRuntime0116)
-
-			// Add GetServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime090)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0280)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0254)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0116)
-
-			// Add GetCurrentServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime090)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0280)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0116)
-
-			// Add DeleteServer latest Command
-			testCase.Add(serverTestHelper.DeleteServerCmdForRuntimeLatestWithError)
-
-			// Add GetServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime090)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0280)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0254)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0116)
-
-			// Add GetCurrentServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime090)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0280)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0116)
-
-			// Run all the commands
-			executer.Execute(testCase)
-		})
 	})
 
 	ginkgo.Context("using multiple servers", func() {
 
-		ginkgo.It("Run two SetServer of Runtime latest then SetCurrentServer of Runtime latest then GetServer, GetCurrentServer on all supported Runtime library versions and then DeleteServer, RemoveCurrentServer of Runtime v0.28.0 then GetServer, GetCurrentServer on all supported Runtime library versions", func() {
-			// Add two SetServer Commands of Runtime Latest
-			testCase := core.NewTestCase().Add(serverTestHelper.SetServerCmdForRuntimeLatest).Add(serverTestHelper.SetServerTwoCmdForRuntimeLatest)
+		ginkgo.It("Run two SetServer, SetCurrentServer of Runtime latest - DeleteServer, RemoveCurrentServer of Runtime v1.0.2", func() {
+			testCase := core.NewTestCase()
 
-			// Add SetCurrentServer Command of Runtime Latest
-			testCase.Add(serverTestHelper.SetCurrentServerCmdForRuntimeLatest)
+			testCase.Add(server.SetServerCommand())
+			testCase.Add(server.SetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
 
-			// Add GetServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime090)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0280)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0254)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0116)
+			testCase.Add(server.SetCurrentServerCommand())
 
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntimeLatest)
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntime090)
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntime0280)
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntime0254)
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntime0116)
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
 
-			// Add GetCurrentServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime090)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0280)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0116)
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
 
-			// Add RemoveCurrentServer v0.28.0 Command
-			testCase.Add(serverTestHelper.RemoveCurrentServerCmdForRuntime0280)
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
 
-			// Add DeleteServer v0.28.0 Command
-			testCase.Add(serverTestHelper.DeleteServerCmdForRuntime0280)
+			testCase.Add(server.RemoveCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version102)))
 
-			// Add GetServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatestWithError)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime090WithError)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0280WithError)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0254WithError)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0116WithError)
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
 
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntimeLatest)
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntime090)
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntime0280)
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntime0254)
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntime0116)
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
 
-			// Add GetCurrentServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatestWithError)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime090WithError)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0280WithError)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0254WithError)
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
 
-			// Run all the commands
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run two SetServer, SetCurrentServer of Runtime latest - DeleteServer, RemoveCurrentServer of Runtime v0.90.0", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand())
+			testCase.Add(server.SetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.SetCurrentServerCommand())
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.RemoveCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version090)))
+
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run two SetServer, SetCurrentServer of Runtime latest - DeleteServer, RemoveCurrentServer of Runtime v0.28.0", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand())
+			testCase.Add(server.SetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.SetCurrentServerCommand())
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.RemoveCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version0280)))
+
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run two SetServer, SetCurrentServer of Runtime latest - DeleteServer, RemoveCurrentServer of Runtime v0.25.4", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand())
+			testCase.Add(server.SetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.SetCurrentServerCommand())
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run two SetServer, SetCurrentServer of Runtime latest - DeleteServer, RemoveCurrentServer of Runtime v0.11.6", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand())
+			testCase.Add(server.SetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.SetCurrentServerCommand())
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
 			executer.Execute(testCase)
 		})
 
-		ginkgo.It("Run two SetServer of Runtime v0.25.4 then SetCurrentServer of Runtime v0.25.4 then GetServer, GetCurrentServer on v0.11.6, v0.25.4, v0.28.0, latest then DeleteServer, RemoveCurrentServer of Runtime v0.28.0 then GetServer, GetCurrentServer on all supported Runtime library versions", func() {
-			// Add two SetServer Commands of Runtime v0.25.4
-			testCase := core.NewTestCase().Add(serverTestHelper.SetServerCmdForRuntime0254).Add(serverTestHelper.SetServerTwoCmdForRuntime0254)
+		ginkgo.It("Run two SetServer, SetCurrentServer of Runtime v1.0.2 - DeleteServer, RemoveCurrentServer of Runtime latest", func() {
+			testCase := core.NewTestCase()
 
-			// Add SetCurrentServer Command of Runtime v0.25.4
-			testCase.Add(serverTestHelper.SetCurrentServerCmdForRuntime0254)
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
 
-			// Add GetServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime090)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0280)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0254)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0116)
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
 
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntimeLatest)
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntime090)
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntime0280)
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntime0254)
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntime0116)
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
 
-			// Add GetCurrentServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime090)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0280)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0116)
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
 
-			// Add RemoveCurrentServer v0.28.0 Command
-			testCase.Add(serverTestHelper.RemoveCurrentServerCmdForRuntime0280WithError)
+			testCase.Add(server.RemoveCurrentServerCommand())
+			testCase.Add(server.DeleteServerCommand())
 
-			// Add DeleteServer v0.28.0 Command
-			testCase.Add(serverTestHelper.DeleteServerCmdForRuntime0280WithError)
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
 
-			// Add GetServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime090)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0280)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0254)
-			testCase.Add(serverTestHelper.GetServerCmdForRuntime0116)
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
 
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntimeLatest)
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntime090)
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntime0280)
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntime0254)
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntime0116)
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
 
-			// Add GetCurrentServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime090)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0280)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0254)
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntime0116)
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run two SetServer, SetCurrentServer of Runtime v1.0.2 - DeleteServer, RemoveCurrentServer of Runtime v0.90.0", func() {
+			testCase := core.NewTestCase()
 
-			// Run all the commands
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.RemoveCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version090)))
+
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run two SetServer, SetCurrentServer of Runtime v1.0.2 - DeleteServer, RemoveCurrentServer of Runtime v0.28.0", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.RemoveCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version0280)))
+
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run two SetServer, SetCurrentServer of Runtime v1.0.2 - DeleteServer of Runtime v0.25.4", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run two SetServer, SetCurrentServer of Runtime v1.0.2 - DeleteServer of Runtime v0.11.6", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
 			executer.Execute(testCase)
 		})
 
-		ginkgo.It("Run two SetServer of Runtime v0.28.0 then SetCurrentServer of Runtime v0.28.0 then GetServer, GetCurrentServer on v0.11.6, v0.25.4, v0.28.0, latest then DeleteServer of Runtime v0.25.4 then GetServer, GetCurrentServer on all supported Runtime library versions", func() {
+		ginkgo.It("Run two SetServer, SetCurrentServer of Runtime v0.90.0 - DeleteServer, RemoveCurrentServer of Runtime v1.0.2", func() {
+			testCase := core.NewTestCase()
 
-			// Add two SetServer Commands of Runtime v0.28.0
-			testCase := core.NewTestCase().Add(serverTestHelper.SetServerCmdForRuntime0280).Add(serverTestHelper.SetServerTwoCmdForRuntime0280)
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
 
-			// Add SetCurrentServer Command of Runtime v0.28.0
-			testCase.Add(serverTestHelper.SetCurrentServerCmdForRuntime0280)
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
 
-			// Add GetServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest).Add(serverTestHelper.GetServerCmdForRuntime090).Add(serverTestHelper.GetServerCmdForRuntime0280).Add(serverTestHelper.GetServerCmdForRuntime0254).Add(serverTestHelper.GetServerCmdForRuntime0116)
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntimeLatest).Add(serverTestHelper.GetServerTwoCmdForRuntime090).Add(serverTestHelper.GetServerTwoCmdForRuntime0280).Add(serverTestHelper.GetServerTwoCmdForRuntime0254).Add(serverTestHelper.GetServerTwoCmdForRuntime0116)
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
 
-			// Add GetCurrentServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest).Add(serverTestHelper.GetCurrentServerCmdForRuntime090).Add(serverTestHelper.GetCurrentServerCmdForRuntime0280).Add(serverTestHelper.GetCurrentServerCmdForRuntime0254).Add(serverTestHelper.GetCurrentServerCmdForRuntime0116)
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
 
-			// Add DeleteServer v0.25.4 Command
-			testCase.Add(serverTestHelper.DeleteServerCmdForRuntime0254)
+			testCase.Add(server.RemoveCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version102)))
 
-			// Add GetServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatestWithError).Add(serverTestHelper.GetServerCmdForRuntime090WithError).Add(serverTestHelper.GetServerCmdForRuntime0280WithError).Add(serverTestHelper.GetServerCmdForRuntime0254WithError).Add(serverTestHelper.GetServerCmdForRuntime0116WithError)
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntimeLatest).Add(serverTestHelper.GetServerTwoCmdForRuntime090).Add(serverTestHelper.GetServerTwoCmdForRuntime0280).Add(serverTestHelper.GetServerTwoCmdForRuntime0254).Add(serverTestHelper.GetServerTwoCmdForRuntime0116)
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
 
-			// Add GetCurrentServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatestWithError).Add(serverTestHelper.GetCurrentServerCmdForRuntime090WithError).Add(serverTestHelper.GetCurrentServerCmdForRuntime0280WithError).Add(serverTestHelper.GetCurrentServerCmdForRuntime0254WithError).Add(serverTestHelper.GetCurrentServerCmdForRuntime0116WithError)
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
 
-			// Run all the commands
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run two SetServer, SetCurrentServer of Runtime v0.90.0 - DeleteServer, RemoveCurrentServer of Runtime latest", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.RemoveCurrentServerCommand())
+			testCase.Add(server.DeleteServerCommand())
+
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run two SetServer, SetCurrentServer of Runtime v0.90.0 - DeleteServer, RemoveCurrentServer of Runtime v0.28.0", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.RemoveCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version0280)))
+
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run two SetServer, SetCurrentServer of Runtime v0.90.0 - DeleteServer of Runtime v0.25.4", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run two SetServer, SetCurrentServer of Runtime v0.90.0 - DeleteServer of Runtime v0.11.6", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
 			executer.Execute(testCase)
 		})
 
-		ginkgo.It("Run two SetServer of Runtime v0.11.6 then SetCurrentServer of Runtime v0.11.6 then GetServer, GetCurrentServer on v0.11.6, v0.25.4, v0.28.0, latest then DeleteServer of Runtime latest then GetServer, GetCurrentServer on all supported Runtime library versions", func() {
-			// Add two SetServer Commands of Runtime v0.11.6
-			testCase := core.NewTestCase().Add(serverTestHelper.SetServerCmdForRuntime0116).Add(serverTestHelper.SetServerTwoCmdForRuntime0116)
+		ginkgo.It("Run two SetServer, SetCurrentServer of Runtime v0.28.0 - DeleteServer of Runtime latest", func() {
+			testCase := core.NewTestCase()
 
-			// Add SetCurrentServer Command of Runtime v0.11.6
-			testCase.Add(serverTestHelper.SetCurrentServerCmdForRuntime0116)
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.SetServerCommand(server.WithServerName(common.CompatibilityTestTwo), server.WithRuntimeVersion(core.Version0280)))
 
-			// Add GetServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest).Add(serverTestHelper.GetServerCmdForRuntime090).Add(serverTestHelper.GetServerCmdForRuntime0280).Add(serverTestHelper.GetServerCmdForRuntime0254).Add(serverTestHelper.GetServerCmdForRuntime0116)
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntimeLatest).Add(serverTestHelper.GetServerTwoCmdForRuntime090).Add(serverTestHelper.GetServerTwoCmdForRuntime0280).Add(serverTestHelper.GetServerTwoCmdForRuntime0254).Add(serverTestHelper.GetServerTwoCmdForRuntime0116)
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
 
-			// Add GetCurrentServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest).Add(serverTestHelper.GetCurrentServerCmdForRuntime090).Add(serverTestHelper.GetCurrentServerCmdForRuntime0280).Add(serverTestHelper.GetCurrentServerCmdForRuntime0254).Add(serverTestHelper.GetCurrentServerCmdForRuntime0116)
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
 
-			// Add DeleteServer latest Command
-			testCase.Add(serverTestHelper.DeleteServerCmdForRuntimeLatestWithError)
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
 
-			// Add GetServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest).Add(serverTestHelper.GetServerCmdForRuntime090).Add(serverTestHelper.GetServerCmdForRuntime0280).Add(serverTestHelper.GetServerCmdForRuntime0254).Add(serverTestHelper.GetServerCmdForRuntime0116)
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntimeLatest).Add(serverTestHelper.GetServerTwoCmdForRuntime090).Add(serverTestHelper.GetServerTwoCmdForRuntime0280).Add(serverTestHelper.GetServerTwoCmdForRuntime0254).Add(serverTestHelper.GetServerTwoCmdForRuntime0116)
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
 
-			// Add GetCurrentServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest).Add(serverTestHelper.GetCurrentServerCmdForRuntime090).Add(serverTestHelper.GetCurrentServerCmdForRuntime0280).Add(serverTestHelper.GetCurrentServerCmdForRuntime0254).Add(serverTestHelper.GetCurrentServerCmdForRuntime0116)
+			testCase.Add(server.RemoveCurrentServerCommand())
+			testCase.Add(server.DeleteServerCommand())
 
-			// Run all the commands
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run two SetServer, SetCurrentServer of Runtime v0.28.0 - DeleteServer of Runtime v1.0.2", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.SetServerCommand(server.WithServerName(common.CompatibilityTestTwo), server.WithRuntimeVersion(core.Version0280)))
+
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.RemoveCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version102)))
+
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run two SetServer, SetCurrentServer of Runtime v0.28.0 - DeleteServer of Runtime v0.90.0", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.SetServerCommand(server.WithServerName(common.CompatibilityTestTwo), server.WithRuntimeVersion(core.Version0280)))
+
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.RemoveCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version090)))
+
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
 			executer.Execute(testCase)
 		})
 
-		ginkgo.It("Run two SetServer of Runtime v0.11.6 then SetCurrentServer of Runtime v0.11.6 then GetServer, GetCurrentServer on v0.11.6, v0.25.4, v0.28.0, latest then DeleteServer of Runtime v0.25.4 then GetServer, GetCurrentServer on all supported Runtime library versions", func() {
-			// Add two SetServer Commands of Runtime v0.11.6
-			testCase := core.NewTestCase().Add(serverTestHelper.SetServerCmdForRuntime0116).Add(serverTestHelper.SetServerTwoCmdForRuntime0116)
+		ginkgo.It("Run two SetServer, SetCurrentServer of Runtime v0.28.0 - DeleteServer of Runtime v0.25.4", func() {
+			testCase := core.NewTestCase()
 
-			// Add SetCurrentServer Command of Runtime v0.11.6
-			testCase.Add(serverTestHelper.SetCurrentServerCmdForRuntime0116)
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.SetServerCommand(server.WithServerName(common.CompatibilityTestTwo), server.WithRuntimeVersion(core.Version0280)))
 
-			// Add GetServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatest).Add(serverTestHelper.GetServerCmdForRuntime090).Add(serverTestHelper.GetServerCmdForRuntime0280).Add(serverTestHelper.GetServerCmdForRuntime0254).Add(serverTestHelper.GetServerCmdForRuntime0116)
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntimeLatest).Add(serverTestHelper.GetServerTwoCmdForRuntime090).Add(serverTestHelper.GetServerTwoCmdForRuntime0280).Add(serverTestHelper.GetServerTwoCmdForRuntime0254).Add(serverTestHelper.GetServerTwoCmdForRuntime0116)
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
 
-			// Add GetCurrentServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatest).Add(serverTestHelper.GetCurrentServerCmdForRuntime090).Add(serverTestHelper.GetCurrentServerCmdForRuntime0280).Add(serverTestHelper.GetCurrentServerCmdForRuntime0254).Add(serverTestHelper.GetCurrentServerCmdForRuntime0116)
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
 
-			// Add DeleteServer v0.25.4 Command
-			testCase.Add(serverTestHelper.DeleteServerCmdForRuntime0254)
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
 
-			// Add GetServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetServerCmdForRuntimeLatestWithError).Add(serverTestHelper.GetServerCmdForRuntime090WithError).Add(serverTestHelper.GetServerCmdForRuntime0280WithError).Add(serverTestHelper.GetServerCmdForRuntime0254WithError).Add(serverTestHelper.GetServerCmdForRuntime0116WithError)
-			testCase.Add(serverTestHelper.GetServerTwoCmdForRuntimeLatest).Add(serverTestHelper.GetServerTwoCmdForRuntime090).Add(serverTestHelper.GetServerTwoCmdForRuntime0280).Add(serverTestHelper.GetServerTwoCmdForRuntime0254).Add(serverTestHelper.GetServerTwoCmdForRuntime0116)
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
 
-			// Add GetCurrentServer Commands on all supported Runtime library versions
-			testCase.Add(serverTestHelper.GetCurrentServerCmdForRuntimeLatestWithError).Add(serverTestHelper.GetCurrentServerCmdForRuntime090WithError).Add(serverTestHelper.GetCurrentServerCmdForRuntime0280WithError).Add(serverTestHelper.GetCurrentServerCmdForRuntime0254WithError).Add(serverTestHelper.GetCurrentServerCmdForRuntime0116WithError)
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version0254)))
 
-			// Run all the commands
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run two SetServer, SetCurrentServer of Runtime v0.28.0 - DeleteServer of Runtime v0.11.6", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.SetServerCommand(server.WithServerName(common.CompatibilityTestTwo), server.WithRuntimeVersion(core.Version0280)))
+
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			executer.Execute(testCase)
+		})
+
+		ginkgo.It("Run two SetServer of Runtime v0.25.4 - DeleteServer, RemoveCurrentServer of Runtime latest", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.SetServerCommand(server.WithServerName(common.CompatibilityTestTwo), server.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.RemoveCurrentServerCommand(server.WithError()))
+			testCase.Add(server.DeleteServerCommand(server.WithError()))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run two SetServer, SetCurrentServer of Runtime v0.25.4 - DeleteServer, RemoveCurrentServer of Runtime v1.0.2", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.SetServerCommand(server.WithServerName(common.CompatibilityTestTwo), server.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.RemoveCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run two SetServer, SetCurrentServer of Runtime v0.25.4 - DeleteServer, RemoveCurrentServer of Runtime v0.90.0", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.SetServerCommand(server.WithServerName(common.CompatibilityTestTwo), server.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.RemoveCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run two SetServer, SetCurrentServer of Runtime v0.25.4 - DeleteServer, RemoveCurrentServer of Runtime v0.28.0", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.SetServerCommand(server.WithServerName(common.CompatibilityTestTwo), server.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.RemoveCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run two SetServer, SetCurrentServer of Runtime v0.25.4 - DeleteServer of Runtime v0.11.6", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.SetServerCommand(server.WithServerName(common.CompatibilityTestTwo), server.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			executer.Execute(testCase)
+		})
+
+		ginkgo.It("Run two SetServer, SetCurrentServer of Runtime v0.11.6 - DeleteServer of Runtime latest", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+			testCase.Add(server.SetServerCommand(server.WithServerName(common.CompatibilityTestTwo), server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.RemoveCurrentServerCommand(server.WithError()))
+			testCase.Add(server.DeleteServerCommand(server.WithError()))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run two SetServer, SetCurrentServer of Runtime v0.11.6 - DeleteServer of Runtime v1.0.2", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+			testCase.Add(server.SetServerCommand(server.WithServerName(common.CompatibilityTestTwo), server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.RemoveCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run two SetServer, SetCurrentServer of Runtime v0.11.6 - DeleteServer of Runtime v0.90.0", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+			testCase.Add(server.SetServerCommand(server.WithServerName(common.CompatibilityTestTwo), server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.RemoveCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			executer.Execute(testCase)
+		})
+		ginkgo.It("Run two SetServer, SetCurrentServer of Runtime v0.11.6 - DeleteServer of Runtime v0.25.4 ", func() {
+			testCase := core.NewTestCase()
+
+			testCase.Add(server.SetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+			testCase.Add(server.SetServerCommand(server.WithServerName(common.CompatibilityTestTwo), server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.SetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand())
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand())
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254)))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116)))
+
+			testCase.Add(server.DeleteServerCommand(server.WithRuntimeVersion(core.Version0254)))
+
+			testCase.Add(server.GetServerCommand(server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
+			testCase.Add(server.GetServerCommand(server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version102), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version090), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithServerName(common.CompatibilityTestTwo)))
+			testCase.Add(server.GetServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithServerName(common.CompatibilityTestTwo)))
+
+			testCase.Add(server.GetCurrentServerCommand(server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version102), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version090), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0280), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0254), server.WithError()))
+			testCase.Add(server.GetCurrentServerCommand(server.WithRuntimeVersion(core.Version0116), server.WithError()))
+
 			executer.Execute(testCase)
 		})
 	})
+
 })

@@ -43,6 +43,7 @@ currentContext:
         endpoint: test-endpoint
     - name: test-mc2
       target: kubernetes
+      contextType: kubernetes
       clusterOpts:
         endpoint: test-endpoint
         path: test-path
@@ -62,8 +63,9 @@ currentContext:
 	// Get Context
 	context, err := GetContext("test-mc")
 	expected := &configtypes.Context{
-		Name:   "test-mc",
-		Target: configtypes.TargetK8s,
+		Name:        "test-mc",
+		Target:      configtypes.TargetK8s,
+		ContextType: configtypes.ContextTypeK8s,
 		ClusterOpts: &configtypes.ClusterServer{
 			Endpoint:            "test-endpoint",
 			Path:                "test-path",
@@ -153,6 +155,7 @@ current: test-mc2
 		expectedCfg2 := `contexts:
     - name: test-mc2
       target: kubernetes
+      contextType: kubernetes
       clusterOpts:
         endpoint: test-endpoint
         path: test-path
@@ -198,8 +201,9 @@ currentContext:
 		},
 	}
 	newCtx := &configtypes.Context{
-		Name:   "test-mc2",
-		Target: configtypes.TargetK8s,
+		Name:        "test-mc2",
+		Target:      configtypes.TargetK8s,
+		ContextType: configtypes.ContextTypeK8s,
 		ClusterOpts: &configtypes.ClusterServer{
 			Path:                "test-path",
 			Endpoint:            "test-endpoint",

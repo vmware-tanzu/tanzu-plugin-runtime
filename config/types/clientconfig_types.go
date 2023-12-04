@@ -234,6 +234,8 @@ type OCIDiscovery struct {
 	// Contains a directory containing YAML files, each of which contains single
 	// CLIPlugin API resource.
 	Image string `json:"image,omitempty" yaml:"image,omitempty"`
+	// LastRefresh allows to store the last time the OCI image was refreshed by the CLI
+	LastRefresh string `json:"lastrefresh,omitempty" yaml:"lastrefresh,omitempty"`
 }
 
 // GenericRESTDiscovery provides a plugin discovery mechanism via any REST API

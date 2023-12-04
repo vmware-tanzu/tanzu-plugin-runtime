@@ -22,8 +22,9 @@ func TestGetCLIDiscoverySources(t *testing.T) {
 	discoveries := []configtypes.PluginDiscovery{
 		{
 			OCI: &configtypes.OCIDiscovery{
-				Name:  "test",
-				Image: "image",
+				Name:        "test",
+				Image:       "image",
+				LastRefresh: "2023-12-04 11:45:53 -0500 EST",
 			},
 		},
 	}
@@ -60,8 +61,9 @@ func TestGetCLIDiscoverySource(t *testing.T) {
 
 	discovery := &configtypes.PluginDiscovery{
 		OCI: &configtypes.OCIDiscovery{
-			Name:  "test",
-			Image: "image",
+			Name:        "test",
+			Image:       "image",
+			LastRefresh: "2023-12-04 11:45:53 -0500 EST",
 		},
 	}
 
@@ -125,7 +127,7 @@ func TestSetCLIDiscoverySources(t *testing.T) {
 		errStr string
 	}{
 		{
-			name: "success add test",
+			name: "success add test 1",
 			input: []configtypes.PluginDiscovery{
 				{
 					OCI: &configtypes.OCIDiscovery{
@@ -143,7 +145,7 @@ func TestSetCLIDiscoverySources(t *testing.T) {
 			total: 2,
 		},
 		{
-			name: "success add test",
+			name: "success add test 2",
 			input: []configtypes.PluginDiscovery{
 				{
 					Local: &configtypes.LocalDiscovery{
@@ -155,7 +157,7 @@ func TestSetCLIDiscoverySources(t *testing.T) {
 			total: 3,
 		},
 		{
-			name: "success add test",
+			name: "success add test 3",
 			input: []configtypes.PluginDiscovery{
 				{
 					OCI: &configtypes.OCIDiscovery{
@@ -191,12 +193,26 @@ func TestSetCLIDiscoverySources(t *testing.T) {
 			total: 3,
 		},
 		{
-			name: "success add default oci",
+			name: "success add default oci with last refresh 0",
 			input: []configtypes.PluginDiscovery{
 				{
 					OCI: &configtypes.OCIDiscovery{
-						Name:  "default",
-						Image: "image",
+						Name:        "default",
+						Image:       "image",
+						LastRefresh: "0", // The CLI uses "0" to reset the LastRefresh field
+					},
+				},
+			},
+			total: 3,
+		},
+		{
+			name: "success add default oci full last refresh time",
+			input: []configtypes.PluginDiscovery{
+				{
+					OCI: &configtypes.OCIDiscovery{
+						Name:        "default",
+						Image:       "image",
+						LastRefresh: "2023-12-04 11:45:53 -0500 EST",
 					},
 				},
 			},
@@ -288,8 +304,9 @@ func TestDeleteCLIDiscoverySource(t *testing.T) {
 			src: []configtypes.PluginDiscovery{
 				{
 					OCI: &configtypes.OCIDiscovery{
-						Name:  "test",
-						Image: "image",
+						Name:        "test",
+						Image:       "image",
+						LastRefresh: "2023-12-04 11:45:53 -0500 EST",
 					},
 				},
 			},
@@ -302,8 +319,9 @@ func TestDeleteCLIDiscoverySource(t *testing.T) {
 			src: []configtypes.PluginDiscovery{
 				{
 					OCI: &configtypes.OCIDiscovery{
-						Name:  "test",
-						Image: "image",
+						Name:        "test",
+						Image:       "image",
+						LastRefresh: "2023-12-04 11:45:53 -0500 EST",
 					},
 				},
 			},
@@ -315,14 +333,16 @@ func TestDeleteCLIDiscoverySource(t *testing.T) {
 			src: []configtypes.PluginDiscovery{
 				{
 					OCI: &configtypes.OCIDiscovery{
-						Name:  "test",
-						Image: "image",
+						Name:        "test",
+						Image:       "image",
+						LastRefresh: "2023-12-04 11:45:53 -0500 EST",
 					},
 				},
 				{
 					OCI: &configtypes.OCIDiscovery{
-						Name:  "test2",
-						Image: "image2",
+						Name:        "test2",
+						Image:       "image2",
+						LastRefresh: "2023-12-04 11:45:53 -0500 EST",
 					},
 				},
 			},
@@ -334,8 +354,9 @@ func TestDeleteCLIDiscoverySource(t *testing.T) {
 			src: []configtypes.PluginDiscovery{
 				{
 					OCI: &configtypes.OCIDiscovery{
-						Name:  "test",
-						Image: "image",
+						Name:        "test",
+						Image:       "image",
+						LastRefresh: "2023-12-04 11:45:53 -0500 EST",
 					},
 				},
 				{
@@ -383,8 +404,9 @@ func TestIntegrationSetGetDeleteCLIDiscoverySource(t *testing.T) {
 	sources := []configtypes.PluginDiscovery{
 		{
 			OCI: &configtypes.OCIDiscovery{
-				Name:  "default",
-				Image: "image",
+				Name:        "default",
+				Image:       "image",
+				LastRefresh: "2023-12-04 11:45:53 -0500 EST",
 			},
 		},
 	}
@@ -486,8 +508,9 @@ func TestSetCLIDiscoverySourceWithDefaultAndDefaultLocal(t *testing.T) {
 			input: []configtypes.PluginDiscovery{
 				{
 					OCI: &configtypes.OCIDiscovery{
-						Name:  "default-test",
-						Image: "image",
+						Name:        "default-test",
+						Image:       "image",
+						LastRefresh: "2023-12-04 11:45:53 -0500 EST",
 					},
 				},
 			},
@@ -498,8 +521,9 @@ func TestSetCLIDiscoverySourceWithDefaultAndDefaultLocal(t *testing.T) {
 			input: []configtypes.PluginDiscovery{
 				{
 					OCI: &configtypes.OCIDiscovery{
-						Name:  "default",
-						Image: "image",
+						Name:        "default",
+						Image:       "image",
+						LastRefresh: "2023-12-04 11:45:53 -0500 EST",
 					},
 				},
 			},
@@ -510,8 +534,9 @@ func TestSetCLIDiscoverySourceWithDefaultAndDefaultLocal(t *testing.T) {
 			input: []configtypes.PluginDiscovery{
 				{
 					OCI: &configtypes.OCIDiscovery{
-						Name:  "default-local",
-						Image: "image",
+						Name:        "default-local",
+						Image:       "image",
+						LastRefresh: "2023-12-04 11:45:53 -0500 EST",
 					},
 				},
 			},
@@ -523,8 +548,9 @@ func TestSetCLIDiscoverySourceWithDefaultAndDefaultLocal(t *testing.T) {
 			input: []configtypes.PluginDiscovery{
 				{
 					OCI: &configtypes.OCIDiscovery{
-						Name:  "default",
-						Image: "updatedImage",
+						Name:        "default",
+						Image:       "updatedImage",
+						LastRefresh: "2023-12-04 11:45:53 -0500 EST",
 					},
 				},
 			},
@@ -536,8 +562,9 @@ func TestSetCLIDiscoverySourceWithDefaultAndDefaultLocal(t *testing.T) {
 			input: []configtypes.PluginDiscovery{
 				{
 					OCI: &configtypes.OCIDiscovery{
-						Name:  "default-local",
-						Image: "updatedImage",
+						Name:        "default-local",
+						Image:       "updatedImage",
+						LastRefresh: "2023-12-04 11:45:53 -0500 EST",
 					},
 				},
 			},
@@ -549,8 +576,9 @@ func TestSetCLIDiscoverySourceWithDefaultAndDefaultLocal(t *testing.T) {
 			input: []configtypes.PluginDiscovery{
 				{
 					OCI: &configtypes.OCIDiscovery{
-						Name:  "default",
-						Image: "updatedImage",
+						Name:        "default",
+						Image:       "updatedImage",
+						LastRefresh: "2023-12-04 11:45:53 -0500 EST",
 					},
 				},
 				{
@@ -567,14 +595,16 @@ func TestSetCLIDiscoverySourceWithDefaultAndDefaultLocal(t *testing.T) {
 				},
 				{
 					OCI: &configtypes.OCIDiscovery{
-						Name:  "default",
-						Image: "updatedImage2",
+						Name:        "default",
+						Image:       "updatedImage2",
+						LastRefresh: "2023-12-04 11:45:53 -0500 EST",
 					},
 				},
 				{
 					OCI: &configtypes.OCIDiscovery{
-						Name:  "test-oci1",
-						Image: "updatedImage",
+						Name:        "test-oci1",
+						Image:       "updatedImage",
+						LastRefresh: "2023-12-04 11:45:53 -0500 EST",
 					},
 				},
 				{
@@ -628,8 +658,9 @@ func TestSetCLIDiscoverySourceMultiTypes(t *testing.T) {
 			input: []configtypes.PluginDiscovery{
 				{
 					OCI: &configtypes.OCIDiscovery{
-						Name:  "default",
-						Image: "defaultImage",
+						Name:        "default",
+						Image:       "defaultImage",
+						LastRefresh: "2023-12-04 11:45:53 -0500 EST",
 					},
 				},
 				{
@@ -646,14 +677,16 @@ func TestSetCLIDiscoverySourceMultiTypes(t *testing.T) {
 				},
 				{
 					OCI: &configtypes.OCIDiscovery{
-						Name:  "default",
-						Image: "defaultImage2",
+						Name:        "default",
+						Image:       "defaultImage2",
+						LastRefresh: "2023-12-04 11:45:53 -0500 EST",
 					},
 				},
 				{
 					OCI: &configtypes.OCIDiscovery{
-						Name:  "test-oci1",
-						Image: "updatedImage",
+						Name:        "test-oci1",
+						Image:       "updatedImage",
+						LastRefresh: "2023-12-04 11:45:53 -0500 EST",
 					},
 				},
 				{
@@ -670,8 +703,9 @@ func TestSetCLIDiscoverySourceMultiTypes(t *testing.T) {
 				},
 				{
 					OCI: &configtypes.OCIDiscovery{
-						Name:  "test-oci2",
-						Image: "updatedImage",
+						Name:        "test-oci2",
+						Image:       "updatedImage",
+						LastRefresh: "2023-12-04 11:45:53 -0500 EST",
 					},
 				},
 			},

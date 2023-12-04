@@ -56,11 +56,13 @@ current: test-mc
     - oci:
         name: test
         image: image
+        lastrefresh: 2023-12-04 11:45:53 -0500 EST
         annotation: one
         required: true
     - oci:
         name: test2
         image: image2
+        lastrefresh: 2023-12-04 11:45:53 -0500 EST
         annotation: one
         required: true
     - local:
@@ -90,15 +92,18 @@ currentContext:
         - oci:
             name: test
             image: image
+            lastrefresh: 2023-12-04 11:45:53 -0500 EST
             annotation: one
         - oci:
             name: test2
             image: image2
+            lastrefresh: 2023-12-04 11:45:53 -0500 EST
             annotation: one
             required: true
         - oci:
             name: test-local
             image: test-local-image-path
+            lastrefresh: 2023-12-04 11:45:53 -0500 EST
 contexts:
     - name: test-mc
       target: kubernetes
@@ -144,14 +149,16 @@ func TestIntegrationWithReplacePatchStrategy(t *testing.T) {
 	expectedSources := []configtypes.PluginDiscovery{
 		{
 			OCI: &configtypes.OCIDiscovery{
-				Name:  "test",
-				Image: "image",
+				Name:        "test",
+				Image:       "image",
+				LastRefresh: "2023-12-04 11:45:53 -0500 EST",
 			},
 		},
 		{
 			OCI: &configtypes.OCIDiscovery{
-				Name:  "test2",
-				Image: "image2",
+				Name:        "test2",
+				Image:       "image2",
+				LastRefresh: "2023-12-04 11:45:53 -0500 EST",
 			},
 		},
 		{
@@ -168,8 +175,9 @@ func TestIntegrationWithReplacePatchStrategy(t *testing.T) {
 	// Get CLI Discovery Source
 	expectedSource := &configtypes.PluginDiscovery{
 		OCI: &configtypes.OCIDiscovery{
-			Name:  "test",
-			Image: "image",
+			Name:        "test",
+			Image:       "image",
+			LastRefresh: "2023-12-04 11:45:53 -0500 EST",
 		},
 	}
 
@@ -181,14 +189,16 @@ func TestIntegrationWithReplacePatchStrategy(t *testing.T) {
 	updatedSources := []configtypes.PluginDiscovery{
 		{
 			OCI: &configtypes.OCIDiscovery{
-				Name:  "test",
-				Image: "image",
+				Name:        "test",
+				Image:       "image",
+				LastRefresh: "2023-12-04 11:45:53 -0500 EST",
 			},
 		},
 		{
 			OCI: &configtypes.OCIDiscovery{
-				Name:  "test-local",
-				Image: "test-local-image-path",
+				Name:        "test-local",
+				Image:       "test-local-image-path",
+				LastRefresh: "2023-12-04 11:45:53 -0500 EST",
 			},
 		},
 	}

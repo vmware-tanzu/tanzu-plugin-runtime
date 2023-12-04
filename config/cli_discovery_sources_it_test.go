@@ -79,6 +79,7 @@ currentContext:
     - oci:
         name: default
         image: "/:"
+        lastrefresh: 2023-12-04 11:45:53 -0500 EST
         unknown: cli-unknown
     - local:
         name: admin-local
@@ -150,6 +151,7 @@ current: test-mc
         - oci:
             name: default
             image: "default-image"
+            lastrefresh: 2023-12-04 11:45:53 -0500 EST
             unknown: cli-unknown
         - local:
             name: admin-local
@@ -157,6 +159,7 @@ current: test-mc
         - oci:
             name: new-default
             image: new-default-image
+            lastrefresh: 2023-12-04 11:45:53 -0500 EST
 contexts:
     - name: test-mc
       target: kubernetes
@@ -209,8 +212,9 @@ func TestCLIDiscoverySourceIntegration(t *testing.T) {
 	// Add new OCI CLI DiscoverySource
 	ds := &configtypes.PluginDiscovery{
 		OCI: &configtypes.OCIDiscovery{
-			Name:  "new-default",
-			Image: "new-default-image",
+			Name:        "new-default",
+			Image:       "new-default-image",
+			LastRefresh: "2023-12-04 11:45:53 -0500 EST",
 		},
 	}
 	err = SetCLIDiscoverySource(*ds)
@@ -228,8 +232,9 @@ func TestCLIDiscoverySourceIntegration(t *testing.T) {
 	// Update existing OCI CLI DiscoverySource
 	ds = &configtypes.PluginDiscovery{
 		OCI: &configtypes.OCIDiscovery{
-			Name:  "default",
-			Image: "default-image",
+			Name:        "default",
+			Image:       "default-image",
+			LastRefresh: "2023-12-04 11:45:53 -0500 EST",
 		},
 	}
 	err = SetCLIDiscoverySource(*ds)
@@ -261,6 +266,7 @@ func setupDataWithPatchStrategy() (string, string, string, string) {
     - oci:
         name: default
         image: "/:"
+        lastrefresh: 2023-12-04 11:45:53 -0500 EST
         unknown: cli-unknown
         annotation: new-annotation
       contextType: k8s
@@ -275,6 +281,7 @@ func setupDataWithPatchStrategy() (string, string, string, string) {
         - oci:
             name: default
             image: "update-default-image"
+            lastrefresh: 2023-12-04 11:45:53 -0500 EST
             unknown: cli-unknown
           contextType: k8s
         - local:
@@ -283,6 +290,7 @@ func setupDataWithPatchStrategy() (string, string, string, string) {
         - oci:
             name: new-default
             image: new-default-image
+            lastrefresh: 2023-12-04 11:45:53 -0500 EST
 `
 
 	return "", expectedCfg, cfg2, expectedCfg2
@@ -307,8 +315,9 @@ func TestCLIDiscoverySourceIntegrationWithPatchStrategy(t *testing.T) {
 	// Add new OCI CLI DiscoverySource
 	ds := &configtypes.PluginDiscovery{
 		OCI: &configtypes.OCIDiscovery{
-			Name:  "new-default",
-			Image: "new-default-image",
+			Name:        "new-default",
+			Image:       "new-default-image",
+			LastRefresh: "2023-12-04 11:45:53 -0500 EST",
 		},
 	}
 	err = SetCLIDiscoverySource(*ds)
@@ -327,8 +336,9 @@ func TestCLIDiscoverySourceIntegrationWithPatchStrategy(t *testing.T) {
 	// Update existing OCI CLI DiscoverySource
 	ds = &configtypes.PluginDiscovery{
 		OCI: &configtypes.OCIDiscovery{
-			Name:  "default",
-			Image: "update-default-image",
+			Name:        "default",
+			Image:       "update-default-image",
+			LastRefresh: "2023-12-04 11:45:53 -0500 EST",
 		},
 	}
 	err = SetCLIDiscoverySource(*ds)

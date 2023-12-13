@@ -247,6 +247,7 @@ func (c *ClientConfig) SetActiveContext(contextType ContextType, ctxName string)
 }
 
 // IsManagementCluster tells if the context is for a management cluster.
+// Deprecated: This field is deprecated.  It is currently no used.
 func (c *Context) IsManagementCluster() bool {
 	return c != nil && c.Target == TargetK8s && c.ClusterOpts != nil && c.ClusterOpts.IsManagementCluster
 }

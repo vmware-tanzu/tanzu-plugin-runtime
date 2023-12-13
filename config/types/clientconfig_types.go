@@ -105,6 +105,7 @@ type ClusterServer struct {
 	Context string `json:"context,omitempty" yaml:"context,omitempty"`
 
 	// Denotes whether this server is a management cluster or not (workload cluster).
+	// Deprecated: This field is deprecated.
 	IsManagementCluster bool `json:"isManagementCluster,omitempty" yaml:"isManagementCluster,omitempty"`
 }
 

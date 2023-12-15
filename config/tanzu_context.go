@@ -176,7 +176,7 @@ func GetKubeconfigForContext(contextName string, opts ...ResourceOptions) ([]byt
 		return nil, errors.Errorf("context must be of type: %s", configtypes.ContextTypeTanzu)
 	}
 	if rOptions.spaceName != "" && rOptions.clusterGroupName != "" {
-		return nil, errors.Errorf("incorrect resource options provided. Both space and clustergroup are set but only one can be set.")
+		return nil, errors.Errorf("incorrect resource options provided. Both space and clustergroup are set but only one can be set")
 	}
 
 	kc, err := kubeconfig.ReadKubeConfig(ctx.ClusterOpts.Path)

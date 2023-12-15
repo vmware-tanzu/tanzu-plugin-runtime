@@ -19,9 +19,10 @@ import (
 
 // keys to Context's AdditionalMetadata map
 const (
-	OrgIDKey       = "tanzuOrgID"
-	ProjectNameKey = "tanzuProjectName"
-	SpaceNameKey   = "tanzuSpaceName"
+	OrgIDKey            = "tanzuOrgID"
+	ProjectNameKey      = "tanzuProjectName"
+	SpaceNameKey        = "tanzuSpaceName"
+	ClusterGroupNameKey = "tanzuClusterGroupName"
 )
 
 const (
@@ -39,6 +40,8 @@ type ResourceInfo struct {
 	ProjectName string
 	// SpaceName name of the Space
 	SpaceName string
+	// ClusterGroupName name of the ClusterGroup
+	ClusterGroupName string
 }
 
 // cmdOptions specifies the command options
@@ -99,29 +102,81 @@ func runCommand(commandPath string, args []string, opts *cmdOptions) (bytes.Buff
 	return stdout, stderr, command.Run()
 }
 
+// resourceOptions specifies the resources to use for kubeconfig generation
+type resourceOptions struct {
+	// projectName name of the Project
+	projectName string
+	// spaceName name of the Space
+	spaceName string
+	// clusterGroupName name of the ClusterGroup
+	clusterGroupName string
+}
+
+type ResourceOptions func(o *resourceOptions)
+
+func ForProject(projectName string) ResourceOptions {
+	return func(o *resourceOptions) {
+		o.projectName = strings.TrimSpace(projectName)
+	}
+}
+func ForSpace(spaceName string) ResourceOptions {
+	return func(o *resourceOptions) {
+		o.spaceName = strings.TrimSpace(spaceName)
+	}
+}
+func ForClusterGroup(clusterGroupName string) ResourceOptions {
+	return func(o *resourceOptions) {
+		o.clusterGroupName = strings.TrimSpace(clusterGroupName)
+	}
+}
+
 // GetKubeconfigForContext returns the kubeconfig for any arbitrary Tanzu resource in the Tanzu object hierarchy
 // referred by the Tanzu context
-// Pre-reqs: project and space names should be valid
+// Pre-reqs: project, space and clustergroup names should be valid
 //
 // Notes:
-// If projectName and spaceName is empty string the kubeconfig generated would be pointing to Tanzu org
 //
-//	ex: kubeconfig's cluster.server URL : https://endpoint/org/orgid
+// Use Case 1: Get the kubeconfig pointing to Tanzu org
+// -> projectName        = ""
+// -> spaceName          = ""
+// -> clusterGroupName   = ""
+// ex: kubeconfig's cluster.server URL : https://endpoint/org/orgid
 //
-// If projectName is valid projectName and spaceName is empty string the kubeconfig generated would be pointing to Tanzu project
+// Use Case 2: Get the kubeconfig pointing to Tanzu project
+// -> projectName        = "PROJECTNAME"
+// -> spaceName          = ""
+// -> clusterGroupName   = ""
+// ex: kubeconfig's cluster.server URL : https://endpoint/org/orgid/project/<projectName>
 //
-//	ex: kubeconfig's cluster.server URL : https://endpoint/org/orgid/project/<projectName>
+// Use Case 3: Get the kubeconfig pointing to Tanzu space
+// -> projectName        = "PROJECTNAME"
+// -> spaceName          = "SPACENAME"
+// -> clusterGroupName   = ""
+// ex: kubeconfig's cluster.server URL : https://endpoint/org/orgid/project/<projectName>/space/<spaceName>
 //
-// similarly if both project and space names are valid names the kubeconfig generated would be pointing to Tanzu space
+// Use Case 4: Get the kubeconfig pointing to Tanzu clustergroup
+// -> projectName        = "PROJECTNAME"
+// -> spaceName          = ""
+// -> clusterGroupName   = "CLUSTERGROUPNAME"
+// ex: kubeconfig's cluster.server URL : https://endpoint/org/orgid/project/<projectName>/clustergroup/<clustergroupName>
 //
-//	ex: kubeconfig's cluster.server URL:  https://endpoint/org/orgid/project/<projectName>/space/<spaceName>
-func GetKubeconfigForContext(contextName, projectName, spaceName string) ([]byte, error) {
+// Note: Specifying `spaceName` and `clusterGroupName` both at the same time is incorrect input.
+func GetKubeconfigForContext(contextName string, opts ...ResourceOptions) ([]byte, error) {
 	ctx, err := GetContext(contextName)
 	if err != nil {
 		return nil, err
 	}
+
+	rOptions := &resourceOptions{}
+	for _, opt := range opts {
+		opt(rOptions)
+	}
+
 	if ctx.ContextType != configtypes.ContextTypeTanzu {
 		return nil, errors.Errorf("context must be of type: %s", configtypes.ContextTypeTanzu)
+	}
+	if rOptions.spaceName != "" && rOptions.clusterGroupName != "" {
+		return nil, errors.Errorf("incorrect resource options provided. Both space and clustergroup are set but only one can be set.")
 	}
 
 	kc, err := kubeconfig.ReadKubeConfig(ctx.ClusterOpts.Path)
@@ -133,7 +188,7 @@ func GetKubeconfigForContext(contextName, projectName, spaceName string) ([]byte
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to minify the kubeconfig")
 	}
-	updateKubeconfigServerURL(kc, ctx, projectName, spaceName)
+	updateKubeconfigServerURL(kc, ctx, rOptions)
 
 	kubeconfigBytes, err := yaml.Marshal(kc)
 	if err != nil {
@@ -142,36 +197,40 @@ func GetKubeconfigForContext(contextName, projectName, spaceName string) ([]byte
 	return kubeconfigBytes, nil
 }
 
-func prepareClusterServerURL(context *configtypes.Context, projectName, spaceName string) string {
+func prepareClusterServerURL(context *configtypes.Context, rOptions *resourceOptions) string {
 	serverURL := context.ClusterOpts.Endpoint
-	if projectName == "" {
+	if rOptions.projectName == "" {
 		return serverURL
 	}
-	serverURL = serverURL + "/project/" + projectName
+	serverURL = serverURL + "/project/" + rOptions.projectName
 
-	if spaceName == "" {
-		return serverURL
+	if rOptions.spaceName != "" {
+		return serverURL + "/space/" + rOptions.spaceName
 	}
-	return serverURL + "/space/" + spaceName
+	if rOptions.clusterGroupName != "" {
+		return serverURL + "/clustergroup/" + rOptions.clusterGroupName
+	}
+	return serverURL
 }
 
-func updateKubeconfigServerURL(kc *kubeconfig.Config, cliContext *configtypes.Context, projectName, spaceName string) {
+func updateKubeconfigServerURL(kc *kubeconfig.Config, cliContext *configtypes.Context, rOptions *resourceOptions) {
 	currentContextName := kc.CurrentContext
 	context := kubeconfig.GetContext(kc, currentContextName)
 	cluster := kubeconfig.GetCluster(kc, context.Context.Cluster)
-	cluster.Cluster.Server = prepareClusterServerURL(cliContext, projectName, spaceName)
+	cluster.Cluster.Server = prepareClusterServerURL(cliContext, rOptions)
 }
 
 // SetTanzuContextActiveResource sets the active Tanzu resource for the given context and also updates
 // the kubeconfig referenced by the context of type Tanzu
 //
-// Pre-reqs: project and space names should be valid
+// Pre-reqs: project and space/clustergroup names should be valid
 //
 // Note: To set
 //   - a space as active resource, both project and space names are required
+//   - a clustergroup as active resource, both project and clustergroup names are required
 //   - a project as active resource, only project name is required (space should be empty string)
-//   - org as active resource, both project and space names should be empty strings
-func SetTanzuContextActiveResource(contextName, projectName, spaceName string, opts ...CommandOptions) error {
+//   - org as active resource, project, space and clustergroup names should be empty strings
+func SetTanzuContextActiveResource(contextName string, resourceInfo ResourceInfo, opts ...CommandOptions) error {
 	// For now, the implementation expects env var TANZU_BIN to be set and
 	// pointing to the core CLI binary used to invoke setting the active Tanzu resource.
 
@@ -186,7 +245,13 @@ func SetTanzuContextActiveResource(contextName, projectName, spaceName string, o
 	}
 
 	altCommandArgs := []string{customCommandName}
-	args := []string{"context", "update", "tanzu-active-resource", contextName, "--project", projectName, "--space", spaceName}
+	args := []string{"context", "update", "tanzu-active-resource", contextName, "--project", resourceInfo.ProjectName}
+	if resourceInfo.SpaceName != "" {
+		args = append(args, "--space", resourceInfo.SpaceName)
+	}
+	if resourceInfo.ClusterGroupName != "" {
+		args = append(args, "--clustergroup", resourceInfo.ClusterGroupName)
+	}
 
 	altCommandArgs = append(altCommandArgs, args...)
 
@@ -218,9 +283,10 @@ func GetTanzuContextActiveResource(contextName string) (*ResourceInfo, error) {
 		return nil, errors.New("context is missing the Tanzu metadata")
 	}
 	activeResourceInfo := &ResourceInfo{
-		OrgID:       stringValue(ctx.AdditionalMetadata[OrgIDKey]),
-		ProjectName: stringValue(ctx.AdditionalMetadata[ProjectNameKey]),
-		SpaceName:   stringValue(ctx.AdditionalMetadata[SpaceNameKey]),
+		OrgID:            stringValue(ctx.AdditionalMetadata[OrgIDKey]),
+		ProjectName:      stringValue(ctx.AdditionalMetadata[ProjectNameKey]),
+		SpaceName:        stringValue(ctx.AdditionalMetadata[SpaceNameKey]),
+		ClusterGroupName: stringValue(ctx.AdditionalMetadata[ClusterGroupNameKey]),
 	}
 	return activeResourceInfo, nil
 }

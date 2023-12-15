@@ -108,7 +108,7 @@ func TestGetKubeconfigForContext(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Test getting the kubeconfig for an arbitrary Tanzu resource
-	kubeconfigBytes, err := GetKubeconfigForContext(c.Name, "project1", "space1")
+	kubeconfigBytes, err := GetKubeconfigForContext(c.Name, ForProject("project1"), ForSpace("space1"))
 	assert.NoError(t, err)
 	c, err = GetContext("test-tanzu")
 	assert.NoError(t, err)
@@ -119,7 +119,7 @@ func TestGetKubeconfigForContext(t *testing.T) {
 	assert.Equal(t, cluster.Cluster.Server, c.ClusterOpts.Endpoint+"/project/project1/space/space1")
 
 	// Test getting the kubeconfig for an arbitrary Tanzu resource
-	kubeconfigBytes, err = GetKubeconfigForContext(c.Name, "project2", "")
+	kubeconfigBytes, err = GetKubeconfigForContext(c.Name, ForProject("project2"))
 	assert.NoError(t, err)
 	c, err = GetContext("test-tanzu")
 	assert.NoError(t, err)
@@ -131,7 +131,7 @@ func TestGetKubeconfigForContext(t *testing.T) {
 	// Test getting the kubeconfig for an arbitrary Tanzu resource for non Tanzu context
 	nonTanzuCtx, err := GetContext("test-mc")
 	assert.NoError(t, err)
-	_, err = GetKubeconfigForContext(nonTanzuCtx.Name, "project2", "")
+	_, err = GetKubeconfigForContext(nonTanzuCtx.Name, ForProject("project2"))
 	assert.Error(t, err)
 	assert.ErrorContains(t, err, "context must be of type: tanzu")
 }
@@ -269,7 +269,7 @@ func TestSetTanzuContextActiveResource(t *testing.T) {
 
 			// Test-1:
 			// - verify correct string gets printed to default stdout and stderr
-			err = SetTanzuContextActiveResource("test-context", "projectA", "spaceA")
+			err = SetTanzuContextActiveResource("test-context", ResourceInfo{ProjectName: "projectA", SpaceName: "spaceA"})
 			w.Close()
 			stdoutRecieved := <-c
 
@@ -284,7 +284,7 @@ func TestSetTanzuContextActiveResource(t *testing.T) {
 			// Test-2: when external stdout and stderr are provided with WithStdout, WithStderr options,
 			// verify correct string gets printed to provided custom stdout/stderr
 			var combinedOutputBuff bytes.Buffer
-			err = SetTanzuContextActiveResource("test-context", "projectA", "spaceA", WithOutputWriter(&combinedOutputBuff), WithErrorWriter(&combinedOutputBuff))
+			err = SetTanzuContextActiveResource("test-context", ResourceInfo{ProjectName: "projectA", SpaceName: "spaceA"}, WithOutputWriter(&combinedOutputBuff), WithErrorWriter(&combinedOutputBuff))
 			if spec.expectedFailure {
 				assert.NotNil(err)
 			} else {

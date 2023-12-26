@@ -107,8 +107,8 @@ func TestGetKubeconfigForContext(t *testing.T) {
 	err = SetContext(c, false)
 	assert.NoError(t, err)
 
-	// Test getting the kubeconfig for an arbitrary Tanzu resource
-	kubeconfigBytes, err := GetKubeconfigForContext(c.Name, "project1", "space1")
+	// Test getting the kubeconfig for a space within a project
+	kubeconfigBytes, err := GetKubeconfigForContext(c.Name, ForProject("project1"), ForSpace("space1"))
 	assert.NoError(t, err)
 	c, err = GetContext("test-tanzu")
 	assert.NoError(t, err)
@@ -118,8 +118,8 @@ func TestGetKubeconfigForContext(t *testing.T) {
 	cluster := kubeconfig.GetCluster(&kc, "tanzu-cli-mytanzu/current")
 	assert.Equal(t, cluster.Cluster.Server, c.ClusterOpts.Endpoint+"/project/project1/space/space1")
 
-	// Test getting the kubeconfig for an arbitrary Tanzu resource
-	kubeconfigBytes, err = GetKubeconfigForContext(c.Name, "project2", "")
+	// Test getting the kubeconfig for a project
+	kubeconfigBytes, err = GetKubeconfigForContext(c.Name, ForProject("project2"))
 	assert.NoError(t, err)
 	c, err = GetContext("test-tanzu")
 	assert.NoError(t, err)
@@ -128,10 +128,27 @@ func TestGetKubeconfigForContext(t *testing.T) {
 	cluster = kubeconfig.GetCluster(&kc, "tanzu-cli-mytanzu/current")
 	assert.Equal(t, cluster.Cluster.Server, c.ClusterOpts.Endpoint+"/project/project2")
 
+	// Test getting the kubeconfig for a clustergroup within a project
+	kubeconfigBytes, err = GetKubeconfigForContext(c.Name, ForProject("project2"), ForClusterGroup("clustergroup1"))
+	assert.NoError(t, err)
+	c, err = GetContext("test-tanzu")
+	assert.NoError(t, err)
+	err = yaml.Unmarshal(kubeconfigBytes, &kc)
+	assert.NoError(t, err)
+	cluster = kubeconfig.GetCluster(&kc, "tanzu-cli-mytanzu/current")
+	assert.Equal(t, cluster.Cluster.Server, c.ClusterOpts.Endpoint+"/project/project2/clustergroup/clustergroup1")
+
+	// Test getting the kubeconfig with incorrect resource combination (request kubeconfig for space and clustergroup)
+	c, err = GetContext("test-tanzu")
+	assert.NoError(t, err)
+	_, err = GetKubeconfigForContext(c.Name, ForProject("project2"), ForSpace("space1"), ForClusterGroup("clustergroup1"))
+	assert.Error(t, err)
+	assert.ErrorContains(t, err, "incorrect resource options provided. Both space and clustergroup are set but only one can be set")
+
 	// Test getting the kubeconfig for an arbitrary Tanzu resource for non Tanzu context
 	nonTanzuCtx, err := GetContext("test-mc")
 	assert.NoError(t, err)
-	_, err = GetKubeconfigForContext(nonTanzuCtx.Name, "project2", "")
+	_, err = GetKubeconfigForContext(nonTanzuCtx.Name, ForProject("project2"))
 	assert.Error(t, err)
 	assert.ErrorContains(t, err, "context must be of type: tanzu")
 }
@@ -163,7 +180,7 @@ func TestGetTanzuContextActiveResource(t *testing.T) {
 	assert.Empty(t, activeResources.SpaceName)
 
 	// Test getting the Tanzu active resource of a context with active resource as space
-	c.AdditionalMetadata[ProjectNameKey] = "fake-project"
+	c.AdditionalMetadata[ProjectNameKey] = "fake-project" //nolint:goconst
 	c.AdditionalMetadata[SpaceNameKey] = "fake-space"
 	err = SetContext(c, false)
 	assert.NoError(t, err)
@@ -172,6 +189,20 @@ func TestGetTanzuContextActiveResource(t *testing.T) {
 	assert.Equal(t, activeResources.OrgID, "fake-org-id")
 	assert.Equal(t, activeResources.ProjectName, "fake-project")
 	assert.Equal(t, activeResources.SpaceName, "fake-space")
+	assert.Equal(t, activeResources.ClusterGroupName, "")
+
+	// Test getting the Tanzu active resource of a context with active resource as clustergroup
+	c.AdditionalMetadata[ProjectNameKey] = "fake-project"
+	c.AdditionalMetadata[SpaceNameKey] = ""
+	c.AdditionalMetadata[ClusterGroupNameKey] = "fake-clustergroup"
+	err = SetContext(c, false)
+	assert.NoError(t, err)
+	activeResources, err = GetTanzuContextActiveResource("test-tanzu")
+	assert.NoError(t, err)
+	assert.Equal(t, activeResources.OrgID, "fake-org-id")
+	assert.Equal(t, activeResources.ProjectName, "fake-project")
+	assert.Equal(t, activeResources.ClusterGroupName, "fake-clustergroup")
+	assert.Equal(t, activeResources.SpaceName, "")
 
 	// If context activeMetadata is not set(error case)
 	c.AdditionalMetadata = nil
@@ -269,7 +300,7 @@ func TestSetTanzuContextActiveResource(t *testing.T) {
 
 			// Test-1:
 			// - verify correct string gets printed to default stdout and stderr
-			err = SetTanzuContextActiveResource("test-context", "projectA", "spaceA")
+			err = SetTanzuContextActiveResource("test-context", ResourceInfo{ProjectName: "projectA", SpaceName: "spaceA"})
 			w.Close()
 			stdoutRecieved := <-c
 
@@ -284,7 +315,7 @@ func TestSetTanzuContextActiveResource(t *testing.T) {
 			// Test-2: when external stdout and stderr are provided with WithStdout, WithStderr options,
 			// verify correct string gets printed to provided custom stdout/stderr
 			var combinedOutputBuff bytes.Buffer
-			err = SetTanzuContextActiveResource("test-context", "projectA", "spaceA", WithOutputWriter(&combinedOutputBuff), WithErrorWriter(&combinedOutputBuff))
+			err = SetTanzuContextActiveResource("test-context", ResourceInfo{ProjectName: "projectA", SpaceName: "spaceA"}, WithOutputWriter(&combinedOutputBuff), WithErrorWriter(&combinedOutputBuff))
 			if spec.expectedFailure {
 				assert.NotNil(err)
 			} else {

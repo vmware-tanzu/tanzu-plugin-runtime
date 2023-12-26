@@ -189,6 +189,20 @@ func TestGetTanzuContextActiveResource(t *testing.T) {
 	assert.Equal(t, activeResources.OrgID, "fake-org-id")
 	assert.Equal(t, activeResources.ProjectName, "fake-project")
 	assert.Equal(t, activeResources.SpaceName, "fake-space")
+	assert.Equal(t, activeResources.ClusterGroupName, "")
+
+	// Test getting the Tanzu active resource of a context with active resource as clustergroup
+	c.AdditionalMetadata[ProjectNameKey] = "fake-project"
+	c.AdditionalMetadata[SpaceNameKey] = ""
+	c.AdditionalMetadata[ClusterGroupNameKey] = "fake-clustergroup"
+	err = SetContext(c, false)
+	assert.NoError(t, err)
+	activeResources, err = GetTanzuContextActiveResource("test-tanzu")
+	assert.NoError(t, err)
+	assert.Equal(t, activeResources.OrgID, "fake-org-id")
+	assert.Equal(t, activeResources.ProjectName, "fake-project")
+	assert.Equal(t, activeResources.ClusterGroupName, "fake-clustergroup")
+	assert.Equal(t, activeResources.SpaceName, "")
 
 	// If context activeMetadata is not set(error case)
 	c.AdditionalMetadata = nil

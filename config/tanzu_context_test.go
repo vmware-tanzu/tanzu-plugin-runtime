@@ -180,7 +180,7 @@ func TestGetTanzuContextActiveResource(t *testing.T) {
 	assert.Empty(t, activeResources.SpaceName)
 
 	// Test getting the Tanzu active resource of a context with active resource as space
-	c.AdditionalMetadata[ProjectNameKey] = "fake-project"
+	c.AdditionalMetadata[ProjectNameKey] = "fake-project" //nolint:goconst
 	c.AdditionalMetadata[SpaceNameKey] = "fake-space"
 	err = SetContext(c, false)
 	assert.NoError(t, err)

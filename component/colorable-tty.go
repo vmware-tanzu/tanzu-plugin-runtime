@@ -56,3 +56,8 @@ func TrimRightSpace(s string) string {
 func BeginsWith(s, prefix string) bool {
 	return strings.HasPrefix(s, prefix)
 }
+
+// Green returns a green string.
+func Green(s string) string {
+	return aurora.Green(s).String()
+}

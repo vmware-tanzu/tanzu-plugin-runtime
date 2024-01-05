@@ -61,3 +61,8 @@ func BeginsWith(s, prefix string) bool {
 func Green(s string) string {
 	return aurora.Green(s).String()
 }
+
+// PrefixEmoji prefixes a string with an emoji.
+func PrefixEmoji(emoji Icon, s string) string {
+	return aurora.Sprintf("%s %s", string(emoji), s)
+}

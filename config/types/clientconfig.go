@@ -6,7 +6,9 @@ package types
 import (
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
+	"time"
 )
 
 // ContextType defines the type of control plane endpoint a context represents
@@ -346,4 +348,22 @@ func ConvertContextTypeToTarget(ctxType ContextType) Target {
 		return Target(ContextTypeTanzu)
 	}
 	return Target(ctxType)
+}
+
+// GetDatabaseLastUpdateTimestamp retrieves the last update timestamp of the database image and refreshes the cache.
+// Returns the timestamp of the last update timestamp and an error, if any.
+func (c *ClientConfig) GetDatabaseLastUpdateTimestamp() (time.Time, error) {
+	if c.CoreCliOptions != nil {
+		return c.CoreCliOptions.DatabaseLastUpdateTimestamp, nil
+	}
+	return time.Time{}, errors.New("not found")
+}
+
+// GetDatabaseRefreshTime retrieves the refreshTime of the database image
+// Returns the databaseRefreshTime and an error, if any.
+func (c *ClientConfig) GetDatabaseRefreshTime() (int, error) {
+	if c.CoreCliOptions != nil && c.CoreCliOptions.DatabaseRefreshTime != "" {
+		return strconv.Atoi(c.CoreCliOptions.DatabaseRefreshTime)
+	}
+	return -1, errors.New("not found")
 }

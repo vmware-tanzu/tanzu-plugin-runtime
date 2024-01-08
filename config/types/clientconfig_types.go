@@ -312,6 +312,10 @@ type CoreCliOptions struct {
 	CliID string `json:"cliId,omitempty" yaml:"cliId,omitempty"`
 	// TelemetryOptions are the core CLI specific telemetry options
 	TelemetryOptions *TelemetryOptions `json:"telemetry,omitempty" yaml:"telemetry,omitempty"`
+	// DatabaseLastUpdateTimestamp is the last update timestamp of database image and refresh cache
+	DatabaseLastUpdateTimestamp time.Time `json:"databaseLastUpdateTimestamp,omitempty" yaml:"databaseLastUpdateTimestamp,omitempty"`
+	// DatabaseRefreshTime is the time to refresh the database cache
+	DatabaseRefreshTime string `json:"databaseRefreshTime,omitempty" yaml:"databaseRefreshTime,omitempty"`
 }
 
 type TelemetryOptions struct {

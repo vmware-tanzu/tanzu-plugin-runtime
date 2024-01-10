@@ -12,36 +12,6 @@ import (
 	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
 
-// GetClientConfig retrieves the config from the local directory with file lock
-func GetClientConfig() (cfg *configtypes.ClientConfig, err error) {
-	// Retrieve client config node
-	node, err := getClientConfigNode()
-	if err != nil {
-		return nil, err
-	}
-
-	cfg, err = convertNodeToClientConfig(node)
-	if err != nil {
-		return nil, err
-	}
-
-	return cfg, nil
-}
-
-// GetClientConfigNoLock retrieves the config from the local directory without acquiring the lock
-func GetClientConfigNoLock() (cfg *configtypes.ClientConfig, err error) {
-	node, err := getClientConfigNodeNoLock()
-	if err != nil {
-		return nil, err
-	}
-
-	cfg, err = convertNodeToClientConfig(node)
-	if err != nil {
-		return nil, err
-	}
-	return cfg, nil
-}
-
 // StoreClientConfig stores the config in the local directory.
 // Make sure to Acquire and Release tanzu lock when reading/writing to the
 // tanzu client configuration

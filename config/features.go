@@ -8,10 +8,23 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
+
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
+
 	"gopkg.in/yaml.v3"
 
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/config/nodeutils"
 )
+
+// GetAllFeatureFlags retrieves all feature flags values from config
+func GetAllFeatureFlags() (map[string]types.FeatureMap, error) {
+	// Retrieve client config node
+	cfg, err := GetClientConfig()
+	if err != nil {
+		return nil, err
+	}
+	return cfg.GetAllFeatureFlags()
+}
 
 // IsFeatureEnabled checks and returns whether specific plugin and key is true
 func IsFeatureEnabled(plugin, key string) (bool, error) {
@@ -203,4 +216,63 @@ func IsFeatureActivated(feature string) bool {
 		return false
 	}
 	return status
+}
+
+// FeatureOptions is a struct that defines the options for feature flag configuration.
+type FeatureOptions struct {
+	SkipIfExists bool // SkipIfExists indicates whether to skip setting the feature flag if it already exists.
+}
+
+// Options is a function type that applies configuration options to FeatureOptions.
+type Options func(opts *FeatureOptions)
+
+// SkipIfExists returns an Options function that sets the SkipIfExists option to true.
+func SkipIfExists() Options {
+	return func(opts *FeatureOptions) {
+		opts.SkipIfExists = true // Sets the SkipIfExists field of FeatureOptions to true.
+	}
+}
+
+// ConfigureFeatureFlags sets default feature flags to ClientConfig if they are missing.
+// It accepts a map of feature flags and a variadic Options parameter to apply additional settings.
+func ConfigureFeatureFlags(defaultFeatureFlags map[string]bool, opts ...Options) error {
+	options := new(FeatureOptions) // Initialize FeatureOptions.
+	for _, opt := range opts {
+		opt(options) // Apply each Options function to the FeatureOptions.
+	}
+
+	cfg, err := GetClientConfig() // Retrieves the current client configuration.
+	if err != nil {
+		return errors.Wrap(err, "error while getting client config") // Returns an error if fetching client config fails.
+	}
+
+	return configureFlags(cfg, defaultFeatureFlags, options) // Sets the feature flags based on the provided configuration and options.
+}
+
+// configureFlags processes and sets the feature flags based on the provided configuration and options.
+// It iterates over each flag in the provided map and sets them using the setFlag function.
+func configureFlags(cfg *types.ClientConfig, flags map[string]bool, options *FeatureOptions) error {
+	for path, activated := range flags {
+		if err := setFlag(cfg, path, activated, options); err != nil {
+			return err // Returns an error if setting any feature flag fails.
+		}
+	}
+	return nil
+}
+
+// setFlag configures a single feature flag based on the specified path and activation status.
+// It extracts the plugin and feature from the path and sets the feature flag accordingly.
+func setFlag(cfg *types.ClientConfig, path string, activated bool, options *FeatureOptions) error {
+	plugin, feature, err := cfg.SplitFeaturePath(path)
+	if err != nil {
+		return errors.Wrap(err, "failed to configure feature flags") // Returns an error if splitting the feature path fails.
+	}
+
+	// Checks if the feature flag should be skipped if it already exists.
+	if options.SkipIfExists && cfg.IsFeatureFlagSet(plugin, feature) {
+		return nil // Skips setting the flag.
+	}
+
+	// Sets the feature flag with the specified activation status.
+	return SetFeature(plugin, feature, strconv.FormatBool(activated))
 }

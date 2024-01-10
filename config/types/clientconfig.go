@@ -6,7 +6,6 @@ package types
 import (
 	"errors"
 	"fmt"
-	"strconv"
 	"strings"
 )
 
@@ -274,26 +273,6 @@ func (c *ClientConfig) SetUnstableVersionSelector(f VersionSelectorLevel) {
 		return
 	}
 	c.ClientOptions.CLI.UnstableVersionSelector = AllUnstableVersions
-}
-
-// IsConfigFeatureActivated return true if the feature is activated, false if not. An error if the featurePath is malformed
-func (c *ClientConfig) IsConfigFeatureActivated(featurePath string) (bool, error) {
-	plugin, flag, err := c.SplitFeaturePath(featurePath)
-	if err != nil {
-		return false, err
-	}
-
-	if c.ClientOptions == nil || c.ClientOptions.Features == nil ||
-		c.ClientOptions.Features[plugin] == nil || c.ClientOptions.Features[plugin][flag] == "" {
-		return false, nil
-	}
-
-	booleanValue, err := strconv.ParseBool(c.ClientOptions.Features[plugin][flag])
-	if err != nil {
-		errMsg := "error converting " + featurePath + " entry '" + c.ClientOptions.Features[plugin][flag] + "' to boolean value: " + err.Error()
-		return false, errors.New(errMsg)
-	}
-	return booleanValue, nil
 }
 
 // GetEnvConfigurations returns a map of environment variables to values

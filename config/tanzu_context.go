@@ -5,6 +5,7 @@ package config
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"os"
 	"os/exec"
@@ -110,6 +111,8 @@ type resourceOptions struct {
 	spaceName string
 	// clusterGroupName name of the ClusterGroup
 	clusterGroupName string
+	// customPath use specified path when constructing kubeconfig
+	customPath string
 }
 
 type ResourceOptions func(o *resourceOptions)
@@ -127,6 +130,11 @@ func ForSpace(spaceName string) ResourceOptions {
 func ForClusterGroup(clusterGroupName string) ResourceOptions {
 	return func(o *resourceOptions) {
 		o.clusterGroupName = strings.TrimSpace(clusterGroupName)
+	}
+}
+func ForCustomPath(customPath string) ResourceOptions {
+	return func(o *resourceOptions) {
+		o.customPath = customPath
 	}
 }
 
@@ -199,6 +207,12 @@ func GetKubeconfigForContext(contextName string, opts ...ResourceOptions) ([]byt
 
 func prepareClusterServerURL(context *configtypes.Context, rOptions *resourceOptions) string {
 	serverURL := context.ClusterOpts.Endpoint
+
+	// If customPath is set, append customPath after endpoint to form endpoint URL
+	if rOptions.customPath != "" {
+		return fmt.Sprintf("%s/%s", strings.TrimRight(context.GlobalOpts.Endpoint, "/"), strings.TrimLeft(rOptions.customPath, "/"))
+	}
+
 	if rOptions.projectName == "" {
 		return serverURL
 	}

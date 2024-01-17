@@ -88,58 +88,58 @@ func (l *logger) Enabled() bool {
 
 // Info logs a non-error message with the given key/value pairs as context.
 func (l *logger) Info(msg string, kvs ...interface{}) {
-	l.Print(msg, nil, logTypeINFO, kvs...)
+	l.Print(msg, nil, string(LogTypeINFO), kvs...)
 }
 
 // Infof logs a non-error messages with the given message format with format specifier and arguments.
 func (l *logger) Infof(format string, args ...interface{}) {
 	msg := fmt.Sprintf(format, args...)
-	l.Print(msg, nil, logTypeINFO)
+	l.Print(msg, nil, string(LogTypeINFO))
 }
 
 // Error logs an error message with the given key/value pairs as context.
 func (l *logger) Error(err error, msg string, kvs ...interface{}) {
-	l.Print(msg, err, logTypeERROR, kvs...)
+	l.Print(msg, err, string(LogTypeERROR), kvs...)
 }
 
 // Errorf logs a error message with the given key/value pairs as context.
 func (l *logger) Errorf(format string, args ...interface{}) {
 	msg := fmt.Sprintf(format, args...)
-	l.Print(msg, nil, logTypeERROR)
+	l.Print(msg, nil, string(LogTypeERROR))
 }
 
 // Warning logs a warning messages with the given key/value pairs as context.
 func (l *logger) Warning(msg string, kvs ...interface{}) {
-	l.Print(msg, nil, logTypeWARN, kvs...)
+	l.Print(msg, nil, string(LogTypeWARN), kvs...)
 }
 
 // Warningf logs a warning messages with the given message format with format specifier and arguments.
 func (l *logger) Warningf(format string, args ...interface{}) {
 	msg := fmt.Sprintf(format, args...)
-	l.Print(msg, nil, logTypeWARN)
+	l.Print(msg, nil, string(LogTypeWARN))
 }
 
 // Success logs a success messages with the given key/value pairs as context.
 func (l *logger) Success(msg string, kvs ...interface{}) {
-	l.Print(msg, nil, logTypeSUCCESS, kvs...)
+	l.Print(msg, nil, string(LogTypeSUCCESS), kvs...)
 }
 
 // Successf logs a success messages with the given message format with format specifier and arguments.
 func (l *logger) Successf(format string, args ...interface{}) {
 	msg := fmt.Sprintf(format, args...)
-	l.Print(msg, nil, logTypeSUCCESS)
+	l.Print(msg, nil, string(LogTypeSUCCESS))
 }
 
 // Fatal logs a fatal message with the given key/value pairs as context and returns with os.exit(1)
 func (l *logger) Fatal(err error, msg string, kvs ...interface{}) {
-	l.Print(msg, err, logTypeERROR, kvs...)
+	l.Print(msg, err, string(LogTypeERROR), kvs...)
 	os.Exit(1)
 }
 
 // Outputf writes a message to stdout
 func (l *logger) Outputf(format string, args ...interface{}) {
 	msg := fmt.Sprintf(format, args...)
-	l.Print(msg, nil, logTypeOUTPUT)
+	l.Print(msg, nil, string(LogTypeOUTPUT))
 }
 
 // V returns an InfoLogger value for a specific verbosity level.
@@ -212,25 +212,14 @@ func (l *logger) getLogString(values []interface{}) string {
 	}
 	f, err := flatten(entry)
 	if err != nil {
-		_, _ = logWriter.Write([]byte{}, []byte(err.Error()), l.Enabled(), 0, logTypeWARN)
+		_, _ = logWriter.Write([]byte{}, []byte(err.Error()), l.Enabled(), 0, string(LogTypeWARN))
 		return ""
 	}
 	return f
 }
 
 func (l *logger) getLogTypeIndicator(logType string) string {
-	switch logType {
-	case logTypeINFO:
-		return "[i] "
-	case logTypeWARN:
-		return "[!] "
-	case logTypeERROR:
-		return "[x] "
-	case logTypeSUCCESS:
-		return "[ok] "
-	case logTypeOUTPUT:
-	}
-	return ""
+	return GetLogTypeIndicator(LogType(logType))
 }
 
 func copySlice(in []interface{}) []interface{} {

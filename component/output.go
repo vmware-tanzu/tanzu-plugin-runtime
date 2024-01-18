@@ -23,7 +23,6 @@ const (
 type OutputWriter interface {
 	SetKeys(headerKeys ...string)
 	AddRow(items ...interface{})
-	SetText(text string)
 	Render()
 }
 
@@ -39,8 +38,6 @@ const (
 	JSONOutputType OutputType = "json"
 	// ListTableOutputType specified output should be in a list table format.
 	ListTableOutputType OutputType = "listtable"
-	// TextOutputType specifies output should be in text format.
-	Text OutputType = "text"
 )
 
 // outputwriter is our internal implementation.
@@ -48,7 +45,6 @@ type outputwriter struct {
 	out                 io.Writer
 	keys                []string
 	values              [][]interface{}
-	text                string
 	outputFormat        OutputType
 	autoStringifyFields bool
 }
@@ -104,11 +100,6 @@ func (ow *outputwriter) SetKeys(headerKeys ...string) {
 	ow.keys = headerKeys
 }
 
-// SetText sets the text to be rendered.
-func (ow *outputwriter) SetText(text string) {
-	ow.text = text
-}
-
 func stringify(items []interface{}) []interface{} {
 	var results []interface{}
 	for i := range items {
@@ -140,8 +131,6 @@ func (ow *outputwriter) Render() {
 		renderYAML(ow.out, ow.dataStruct())
 	case ListTableOutputType:
 		renderListTable(ow)
-	case Text:
-		fmt.Fprint(ow.out, ow.text)
 	default:
 		renderTable(ow)
 	}
@@ -196,12 +185,6 @@ func (obw *objectwriter) SetKeys(_ ...string) {
 func (obw *objectwriter) AddRow(_ ...interface{}) {
 	// Object writer does not have the concept of keys
 	fmt.Fprintln(obw.out, "Programming error, attempt to add rows to object output")
-}
-
-// SetText sets the text to be rendered.
-func (obw *objectwriter) SetText(_ string) {
-	// Object writer does not have the concept of text
-	fmt.Fprintln(obw.out, "Programming error, attempt to add text to object output")
 }
 
 // Render emits the generated table to the output once ready

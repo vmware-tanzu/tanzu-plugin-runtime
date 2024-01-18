@@ -68,7 +68,7 @@ func NewOutputWriterSpinnerWithOptions(output io.Writer, outputFormat, spinnerTe
 func (ows *outputwriterspinner) RenderWithSpinner() {
 	if ows.spinner != nil && ows.spinner.Active() {
 		ows.spinner.Stop()
-		fmt.Fprint(ows.out)
+		fmt.Fprintln(ows.out)
 	}
 	ows.Render()
 }
@@ -77,6 +77,6 @@ func (ows *outputwriterspinner) RenderWithSpinner() {
 func (ows *outputwriterspinner) StopSpinner() {
 	if ows.spinner != nil && ows.spinner.Active() {
 		ows.spinner.Stop()
-		fmt.Fprint(ows.out)
+		fmt.Fprintln(ows.out)
 	}
 }

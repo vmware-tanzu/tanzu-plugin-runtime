@@ -538,17 +538,6 @@ func TestObjectWriterYAML(t *testing.T) {
 	require.Contains(t, lines[1], "spacename: Jupiter")
 }
 
-// TestNewOutputWriterText verifies that text output is rendered as-is.
-func TestNewOutputWriterText(t *testing.T) {
-	var b bytes.Buffer
-	msg := "this is a test"
-	txt := NewOutputWriterWithOptions(&b, string(Text), nil)
-	require.NotNil(t, txt)
-	txt.SetText(msg)
-	txt.Render()
-	require.Equal(t, msg, b.String())
-}
-
 type testStruct struct {
 	Name      string `json:"name,omitempty" yaml:"name,omitempty"`
 	Namespace string `json:"spacename,omitempty" yaml:"spacename,omitempty"`

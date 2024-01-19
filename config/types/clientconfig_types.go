@@ -260,7 +260,8 @@ type KubernetesDiscovery struct {
 	Path string `json:"path,omitempty" yaml:"path,omitempty"`
 	// The context to use (if required), defaults to current.
 	Context string `json:"context,omitempty" yaml:"context,omitempty"`
-	// The bytes with the entire kube configuration
+	// KubeConfigBytes is the entire kube configuration
+	// Note: Either Path or KubeConfigBytes should be configured and not both
 	KubeConfigBytes []byte `json:"kubeConfigBytes,omitempty" yaml:"kubeConfigBytes,omitempty"`
 	// Version of the CLIPlugins API to query.
 	// E.g., v1alpha1

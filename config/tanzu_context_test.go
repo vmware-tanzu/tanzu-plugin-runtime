@@ -151,6 +151,16 @@ func TestGetKubeconfigForContext(t *testing.T) {
 	_, err = GetKubeconfigForContext(nonTanzuCtx.Name, ForProject("project2"))
 	assert.Error(t, err)
 	assert.ErrorContains(t, err, "context must be of type: tanzu")
+
+	// Test getting the kubeconfig for a custom endpoint path
+	tanzuCtx, err := GetContext("test-tanzu")
+	assert.NoError(t, err)
+	kubeconfigBytes, err = GetKubeconfigForContext(tanzuCtx.Name, ForCustomPath("/custom-path"))
+	assert.NoError(t, err)
+	err = yaml.Unmarshal(kubeconfigBytes, &kc)
+	assert.NoError(t, err)
+	cluster = kubeconfig.GetCluster(&kc, "tanzu-cli-mytanzu/current")
+	assert.Equal(t, cluster.Cluster.Server, tanzuCtx.GlobalOpts.Endpoint+"/custom-path")
 }
 
 func TestGetTanzuContextActiveResource(t *testing.T) {

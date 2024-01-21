@@ -85,58 +85,58 @@ var l = NewLogger()
 
 // Info logs a non-error message with the given key/value pairs as context.
 func Info(msg string, kvs ...interface{}) {
-	l.Print(msg, nil, logTypeINFO, kvs...)
+	l.Print(msg, nil, string(LogTypeINFO), kvs...)
 }
 
 // Infof logs a non-error message with the given key/value pairs as context.
 func Infof(format string, args ...interface{}) {
 	msg := fmt.Sprintf(format, args...)
-	l.Print(msg, nil, logTypeINFO)
+	l.Print(msg, nil, string(LogTypeINFO))
 }
 
 // Error logs an error message with the given key/value pairs as context.
 func Error(err error, msg string, kvs ...interface{}) {
-	l.Print(msg, err, logTypeERROR, kvs...)
+	l.Print(msg, err, string(LogTypeERROR), kvs...)
 }
 
 // Errorf logs a error message with the given key/value pairs as context.
 func Errorf(format string, args ...interface{}) {
 	msg := fmt.Sprintf(format, args...)
-	l.Print(msg, nil, logTypeERROR)
+	l.Print(msg, nil, string(LogTypeERROR))
 }
 
 // Warning logs a warning messages with the given key/value pairs as context.
 func Warning(msg string, kvs ...interface{}) {
-	l.Print(msg, nil, logTypeWARN, kvs...)
+	l.Print(msg, nil, string(LogTypeWARN), kvs...)
 }
 
 // Warningf logs a warning messages with the given message format with format specifier and arguments.
 func Warningf(format string, args ...interface{}) {
 	msg := fmt.Sprintf(format, args...)
-	l.Print(msg, nil, logTypeWARN)
+	l.Print(msg, nil, string(LogTypeWARN))
 }
 
 // Success logs a success messages with the given key/value pairs as context.
 func Success(msg string, kvs ...interface{}) {
-	l.Print(msg, nil, logTypeSUCCESS, kvs...)
+	l.Print(msg, nil, string(LogTypeSUCCESS), kvs...)
 }
 
 // Successf logs a success messages with the given message format with format specifier and arguments.
 func Successf(format string, args ...interface{}) {
 	msg := fmt.Sprintf(format, args...)
-	l.Print(msg, nil, logTypeSUCCESS)
+	l.Print(msg, nil, string(LogTypeSUCCESS))
 }
 
 // Fatal logs a fatal message with the given key/value pairs as context and returns with os.Exit(1)
 func Fatal(err error, msg string, kvs ...interface{}) {
-	l.Print(msg, err, logTypeERROR, kvs...)
+	l.Print(msg, err, string(LogTypeERROR), kvs...)
 	os.Exit(1)
 }
 
 // Outputf writes a message to stdout
 func Outputf(format string, args ...interface{}) {
 	msg := fmt.Sprintf(format, args...)
-	l.Print(msg, nil, logTypeOUTPUT)
+	l.Print(msg, nil, string(LogTypeOUTPUT))
 }
 
 // V returns an InfoLogger value for a specific verbosity level.

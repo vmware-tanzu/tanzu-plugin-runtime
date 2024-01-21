@@ -130,13 +130,13 @@ func (w *writer) Write(header, msg []byte, logEnabled bool, logVerbosity int32, 
 
 	// If showTimestamp is set to true, log fullMsg with header
 	// If log type is OUTPUT skip the header
-	if w.showTimestamp && logType != logTypeOUTPUT {
+	if w.showTimestamp && logType != string(LogTypeOUTPUT) {
 		msg = fullMsg
 	}
 
 	// write to stdout/stderr if quiet mode is not set and logEnabled is true
 	if !w.quiet && logEnabled {
-		if logType == logTypeOUTPUT {
+		if logType == string(LogTypeOUTPUT) {
 			w.stdoutWriter(msg)
 		} else {
 			w.stderrWriter(msg)

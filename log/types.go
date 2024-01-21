@@ -3,10 +3,27 @@
 
 package log
 
+type LogType string
+
 const (
-	logTypeINFO    = "INFO"
-	logTypeWARN    = "WARN"
-	logTypeERROR   = "ERROR"
-	logTypeSUCCESS = "SUCCESS"
-	logTypeOUTPUT  = "OUTPUT"
+	LogTypeINFO    LogType = "INFO"
+	LogTypeWARN    LogType = "WARN"
+	LogTypeERROR   LogType = "ERROR"
+	LogTypeSUCCESS LogType = "SUCCESS"
+	LogTypeOUTPUT  LogType = "OUTPUT"
 )
+
+func GetLogTypeIndicator(logType LogType) string {
+	switch logType {
+	case LogTypeINFO:
+		return "[i] "
+	case LogTypeWARN:
+		return "[!] "
+	case LogTypeERROR:
+		return "[x] "
+	case LogTypeSUCCESS:
+		return "[ok] "
+	case LogTypeOUTPUT:
+	}
+	return ""
+}

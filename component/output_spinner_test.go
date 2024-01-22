@@ -67,7 +67,7 @@ func TestNewOutputWriterSpinnerWithSpinnerOptions(t *testing.T) {
 	// Test creating an OutputWriterSpinner with spinner options and a spinner
 	opts := OutputWriterSpinnerOptions{
 		OutputWriterOptions: []OutputWriterOption{WithAutoStringify()},
-		SpinnerOptions:      []OutputWriterSpinnerOption{WithSpinnerFinalMsg("Done!", log.LogTypeSUCCESS)},
+		SpinnerOptions:      []OutputWriterSpinnerOption{WithSpinnerFinalText("Done!", log.LogTypeSUCCESS)},
 	}
 	ows, err := NewOutputWriterSpinnerWithSpinnerOptions(&output, "table", spinnerText, true, opts, headers...)
 	assert.NoError(t, err)
@@ -75,7 +75,7 @@ func TestNewOutputWriterSpinnerWithSpinnerOptions(t *testing.T) {
 
 	// Test creating an OutputWriterSpinner with spinner options without a spinner
 	opts = OutputWriterSpinnerOptions{
-		SpinnerOptions: []OutputWriterSpinnerOption{WithSpinnerFinalMsg("Done!", log.LogTypeSUCCESS)},
+		SpinnerOptions: []OutputWriterSpinnerOption{WithSpinnerFinalText("Done!", log.LogTypeSUCCESS)},
 	}
 	ows, err = NewOutputWriterSpinnerWithSpinnerOptions(&output, "table", spinnerText, false, opts, headers...)
 	assert.NoError(t, err)

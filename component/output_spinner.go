@@ -41,9 +41,9 @@ type OutputWriterSpinnerOptions struct {
 // OutputWriterSpinnerOption is an option for outputwriterspinner
 type OutputWriterSpinnerOption func(*outputwriterspinner)
 
-// WithSpinnerFinalMsg sets the spinner final text and prefix log indicator
+// WithSpinnerFinalText sets the spinner final text and prefix log indicator
 // (log.LogTypeOUTPUT can be used for no prefix)
-func WithSpinnerFinalMsg(finalText string, prefix log.LogType) OutputWriterSpinnerOption {
+func WithSpinnerFinalText(finalText string, prefix log.LogType) OutputWriterSpinnerOption {
 	finalText = fmt.Sprintf("%s%s", log.GetLogTypeIndicator(prefix), finalText)
 	return func(ows *outputwriterspinner) {
 		ows.spinnerFinalText = finalText

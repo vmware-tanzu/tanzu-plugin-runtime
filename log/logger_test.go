@@ -19,6 +19,7 @@ func TestLogger(t *testing.T) {
 		containStrings        []string
 		doesNotContainStrings []string
 	}{
+
 		{
 			title:                 "when TANZU_CLI_LOG_LEVEL is not configured and then set to 3",
 			initialLogLevel:       "",
@@ -67,6 +68,7 @@ func TestLogger(t *testing.T) {
 		t.Run(spec.title, func(t *testing.T) {
 			defer os.Setenv(EnvTanzuCLILogLevel, "")
 
+			l = NewLogger()
 			stderr := &bytes.Buffer{}
 			SetStderr(stderr)
 

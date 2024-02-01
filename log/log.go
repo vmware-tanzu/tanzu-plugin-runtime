@@ -81,87 +81,76 @@ type LoggerImpl interface {
 	WithCallDepth(callDepth int) LoggerImpl
 }
 
+var l = NewLogger()
+
 // Info logs a non-error message with the given key/value pairs as context.
 func Info(msg string, kvs ...interface{}) {
-	l := NewLogger()
 	l.Print(msg, nil, string(LogTypeINFO), kvs...)
 }
 
 // Infof logs a non-error message with the given key/value pairs as context.
 func Infof(format string, args ...interface{}) {
-	l := NewLogger()
 	msg := fmt.Sprintf(format, args...)
 	l.Print(msg, nil, string(LogTypeINFO))
 }
 
 // Error logs an error message with the given key/value pairs as context.
 func Error(err error, msg string, kvs ...interface{}) {
-	l := NewLogger()
 	l.Print(msg, err, string(LogTypeERROR), kvs...)
 }
 
 // Errorf logs a error message with the given key/value pairs as context.
 func Errorf(format string, args ...interface{}) {
-	l := NewLogger()
 	msg := fmt.Sprintf(format, args...)
 	l.Print(msg, nil, string(LogTypeERROR))
 }
 
 // Warning logs a warning messages with the given key/value pairs as context.
 func Warning(msg string, kvs ...interface{}) {
-	l := NewLogger()
 	l.Print(msg, nil, string(LogTypeWARN), kvs...)
 }
 
 // Warningf logs a warning messages with the given message format with format specifier and arguments.
 func Warningf(format string, args ...interface{}) {
-	l := NewLogger()
 	msg := fmt.Sprintf(format, args...)
 	l.Print(msg, nil, string(LogTypeWARN))
 }
 
 // Success logs a success messages with the given key/value pairs as context.
 func Success(msg string, kvs ...interface{}) {
-	l := NewLogger()
 	l.Print(msg, nil, string(LogTypeSUCCESS), kvs...)
 }
 
 // Successf logs a success messages with the given message format with format specifier and arguments.
 func Successf(format string, args ...interface{}) {
-	l := NewLogger()
 	msg := fmt.Sprintf(format, args...)
 	l.Print(msg, nil, string(LogTypeSUCCESS))
 }
 
 // Fatal logs a fatal message with the given key/value pairs as context and returns with os.Exit(1)
 func Fatal(err error, msg string, kvs ...interface{}) {
-	l := NewLogger()
 	l.Print(msg, err, string(LogTypeERROR), kvs...)
 	os.Exit(1)
 }
 
 // Outputf writes a message to stdout
 func Outputf(format string, args ...interface{}) {
-	l := NewLogger()
 	msg := fmt.Sprintf(format, args...)
 	l.Print(msg, nil, string(LogTypeOUTPUT))
 }
 
 // V returns an InfoLogger value for a specific verbosity level.
 func V(level int) LoggerImpl {
-	l := NewLogger()
 	return l.CloneWithLevel(level)
 }
 
 // WithName adds a new element to the logger's name.
 func WithName(name string) LoggerImpl {
-	l := NewLogger()
 	return l.Clone().WithName(name)
 }
 
 // WithValues adds some key-value pairs of context to a logger.
 func WithValues(kvList ...interface{}) LoggerImpl {
-	l := NewLogger()
 	return l.Clone().WithValues(kvList...)
 }
 
@@ -193,7 +182,6 @@ func ShowTimestamp(show bool) {
 
 // SetVerbosity sets verbosity level and also updates default verbosity level
 func SetVerbosity(verbosity int32) {
-	l := NewLogger()
 	l.SetThreshold(&verbosity)
 	logWriter.SetVerbosity(verbosity)
 }

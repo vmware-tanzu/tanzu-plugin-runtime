@@ -18,8 +18,15 @@ import (
 // OutputWriterSpinner is OutputWriter augmented with a spinner.
 type OutputWriterSpinner interface {
 	OutputWriter
+	// RenderWithSpinner will stop spinner and render the output
+	// Deprecated: RenderWithSpinner is being deprecated in favor of Render.
 	RenderWithSpinner()
+	// StartSpinner start the spinner instance and renders the spinnerText
+	StartSpinner()
+	// StopSpinner stops the running spinner instance and renders FinalText if set
 	StopSpinner()
+	// SetText sets the spinner text
+	SetText(text string)
 	// SetFinalText sets the spinner final text and prefix
 	// log indicator (log.LogTypeOUTPUT can be used for no prefix)
 	SetFinalText(finalText string, prefix log.LogType)
@@ -28,32 +35,69 @@ type OutputWriterSpinner interface {
 // outputwriterspinner is our internal implementation.
 type outputwriterspinner struct {
 	outputwriter
-	spinnerText      string
-	spinnerFinalText string
-	spinner          *spinner.Spinner
+	spinnerText        string
+	spinnerFinalText   string
+	startSpinnerOnInit bool
+	spinner            *spinner.Spinner
 }
 
-type OutputWriterSpinnerOptions struct {
-	OutputWriterOptions []OutputWriterOption
-	SpinnerOptions      []OutputWriterSpinnerOption
-}
-
-// OutputWriterSpinnerOption is an option for outputwriterspinner
+// OutputWriterSpinnerOption is an option to configure outputwriterspinner
 type OutputWriterSpinnerOption func(*outputwriterspinner)
 
 // WithSpinnerFinalText sets the spinner final text and prefix log indicator
 // (log.LogTypeOUTPUT can be used for no prefix)
 func WithSpinnerFinalText(finalText string, prefix log.LogType) OutputWriterSpinnerOption {
-	finalText = fmt.Sprintf("%s%s", log.GetLogTypeIndicator(prefix), finalText)
 	return func(ows *outputwriterspinner) {
-		ows.spinnerFinalText = finalText
+		ows.spinnerFinalText = fmt.Sprintf("%s%s", log.GetLogTypeIndicator(prefix), finalText)
+	}
+}
+
+// WithOutputWriterOptions configures OutputWriterOptions to the spinner
+func WithOutputWriterOptions(opts ...OutputWriterOption) OutputWriterSpinnerOption {
+	return func(ow *outputwriterspinner) {
+		ow.applyOptions(opts)
+	}
+}
+
+// WithSpinnerText sets the spinner text
+func WithSpinnerText(text string) OutputWriterSpinnerOption {
+	return func(ows *outputwriterspinner) {
+		ows.spinnerText = text
+	}
+}
+
+// WithSpinnerStarted starts the spinner
+func WithSpinnerStarted() OutputWriterSpinnerOption {
+	return func(ows *outputwriterspinner) {
+		ows.startSpinnerOnInit = true
+	}
+}
+
+// WithHeaders sets key headers
+func WithHeaders(headers ...string) OutputWriterSpinnerOption {
+	return func(ows *outputwriterspinner) {
+		ows.keys = headers
+	}
+}
+
+// WithOutputFormat sets output format for the OutputWriterSpinner component
+func WithOutputFormat(outputFormat OutputType) OutputWriterSpinnerOption {
+	return func(ows *outputwriterspinner) {
+		ows.outputFormat = outputFormat
+	}
+}
+
+// WithOutputStream sets the output stream for the OutputWriterSpinner component
+func WithOutputStream(writer io.Writer) OutputWriterSpinnerOption {
+	return func(ows *outputwriterspinner) {
+		ows.out = writer
 	}
 }
 
 // NewOutputWriterWithSpinner returns implementation of OutputWriterSpinner.
 //
 // Deprecated: NewOutputWriterWithSpinner is being deprecated in favor of
-// NewOutputWriterSpinnerWithSpinnerOptions.
+// NewOutputWriterSpinner.
 // Until it is removed, it will retain the existing behavior of converting
 // incoming row values to their golang string representation for backward
 // compatibility reasons
@@ -65,44 +109,41 @@ func NewOutputWriterWithSpinner(output io.Writer, outputFormat, spinnerText stri
 // NewOutputWriterSpinnerWithOptions returns implementation of OutputWriterSpinner.
 //
 // Deprecated: NewOutputWriterSpinnerWithOptions is being deprecated in favor of
-// NewOutputWriterSpinnerWithSpinnerOptions.
+// NewOutputWriterSpinner.
 func NewOutputWriterSpinnerWithOptions(output io.Writer, outputFormat, spinnerText string, startSpinner bool, opts []OutputWriterOption, headers ...string) (OutputWriterSpinner, error) {
 	ows := &outputwriterspinner{}
 	ows.out = output
 	ows.outputFormat = OutputType(outputFormat)
 	ows.keys = headers
 	ows.applyOptions(opts)
-
-	return setAndInitializeSpinner(ows, spinnerText, startSpinner)
+	ows.spinnerText = spinnerText
+	ows.startSpinnerOnInit = startSpinner
+	return initializeSpinner(ows)
 }
 
-// NewOutputWriterSpinnerWithSpinnerOptions returns implementation of OutputWriterSpinner.
-func NewOutputWriterSpinnerWithSpinnerOptions(output io.Writer, outputFormat OutputType, spinnerText string, startSpinner bool, opts OutputWriterSpinnerOptions, headers ...string) (OutputWriterSpinner, error) {
+// NewOutputWriterSpinner returns implementation of OutputWriterSpinner
+func NewOutputWriterSpinner(opts ...OutputWriterSpinnerOption) (OutputWriterSpinner, error) {
 	ows := &outputwriterspinner{}
-	ows.out = output
-	ows.outputFormat = outputFormat
-	ows.keys = headers
-	ows.applyOptions(opts.OutputWriterOptions)
-	ows.applyOutputWriterSpinnerOptions(opts.SpinnerOptions)
-	return setAndInitializeSpinner(ows, spinnerText, startSpinner)
+	ows.out = os.Stdout
+	ows.applySpinnerOptions(opts)
+	return initializeSpinner(ows)
 }
 
-// setAndInitializeSpinner sets the spinner text and initializes the spinner
-func setAndInitializeSpinner(ows *outputwriterspinner, spinnerText string, startSpinner bool) (OutputWriterSpinner, error) {
+// initializeSpinner initializes the spinner
+func initializeSpinner(ows *outputwriterspinner) (OutputWriterSpinner, error) {
 	if ows.outputFormat != JSONOutputType && ows.outputFormat != YAMLOutputType {
-		ows.spinnerText = spinnerText
-		ows.spinner = spinner.New(spinner.CharSets[9], 100*time.Millisecond)
+		ows.spinner = spinner.New(spinner.CharSets[9], 100*time.Millisecond, spinner.WithWriter(ows.out))
 		if err := ows.spinner.Color("bgBlack", "bold", "fgWhite"); err != nil {
 			return nil, err
 		}
-		ows.spinner.Suffix = fmt.Sprintf(" %s", spinnerText)
+		ows.spinner.Suffix = fmt.Sprintf(" %s", ows.spinnerText)
 		if ows.spinnerFinalText != "" {
 			spinner.WithFinalMSG(ows.spinnerFinalText)(ows.spinner)
 		}
 
 		// Start the spinner only if attached to terminal
 		attachedToTerminal := isatty.IsTerminal(os.Stdout.Fd()) || isatty.IsCygwinTerminal(os.Stdout.Fd())
-		if startSpinner && attachedToTerminal {
+		if ows.startSpinnerOnInit && attachedToTerminal {
 			ows.spinner.Start()
 		}
 	}
@@ -110,15 +151,27 @@ func setAndInitializeSpinner(ows *outputwriterspinner, spinnerText string, start
 }
 
 // RenderWithSpinner will stop spinner and render the output
+//
+// Deprecated: RenderWithSpinner is being deprecated in favor of Render.
 func (ows *outputwriterspinner) RenderWithSpinner() {
-	if ows.spinner != nil && ows.spinner.Active() {
-		ows.spinner.Stop()
-		fmt.Fprintln(ows.out)
-	}
 	ows.Render()
 }
 
-// stop spinner
+// Render will stop spinner and render the output
+func (ows *outputwriterspinner) Render() {
+	ows.StopSpinner()
+	ows.outputwriter.Render()
+}
+
+// StartSpinner start the spinner instance and renders the spinnerText
+func (ows *outputwriterspinner) StartSpinner() {
+	attachedToTerminal := isatty.IsTerminal(os.Stdout.Fd()) || isatty.IsCygwinTerminal(os.Stdout.Fd())
+	if ows.spinner != nil && !ows.spinner.Active() && attachedToTerminal {
+		ows.spinner.Start()
+	}
+}
+
+// StopSpinner stops the running spinner instance and renders FinalText if set
 func (ows *outputwriterspinner) StopSpinner() {
 	if ows.spinner != nil && ows.spinner.Active() {
 		ows.spinner.Stop()
@@ -135,8 +188,16 @@ func (ows *outputwriterspinner) SetFinalText(finalText string, prefix log.LogTyp
 	}
 }
 
-// applyOutputWriterSpinnerOptions applies the options to the outputwriterspinner
-func (ows *outputwriterspinner) applyOutputWriterSpinnerOptions(spinnerOpts []OutputWriterSpinnerOption) {
+// SetText sets the spinner text
+func (ows *outputwriterspinner) SetText(text string) {
+	if ows.spinner != nil {
+		ows.spinnerText = text
+		ows.spinner.Suffix = fmt.Sprintf(" %s", text)
+	}
+}
+
+// applySpinnerOptions applies the options to the outputwriterspinner
+func (ows *outputwriterspinner) applySpinnerOptions(spinnerOpts []OutputWriterSpinnerOption) {
 	for i := range spinnerOpts {
 		spinnerOpts[i](ows)
 	}

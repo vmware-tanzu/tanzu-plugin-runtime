@@ -177,42 +177,75 @@ This will output:
 {"Age":30,"Name":"John"}
 ```
 
-## OutputWriterSpinner Component
+## Spinner Component
 
-`OutputWriterSpinner` provides an interface to `OutputWriter` augmented with a spinner. It allows for rendering output with a spinner while also providing the ability to stop the spinner and render the final output.
+`Spinner` provides an interface to `OutputWriter` augmented with a spinner. It allows for rendering output of multiple types (Text, Table, Yaml, Json) with a spinner while also providing the ability to stop the spinner and render the final output.
 
 ### Usage
 
-To use `OutputWriterSpinner`, you can import the package in your Go code and create an instance of the `OutputWriterSpinner` interface using the `NewOutputWriterSpinnerWithOptions` function.
+To use `Spinner`, you can import the package in your Go code and create an instance of the `Spinner` interface using the `NewSpinner` function.
 
-Note that NewOutputWriterWithSpinner has been deprecated in favor of NewOutputWriterSpinnerWithOptions
-One difference in the default rendering behavior for YAML/JSON output between
-the writer created with NewOutputWriterWithSpinner vs that created with NewOutputWriterSpinnerWithOptions
-is that row fields no longer gets auto stringified in the latter.
+Note that NewOutputWriterWithSpinner and NewOutputWriterSpinnerWithOptions has been deprecated in favor of NewSpinner
+The main difference is how the parameters are provided when creating a spinner component.
 
-To retain the stringify behavior (unlikely what if needed except for backward compatibility
-reasons), create the output writer by including WithAutoStringify() in the
-options list .
+#### Using Spinner to display Table/JSON/YAML output
 
 ``` go
 import "github.com/vmware-tanzu/tanzu-plugin-runtime/component"
 
 
-// create new OutputWriterSpinner
-outputWriterSpinner, err := component.NewOutputWriterSpinnerWithOptions(os.Stdout, "json", "Loading...", true, []OutputWriterOption{})
+// Create new Spinner component
+spinner, err := component.NewSpinner(component.WithOutputStream(os.Stderr),
+		component.WithOutputFormat(component.TableOutputType), // For JSON use JSONOutputType and for YAML use YAMLOutputType
+		component.WithSpinnerText("Fetching data..."),
+		component.WithSpinnerStarted(),
+        component.WithHeaders("Namespace", "Name", "Ready"))
 if err != nil {
-    fmt.Println("Error creating OutputWriterSpinner:", err)
+    fmt.Println("Error creating spinner:", err)
     return
 }
 
-// Render output with spinner
-outputWriterSpinner.RenderWithSpinner()
+// Do some processing to fetch the data from server and fill rows for table
+spinner.AddRow("default", "pod1", "False")
+spinner.AddRow("default", "pod2", "True")
 
-// Stop spinner and render final output
-outputWriterSpinner.StopSpinner()
+// Render output to stop the spinner and render output in table format
+spinner.Render()
+
 ```
 
-The `NewOutputWriterWithSpinner` function takes in the following parameters:
+#### Using Spinner to display plain text
+
+``` go
+import "github.com/vmware-tanzu/tanzu-plugin-runtime/component"
+
+
+// Create new Spinner component
+spinner, err := component.NewSpinner()
+if err != nil {
+    fmt.Println("Error creating spinner:", err)
+    return
+}
+
+spinner.SetText("Installing plugin 'apps'")
+spinner.StartSpinner()
+
+// Do some processing to fetch and install the required plugin
+err := InstallPlugin("apps")
+
+if err != nil {
+    spinner.SetFinalText("Error while installing the plugin 'apps'", log.LogTypeERROR)
+} else {
+    spinner.SetFinalText("Successfully installed the plugin 'apps'", log.LogTypeSuccess)
+}
+
+// Stop the spinner and render/output FinalText
+spinner.StopSpinner()
+
+```
+
+
+The `NewSpinner` function takes in the following optional options:
 
 - `output io.Writer`: The output writer for the spinner and final output.
 - `outputFormat string`: The output format for the final output. It can be either "json" or "yaml".

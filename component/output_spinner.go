@@ -21,9 +21,9 @@ type OutputWriterSpinner interface {
 	// RenderWithSpinner will stop spinner and render the output
 	// Deprecated: RenderWithSpinner is being deprecated in favor of Render.
 	RenderWithSpinner()
-	// StartSpinner start the spinner instance and renders the spinnerText
+	// StartSpinner starts the spinner instance, showing the spinnerText
 	StartSpinner()
-	// StopSpinner stops the running spinner instance and renders FinalText if set
+	// StopSpinner stops the running spinner instance, displays FinalText if set
 	StopSpinner()
 	// SetText sets the spinner text
 	SetText(text string)
@@ -138,12 +138,8 @@ func initializeSpinner(ows *outputwriterspinner) OutputWriterSpinner {
 			spinner.WithWriter(ows.out),
 			spinner.WithFinalMSG(ows.spinnerFinalText),
 			spinner.WithSuffix(fmt.Sprintf(" %s", ows.spinnerText)),
+			spinner.WithColor("bold"),
 		)
-
-		// If the colors cannot be assigned to the spinner, we do not want to throw and error
-		// as spinner will use default coloring. Note this color scheme is only applicable to spinner object
-		// and not to the text we display along with the spinner object
-		_ = ows.spinner.Color("bgBlack", "bold", "fgWhite")
 
 		// Start the spinner only if attached to terminal
 		attachedToTerminal := isatty.IsTerminal(os.Stdout.Fd()) || isatty.IsCygwinTerminal(os.Stdout.Fd())
@@ -154,20 +150,20 @@ func initializeSpinner(ows *outputwriterspinner) OutputWriterSpinner {
 	return ows
 }
 
-// RenderWithSpinner will stop spinner and render the output
+// RenderWithSpinner stops the running spinner instance, displays FinalText if set, then renders the output
 //
 // Deprecated: RenderWithSpinner is being deprecated in favor of Render.
 func (ows *outputwriterspinner) RenderWithSpinner() {
 	ows.Render()
 }
 
-// Render will stop spinner and render the output
+// Render stops the running spinner instance, displays FinalText if set, then renders the output
 func (ows *outputwriterspinner) Render() {
 	ows.StopSpinner()
 	ows.outputwriter.Render()
 }
 
-// StartSpinner start the spinner instance and renders the spinnerText
+// StartSpinner starts the spinner instance, showing the spinnerText
 func (ows *outputwriterspinner) StartSpinner() {
 	attachedToTerminal := isatty.IsTerminal(os.Stdout.Fd()) || isatty.IsCygwinTerminal(os.Stdout.Fd())
 	if ows.spinner != nil && !ows.spinner.Active() && attachedToTerminal {
@@ -175,7 +171,7 @@ func (ows *outputwriterspinner) StartSpinner() {
 	}
 }
 
-// StopSpinner stops the running spinner instance and renders FinalText if set
+// StopSpinner stops the running spinner instance, displays FinalText if set
 func (ows *outputwriterspinner) StopSpinner() {
 	if ows.spinner != nil && ows.spinner.Active() {
 		ows.spinner.Stop()

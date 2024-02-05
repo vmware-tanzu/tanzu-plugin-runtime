@@ -179,7 +179,7 @@ This will output:
 
 ## OutputWriterSpinner Component
 
-`OutputWriterSpinner` provides an interface to `OutputWriter` augmented with a spinner. It allows for rendering output of multiple types (Text, Table, Yaml, Json) with a spinner while also providing the ability to stop the spinner and render the final output.
+`OutputWriterSpinner` provides an interface to `OutputWriter` augmented with a spinner. It allows for displaying output of multiple types (Text, Table, Yaml, Json) with a spinner while also providing the ability to stop the spinner, display the final text and render the output.
 
 ### Usage
 
@@ -208,7 +208,7 @@ if err != nil {
 owSpinner.AddRow("default", "pod1", "False")
 owSpinner.AddRow("default", "pod2", "True")
 
-// Render output to stop the spinner and render output in table format
+// Stop the running spinner instance, displays FinalText if set, then renders the tabular output
 owSpinner.Render()
 
 ```
@@ -237,7 +237,7 @@ if err != nil {
     spinner.SetFinalText("Successfully installed the plugin 'apps'", log.LogTypeSuccess)
 }
 
-// Stop the spinner and render/output FinalText
+// Stop the spinner and displays FinalText
 spinner.StopSpinner()
 
 ```
@@ -258,9 +258,9 @@ The created `OutputWriterSpinner` instance provides following methods:
 - `AddRow(items ...interface{})`: adds rows to the OutputWriter component
 - `SetText(text string)`: sets the spinner text
 - `SetFinalText(finalText string, prefix log.LogType)`: sets the spinner final text and prefix log indicator
-- `StartSpinner()`: start the spinner instance and renders the spinnerText
-- `StopSpinner()`: stops the running spinner instance and renders FinalText if set
-- `Render()`: stops the spinner and render the output
+- `StartSpinner()`: starts the spinner instance, showing the spinnerText
+- `StopSpinner()`: stops the running spinner instance, displays FinalText if set
+- `Render()`: stops the running spinner instance, displays FinalText if set, then renders the output
 
 ## Prompt Component
 

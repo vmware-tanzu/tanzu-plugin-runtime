@@ -177,40 +177,39 @@ This will output:
 {"Age":30,"Name":"John"}
 ```
 
-## Spinner Component
+## OutputWriterSpinner Component
 
-`Spinner` provides an interface to `OutputWriter` augmented with a spinner. It allows for rendering output of multiple types (Text, Table, Yaml, Json) with a spinner while also providing the ability to stop the spinner and render the final output.
+`OutputWriterSpinner` provides an interface to `OutputWriter` augmented with a spinner. It allows for rendering output of multiple types (Text, Table, Yaml, Json) with a spinner while also providing the ability to stop the spinner and render the final output.
 
 ### Usage
 
-To use `Spinner`, you can import the package in your Go code and create an instance of the `Spinner` interface using the `NewSpinner` function.
+To use `OutputWriterSpinner`, you can import the package in your Go code and create an instance of the `OutputWriterSpinner` interface using the `NewOutputWriterSpinner` function.
 
-Note that NewOutputWriterWithSpinner and NewOutputWriterSpinnerWithOptions has been deprecated in favor of NewSpinner
-The main difference is how the parameters are provided when creating a spinner component.
+Note that `NewOutputWriterWithSpinner` and `NewOutputWriterSpinnerWithOptions` has been deprecated in favor of `NewOutputWriterSpinner`.
+The main difference is how the parameters are provided when creating a `OutputWriterSpinner` component.
 
 #### Using Spinner to display Table/JSON/YAML output
 
 ``` go
 import "github.com/vmware-tanzu/tanzu-plugin-runtime/component"
 
-
-// Create new Spinner component
-spinner, err := component.NewSpinner(component.WithOutputStream(os.Stderr),
-		component.WithOutputFormat(component.TableOutputType), // For JSON use JSONOutputType and for YAML use YAMLOutputType
-		component.WithSpinnerText("Fetching data..."),
-		component.WithSpinnerStarted(),
+// Create new OutputWriterSpinner component
+owSpinner, err := component.NewOutputWriterSpinner(component.WithOutputStream(os.Stderr),
+        component.WithOutputFormat(component.TableOutputType), // For JSON use JSONOutputType and for YAML use YAMLOutputType
+        component.WithSpinnerText("Fetching data..."),
+        component.WithSpinnerStarted(),
         component.WithHeaders("Namespace", "Name", "Ready"))
 if err != nil {
-    fmt.Println("Error creating spinner:", err)
+    fmt.Println("Error creating OutputWriterSpinner:", err)
     return
 }
 
 // Do some processing to fetch the data from server and fill rows for table
-spinner.AddRow("default", "pod1", "False")
-spinner.AddRow("default", "pod2", "True")
+owSpinner.AddRow("default", "pod1", "False")
+owSpinner.AddRow("default", "pod2", "True")
 
 // Render output to stop the spinner and render output in table format
-spinner.Render()
+owSpinner.Render()
 
 ```
 
@@ -219,9 +218,8 @@ spinner.Render()
 ``` go
 import "github.com/vmware-tanzu/tanzu-plugin-runtime/component"
 
-
-// Create new Spinner component
-spinner, err := component.NewSpinner()
+// Create new OutputWriterSpinner component
+spinner, err := component.NewOutputWriterSpinner()
 if err != nil {
     fmt.Println("Error creating spinner:", err)
     return
@@ -244,19 +242,25 @@ spinner.StopSpinner()
 
 ```
 
+The `NewOutputWriterSpinner` function takes in the following optional options:
 
-The `NewSpinner` function takes in the following optional options:
+- `WithOutputStream(writer io.Writer)`: sets the output stream for the OutputWriterSpinner component.
+- `WithOutputFormat(outputFormat OutputType)`: sets output format for the OutputWriterSpinner component.
+- `WithOutputWriterOptions(opts ...OutputWriterOption)`: configures OutputWriterOptions to the OutputWriterSpinner component.
+- `WithSpinnerText(text string)`: sets the spinner text
+- `WithSpinnerFinalText(finalText string, prefix log.LogType)`: sets the spinner final text and prefix log indicator
+- `WithSpinnerStarted()`: starts the spinner when the OutputWriterSpinner component gets created
+- `WithHeaders(headers ...string)`: Sets the headers for the OutputWriterOptions component
 
-- `output io.Writer`: The output writer for the spinner and final output.
-- `outputFormat string`: The output format for the final output. It can be either "json" or "yaml".
-- `spinnerText string`: The text to display next to the spinner.
-- `startSpinner bool`: Whether to start the spinner immediately or not.
-- `headers ...string`: Optional headers for the final output.
+The created `OutputWriterSpinner` instance provides following methods:
 
-The created `OutputWriterSpinner` instance provides two methods:
-
-- `RenderWithSpinner()`: Renders the output with a spinner.
-- `StopSpinner()`: Stops the spinner and renders the final output.
+- `SetKeys(headerKeys ...string)`: sets the headers for the OutputWriter component
+- `AddRow(items ...interface{})`: adds rows to the OutputWriter component
+- `SetText(text string)`: sets the spinner text
+- `SetFinalText(finalText string, prefix log.LogType)`: sets the spinner final text and prefix log indicator
+- `StartSpinner()`: start the spinner instance and renders the spinnerText
+- `StopSpinner()`: stops the running spinner instance and renders FinalText if set
+- `Render()`: stops the spinner and render the output
 
 ## Prompt Component
 

@@ -118,7 +118,7 @@ func NewOutputWriterSpinnerWithOptions(output io.Writer, outputFormat, spinnerTe
 	ows.applyOptions(opts)
 	ows.spinnerText = spinnerText
 	ows.startSpinnerOnInit = startSpinner
-	return initializeSpinner(ows)
+	return initializeSpinner(ows), nil
 }
 
 // NewOutputWriterSpinner returns implementation of OutputWriterSpinner
@@ -126,20 +126,24 @@ func NewOutputWriterSpinner(opts ...OutputWriterSpinnerOption) (OutputWriterSpin
 	ows := &outputwriterspinner{}
 	ows.out = os.Stdout
 	ows.applySpinnerOptions(opts)
-	return initializeSpinner(ows)
+	// Note: We are returning the 'nil' error always to protect against the possible API
+	// enhancement which might require throwing an error in future
+	return initializeSpinner(ows), nil
 }
 
 // initializeSpinner initializes the spinner
-func initializeSpinner(ows *outputwriterspinner) (OutputWriterSpinner, error) {
+func initializeSpinner(ows *outputwriterspinner) OutputWriterSpinner {
 	if ows.outputFormat != JSONOutputType && ows.outputFormat != YAMLOutputType {
-		ows.spinner = spinner.New(spinner.CharSets[9], 100*time.Millisecond, spinner.WithWriter(ows.out))
-		if err := ows.spinner.Color("bgBlack", "bold", "fgWhite"); err != nil {
-			return nil, err
-		}
-		ows.spinner.Suffix = fmt.Sprintf(" %s", ows.spinnerText)
-		if ows.spinnerFinalText != "" {
-			spinner.WithFinalMSG(ows.spinnerFinalText)(ows.spinner)
-		}
+		ows.spinner = spinner.New(spinner.CharSets[9], 100*time.Millisecond,
+			spinner.WithWriter(ows.out),
+			spinner.WithFinalMSG(ows.spinnerFinalText),
+			spinner.WithSuffix(fmt.Sprintf(" %s", ows.spinnerText)),
+		)
+
+		// If the colors cannot be assigned to the spinner, we do not want to throw and error
+		// as spinner will use default coloring. Note this color scheme is only applicable to spinner object
+		// and not to the text we display along with the spinner object
+		_ = ows.spinner.Color("bgBlack", "bold", "fgWhite")
 
 		// Start the spinner only if attached to terminal
 		attachedToTerminal := isatty.IsTerminal(os.Stdout.Fd()) || isatty.IsCygwinTerminal(os.Stdout.Fd())
@@ -147,7 +151,7 @@ func initializeSpinner(ows *outputwriterspinner) (OutputWriterSpinner, error) {
 			ows.spinner.Start()
 		}
 	}
-	return ows, nil
+	return ows
 }
 
 // RenderWithSpinner will stop spinner and render the output

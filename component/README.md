@@ -193,8 +193,8 @@ The main difference is how the parameters are provided when creating a `OutputWr
 ``` go
 import "github.com/vmware-tanzu/tanzu-plugin-runtime/component"
 
-// Create new OutputWriterSpinner component
-owSpinner, err := component.NewOutputWriterSpinner(component.WithOutputStream(os.Stderr),
+// Create new OutputWriterSpinner component. If `WithOutputStream` option is not provided, it will use os.Stdout as default output stream
+owSpinner, err := component.NewOutputWriterSpinner(
         component.WithOutputFormat(component.TableOutputType), // For JSON use JSONOutputType and for YAML use YAMLOutputType
         component.WithSpinnerText("Fetching data..."),
         component.WithSpinnerStarted(),
@@ -219,7 +219,7 @@ owSpinner.Render()
 import "github.com/vmware-tanzu/tanzu-plugin-runtime/component"
 
 // Create new OutputWriterSpinner component
-spinner, err := component.NewOutputWriterSpinner()
+spinner, err := component.NewOutputWriterSpinner(component.WithOutputStream(os.Stderr))
 if err != nil {
     fmt.Println("Error creating spinner:", err)
     return

@@ -59,31 +59,34 @@ func TestNewOutputWriterSpinnerWithOptions(t *testing.T) {
 	assert.NotNil(t, ows)
 }
 
-func TestNewOutputWriterSpinnerWithSpinnerOptions(t *testing.T) {
+func TestNewOutputWriterSpinner(t *testing.T) {
 	output := bytes.Buffer{}
 	spinnerText := loading
 	headers := []string{"Name", "Age"}
 
-	// Test creating an OutputWriterSpinner with spinner options and a spinner
-	opts := OutputWriterSpinnerOptions{
-		OutputWriterOptions: []OutputWriterOption{WithAutoStringify()},
-		SpinnerOptions:      []OutputWriterSpinnerOption{WithSpinnerFinalText("Done!", log.LogTypeSUCCESS)},
-	}
-	ows, err := NewOutputWriterSpinnerWithSpinnerOptions(&output, "table", spinnerText, true, opts, headers...)
+	ows, err := NewOutputWriterSpinner(WithOutputStream(&output),
+		WithOutputFormat(TableOutputType),
+		WithSpinnerText(spinnerText),
+		WithSpinnerStarted(),
+		WithOutputWriterOptions(WithAutoStringify()),
+		WithHeaders(headers...),
+		WithSpinnerFinalText("Done!", log.LogTypeSUCCESS))
 	assert.NoError(t, err)
 	assert.NotNil(t, ows)
 
-	// Test creating an OutputWriterSpinner with spinner options without a spinner
-	opts = OutputWriterSpinnerOptions{
-		SpinnerOptions: []OutputWriterSpinnerOption{WithSpinnerFinalText("Done!", log.LogTypeSUCCESS)},
-	}
-	ows, err = NewOutputWriterSpinnerWithSpinnerOptions(&output, "table", spinnerText, false, opts, headers...)
+	ows, err = NewOutputWriterSpinner(WithOutputStream(&output),
+		WithOutputFormat(TableOutputType),
+		WithSpinnerText(spinnerText),
+		WithHeaders(headers...),
+		WithSpinnerFinalText("Done!", log.LogTypeSUCCESS))
 	assert.NoError(t, err)
 	assert.NotNil(t, ows)
 
-	// Test creating an OutputWriterSpinner with unsupported output format
-	opts = OutputWriterSpinnerOptions{}
-	ows, err = NewOutputWriterSpinnerWithSpinnerOptions(&output, "unsupported", spinnerText, true, opts, headers...)
+	ows, err = NewOutputWriterSpinner(WithOutputStream(&output),
+		WithOutputFormat("unsupported"),
+		WithSpinnerText(spinnerText),
+		WithSpinnerStarted(),
+		WithHeaders(headers...))
 	assert.NoError(t, err)
 	assert.NotNil(t, ows)
 }

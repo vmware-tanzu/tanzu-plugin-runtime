@@ -64,30 +64,27 @@ func TestNewOutputWriterSpinner(t *testing.T) {
 	spinnerText := loading
 	headers := []string{"Name", "Age"}
 
-	ows, err := NewOutputWriterSpinner(WithOutputStream(&output),
+	ows := NewOutputWriterSpinner(WithOutputStream(&output),
 		WithOutputFormat(TableOutputType),
 		WithSpinnerText(spinnerText),
 		WithSpinnerStarted(),
 		WithOutputWriterOptions(WithAutoStringify()),
 		WithHeaders(headers...),
 		WithSpinnerFinalText("Done!", log.LogTypeSUCCESS))
-	assert.NoError(t, err)
 	assert.NotNil(t, ows)
 
-	ows, err = NewOutputWriterSpinner(WithOutputStream(&output),
+	ows = NewOutputWriterSpinner(WithOutputStream(&output),
 		WithOutputFormat(TableOutputType),
 		WithSpinnerText(spinnerText),
 		WithHeaders(headers...),
 		WithSpinnerFinalText("Done!", log.LogTypeSUCCESS))
-	assert.NoError(t, err)
 	assert.NotNil(t, ows)
 
-	ows, err = NewOutputWriterSpinner(WithOutputStream(&output),
+	ows = NewOutputWriterSpinner(WithOutputStream(&output),
 		WithOutputFormat("unsupported"),
 		WithSpinnerText(spinnerText),
 		WithSpinnerStarted(),
 		WithHeaders(headers...))
-	assert.NoError(t, err)
 	assert.NotNil(t, ows)
 }
 

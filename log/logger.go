@@ -35,24 +35,22 @@ type logEntry struct {
 
 // NewLogger returns a new instance of the logger.
 func NewLogger() LoggerImpl {
-	logThreshold := getLogThreshold(defaultLogThreshold)
+	logThreshold := getLogThreshold()
 	return &logger{
 		threshold: &logThreshold,
 	}
 }
 
-func getLogThreshold(defaultThreshold int32) int32 {
+func getLogThreshold() int32 {
 	reqLogLevelStr := os.Getenv(EnvTanzuCLILogLevel)
 	if reqLogLevelStr != "" {
 		requestedLogLevel, err := strconv.ParseUint(reqLogLevelStr, 10, 32)
 		if err == nil {
 			return int32(requestedLogLevel)
 		}
-
 		fmt.Fprintf(os.Stderr, "invalid value %q for %s\n", reqLogLevelStr, EnvTanzuCLILogLevel)
 	}
-
-	return defaultThreshold
+	return defaultLogThreshold
 }
 
 // logger defines a logr.Logger
@@ -67,22 +65,8 @@ type logger struct {
 
 var _ LoggerImpl = &logger{}
 
-// SyncThreshold syncs the threshold value for a logger based on what is set on logger and TANZU_CLI_LOG_LEVEL.
-// TANZU_CLI_LOG_LEVEL value takes precedence over SetThreshold
-func (l *logger) syncThreshold() {
-	var logThreshold int32
-
-	// If threshold is already set then use that value as default fallback if TANZU_CLI_LOG_LEVEL is not set
-	if l.threshold != nil {
-		logThreshold = getLogThreshold(*l.threshold)
-	} else {
-		logThreshold = getLogThreshold(defaultLogThreshold)
-	}
-	l.threshold = &logThreshold
-}
-
 // SetThreshold implements a New Option that allows to set the threshold level for a logger.
-// The logger will write only log messages with a level/V(x) equal or lower to the threshold.
+// The logger will write only log messages with a level/V(x) equal or higher to the threshold.
 func (l *logger) SetThreshold(threshold *int32) {
 	l.threshold = threshold
 }
@@ -209,7 +193,6 @@ func (l *logger) CloneWithLevel(level int) LoggerImpl {
 }
 
 func (l *logger) Print(msg string, err error, logType string, kvs ...interface{}) {
-	l.syncThreshold()
 	msg = fmt.Sprintf("%s%s", l.getLogTypeIndicator(logType), msg)
 	values := copySlice(l.values)
 	values = append(values, kvs...)

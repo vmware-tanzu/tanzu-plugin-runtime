@@ -122,13 +122,11 @@ func NewOutputWriterSpinnerWithOptions(output io.Writer, outputFormat, spinnerTe
 }
 
 // NewOutputWriterSpinner returns implementation of OutputWriterSpinner
-func NewOutputWriterSpinner(opts ...OutputWriterSpinnerOption) (OutputWriterSpinner, error) {
+func NewOutputWriterSpinner(opts ...OutputWriterSpinnerOption) OutputWriterSpinner {
 	ows := &outputwriterspinner{}
 	ows.out = os.Stdout
 	ows.applySpinnerOptions(opts)
-	// Note: We are returning the 'nil' error always to protect against the possible API
-	// enhancement which might require throwing an error in future
-	return initializeSpinner(ows), nil
+	return initializeSpinner(ows)
 }
 
 // initializeSpinner initializes the spinner

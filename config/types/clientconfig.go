@@ -44,6 +44,10 @@ const (
 	// TargetGlobal is used for plugins that are not associated with any target
 	TargetGlobal Target = "global"
 
+	// TargetOperations is used for plugins that does operations for application platforms
+	TargetOperations Target = "operations"
+	targetOperations Target = "ops"
+
 	// TargetUnknown specifies that the target is not currently known
 	TargetUnknown Target = ""
 )

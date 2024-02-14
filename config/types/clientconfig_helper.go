@@ -11,6 +11,8 @@ func StringToTarget(target string) Target {
 		return TargetK8s
 	} else if target == string(targetTMC) || target == string(TargetTMC) {
 		return TargetTMC
+	} else if target == string(targetOperations) || target == string(TargetOperations) {
+		return TargetOperations
 	} else if target == string(TargetGlobal) {
 		return TargetGlobal
 	} else if target == string(TargetUnknown) {
@@ -27,6 +29,8 @@ func IsValidTarget(target string, allowGlobal, allowUnknown bool) bool {
 		target == string(TargetK8s) ||
 		target == string(targetTMC) ||
 		target == string(TargetTMC) ||
+		target == string(targetOperations) ||
+		target == string(TargetOperations) ||
 		(allowGlobal && target == string(TargetGlobal)) ||
 		(allowUnknown && target == string(TargetUnknown))
 }

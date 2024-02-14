@@ -180,10 +180,11 @@ func GetKubeconfigForContext(contextName string, opts ...ResourceOptions) ([]byt
 		opt(rOptions)
 	}
 
-	if ctx.ContextType != configtypes.ContextTypeTanzu {
-		return nil, errors.Errorf("context must be of type: %s", configtypes.ContextTypeTanzu)
+	if ctx.ContextType != configtypes.ContextTypeTanzu && ctx.ContextType != configtypes.ContextTypeK8s {
+		return nil, errors.Errorf("context must be of type: %s or %s", configtypes.ContextTypeTanzu, configtypes.ContextTypeK8s)
 	}
-	if rOptions.spaceName != "" && rOptions.clusterGroupName != "" {
+
+	if ctx.ContextType == configtypes.ContextTypeTanzu && rOptions.spaceName != "" && rOptions.clusterGroupName != "" {
 		return nil, errors.Errorf("incorrect resource options provided. Both space and clustergroup are set but only one can be set")
 	}
 
@@ -196,7 +197,10 @@ func GetKubeconfigForContext(contextName string, opts ...ResourceOptions) ([]byt
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to minify the kubeconfig")
 	}
-	updateKubeconfigServerURL(kc, ctx, rOptions)
+
+	if ctx.ContextType == configtypes.ContextTypeTanzu {
+		updateKubeconfigServerURL(kc, ctx, rOptions)
+	}
 
 	kubeconfigBytes, err := yaml.Marshal(kc)
 	if err != nil {

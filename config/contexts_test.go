@@ -470,6 +470,27 @@ func setupForGetContext() error {
 				},
 			},
 			{
+				Name:        "k8s-context",
+				ContextType: configtypes.ContextTypeK8s,
+				GlobalOpts: &configtypes.GlobalServer{
+					Endpoint: "test-endpoint",
+				},
+				ClusterOpts: &configtypes.ClusterServer{
+					Endpoint: "https://api.tanzu.cloud.vmware.com:443/org/fake-org-id",
+					Path:     "test-path",
+					Context:  "test-context",
+				},
+			},
+			{
+				Name:        "k8s-context",
+				ContextType: configtypes.ContextTypeK8s,
+				ClusterOpts: &configtypes.ClusterServer{
+					Endpoint: "https://api.tanzu.cloud.vmware.com:443/org/fake-org-id",
+					Path:     "test-path",
+					Context:  "test-context",
+				},
+			},
+			{
 				Name:        "test-tanzu",
 				ContextType: configtypes.ContextTypeTanzu,
 				GlobalOpts: &configtypes.GlobalServer{
@@ -558,7 +579,7 @@ func TestGetContextsByType(t *testing.T) {
 	}{
 		{
 			name:                    "get k8s contexts",
-			expectedNamesOfContexts: []string{"test-mc", "test-mc-2"},
+			expectedNamesOfContexts: []string{"test-mc", "test-mc-2", "k8s-context"},
 			contextType:             configtypes.ContextTypeK8s,
 		},
 		{

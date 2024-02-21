@@ -54,6 +54,11 @@ const (
 
 var (
 	// SupportedTargets is a list of all supported Target
+	// As this constant was used wrt ContextType in the deprecated function
+	// `GetAllCurrentContextsMap`, it does not make sense to add `TargetOperations`
+	// to it even though `TargetOperations` is a supported target value.
+	//
+	// Deprecated: This constant is deprecated
 	SupportedTargets = []Target{TargetK8s, TargetTMC}
 	// SupportedContextTypes is a list of all supported ContextTypes
 	SupportedContextTypes = []ContextType{ContextTypeK8s, ContextTypeTMC, ContextTypeTanzu}

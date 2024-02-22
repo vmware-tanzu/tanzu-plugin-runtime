@@ -32,7 +32,7 @@ type Target string
 
 const (
 	// TargetK8s is a kubernetes target of the CLI
-	// This target applies if the plugin is interacting with a Kubernetes cluster
+	// This target applies if the plugin is interacting with a Kubernetes endpoint
 	TargetK8s Target = "kubernetes"
 	targetK8s Target = "k8s"
 
@@ -44,7 +44,7 @@ const (
 	// TargetGlobal is used for plugins that are not associated with any target
 	TargetGlobal Target = "global"
 
-	// TargetOperations is used for plugins that does operations for application platforms
+	// TargetOperations is used for plugins that support Kubernetes operations for Tanzu Application Platform
 	TargetOperations Target = "operations"
 	targetOperations Target = "ops"
 

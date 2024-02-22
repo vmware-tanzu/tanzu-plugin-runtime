@@ -27,7 +27,15 @@ for i in `cat ${PLUGINS_JSON} | jq -r '.[] | select(.target == "mission-control"
    tanzu mission-control $i lint >> ${LINT_OUT} 
 done
 
-for i in `cat ${PLUGINS_JSON} | jq -r '.[] | select(.target != "mission-control") | .name'`; do 
+for i in `cat ${PLUGINS_JSON} | jq -r '.[] | select(.target == "operations") | .name'`; do 
+   echo "operations $i"
+   echo "** operations $i" >> ${LINT_OUT}
+   echo tanzu operations $i lint
+   tanzu plugin install $i --target operations
+   tanzu operations $i lint >> ${LINT_OUT} 
+done
+
+for i in `cat ${PLUGINS_JSON} | jq -r '.[] | select((.target == "kubernetes") or (.target == "global")) | .name'`; do
    echo "$i"
    echo "** $i" >> ${LINT_OUT}
    echo tanzu $i lint 

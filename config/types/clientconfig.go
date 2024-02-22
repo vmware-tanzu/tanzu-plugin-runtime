@@ -32,7 +32,7 @@ type Target string
 
 const (
 	// TargetK8s is a kubernetes target of the CLI
-	// This target applies if the plugin is interacting with a Kubernetes cluster
+	// This target applies if the plugin is interacting with a Kubernetes endpoint
 	TargetK8s Target = "kubernetes"
 	targetK8s Target = "k8s"
 
@@ -44,12 +44,21 @@ const (
 	// TargetGlobal is used for plugins that are not associated with any target
 	TargetGlobal Target = "global"
 
+	// TargetOperations is used for plugins that support Kubernetes operations for Tanzu Application Platform
+	TargetOperations Target = "operations"
+	targetOperations Target = "ops"
+
 	// TargetUnknown specifies that the target is not currently known
 	TargetUnknown Target = ""
 )
 
 var (
 	// SupportedTargets is a list of all supported Target
+	// As this constant was used wrt ContextType in the deprecated function
+	// `GetAllCurrentContextsMap`, it does not make sense to add `TargetOperations`
+	// to it even though `TargetOperations` is a supported target value.
+	//
+	// Deprecated: This constant is deprecated
 	SupportedTargets = []Target{TargetK8s, TargetTMC}
 	// SupportedContextTypes is a list of all supported ContextTypes
 	SupportedContextTypes = []ContextType{ContextTypeK8s, ContextTypeTMC, ContextTypeTanzu}

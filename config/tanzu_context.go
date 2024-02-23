@@ -138,9 +138,9 @@ func ForCustomPath(customPath string) ResourceOptions {
 	}
 }
 
-// GetKubeconfigForContext returns the kubeconfig for any arbitrary Tanzu resource in the Tanzu object hierarchy
+// GetKubeconfigForContext returns the kubeconfig for any arbitrary kubernetes resource or Tanzu resource in the Tanzu object hierarchy
 // referred by the Tanzu context
-// Pre-reqs: project, space and clustergroup names should be valid
+// Pre-reqs: project, space and clustergroup names should be valid for retreiving Kubeconfig of Tanzu context
 //
 // Notes:
 //
@@ -169,6 +169,11 @@ func ForCustomPath(customPath string) ResourceOptions {
 // ex: kubeconfig's cluster.server URL : https://endpoint/org/orgid/project/<projectName>/clustergroup/<clustergroupName>
 //
 // Note: Specifying `spaceName` and `clusterGroupName` both at the same time is incorrect input.
+//
+// Use Case 5: Get the kubeconfig pointing to Kubernetes context
+// -> projectName        = ""
+// -> spaceName          = ""
+// -> clusterGroupName   = ""
 func GetKubeconfigForContext(contextName string, opts ...ResourceOptions) ([]byte, error) {
 	ctx, err := GetContext(contextName)
 	if err != nil {

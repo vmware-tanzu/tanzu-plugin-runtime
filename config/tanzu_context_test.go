@@ -100,11 +100,23 @@ func TestGetKubeconfigForContext(t *testing.T) {
 		_ = os.RemoveAll(kubeconfigFilePath.Name())
 	}()
 
+	// Cluster context
+	myTanzu := "tanzu-cli-mytanzu"
+
+	// Setup tanzu context
 	c, err := GetContext("test-tanzu")
 	assert.NoError(t, err)
 	c.ClusterOpts.Path = kubeconfigFilePath.Name()
-	c.ClusterOpts.Context = "tanzu-cli-mytanzu"
+	c.ClusterOpts.Context = myTanzu
 	err = SetContext(c, false)
+	assert.NoError(t, err)
+
+	// Setup kubernetes context
+	k8sCtx, err := GetContext("k8s-context")
+	assert.NoError(t, err)
+	k8sCtx.ClusterOpts.Path = kubeconfigFilePath.Name()
+	k8sCtx.ClusterOpts.Context = "k8s-context"
+	err = SetContext(k8sCtx, false)
 	assert.NoError(t, err)
 
 	// Test getting the kubeconfig for a space within a project
@@ -146,11 +158,11 @@ func TestGetKubeconfigForContext(t *testing.T) {
 	assert.ErrorContains(t, err, "incorrect resource options provided. Both space and clustergroup are set but only one can be set")
 
 	// Test getting the kubeconfig for an arbitrary Tanzu resource for non Tanzu context
-	nonTanzuCtx, err := GetContext("test-mc")
+	tmcCtx, err := GetContext("test-tmc")
 	assert.NoError(t, err)
-	_, err = GetKubeconfigForContext(nonTanzuCtx.Name, ForProject("project2"))
+	_, err = GetKubeconfigForContext(tmcCtx.Name, ForProject("project2"))
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "context must be of type: tanzu")
+	assert.ErrorContains(t, err, "context must be of type: tanzu or kubernetes")
 
 	// Test getting the kubeconfig for a custom endpoint path
 	tanzuCtx, err := GetContext("test-tanzu")
@@ -161,6 +173,16 @@ func TestGetKubeconfigForContext(t *testing.T) {
 	assert.NoError(t, err)
 	cluster = kubeconfig.GetCluster(&kc, "tanzu-cli-mytanzu/current")
 	assert.Equal(t, cluster.Cluster.Server, tanzuCtx.GlobalOpts.Endpoint+"/custom-path")
+
+	// Test getting the kubeconfig for a kubernetes context
+	k8sCtx, err = GetContext("k8s-context")
+	assert.NoError(t, err)
+	kubeconfigBytes, err = GetKubeconfigForContext(k8sCtx.Name)
+	assert.NoError(t, err)
+	err = yaml.Unmarshal(kubeconfigBytes, &kc)
+	assert.NoError(t, err)
+	cluster = kubeconfig.GetCluster(&kc, "k8s-cluster")
+	assert.Equal(t, cluster.Cluster.Server, k8sCtx.ClusterOpts.Endpoint)
 }
 
 func TestGetTanzuContextActiveResource(t *testing.T) {

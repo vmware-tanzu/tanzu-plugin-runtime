@@ -115,6 +115,7 @@ func (w *writer) SetStderr(writer io.Writer) {
 // logType used to decide should write to stdout or stderr
 func (w *writer) Write(header, msg []byte, logEnabled bool, logVerbosity int32, logType string) (n int, err error) {
 	fullMsg := append(header, msg...) //nolint:gocritic
+	fullMsg = GetLogBasedOnLogType(fullMsg, logType)
 
 	// Always write to the audit log so it captures everything
 	if w.auditFile != "" {

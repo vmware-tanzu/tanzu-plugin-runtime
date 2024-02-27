@@ -48,7 +48,7 @@ type OutputWriterSpinnerOption func(*outputwriterspinner)
 // (log.LogTypeOUTPUT can be used for no prefix)
 func WithSpinnerFinalText(finalText string, prefix log.LogType) OutputWriterSpinnerOption {
 	return func(ows *outputwriterspinner) {
-		ows.spinnerFinalText = fmt.Sprintf("%s%s", log.GetLogTypeIndicator(prefix), finalText)
+		ows.spinnerFinalText = string(log.GetLogBasedOnLogType([]byte(finalText), string(prefix)))
 	}
 }
 
@@ -181,7 +181,7 @@ func (ows *outputwriterspinner) StopSpinner() {
 // (log.LogTypeOUTPUT can be used for no prefix)
 func (ows *outputwriterspinner) SetFinalText(finalText string, prefix log.LogType) {
 	if ows.spinner != nil {
-		ows.spinnerFinalText = fmt.Sprintf("%s%s", log.GetLogTypeIndicator(prefix), finalText)
+		ows.spinnerFinalText = string(log.GetLogBasedOnLogType([]byte(finalText), string(prefix)))
 		spinner.WithFinalMSG(ows.spinnerFinalText)(ows.spinner)
 	}
 }

@@ -193,7 +193,6 @@ func (l *logger) CloneWithLevel(level int) LoggerImpl {
 }
 
 func (l *logger) Print(msg string, err error, logType string, kvs ...interface{}) {
-	msg = fmt.Sprintf("%s%s", l.getLogTypeIndicator(logType), msg)
 	values := copySlice(l.values)
 	values = append(values, kvs...)
 	values = append(values, "msg", msg)
@@ -216,10 +215,6 @@ func (l *logger) getLogString(values []interface{}) string {
 		return ""
 	}
 	return f
-}
-
-func (l *logger) getLogTypeIndicator(logType string) string {
-	return GetLogTypeIndicator(LogType(logType))
 }
 
 func copySlice(in []interface{}) []interface{} {

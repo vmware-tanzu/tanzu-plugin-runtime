@@ -62,14 +62,16 @@ func TestAddCommands(t *testing.T) {
 	assert := assert.New(t)
 
 	descriptor := PluginDescriptor{
-		Name:        "Test Plugin",
-		Target:      types.TargetGlobal,
-		Description: "Description of the plugin",
-		Version:     "v1.2.3",
-		BuildSHA:    "cafecafe",
-		Group:       "TestGroup",
-		DocURL:      "https://docs.example.com",
-		Hidden:      false,
+		Name:                 "dummy",
+		Target:               types.TargetK8s,
+		Description:          "Description of the plugin",
+		Version:              "v1.2.3",
+		BuildSHA:             "cafecafe",
+		Group:                "TestGroup",
+		DocURL:               "https://docs.example.com",
+		Hidden:               false,
+		InvokedAs:            []string{"dummy2"},
+		SupportedContextType: []types.ContextType{types.ContextTypeTanzu},
 	}
 
 	cmd, err := NewPlugin(&descriptor)

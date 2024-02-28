@@ -104,4 +104,19 @@ type PluginDescriptor struct {
 
 	// DefaultFeatureFlags is default featureflags to be configured if missing when invoking plugin
 	DefaultFeatureFlags map[string]bool `json:"defaultFeatureFlags,omitempty" yaml:"defaultFeatureFlags,omitempty"`
+
+	// InvokedAs provides a specific mapping to how any command provided by this plugin should be invoked as.
+	// If unset (which is equivalent to setting it to ["<PluginDescriptor.Name>"]), commands will typically be invocable
+	// with the Tanzu CLI using "<PluginDescriptor.Name> <command name> commandargs...."
+	// Can be used to specify additional levels in the command hierarchy via values with space-delimited parts.
+	// e.g. ["operations cluster"] implies plugin's command foo will be invoked by the Tanzu CLI using
+	// 'tanzu operations cluster foo...'
+	// EXPERIMENTAL: subject to change prior to the next official minor release
+	InvokedAs []string `json:"invokedAs,omitempty" yaml:"invokedAs,omitempty"`
+
+	// SupportedContextType specifies one or more ContextType that this plugin will specifically apply to.
+	// When no context of matching type is active, the command tree specified by this plugin should be omitted.
+	// When unset, the plugin does not define any specific opinions on this aspect.
+	// EXPERIMENTAL: subject to change prior to the next official minor release
+	SupportedContextType []types.ContextType `json:"supportedContextType,omitempty" yaml:"supportedContextType,omitempty"`
 }

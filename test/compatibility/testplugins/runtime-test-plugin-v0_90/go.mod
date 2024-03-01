@@ -5,12 +5,7 @@ go 1.18
 replace github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core => ../../core
 
 require (
-<<<<<<< HEAD
 	github.com/spf13/cobra v1.7.0
-=======
-	github.com/spf13/cobra v1.8.0
-	// Needs to be replaced by latest release tags
->>>>>>> 472f06c7 (Update to Cobra v1.8.0)
 	github.com/vmware-tanzu/tanzu-plugin-runtime v0.90.0
 	github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core v0.90.0
 	gopkg.in/yaml.v3 v3.0.1

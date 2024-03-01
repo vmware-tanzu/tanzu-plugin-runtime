@@ -11,7 +11,7 @@ replace (
 )
 
 require (
-	github.com/spf13/cobra v1.8.0
+	github.com/spf13/cobra v1.6.1
 	github.com/stretchr/testify v1.8.1
 	github.com/vmware-tanzu/tanzu-framework v0.11.6
 	github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core v0.0.0-00010101000000-000000000000

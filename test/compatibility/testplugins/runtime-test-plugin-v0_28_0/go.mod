@@ -6,7 +6,7 @@ replace github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core => 
 
 require (
 	github.com/pkg/errors v0.9.1
-	github.com/spf13/cobra v1.8.0
+	github.com/spf13/cobra v1.6.1
 	github.com/stretchr/testify v1.8.1
 	github.com/vmware-tanzu/tanzu-framework/apis/cli v0.0.0-20230214111918-af087107ddc3
 	github.com/vmware-tanzu/tanzu-framework/cli/runtime v0.0.0-20230214111918-af087107ddc3
@@ -46,6 +46,6 @@ require (
 
 // indirect
 require (
-	github.com/inconshreveable/mousetrap v1.1.0 // indirect
+	github.com/inconshreveable/mousetrap v1.0.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 )

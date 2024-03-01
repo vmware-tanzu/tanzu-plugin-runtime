@@ -7,7 +7,7 @@ replace github.com/vmware-tanzu/tanzu-plugin-runtime => ./../../../../../tanzu-p
 replace github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core => ../../core
 
 require (
-	github.com/spf13/cobra v1.8.0
+	github.com/spf13/cobra v1.7.0
 	// Needs to be replaced by latest release tags
 	github.com/vmware-tanzu/tanzu-plugin-runtime v0.0.0-00010101000000-000000000000
 	github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/core v0.0.0-00010101000000-000000000000

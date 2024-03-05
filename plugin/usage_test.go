@@ -71,13 +71,14 @@ func SampleTestPlugin(t *testing.T, target types.Target) *Plugin {
 	}
 
 	var descriptor = PluginDescriptor{
-		Name:        "test",
+		Name:        "testNotUserVisible",
 		Target:      target,
 		Aliases:     []string{"t"},
 		Description: "Test the CLI",
 		Group:       AdminCmdGroup,
 		Version:     "v1.1.0",
 		BuildSHA:    "1234567",
+		InvokedAs:   []string{"test"},
 	}
 
 	var local string
@@ -140,6 +141,12 @@ func TestGlobalTestPluginCommandHelpText(t *testing.T) {
 
 	got := string(<-c)
 
+	// note: reference to the unmapped name, as in
+	//
+	// '-h, --help         help for testNotUserVisible'
+	//
+	// is a known bug in cobra 1.8.0 that should be fixed in the next patch or
+	// minor release
 	expected := `Test the CLI
 
 Usage:
@@ -157,7 +164,7 @@ Available Commands:
 
 Flags:
   -e, --env string   env to test
-  -h, --help         help for test
+  -h, --help         help for testNotUserVisible
 
 Additional help topics:
   test plugin        Plugin tests
@@ -218,7 +225,7 @@ Available Commands:
 
 Flags:
   -e, --env string   env to test
-  -h, --help         help for test
+  -h, --help         help for testNotUserVisible
 
 Additional help topics:
   test plugin        Plugin tests
@@ -279,7 +286,7 @@ Available Commands:
 
 Flags:
   -e, --env string   env to test
-  -h, --help         help for test
+  -h, --help         help for testNotUserVisible
 
 Additional help topics:
   test plugin        Plugin tests

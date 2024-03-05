@@ -4,10 +4,30 @@
 package plugin
 
 import (
+	"strings"
+
 	"github.com/spf13/cobra"
 )
 
+func getPluginInvokedAs(descriptor *PluginDescriptor) string {
+	var invokedAsString string
+	name := descriptor.Name
+
+	if len(descriptor.InvokedAs) != 0 {
+		invokedAsString = strings.TrimSpace(descriptor.InvokedAs[0])
+	}
+
+	if invokedAsString != "" {
+		cmdParts := strings.Split(invokedAsString, " ")
+		name = cmdParts[len(cmdParts)-1]
+	}
+
+	return name
+}
+
 func newRootCmd(descriptor *PluginDescriptor) *cobra.Command {
+	cmdName := getPluginInvokedAs(descriptor)
+
 	cmd := &cobra.Command{
 		Use:     descriptor.Name,
 		Short:   descriptor.Description,
@@ -26,7 +46,8 @@ func newRootCmd(descriptor *PluginDescriptor) *cobra.Command {
 			HiddenDefaultCmd: true,
 		},
 		Annotations: map[string]string{
-			"target": string(descriptor.Target),
+			"target":                           string(descriptor.Target),
+			cobra.CommandDisplayNameAnnotation: cmdName,
 		},
 	}
 	cobra.AddTemplateFuncs(TemplateFuncs)

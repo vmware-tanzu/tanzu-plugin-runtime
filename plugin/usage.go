@@ -132,6 +132,14 @@ func formatHelpFooter(cmd *cobra.Command, target types.Target) string {
 	return footer.String()
 }
 
+func aliasesWithMappedName(cmd *cobra.Command) string {
+	cmdName := cmd.Name()
+	if v, ok := cmd.Annotations[cobra.CommandDisplayNameAnnotation]; ok {
+		cmdName = v
+	}
+	return strings.Join(append([]string{cmdName}, cmd.Aliases...), ", ")
+}
+
 func printHelp(cmd *cobra.Command) string {
 	var output strings.Builder
 	target := types.StringToTarget(cmd.Annotations["target"])
@@ -140,7 +148,7 @@ func printHelp(cmd *cobra.Command) string {
 
 	if len(cmd.Aliases) > 0 {
 		output.WriteString("\n" + component.Bold(aliasesStr) + "\n")
-		output.WriteString(indentStr + cmd.NameAndAliases() + "\n")
+		output.WriteString(indentStr + aliasesWithMappedName(cmd) + "\n")
 	}
 
 	if cmd.HasExample() {

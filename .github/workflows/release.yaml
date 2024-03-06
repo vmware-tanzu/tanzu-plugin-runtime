@@ -118,7 +118,7 @@ jobs:
         body: "${{ fromJson(steps.get-github-release-notes.outputs.data).body }}"
       run: |
         githubOutput="/tmp/${{ steps.time.outputs.time }}-github-output"
-        echo "$data" > "$githubOutput"
+        echo "$body" > "$githubOutput"
 
     - name: Generate the release notes
       shell: bash

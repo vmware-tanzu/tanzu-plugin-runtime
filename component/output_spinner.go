@@ -80,6 +80,14 @@ func WithHeaders(headers ...string) OutputWriterSpinnerOption {
 	}
 }
 
+// WithDynamicHeaders sets the headers as dynamic and only shows the column
+// if at least one row is non empty for the specified header
+func WithDynamicHeaders(dynamicHeaders ...string) OutputWriterSpinnerOption {
+	return func(ows *outputwriterspinner) {
+		ows.dynamicKeys = dynamicHeaders
+	}
+}
+
 // WithOutputFormat sets output format for the OutputWriterSpinner component
 func WithOutputFormat(outputFormat OutputType) OutputWriterSpinnerOption {
 	return func(ows *outputwriterspinner) {

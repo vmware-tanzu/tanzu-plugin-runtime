@@ -61,7 +61,7 @@ func main() {
 
 ## Output Writer Component
 
-This package provides a way to write output to different formats. It defines the `OutputWriter` interface which consists of `SetKeys`, `AddRow`, and `Render` methods.
+This package provides a way to write output to different formats. It defines the `OutputWriter` interface which consists of `SetKeys`, `MarkDynamicKeys`, `AddRow`, and `Render` methods.
 
 ### How to use
 

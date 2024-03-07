@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/briandowns/spinner"
@@ -30,6 +32,9 @@ type OutputWriterSpinner interface {
 	// SetFinalText sets the spinner final text and prefix
 	// log indicator (log.LogTypeOUTPUT can be used for no prefix)
 	SetFinalText(finalText string, prefix log.LogType)
+
+	// GetErrorText returns the spinner error text if spinner is terminated or interrupted
+	GetErrorText() string
 }
 
 // outputwriterspinner is our internal implementation.
@@ -37,6 +42,7 @@ type outputwriterspinner struct {
 	outputwriter
 	spinnerText        string
 	spinnerFinalText   string
+	spinnerErrorText   string
 	startSpinnerOnInit bool
 	spinner            *spinner.Spinner
 }
@@ -44,11 +50,22 @@ type outputwriterspinner struct {
 // OutputWriterSpinnerOption is an option to configure outputwriterspinner
 type OutputWriterSpinnerOption func(*outputwriterspinner)
 
+var spinners []OutputWriterSpinner
+var signalCatcherStarted bool
+var signalChannel = make(chan os.Signal, 1)
+
 // WithSpinnerFinalText sets the spinner final text and prefix log indicator
 // (log.LogTypeOUTPUT can be used for no prefix)
 func WithSpinnerFinalText(finalText string, prefix log.LogType) OutputWriterSpinnerOption {
 	return func(ows *outputwriterspinner) {
 		ows.spinnerFinalText = fmt.Sprintf("%s%s", log.GetLogTypeIndicator(prefix), finalText)
+	}
+}
+
+// WithSpinnerErrorText sets the spinner error text if spinner is terminated or interrupted
+func WithSpinnerErrorText(errorText string) OutputWriterSpinnerOption {
+	return func(ows *outputwriterspinner) {
+		ows.spinnerErrorText = errorText
 	}
 }
 
@@ -145,7 +162,35 @@ func initializeSpinner(ows *outputwriterspinner) OutputWriterSpinner {
 			ows.spinner.Start()
 		}
 	}
+	storeSpinners(ows)
 	return ows
+}
+
+var signalCatcher = func() {
+	signalCatcherStarted = true
+	sig := <-signalChannel
+	if sig != nil {
+		for _, s := range spinners {
+			if s != nil {
+				if s.GetErrorText() != "" {
+					s.SetFinalText(s.GetErrorText(), log.LogTypeERROR)
+				}
+				s.StopSpinner()
+			}
+		}
+	}
+	os.Exit(128 + int(sig.(syscall.Signal)))
+}
+
+func init() {
+	signal.Notify(signalChannel, syscall.SIGINT, syscall.SIGTERM)
+}
+
+func storeSpinners(s OutputWriterSpinner) {
+	spinners = append(spinners, s)
+	if !signalCatcherStarted {
+		go signalCatcher()
+	}
 }
 
 // RenderWithSpinner stops the running spinner instance, displays FinalText if set, then renders the output
@@ -192,6 +237,11 @@ func (ows *outputwriterspinner) SetText(text string) {
 		ows.spinnerText = text
 		ows.spinner.Suffix = fmt.Sprintf(" %s", text)
 	}
+}
+
+// GetErrorText returns the spinner error text if spinner is terminated or interrupted
+func (ows *outputwriterspinner) GetErrorText() string {
+	return ows.spinnerErrorText
 }
 
 // applySpinnerOptions applies the options to the outputwriterspinner

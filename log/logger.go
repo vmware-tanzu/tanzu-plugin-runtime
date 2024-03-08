@@ -19,7 +19,7 @@ const (
 	EnvTanzuCLILogLevel = "TANZU_CLI_LOG_LEVEL"
 )
 
-var defaultLogThreshold int32 = 3
+var defaultLogThreshold int32 = 1
 
 // logEntry defines the information that can be used for composing a log line.
 type logEntry struct {

@@ -18,6 +18,12 @@ import (
 )
 
 const (
+	fakeOrgID            = "fake-org-id"
+	fakeProjectName      = "fake-project"
+	fakeProjectID        = "fake-project-id"
+	fakeSpace            = "fake-space"
+	fakeClusterGroupName = "fake-clustergroup"
+
 	fakePluginScriptFmtString string = `#!/bin/bash
 # Fake tanzu core binary
 
@@ -188,7 +194,6 @@ func TestGetKubeconfigForContext(t *testing.T) {
 func TestGetTanzuContextActiveResource(t *testing.T) {
 	err := setupForGetContext()
 	assert.NoError(t, err)
-
 	defer cleanupTestingDir(t)
 
 	c, err := GetContext("test-tanzu")
@@ -207,33 +212,38 @@ func TestGetTanzuContextActiveResource(t *testing.T) {
 	// Test getting the Tanzu active resource of a context with active resource as Org only
 	activeResources, err := GetTanzuContextActiveResource("test-tanzu")
 	assert.NoError(t, err)
-	assert.Equal(t, activeResources.OrgID, "fake-org-id")
+	assert.Equal(t, activeResources.OrgID, fakeOrgID)
 	assert.Empty(t, activeResources.ProjectName)
+	assert.Empty(t, activeResources.ProjectID)
 	assert.Empty(t, activeResources.SpaceName)
 
 	// Test getting the Tanzu active resource of a context with active resource as space
-	c.AdditionalMetadata[ProjectNameKey] = "fake-project" //nolint:goconst
-	c.AdditionalMetadata[SpaceNameKey] = "fake-space"
+	c.AdditionalMetadata[ProjectNameKey] = fakeProjectName
+	c.AdditionalMetadata[ProjectIDKey] = fakeProjectID
+	c.AdditionalMetadata[SpaceNameKey] = fakeSpace
 	err = SetContext(c, false)
 	assert.NoError(t, err)
 	activeResources, err = GetTanzuContextActiveResource("test-tanzu")
 	assert.NoError(t, err)
-	assert.Equal(t, activeResources.OrgID, "fake-org-id")
-	assert.Equal(t, activeResources.ProjectName, "fake-project")
-	assert.Equal(t, activeResources.SpaceName, "fake-space")
+	assert.Equal(t, activeResources.OrgID, fakeOrgID)
+	assert.Equal(t, activeResources.ProjectName, fakeProjectName)
+	assert.Equal(t, activeResources.ProjectID, fakeProjectID)
+	assert.Equal(t, activeResources.SpaceName, fakeSpace)
 	assert.Equal(t, activeResources.ClusterGroupName, "")
 
 	// Test getting the Tanzu active resource of a context with active resource as clustergroup
-	c.AdditionalMetadata[ProjectNameKey] = "fake-project"
+	c.AdditionalMetadata[ProjectNameKey] = fakeProjectName
+	c.AdditionalMetadata[ProjectIDKey] = fakeProjectID
 	c.AdditionalMetadata[SpaceNameKey] = ""
-	c.AdditionalMetadata[ClusterGroupNameKey] = "fake-clustergroup"
+	c.AdditionalMetadata[ClusterGroupNameKey] = fakeClusterGroupName
 	err = SetContext(c, false)
 	assert.NoError(t, err)
 	activeResources, err = GetTanzuContextActiveResource("test-tanzu")
 	assert.NoError(t, err)
-	assert.Equal(t, activeResources.OrgID, "fake-org-id")
-	assert.Equal(t, activeResources.ProjectName, "fake-project")
-	assert.Equal(t, activeResources.ClusterGroupName, "fake-clustergroup")
+	assert.Equal(t, activeResources.OrgID, fakeOrgID)
+	assert.Equal(t, activeResources.ProjectName, fakeProjectName)
+	assert.Equal(t, activeResources.ProjectID, fakeProjectID)
+	assert.Equal(t, activeResources.ClusterGroupName, fakeClusterGroupName)
 	assert.Equal(t, activeResources.SpaceName, "")
 
 	// If context activeMetadata is not set(error case)
@@ -278,26 +288,26 @@ func TestSetTanzuContextActiveResource(t *testing.T) {
 		{
 			test:            "with no alternate command and Tanzu active resource update successfully",
 			exitStatus:      "0",
-			expectedOutput:  "context update tanzu-active-resource test-context --project projectA --space spaceA succeeded\n",
+			expectedOutput:  "context update tanzu-active-resource test-context --project projectA --project-id projectA-ID --space spaceA succeeded\n",
 			expectedFailure: false,
 		},
 		{
 			test:            "with no alternate command and Tanzu active resource update unsuccessfully",
 			exitStatus:      "1",
-			expectedOutput:  "context update tanzu-active-resource test-context --project projectA --space spaceA failed\n",
+			expectedOutput:  "context update tanzu-active-resource test-context --project projectA --project-id projectA-ID --space spaceA failed\n",
 			expectedFailure: true,
 		},
 		{
 			test:                 "with alternate command and Tanzu active resource update successfully",
 			newCommandExitStatus: "0",
-			expectedOutput:       "newcommand update tanzu-active-resource test-context --project projectA --space spaceA succeeded\n",
+			expectedOutput:       "newcommand update tanzu-active-resource test-context --project projectA --project-id projectA-ID --space spaceA succeeded\n",
 			expectedFailure:      false,
 			enableCustomCommand:  true,
 		},
 		{
 			test:                 "with alternate command and Tanzu active resource update unsuccessfully",
 			newCommandExitStatus: "1",
-			expectedOutput:       "newcommand update tanzu-active-resource test-context --project projectA --space spaceA failed\n",
+			expectedOutput:       "newcommand update tanzu-active-resource test-context --project projectA --project-id projectA-ID --space spaceA failed\n",
 			expectedFailure:      true,
 			enableCustomCommand:  true,
 		},
@@ -332,7 +342,7 @@ func TestSetTanzuContextActiveResource(t *testing.T) {
 
 			// Test-1:
 			// - verify correct string gets printed to default stdout and stderr
-			err = SetTanzuContextActiveResource("test-context", ResourceInfo{ProjectName: "projectA", SpaceName: "spaceA"})
+			err = SetTanzuContextActiveResource("test-context", ResourceInfo{ProjectName: "projectA", ProjectID: "projectA-ID", SpaceName: "spaceA"})
 			w.Close()
 			stdoutRecieved := <-c
 
@@ -347,7 +357,7 @@ func TestSetTanzuContextActiveResource(t *testing.T) {
 			// Test-2: when external stdout and stderr are provided with WithStdout, WithStderr options,
 			// verify correct string gets printed to provided custom stdout/stderr
 			var combinedOutputBuff bytes.Buffer
-			err = SetTanzuContextActiveResource("test-context", ResourceInfo{ProjectName: "projectA", SpaceName: "spaceA"}, WithOutputWriter(&combinedOutputBuff), WithErrorWriter(&combinedOutputBuff))
+			err = SetTanzuContextActiveResource("test-context", ResourceInfo{ProjectName: "projectA", ProjectID: "projectA-ID", SpaceName: "spaceA"}, WithOutputWriter(&combinedOutputBuff), WithErrorWriter(&combinedOutputBuff))
 			if spec.expectedFailure {
 				assert.NotNil(err)
 			} else {

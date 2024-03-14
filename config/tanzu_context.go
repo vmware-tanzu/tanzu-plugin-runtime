@@ -22,6 +22,7 @@ import (
 const (
 	OrgIDKey            = "tanzuOrgID"
 	ProjectNameKey      = "tanzuProjectName"
+	ProjectIDKey        = "tanzuProjectID"
 	SpaceNameKey        = "tanzuSpaceName"
 	ClusterGroupNameKey = "tanzuClusterGroupName"
 )
@@ -39,6 +40,8 @@ type ResourceInfo struct {
 	OrgID string
 	// ProjectName name of the Project
 	ProjectName string
+	// ProjectID ID of the Project.
+	ProjectID string
 	// SpaceName name of the Space
 	SpaceName string
 	// ClusterGroupName name of the ClusterGroup
@@ -249,11 +252,11 @@ func updateKubeconfigServerURL(kc *kubeconfig.Config, cliContext *configtypes.Co
 // Pre-reqs: project and space/clustergroup names should be valid
 //
 // Note: To set
-//   - a space as active resource, both project and space names are required
-//   - a clustergroup as active resource, both project and clustergroup names are required
-//   - a project as active resource, only project name is required (space should be empty string)
-//   - org as active resource, project, space and clustergroup names should be empty strings
-func SetTanzuContextActiveResource(contextName string, resourceInfo ResourceInfo, opts ...CommandOptions) error {
+//   - a space as active resource, both project,projectID and space names are required
+//   - a clustergroup as active resource, both project,projectID and clustergroup names are required
+//   - a project as active resource, only project name and project ID are required (space should be empty string)
+//   - org as active resource, project name, project ID, space and clustergroup names should be empty strings
+func SetTanzuContextActiveResource(contextName string, resourceInfo ResourceInfo, opts ...CommandOptions) error { //nolint:gocritic
 	// For now, the implementation expects env var TANZU_BIN to be set and
 	// pointing to the core CLI binary used to invoke setting the active Tanzu resource.
 
@@ -268,7 +271,13 @@ func SetTanzuContextActiveResource(contextName string, resourceInfo ResourceInfo
 	}
 
 	altCommandArgs := []string{customCommandName}
-	args := []string{"context", "update", "tanzu-active-resource", contextName, "--project", resourceInfo.ProjectName}
+	args := []string{"context", "update", "tanzu-active-resource", contextName}
+	if resourceInfo.ProjectName != "" {
+		args = append(args, "--project", resourceInfo.ProjectName)
+	}
+	if resourceInfo.ProjectID != "" {
+		args = append(args, "--project-id", resourceInfo.ProjectID)
+	}
 	if resourceInfo.SpaceName != "" {
 		args = append(args, "--space", resourceInfo.SpaceName)
 	}
@@ -308,6 +317,7 @@ func GetTanzuContextActiveResource(contextName string) (*ResourceInfo, error) {
 	activeResourceInfo := &ResourceInfo{
 		OrgID:            stringValue(ctx.AdditionalMetadata[OrgIDKey]),
 		ProjectName:      stringValue(ctx.AdditionalMetadata[ProjectNameKey]),
+		ProjectID:        stringValue(ctx.AdditionalMetadata[ProjectIDKey]),
 		SpaceName:        stringValue(ctx.AdditionalMetadata[SpaceNameKey]),
 		ClusterGroupName: stringValue(ctx.AdditionalMetadata[ClusterGroupNameKey]),
 	}

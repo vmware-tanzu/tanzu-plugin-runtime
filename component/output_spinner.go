@@ -7,8 +7,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/signal"
-	"syscall"
 	"time"
 
 	"github.com/briandowns/spinner"
@@ -51,8 +49,6 @@ type outputwriterspinner struct {
 type OutputWriterSpinnerOption func(*outputwriterspinner)
 
 var spinners []OutputWriterSpinner
-var signalCatcherStarted bool
-var signalChannel = make(chan os.Signal, 1)
 
 // WithSpinnerFinalText sets the spinner final text and prefix log indicator
 // (log.LogTypeOUTPUT can be used for no prefix)
@@ -174,31 +170,8 @@ func initializeSpinner(ows *outputwriterspinner) OutputWriterSpinner {
 	return ows
 }
 
-var signalCatcher = func() {
-	signalCatcherStarted = true
-	sig := <-signalChannel
-	if sig != nil {
-		for _, s := range spinners {
-			if s != nil {
-				if s.GetErrorText() != "" {
-					s.SetFinalText(s.GetErrorText(), log.LogTypeERROR)
-				}
-				s.StopSpinner()
-			}
-		}
-	}
-	os.Exit(128 + int(sig.(syscall.Signal)))
-}
-
-func init() {
-	signal.Notify(signalChannel, syscall.SIGINT, syscall.SIGTERM)
-}
-
 func storeSpinners(s OutputWriterSpinner) {
 	spinners = append(spinners, s)
-	if !signalCatcherStarted {
-		go signalCatcher()
-	}
 }
 
 // RenderWithSpinner stops the running spinner instance, displays FinalText if set, then renders the output
@@ -224,9 +197,18 @@ func (ows *outputwriterspinner) StartSpinner() {
 
 // StopSpinner stops the running spinner instance, displays FinalText if set
 func (ows *outputwriterspinner) StopSpinner() {
-	if ows.spinner != nil && ows.spinner.Active() {
-		ows.spinner.Stop()
-		fmt.Fprintln(ows.out)
+	for _, s := range spinners {
+		if s != nil {
+			if s.GetErrorText() != "" {
+				s.SetFinalText(s.GetErrorText(), log.LogTypeERROR)
+			}
+			if ows.spinner != nil && ows.spinner.Active() {
+				ows.spinner.Stop()
+				if ows.spinnerFinalText != "" {
+					fmt.Fprintln(ows.out)
+				}
+			}
+		}
 	}
 }
 

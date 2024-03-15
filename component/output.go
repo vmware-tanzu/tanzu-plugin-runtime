@@ -21,8 +21,15 @@ const (
 
 // OutputWriter is an interface for something that can write output.
 type OutputWriter interface {
+	// SetKeys sets the values to use as the keys for the output values.
 	SetKeys(headerKeys ...string)
+	// MarkDynamicKeys sets the headers as dynamic and only shows the column
+	// if at least one row is non empty for the specified header
+	// Note: This is only supported with output render type TableOutputType
+	MarkDynamicKeys(dynamicKeys ...string)
+	// AddRow appends a new row to our table.
 	AddRow(items ...interface{})
+	// Render emits the generated table to the output once ready
 	Render()
 }
 
@@ -44,6 +51,7 @@ const (
 type outputwriter struct {
 	out                 io.Writer
 	keys                []string
+	dynamicKeys         []string
 	values              [][]interface{}
 	outputFormat        OutputType
 	autoStringifyFields bool
@@ -98,6 +106,12 @@ func (ow *outputwriter) applyOptions(opts []OutputWriterOption) {
 func (ow *outputwriter) SetKeys(headerKeys ...string) {
 	// Overwrite whatever was used in initialization
 	ow.keys = headerKeys
+}
+
+// MarkDynamicKeys sets the headers as dynamic and only shows the column if at least one row is non empty
+// This is only supported with output render type TableOutputType
+func (ow *outputwriter) MarkDynamicKeys(dynamicKeys ...string) {
+	ow.dynamicKeys = dynamicKeys
 }
 
 func stringify(items []interface{}) []interface{} {
@@ -181,6 +195,12 @@ func (obw *objectwriter) SetKeys(_ ...string) {
 	fmt.Fprintln(obw.out, "Programming error, attempt to add headers to object output")
 }
 
+// MarkDynamicKeys marks the headers as dynamic
+func (obw *objectwriter) MarkDynamicKeys(dynamicKeys ...string) {
+	// Object writer does not have the concept of dynamic keys
+	fmt.Fprintln(obw.out, "Programming error, attempt to mark dynamic headers to object output")
+}
+
 // AddRow appends a new row to our table.
 func (obw *objectwriter) AddRow(_ ...interface{}) {
 	// Object writer does not have the concept of keys
@@ -248,15 +268,9 @@ func renderListTable(ow *outputwriter) {
 
 // renderTable prints output as a table
 func renderTable(ow *outputwriter) {
-	// Drop values if there aren't as many as the headers
-	headerLength := len(ow.keys)
-	for i, values := range ow.values {
-		if len(values) <= headerLength {
-			continue
-		}
+	// Filter keys and values based on dynamic keys
+	ow.keys, ow.values = filterDynamicColumns(ow.keys, ow.dynamicKeys, ow.values)
 
-		ow.values[i] = values[:headerLength]
-	}
 	table := tablewriter.NewWriter(ow.out)
 	table.SetBorder(false)
 	table.SetCenterSeparator("")
@@ -283,4 +297,41 @@ func convertInterfaceToString(values [][]interface{}) [][]string {
 		result = append(result, row)
 	}
 	return result
+}
+
+func filterDynamicColumns(headers, dynamicHeaders []string, values [][]interface{}) ([]string, [][]interface{}) {
+	resultHeaders := make([]string, 0)
+	resultValues := make([][]interface{}, len(values))
+
+	// Create a map for faster lookup of dynamic headers
+	dynamicHeaderMap := make(map[string]bool)
+	for _, header := range dynamicHeaders {
+		dynamicHeaderMap[header] = true
+	}
+
+	// Iterate over the headers and values
+	for i, header := range headers {
+		// Check if the header is dynamic and all values for that column are empty
+		if _, isDynamic := dynamicHeaderMap[header]; !isDynamic || !allEmptyColumn(values, i) {
+			resultHeaders = append(resultHeaders, header)
+
+			// Copy non-empty values for the current column
+			for j, row := range values {
+				if j < len(resultValues) && i < len(row) {
+					resultValues[j] = append(resultValues[j], row[i])
+				}
+			}
+		}
+	}
+
+	return resultHeaders, resultValues
+}
+
+func allEmptyColumn(values [][]interface{}, columnIndex int) bool {
+	for _, row := range values {
+		if row[columnIndex] != "" {
+			return false
+		}
+	}
+	return true
 }

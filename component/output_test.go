@@ -5,6 +5,7 @@ package component
 
 import (
 	"bytes"
+	"reflect"
 	"strings"
 	"testing"
 
@@ -541,4 +542,86 @@ func TestObjectWriterYAML(t *testing.T) {
 type testStruct struct {
 	Name      string `json:"name,omitempty" yaml:"name,omitempty"`
 	Namespace string `json:"spacename,omitempty" yaml:"spacename,omitempty"`
+}
+
+func TestFilterEmptyColumns(t *testing.T) {
+	testCases := []struct {
+		name            string
+		headers         []string
+		dynamicHeaders  []string
+		values          [][]interface{}
+		expectedHeaders []string
+		expectedValues  [][]interface{}
+	}{
+		{
+			name:           "Basic test case",
+			headers:        []string{"name", "namespace", "active", "status"},
+			dynamicHeaders: []string{"active"},
+			values: [][]interface{}{
+				{"a1", "n1", "", ""},
+				{"a2", "n1", "", ""},
+				{"a3", "n1", "", ""},
+				{"a4", "n1", "", ""},
+			},
+			expectedHeaders: []string{"name", "namespace", "status"},
+			expectedValues: [][]interface{}{
+				{"a1", "n1", ""},
+				{"a2", "n1", ""},
+				{"a3", "n1", ""},
+				{"a4", "n1", ""},
+			},
+		},
+		{
+			name:           "No dynamic headers",
+			headers:        []string{"name", "namespace", "active", "status"},
+			dynamicHeaders: []string{},
+			values: [][]interface{}{
+				{"a1", "n1", "", ""},
+				{"a2", "n1", "", ""},
+				{"a3", "n1", "", ""},
+				{"a4", "n1", "", ""},
+			},
+			expectedHeaders: []string{"name", "namespace", "active", "status"},
+			expectedValues: [][]interface{}{
+				{"a1", "n1", "", ""},
+				{"a2", "n1", "", ""},
+				{"a3", "n1", "", ""},
+				{"a4", "n1", "", ""},
+			},
+		},
+		{
+			name:           "All empty values in dynamic column",
+			headers:        []string{"name", "namespace", "active", "status"},
+			dynamicHeaders: []string{"active"},
+			values: [][]interface{}{
+				{"", "", "", ""},
+				{"", "", "", ""},
+				{"", "", "", ""},
+				{"", "", "", ""},
+			},
+			expectedHeaders: []string{"name", "namespace", "status"},
+			expectedValues: [][]interface{}{
+				{"", "", ""},
+				{"", "", ""},
+				{"", "", ""},
+				{"", "", ""},
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			resultHeaders, resultValues := filterDynamicColumns(testCase.headers, testCase.dynamicHeaders, testCase.values)
+
+			// Test if result headers are as expected
+			if !reflect.DeepEqual(resultHeaders, testCase.expectedHeaders) {
+				t.Errorf("Expected headers: %v, got: %v", testCase.expectedHeaders, resultHeaders)
+			}
+
+			// Test if result values are as expected
+			if !reflect.DeepEqual(resultValues, testCase.expectedValues) {
+				t.Errorf("Expected values: %v, got: %v", testCase.expectedValues, resultValues)
+			}
+		})
+	}
 }

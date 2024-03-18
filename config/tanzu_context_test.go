@@ -126,7 +126,7 @@ func TestGetKubeconfigForContext(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Test getting the kubeconfig for a space within a project
-	kubeconfigBytes, err := GetKubeconfigForContext(c.Name, ForProject("project1"), ForSpace("space1"))
+	kubeconfigBytes, err := GetKubeconfigForContext(c.Name, ForProject("project1-id"), ForSpace("space1"))
 	assert.NoError(t, err)
 	c, err = GetContext("test-tanzu")
 	assert.NoError(t, err)
@@ -134,39 +134,39 @@ func TestGetKubeconfigForContext(t *testing.T) {
 	err = yaml.Unmarshal(kubeconfigBytes, &kc)
 	assert.NoError(t, err)
 	cluster := kubeconfig.GetCluster(&kc, "tanzu-cli-mytanzu/current")
-	assert.Equal(t, cluster.Cluster.Server, c.ClusterOpts.Endpoint+"/project/project1/space/space1")
+	assert.Equal(t, cluster.Cluster.Server, c.ClusterOpts.Endpoint+"/project/project1-id/space/space1")
 
 	// Test getting the kubeconfig for a project
-	kubeconfigBytes, err = GetKubeconfigForContext(c.Name, ForProject("project2"))
+	kubeconfigBytes, err = GetKubeconfigForContext(c.Name, ForProject("project2-id"))
 	assert.NoError(t, err)
 	c, err = GetContext("test-tanzu")
 	assert.NoError(t, err)
 	err = yaml.Unmarshal(kubeconfigBytes, &kc)
 	assert.NoError(t, err)
 	cluster = kubeconfig.GetCluster(&kc, "tanzu-cli-mytanzu/current")
-	assert.Equal(t, cluster.Cluster.Server, c.ClusterOpts.Endpoint+"/project/project2")
+	assert.Equal(t, cluster.Cluster.Server, c.ClusterOpts.Endpoint+"/project/project2-id")
 
 	// Test getting the kubeconfig for a clustergroup within a project
-	kubeconfigBytes, err = GetKubeconfigForContext(c.Name, ForProject("project2"), ForClusterGroup("clustergroup1"))
+	kubeconfigBytes, err = GetKubeconfigForContext(c.Name, ForProject("project2-id"), ForClusterGroup("clustergroup1"))
 	assert.NoError(t, err)
 	c, err = GetContext("test-tanzu")
 	assert.NoError(t, err)
 	err = yaml.Unmarshal(kubeconfigBytes, &kc)
 	assert.NoError(t, err)
 	cluster = kubeconfig.GetCluster(&kc, "tanzu-cli-mytanzu/current")
-	assert.Equal(t, cluster.Cluster.Server, c.ClusterOpts.Endpoint+"/project/project2/clustergroup/clustergroup1")
+	assert.Equal(t, cluster.Cluster.Server, c.ClusterOpts.Endpoint+"/project/project2-id/clustergroup/clustergroup1")
 
 	// Test getting the kubeconfig with incorrect resource combination (request kubeconfig for space and clustergroup)
 	c, err = GetContext("test-tanzu")
 	assert.NoError(t, err)
-	_, err = GetKubeconfigForContext(c.Name, ForProject("project2"), ForSpace("space1"), ForClusterGroup("clustergroup1"))
+	_, err = GetKubeconfigForContext(c.Name, ForProject("project2-id"), ForSpace("space1"), ForClusterGroup("clustergroup1"))
 	assert.Error(t, err)
 	assert.ErrorContains(t, err, "incorrect resource options provided. Both space and clustergroup are set but only one can be set")
 
 	// Test getting the kubeconfig for an arbitrary Tanzu resource for non Tanzu context
 	tmcCtx, err := GetContext("test-tmc")
 	assert.NoError(t, err)
-	_, err = GetKubeconfigForContext(tmcCtx.Name, ForProject("project2"))
+	_, err = GetKubeconfigForContext(tmcCtx.Name, ForProject("project2-id"))
 	assert.Error(t, err)
 	assert.ErrorContains(t, err, "context must be of type: tanzu or kubernetes")
 

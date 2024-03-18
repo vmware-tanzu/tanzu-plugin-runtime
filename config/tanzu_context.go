@@ -21,6 +21,7 @@ import (
 // keys to Context's AdditionalMetadata map
 const (
 	OrgIDKey            = "tanzuOrgID"
+	OrgNameKey          = "tanzuOrgName"
 	ProjectNameKey      = "tanzuProjectName"
 	ProjectIDKey        = "tanzuProjectID"
 	SpaceNameKey        = "tanzuSpaceName"
@@ -108,8 +109,8 @@ func runCommand(commandPath string, args []string, opts *cmdOptions) (bytes.Buff
 
 // resourceOptions specifies the resources to use for kubeconfig generation
 type resourceOptions struct {
-	// projectName name of the Project
-	projectName string
+	// projectID UUID of the Project
+	projectID string
 	// spaceName name of the Space
 	spaceName string
 	// clusterGroupName name of the ClusterGroup
@@ -120,9 +121,9 @@ type resourceOptions struct {
 
 type ResourceOptions func(o *resourceOptions)
 
-func ForProject(projectName string) ResourceOptions {
+func ForProject(projectID string) ResourceOptions {
 	return func(o *resourceOptions) {
-		o.projectName = strings.TrimSpace(projectName)
+		o.projectID = strings.TrimSpace(projectID)
 	}
 }
 func ForSpace(spaceName string) ResourceOptions {
@@ -143,38 +144,38 @@ func ForCustomPath(customPath string) ResourceOptions {
 
 // GetKubeconfigForContext returns the kubeconfig for any arbitrary kubernetes resource or Tanzu resource in the Tanzu object hierarchy
 // referred by the Tanzu context
-// Pre-reqs: project, space and clustergroup names should be valid for retreiving Kubeconfig of Tanzu context
+// Pre-reqs: projectID, space and clustergroup names should be valid for retrieving Kubeconfig of Tanzu context
 //
 // Notes:
 //
 // Use Case 1: Get the kubeconfig pointing to Tanzu org
-// -> projectName        = ""
+// -> projectID          = ""
 // -> spaceName          = ""
 // -> clusterGroupName   = ""
 // ex: kubeconfig's cluster.server URL : https://endpoint/org/orgid
 //
 // Use Case 2: Get the kubeconfig pointing to Tanzu project
-// -> projectName        = "PROJECTNAME"
+// -> projectID          = "PROJECTNAME"
 // -> spaceName          = ""
 // -> clusterGroupName   = ""
-// ex: kubeconfig's cluster.server URL : https://endpoint/org/orgid/project/<projectName>
+// ex: kubeconfig's cluster.server URL : https://endpoint/org/orgid/project/<projectID>
 //
 // Use Case 3: Get the kubeconfig pointing to Tanzu space
-// -> projectName        = "PROJECTNAME"
+// -> projectID          = "PROJECTID"
 // -> spaceName          = "SPACENAME"
 // -> clusterGroupName   = ""
-// ex: kubeconfig's cluster.server URL : https://endpoint/org/orgid/project/<projectName>/space/<spaceName>
+// ex: kubeconfig's cluster.server URL : https://endpoint/org/orgid/project/<projectID>/space/<spaceName>
 //
 // Use Case 4: Get the kubeconfig pointing to Tanzu clustergroup
-// -> projectName        = "PROJECTNAME"
+// -> projectID          = "PROJECTID"
 // -> spaceName          = ""
 // -> clusterGroupName   = "CLUSTERGROUPNAME"
-// ex: kubeconfig's cluster.server URL : https://endpoint/org/orgid/project/<projectName>/clustergroup/<clustergroupName>
+// ex: kubeconfig's cluster.server URL : https://endpoint/org/orgid/project/<projectID>/clustergroup/<clustergroupName>
 //
 // Note: Specifying `spaceName` and `clusterGroupName` both at the same time is incorrect input.
 //
 // Use Case 5: Get the kubeconfig pointing to Kubernetes context
-// -> projectName        = ""
+// -> projectID          = ""
 // -> spaceName          = ""
 // -> clusterGroupName   = ""
 func GetKubeconfigForContext(contextName string, opts ...ResourceOptions) ([]byte, error) {
@@ -225,10 +226,10 @@ func prepareClusterServerURL(context *configtypes.Context, rOptions *resourceOpt
 		return fmt.Sprintf("%s/%s", strings.TrimRight(context.GlobalOpts.Endpoint, "/"), strings.TrimLeft(rOptions.customPath, "/"))
 	}
 
-	if rOptions.projectName == "" {
+	if rOptions.projectID == "" {
 		return serverURL
 	}
-	serverURL = serverURL + "/project/" + rOptions.projectName
+	serverURL = serverURL + "/project/" + rOptions.projectID
 
 	if rOptions.spaceName != "" {
 		return serverURL + "/space/" + rOptions.spaceName

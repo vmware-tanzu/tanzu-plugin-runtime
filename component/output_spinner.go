@@ -30,7 +30,6 @@ type OutputWriterSpinner interface {
 	// SetFinalText sets the spinner final text and prefix
 	// log indicator (log.LogTypeOUTPUT can be used for no prefix)
 	SetFinalText(finalText string, prefix log.LogType)
-
 	// GetErrorText returns the spinner error text if spinner is terminated or interrupted
 	GetErrorText() string
 }
@@ -189,17 +188,19 @@ func (ows *outputwriterspinner) StartSpinner() {
 
 // StopSpinner stops the running spinner instance, displays FinalText if set
 func (ows *outputwriterspinner) StopSpinner() {
+	if ows.spinner != nil && ows.spinner.Active() {
+		ows.spinner.Stop()
+		if ows.spinnerFinalText != "" {
+			fmt.Fprintln(ows.out)
+		}
+	}
+}
+
+// StopAllSpinners stops all running spinners if any
+func StopAllSpinners() {
 	for _, s := range spinners {
 		if s != nil {
-			if s.GetErrorText() != "" {
-				s.SetFinalText(s.GetErrorText(), log.LogTypeERROR)
-			}
-			if ows.spinner != nil && ows.spinner.Active() {
-				ows.spinner.Stop()
-				if ows.spinnerFinalText != "" {
-					fmt.Fprintln(ows.out)
-				}
-			}
+			s.StopSpinner()
 		}
 	}
 }

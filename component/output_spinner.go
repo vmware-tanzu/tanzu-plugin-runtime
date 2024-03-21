@@ -30,8 +30,6 @@ type OutputWriterSpinner interface {
 	// SetFinalText sets the spinner final text and prefix
 	// log indicator (log.LogTypeOUTPUT can be used for no prefix)
 	SetFinalText(finalText string, prefix log.LogType)
-	// GetErrorText returns the spinner error text if spinner is terminated or interrupted
-	GetErrorText() string
 }
 
 // outputwriterspinner is our internal implementation.
@@ -39,7 +37,6 @@ type outputwriterspinner struct {
 	outputwriter
 	spinnerText        string
 	spinnerFinalText   string
-	spinnerErrorText   string
 	startSpinnerOnInit bool
 	spinner            *spinner.Spinner
 }
@@ -54,13 +51,6 @@ var spinners []OutputWriterSpinner
 func WithSpinnerFinalText(finalText string, prefix log.LogType) OutputWriterSpinnerOption {
 	return func(ows *outputwriterspinner) {
 		ows.spinnerFinalText = fmt.Sprintf("%s%s", log.GetLogTypeIndicator(prefix), finalText)
-	}
-}
-
-// WithSpinnerErrorText sets the spinner error text if spinner is terminated or interrupted
-func WithSpinnerErrorText(errorText string) OutputWriterSpinnerOption {
-	return func(ows *outputwriterspinner) {
-		ows.spinnerErrorText = errorText
 	}
 }
 
@@ -228,11 +218,6 @@ func (ows *outputwriterspinner) SetText(text string) {
 		ows.spinnerText = text
 		ows.spinner.Suffix = fmt.Sprintf(" %s", text)
 	}
-}
-
-// GetErrorText returns the spinner error text if spinner is terminated or interrupted
-func (ows *outputwriterspinner) GetErrorText() string {
-	return ows.spinnerErrorText
 }
 
 // applySpinnerOptions applies the options to the outputwriterspinner

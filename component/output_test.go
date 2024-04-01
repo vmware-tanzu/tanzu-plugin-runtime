@@ -157,7 +157,7 @@ func validateTableOutput(t *testing.T, output string) {
 
 func TestNewOutputWriterListTable(t *testing.T) {
 	var b bytes.Buffer
-	tab := NewOutputWriter(&b, string(ListTableOutputType), "a", "b", "c")
+	tab := NewOutputWriter(&b, string(ListTableOutputType), "a", "B", "c")
 	require.NotNil(t, tab)
 	tab.AddRow("1", "2", "3")
 	tab.AddRow("4", "5", "6")
@@ -169,11 +169,11 @@ func TestNewOutputWriterListTable(t *testing.T) {
 
 	// Output should contain row per header and a blank line
 	require.Equal(t, 4, len(lines), "%v", lines)
-	require.Contains(t, lines[0], "A:")
+	require.Contains(t, lines[0], "a:")
 	require.Contains(t, lines[0], "1, 4")
 	require.Contains(t, lines[1], "B:")
 	require.Contains(t, lines[1], "2, 5")
-	require.Contains(t, lines[2], "C:")
+	require.Contains(t, lines[2], "c:")
 	require.Contains(t, lines[2], "3, 6")
 }
 
@@ -190,9 +190,9 @@ func TestListTableTooManyValues(t *testing.T) {
 
 	// Output should contain header row, data row, and a blank line
 	require.Equal(t, 3, len(lines), "%v", lines)
-	require.Contains(t, lines[0], "A:")
+	require.Contains(t, lines[0], "a:")
 	require.Contains(t, lines[0], " 1")
-	require.Contains(t, lines[1], "B:")
+	require.Contains(t, lines[1], "b:")
 	require.Contains(t, lines[1], " 2")
 }
 
@@ -209,11 +209,11 @@ func TestListTableTooFewValues(t *testing.T) {
 
 	// Output should contain header row, data row, and a blank line
 	require.Equal(t, 4, len(lines), "%v", lines)
-	require.Contains(t, lines[0], "A:")
+	require.Contains(t, lines[0], "a:")
 	require.Contains(t, lines[0], " 1")
-	require.Contains(t, lines[1], "B:")
+	require.Contains(t, lines[1], "b:")
 	require.Contains(t, lines[1], " 2")
-	require.Contains(t, lines[2], "C:")
+	require.Contains(t, lines[2], "c:")
 }
 
 func TestNewOutputWriterYAML(t *testing.T) {
@@ -421,9 +421,9 @@ func TestNewOutputWriterTableListNonStrings(t *testing.T) {
 
 	// leading newline, added for readability, should be trimmed during compare
 	expected := `
-A:           1, 3
-B:           map[b:bar f:foo], 4
-C:           2, 5
+  a:           1, 3
+  b:           map[b:bar f:foo], 4
+  c:           2, 5
 `
 	require.Equal(t, expected[1:], output)
 }

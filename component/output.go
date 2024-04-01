@@ -260,9 +260,9 @@ func renderListTable(ow *outputwriter) {
 			}
 			row = append(row, fmt.Sprintf("%v", data[i]))
 		}
-		headerLabel := strings.ToUpper(header) + ":"
+		headerLabel := header + ":"
 		values := strings.Join(row, ", ")
-		fmt.Fprintf(ow.out, "%-"+strconv.Itoa(headerLength)+"s   %s\n", headerLabel, values)
+		fmt.Fprintf(ow.out, "  %-"+strconv.Itoa(headerLength)+"s   %s\n", headerLabel, values)
 	}
 }
 

@@ -70,8 +70,22 @@ func TestAddCommands(t *testing.T) {
 		Group:                "TestGroup",
 		DocURL:               "https://docs.example.com",
 		Hidden:               false,
-		InvokedAs:            []string{"dummy2"},
 		SupportedContextType: []types.ContextType{types.ContextTypeTanzu},
+		CommandMap: []CommandMapEntry{
+			CommandMapEntry{
+				DestinationCommandPath: "dummy2",
+			},
+			CommandMapEntry{
+				SourceCommandPath:      "delete",
+				DestinationCommandPath: "delete",
+				Description:            "Delete the dummy and all the related resources",
+			},
+			CommandMapEntry{
+				SourceCommandPath:      "deeper delete2",
+				DestinationCommandPath: "deepdel2",
+				Description:            "Delete a dummy, much deeply",
+			},
+		},
 	}
 
 	cmd, err := NewPlugin(&descriptor)

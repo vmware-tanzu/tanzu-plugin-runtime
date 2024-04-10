@@ -56,6 +56,26 @@ const (
 	ExtraCmdGroup CmdGroup = "Extra"
 )
 
+// CommandMapEntry describes how a command or subcommand should be remapped in the Tanzu CLI
+type CommandMapEntry struct {
+	// SourceCommandPath is a space-delimited path to the command relative to
+	// the root Command of this plugin, with the root Command's path being ""
+	SourceCommandPath string `json:"srcPath" yaml:"srcPath"`
+	// DestinationCommandPath is a space-delimited path to the command relative
+	// to the root Command of the Tanzu CLI
+	DestinationCommandPath string `json:"dstPath" yaml:"dstPath"`
+	// By default, the command previously situated at the
+	// DestinationCommandPath of the Tanzu CLI, if exist, will be the one
+	// overridden by this entry. If this mapping attempt is intended to
+	// override another part of the Tanzu CLI command tree, the override path should be used.
+	Overrides string `json:"overrides" yaml:"overrides"`
+	// Required when remapping a subcommand of this plugin outside of the
+	// plugin's command tree (e.g. whe elevating a subcommand to a top level
+	// command of the Tanzu CLI). This enables the CLI to provide better help
+	// information about the remapped command.
+	Description string `json:"description" yaml:"description"`
+}
+
 // PluginDescriptor describes a plugin binary.
 type PluginDescriptor struct {
 	// Name is the name of the plugin.
@@ -105,18 +125,15 @@ type PluginDescriptor struct {
 	// DefaultFeatureFlags is default featureflags to be configured if missing when invoking plugin
 	DefaultFeatureFlags map[string]bool `json:"defaultFeatureFlags,omitempty" yaml:"defaultFeatureFlags,omitempty"`
 
-	// InvokedAs provides a specific mapping to how any command provided by this plugin should be invoked as.
-	// If unset (which is equivalent to setting it to ["<PluginDescriptor.Name>"]), commands will typically be invocable
-	// with the Tanzu CLI using "<PluginDescriptor.Name> <command name> commandargs...."
-	// Can be used to specify additional levels in the command hierarchy via values with space-delimited parts.
-	// e.g. ["operations cluster"] implies plugin's command foo will be invoked by the Tanzu CLI using
-	// 'tanzu operations cluster foo...'
-	// EXPERIMENTAL: subject to change prior to the next official minor release
-	InvokedAs []string `json:"invokedAs,omitempty" yaml:"invokedAs,omitempty"`
-
 	// SupportedContextType specifies one or more ContextType that this plugin will specifically apply to.
 	// When no context of matching type is active, the command tree specified by this plugin should be omitted.
 	// When unset, the plugin does not define any specific opinions on this aspect.
 	// EXPERIMENTAL: subject to change prior to the next official minor release
 	SupportedContextType []types.ContextType `json:"supportedContextType,omitempty" yaml:"supportedContextType,omitempty"`
+
+	// CommandMap specifies one or more CommandMapEntry's and describes how one
+	// or more parts of the plugin's command tree will be remapped in the Tanzu CLI
+	// Empty when the plugin does not offer any specific mapping opinions.
+	// EXPERIMENTAL: subject to change prior to the next official minor release
+	CommandMap []CommandMapEntry `json:"commandMap,omitempty" yaml:"commandMap,omitempty"`
 }

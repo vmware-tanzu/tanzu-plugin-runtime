@@ -78,7 +78,15 @@ func SampleTestPlugin(t *testing.T, target types.Target) *Plugin {
 		Group:       AdminCmdGroup,
 		Version:     "v1.1.0",
 		BuildSHA:    "1234567",
-		InvokedAs:   []string{"test"},
+		CommandMap: []CommandMapEntry{
+			CommandMapEntry{
+				DestinationCommandPath: "test",
+			},
+			CommandMapEntry{
+				DestinationCommandPath: "fetch",
+				SourceCommandPath:      "fetch",
+			},
+		},
 	}
 
 	var local string
@@ -344,6 +352,65 @@ Flags:
 Global Flags:
   -e, --env string   env to test
 `
+	assert.Equal(t, expected, got)
+}
+
+func TestGlobalTestFetchCommandHelpTextWithInvocationContext(t *testing.T) {
+	r, w, err := os.Pipe()
+	if err != nil {
+		t.Error(err)
+	}
+	c := make(chan []byte)
+	go readOutput(t, r, c)
+
+	// Set up for our test
+	stdout := os.Stdout
+	stderr := os.Stderr
+
+	os.Setenv("TANZU_CLI_COMMAND_MAPPED_FROM", "fetch")
+	os.Setenv("TANZU_CLI_INVOKED_COMMAND", "fetch")
+	os.Setenv("TANZU_CLI_INVOKED_GROUP", "")
+	defer func() {
+		os.Stdout = stdout
+		os.Stderr = stderr
+		os.Unsetenv("TANZU_CLI_COMMAND_MAPPED_FROM")
+		os.Unsetenv("TANZU_CLI_INVOKED_COMMAND")
+		os.Unsetenv("TANZU_CLI_INVOKED_GROUP")
+	}()
+	os.Stdout = w
+	os.Stderr = w
+
+	// Prepare the root command with Global target
+	p := SampleTestPlugin(t, types.TargetGlobal)
+
+	p.Cmd.SetArgs([]string{"fetch", "--help"})
+
+	// Execute the command which will trigger the help
+	err = p.Execute()
+	assert.Nil(t, err)
+
+	err = w.Close()
+	assert.Nil(t, err)
+
+	got := string(<-c)
+
+	expected := `Fetch the plugin tests
+
+Usage:
+  tanzu fetch
+
+Examples:
+  sample example usage of the fetch command
+
+Flags:
+  -h, --help           help for fetch
+  -l, --local string   path to local repository
+  -u, --url string     url to remote repository
+
+Global Flags:
+  -e, --env string   env to test
+`
+
 	assert.Equal(t, expected, got)
 }
 

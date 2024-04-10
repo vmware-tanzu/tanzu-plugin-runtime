@@ -64,22 +64,53 @@ const (
 	indentStr               = "  "
 )
 
+// return space delimited concatenation of each non empty string in the array,
+// in the order as provided
+func buildInvocationString(parts ...string) string {
+	var nonEmptyParts []string
+	for _, s := range parts {
+		if strings.TrimSpace(s) != "" {
+			nonEmptyParts = append(nonEmptyParts, s)
+		}
+	}
+	return strings.Join(nonEmptyParts, " ")
+}
+
+func useLineEx(cmd *cobra.Command, ic *InvocationContext) string {
+	// by checking sourceCommandPath we limit the use of the InvocationContext
+	// to only command-level (not plugin level) mapping
+	if ic == nil || ic.sourceCommandPath == "" {
+		return cmd.UseLine()
+	}
+
+	// TODO(vuil) look into still incorporating relevant parts of UseLine into output
+	return ic.String()
+}
+
+func commandPathEx(cmd *cobra.Command, ic *InvocationContext) string {
+	if ic == nil || ic.sourceCommandPath == "" {
+		return cmd.CommandPath()
+	}
+	return ic.String()
+}
+
 // Helper to format the usage help section.
 func formatUsageHelpSection(cmd *cobra.Command, target types.Target) string {
 	var output strings.Builder
+	ic := GetInvocationContext()
 
 	output.WriteString(component.Bold(usageStr) + "\n")
-	base := indentStr + "tanzu "
+	base := indentStr + "tanzu"
 
 	if cmd.Runnable() {
 		// For kubernetes, k8s, global, or no target display tanzu command path without target
 		if target == types.TargetK8s || target == types.TargetGlobal || target == types.TargetUnknown {
-			output.WriteString(base + cmd.UseLine() + "\n")
+			output.WriteString(buildInvocationString(base, useLineEx(cmd, ic)) + "\n")
 		}
 
 		// For non global, or no target ;display tanzu command path with target
 		if target != types.TargetGlobal && target != types.TargetUnknown {
-			output.WriteString(base + string(target) + " " + cmd.UseLine() + "\n")
+			output.WriteString(buildInvocationString(base, string(target), useLineEx(cmd, ic)) + "\n")
 		}
 	}
 
@@ -91,12 +122,12 @@ func formatUsageHelpSection(cmd *cobra.Command, target types.Target) string {
 		}
 		// For kubernetes, k8s, global, or no target display tanzu command path without target
 		if target == types.TargetK8s || target == types.TargetGlobal || target == types.TargetUnknown {
-			output.WriteString(base + cmd.CommandPath() + " [command]\n")
+			output.WriteString(buildInvocationString(base, commandPathEx(cmd, ic), "[command]") + "\n")
 		}
 
 		// For non global, or no target display tanzu command path with target
 		if target != types.TargetGlobal && target != types.TargetUnknown {
-			output.WriteString(base + string(target) + " " + cmd.CommandPath() + " [command]\n")
+			output.WriteString(buildInvocationString(base, string(target), commandPathEx(cmd, ic), "[command]") + "\n")
 		}
 	}
 	return output.String()

@@ -4,22 +4,17 @@
 package plugin
 
 import (
-	"strings"
-
 	"github.com/spf13/cobra"
 )
 
 func getPluginInvokedAs(descriptor *PluginDescriptor) string {
-	var invokedAsString string
 	name := descriptor.Name
 
-	if len(descriptor.InvokedAs) != 0 {
-		invokedAsString = strings.TrimSpace(descriptor.InvokedAs[0])
-	}
-
-	if invokedAsString != "" {
-		cmdParts := strings.Split(invokedAsString, " ")
-		name = cmdParts[len(cmdParts)-1]
+	for _, entry := range descriptor.CommandMap {
+		// this is a plugin-level map
+		if entry.SourceCommandPath == "" {
+			name = entry.DestinationCommandPath
+		}
 	}
 
 	return name

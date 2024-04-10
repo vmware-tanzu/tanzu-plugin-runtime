@@ -44,6 +44,8 @@ type outputwriterspinner struct {
 // OutputWriterSpinnerOption is an option to configure outputwriterspinner
 type OutputWriterSpinnerOption func(*outputwriterspinner)
 
+var spinners []OutputWriterSpinner
+
 // WithSpinnerFinalText sets the spinner final text and prefix log indicator
 // (log.LogTypeOUTPUT can be used for no prefix)
 func WithSpinnerFinalText(finalText string, prefix log.LogType) OutputWriterSpinnerOption {
@@ -153,7 +155,12 @@ func initializeSpinner(ows *outputwriterspinner) OutputWriterSpinner {
 			ows.spinner.Start()
 		}
 	}
+	storeSpinners(ows)
 	return ows
+}
+
+func storeSpinners(s OutputWriterSpinner) {
+	spinners = append(spinners, s)
 }
 
 // RenderWithSpinner stops the running spinner instance, displays FinalText if set, then renders the output
@@ -177,11 +184,24 @@ func (ows *outputwriterspinner) StartSpinner() {
 	}
 }
 
-// StopSpinner stops the running spinner instance, displays FinalText if set
+// StopSpinner stops the running spinner instances and displays FinalText if set.
+// StopSpinner needs to be called explicitly to stop the spinner.
+// It helps to stop all active spinners when the command is completed or interrupted.
 func (ows *outputwriterspinner) StopSpinner() {
 	if ows.spinner != nil && ows.spinner.Active() {
 		ows.spinner.Stop()
-		fmt.Fprintln(ows.out)
+		if ows.spinnerFinalText != "" {
+			fmt.Fprintln(ows.out)
+		}
+	}
+}
+
+// StopAllSpinners stops all running spinners if any
+func StopAllSpinners() {
+	for _, s := range spinners {
+		if s != nil {
+			s.StopSpinner()
+		}
 	}
 }
 

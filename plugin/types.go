@@ -73,7 +73,15 @@ type CommandMapEntry struct {
 	// plugin's command tree (e.g. whe elevating a subcommand to a top level
 	// command of the Tanzu CLI). This enables the CLI to provide better help
 	// information about the remapped command.
+	// Not used for plugin-level mapping. Optional for subcommand mapping in the
+	// sense that if unset, the short description of the actual Command at the
+	// SourceCommandPath will be used.
 	Description string `json:"description" yaml:"description"`
+	// Aliases are other text strings used to call the mapped command.
+	// Not used for plugin-level mapping. Optional for subcommand mapping in the
+	// sense that if unset, the aliases of the actual Command at the
+	// SourceCommandPath will be used.
+	Aliases []string `json:"aliases,omitempty" yaml:"aliases,omitempty"`
 }
 
 // PluginDescriptor describes a plugin binary.

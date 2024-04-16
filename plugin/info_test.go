@@ -9,7 +9,10 @@ import (
 	"runtime"
 	"testing"
 
+	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
 
 func TestInfo(t *testing.T) {
@@ -33,27 +36,47 @@ func TestInfo(t *testing.T) {
 	os.Stderr = w
 
 	descriptor := PluginDescriptor{
-		Name:            "Test Plugin",
-		Description:     "Description of the plugin",
-		Version:         "1.2.3",
-		BuildSHA:        "cafecafe",
-		Group:           "TestGroup",
-		DocURL:          "https://docs.example.com",
-		Hidden:          false,
-		PostInstallHook: func() error { return nil },
+		Name:                 "Foo Plugin",
+		Target:               types.TargetK8s,
+		Description:          "Description of the plugin",
+		Version:              "v1.2.3",
+		BuildSHA:             "cafecafe",
+		Group:                "TestGroup",
+		DocURL:               "https://docs.example.com",
+		Hidden:               false,
+		SupportedContextType: []types.ContextType{types.ContextTypeTanzu},
+		CommandMap: []CommandMapEntry{
+			CommandMapEntry{
+				SourceCommandPath:      "subber",
+				DestinationCommandPath: "subber",
+			},
+		},
 	}
-
-	infoCmd := newInfoCmd(&descriptor)
-	err = infoCmd.Execute()
-	w.Close()
-	assert.Nil(err)
-
-	got := <-c
 
 	expectedInfo := pluginInfo{
 		PluginDescriptor: descriptor,
 		BinaryArch:       runtime.GOARCH,
 	}
+
+	p, err := NewPlugin(&descriptor)
+	if err != nil {
+		t.Error(err)
+	}
+
+	p.Cmd.SetArgs([]string{"info"})
+
+	subCmd := &cobra.Command{
+		Use:     "subber",
+		Short:   "subcommand description",
+		Aliases: []string{"sub"},
+	}
+	p.AddCommands(subCmd)
+
+	err = p.Cmd.Execute()
+	w.Close()
+	assert.Nil(err)
+
+	got := <-c
 
 	gotInfo := &pluginInfo{}
 	err = json.Unmarshal(got, gotInfo)
@@ -67,6 +90,9 @@ func TestInfo(t *testing.T) {
 	assert.Equal(expectedInfo.BuildSHA, gotInfo.BuildSHA)
 	assert.Equal(expectedInfo.DocURL, gotInfo.DocURL)
 	assert.Equal(expectedInfo.Hidden, gotInfo.Hidden)
+	assert.Equal(expectedInfo.SupportedContextType, gotInfo.SupportedContextType)
+	assert.Equal(subCmd.Aliases, gotInfo.CommandMap[0].Aliases)
+	assert.Equal(subCmd.Short, gotInfo.CommandMap[0].Description)
 	assert.Equal(expectedInfo.BinaryArch, gotInfo.BinaryArch)
 	assert.Empty(gotInfo.PluginRuntimeVersion, "Should be empty since unit tests doesn't have the self (tanzu-plugin-runtime) module dependency")
 }

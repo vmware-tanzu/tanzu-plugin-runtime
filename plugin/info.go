@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"runtime"
 	"runtime/debug"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -38,6 +39,7 @@ func newInfoCmd(desc *PluginDescriptor) *cobra.Command {
 		Short:  "Plugin info",
 		Hidden: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			updateCommandLevelMapEntries(cmd, desc)
 			pi := pluginInfo{
 				PluginDescriptor:     *desc,
 				PluginRuntimeVersion: getPluginRuntimeVersion(),
@@ -53,6 +55,42 @@ func newInfoCmd(desc *PluginDescriptor) *cobra.Command {
 	}
 
 	return cmd
+}
+
+func getSourceCommandByPath(rootCmd *cobra.Command, cmdPath string) *cobra.Command {
+	hierarchy := strings.Fields(cmdPath)
+	cmd, _, err := rootCmd.Find(hierarchy)
+	if err == nil {
+		return cmd
+	}
+	return nil
+}
+
+func updateCommandLevelMapEntries(cmd *cobra.Command, desc *PluginDescriptor) {
+	if desc == nil || len(desc.CommandMap) == 0 {
+		return
+	}
+
+	rootCmd := cmd.Parent()
+
+	for i := range desc.CommandMap {
+		mapEntry := &desc.CommandMap[i]
+		// not subcommand mapping
+		if mapEntry.SourceCommandPath == "" {
+			continue
+		}
+
+		srcCmd := getSourceCommandByPath(rootCmd, mapEntry.SourceCommandPath)
+		if srcCmd != nil {
+			if len(mapEntry.Aliases) == 0 {
+				mapEntry.Aliases = srcCmd.Aliases
+			}
+
+			if mapEntry.Description == "" {
+				mapEntry.Description = srcCmd.Short
+			}
+		}
+	}
 }
 
 func getPluginRuntimeVersion() string {

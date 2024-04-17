@@ -344,6 +344,35 @@ func TestEndpointFromContext(t *testing.T) {
 				},
 			},
 		},
+		// Test case for Kubernetes context type with missing cluster options
+		{
+			name: "Kubernetes Context with Missing Cluster Options",
+			ctx: &configtypes.Context{
+				Name:        "test-tmc",
+				ContextType: configtypes.ContextTypeK8s,
+			},
+			errStr: "invalid context. Required fields missing in the context",
+		},
+
+		// Test case for TMC context type with missing global options
+		{
+			name: "TMC Context with Missing Global Options",
+			ctx: &configtypes.Context{
+				Name:        "test-tmc",
+				ContextType: configtypes.ContextTypeTMC,
+			},
+			errStr: "invalid context. Required fields missing in the context",
+		},
+		// Test case for Tanzu context type with missing cluster options
+		{
+			name: "Tanzu Context with Missing Cluster Options",
+			ctx: &configtypes.Context{
+				Name:        "test-tmc",
+				ContextType: configtypes.ContextTypeTanzu,
+			},
+			errStr: "invalid context. Required fields missing in the context",
+		},
+
 		{
 			name: "failure",
 			ctx: &configtypes.Context{

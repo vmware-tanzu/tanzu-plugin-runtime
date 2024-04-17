@@ -189,6 +189,19 @@ func TestGetKubeconfigForContext(t *testing.T) {
 	assert.NoError(t, err)
 	cluster = kubeconfig.GetCluster(&kc, "k8s-cluster")
 	assert.Equal(t, cluster.Cluster.Server, k8sCtx.ClusterOpts.Endpoint)
+
+	// Test if tanzu context ClusterOpts is set to nil
+	tanzuCtx, err = GetContext("test-tanzu")
+	assert.NoError(t, err)
+	// update context to remove clusterOtps
+	tanzuCtx.Name = "test-tanzu-withoutClusterOpts"
+	tanzuCtx.ClusterOpts = nil
+	err = AddContext(tanzuCtx, false)
+	assert.NoError(t, err)
+	_, err = GetKubeconfigForContext(tanzuCtx.Name)
+	assert.ErrorContains(t, err, "invalid context. context missing kubeconfig details")
+	err = DeleteContext(tanzuCtx.Name)
+	assert.NoError(t, err)
 }
 
 func TestGetTanzuContextActiveResource(t *testing.T) {

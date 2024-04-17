@@ -307,12 +307,22 @@ func RemoveActiveContext(contextType configtypes.ContextType) error {
 
 // EndpointFromContext retrieved the endpoint from the specified context
 func EndpointFromContext(s *configtypes.Context) (endpoint string, err error) {
+	missingFieldsErrMsg := "invalid context. Required fields missing in the context"
 	switch s.ContextType {
 	case configtypes.ContextTypeK8s:
+		if s.ClusterOpts == nil {
+			return endpoint, errors.New(missingFieldsErrMsg)
+		}
 		return s.ClusterOpts.Endpoint, nil
 	case configtypes.ContextTypeTMC:
+		if s.GlobalOpts == nil {
+			return endpoint, errors.New(missingFieldsErrMsg)
+		}
 		return s.GlobalOpts.Endpoint, nil
 	case configtypes.ContextTypeTanzu:
+		if s.ClusterOpts == nil {
+			return endpoint, errors.New(missingFieldsErrMsg)
+		}
 		return s.ClusterOpts.Endpoint, nil
 	default:
 		return endpoint, fmt.Errorf("unknown context type %q", s.ContextType)

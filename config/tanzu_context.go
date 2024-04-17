@@ -197,6 +197,10 @@ func GetKubeconfigForContext(contextName string, opts ...ResourceOptions) ([]byt
 		return nil, errors.Errorf("incorrect resource options provided. Both space and clustergroup are set but only one can be set")
 	}
 
+	if ctx.ClusterOpts == nil {
+		return nil, errors.Errorf("invalid context. context missing kubeconfig details")
+	}
+
 	kc, err := kubeconfig.ReadKubeConfig(ctx.ClusterOpts.Path)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to read the Tanzu context kubeconfig")

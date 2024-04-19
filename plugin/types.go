@@ -65,12 +65,13 @@ type CommandMapEntry struct {
 	// to the root Command of the Tanzu CLI
 	DestinationCommandPath string `json:"dstPath" yaml:"dstPath"`
 	// By default, the command previously situated at the
-	// DestinationCommandPath of the Tanzu CLI, if exist, will be the one
+	// DestinationCommandPath of the Tanzu CLI, if one exist, will be the one
 	// overridden by this entry. If this mapping attempt is intended to
 	// override another part of the Tanzu CLI command tree, the override path should be used.
+	// Specified as a space-delimited path relative to the Tanzu CLI command tree.
 	Overrides string `json:"overrides" yaml:"overrides"`
 	// Required when remapping a subcommand of this plugin outside of the
-	// plugin's command tree (e.g. whe elevating a subcommand to a top level
+	// plugin's command tree (e.g. when elevating a subcommand to a top level
 	// command of the Tanzu CLI). This enables the CLI to provide better help
 	// information about the remapped command.
 	// Not used for plugin-level mapping. Optional for subcommand mapping in the

@@ -142,22 +142,20 @@ func formatHelpFooter(cmd *cobra.Command, target types.Target) string {
 
 	footer.WriteString("\n")
 
+	ic := GetInvocationContext()
+	base := "Use \""
+	if !strings.HasPrefix(cmd.CommandPath(), "tanzu ") {
+		base = "Use \"tanzu"
+	}
+
 	// For kubernetes, k8s, global, or no target display tanzu command path without target
 	if target == types.TargetK8s || target == types.TargetGlobal || target == types.TargetUnknown {
-		footer.WriteString(`Use "`)
-		if !strings.HasPrefix(cmd.CommandPath(), "tanzu ") {
-			footer.WriteString("tanzu ")
-		}
-		footer.WriteString(cmd.CommandPath() + ` [command] --help" for more information about a command.` + "\n")
+		footer.WriteString(buildInvocationString(base, commandPathEx(cmd, ic), `[command] --help" for more information about a command.`+"\n"))
 	}
 
 	// For non global, or no target display tanzu command path with target
 	if target != types.TargetGlobal && target != types.TargetUnknown {
-		footer.WriteString(`Use "`)
-		if !strings.HasPrefix(cmd.CommandPath(), "tanzu ") {
-			footer.WriteString("tanzu ")
-		}
-		footer.WriteString(string(target) + " " + cmd.CommandPath() + ` [command] --help" for more information about a command.` + "\n")
+		footer.WriteString(buildInvocationString(base, string(target), commandPathEx(cmd, ic), `[command] --help" for more information about a command.`+"\n"))
 	}
 
 	return footer.String()

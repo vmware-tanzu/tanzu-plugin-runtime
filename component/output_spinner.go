@@ -30,6 +30,8 @@ type OutputWriterSpinner interface {
 	// SetFinalText sets the spinner final text and prefix
 	// log indicator (log.LogTypeOUTPUT can be used for no prefix)
 	SetFinalText(finalText string, prefix log.LogType)
+	// UnSetFinalText unsets the spinner final text
+	UnSetFinalText()
 }
 
 // outputwriterspinner is our internal implementation.
@@ -210,6 +212,14 @@ func StopAllSpinners() {
 func (ows *outputwriterspinner) SetFinalText(finalText string, prefix log.LogType) {
 	if ows.spinner != nil {
 		ows.spinnerFinalText = fmt.Sprintf("%s%s", log.GetLogTypeIndicator(prefix), finalText)
+		spinner.WithFinalMSG(ows.spinnerFinalText)(ows.spinner)
+	}
+}
+
+// UnSetFinalText unsets the spinner final text if set
+func (ows *outputwriterspinner) UnSetFinalText() {
+	if ows.spinner != nil {
+		ows.spinnerFinalText = ""
 		spinner.WithFinalMSG(ows.spinnerFinalText)(ows.spinner)
 	}
 }

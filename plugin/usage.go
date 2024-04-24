@@ -84,14 +84,14 @@ func useLineEx(cmd *cobra.Command, ic *InvocationContext) string {
 	}
 
 	// TODO(vuil) look into still incorporating relevant parts of UseLine into output
-	return ic.String()
+	return ic.CLIInvocationString()
 }
 
 func commandPathEx(cmd *cobra.Command, ic *InvocationContext) string {
 	if ic == nil || ic.sourceCommandPath == "" {
 		return cmd.CommandPath()
 	}
-	return ic.String()
+	return ic.CLIInvocationString()
 }
 
 // Helper to format the usage help section.

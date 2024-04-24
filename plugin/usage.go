@@ -243,9 +243,20 @@ func formatHelpFooter(cmd *cobra.Command, target types.Target) string {
 
 func aliasesWithMappedName(cmd *cobra.Command) string {
 	cmdName := cmd.Name()
+	// if root cmd
 	if v, ok := cmd.Annotations[cobra.CommandDisplayNameAnnotation]; ok {
 		cmdName = v
+	} else {
+		ic := GetInvocationContext()
+		if ic != nil && ic.MappedSourceCommandPath() != "" {
+			hierarchy, err := hierarchyFromMappedCommandPath(ic.MappedSourceCommandPath(), cmd)
+			// cmd is actually the one being command-level mapped
+			if err == nil && len(hierarchy) == 0 {
+				cmdName = ic.InvokedCommandName()
+			}
+		}
 	}
+
 	return strings.Join(append([]string{cmdName}, cmd.Aliases...), ", ")
 }
 

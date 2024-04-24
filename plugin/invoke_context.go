@@ -6,6 +6,8 @@ package plugin
 import (
 	"os"
 	"strings"
+
+	"github.com/spf13/cobra"
 )
 
 // InvocationContext provides details regarding how a plugin's command is being
@@ -28,11 +30,36 @@ type InvocationContext struct {
 	sourceCommandPath string
 }
 
-func (ic *InvocationContext) String() string {
+func (ic *InvocationContext) CLIInvocationString() string {
 	return strings.TrimSpace(ic.invokedGroup + " " + ic.invokedCommand)
 }
 
-// GetInvocationContext returns information about how a Tanzu CLI command is invoked.
+func (ic *InvocationContext) MappedSourceCommandPath() string {
+	return ic.sourceCommandPath
+}
+
+func (ic *InvocationContext) InvokedCommandName() string {
+	return ic.invokedCommand
+}
+
+func (ic *InvocationContext) InvokedGroupPath() string {
+	return ic.invokedGroup
+}
+
+// CLIInvocationStringForCommand returns the CLI invocation string when cmd was
+// invoked under this invocation context.
+// Invoking "tanzu + (the string returned) as a CLI command would equivalent to
+// the running of cmd with no arguments
+func (ic *InvocationContext) CLIInvocationStringForCommand(cmd *cobra.Command) string {
+	hierarchy, err := hierarchyFromMappedCommand(cmd, ic.sourceCommandPath)
+	if err != nil {
+		return strings.TrimSpace(ic.invokedGroup + " " + ic.invokedCommand)
+	}
+	return strings.TrimSpace(ic.invokedGroup+" "+ic.invokedCommand) + " " + strings.Join(hierarchy, " ")
+}
+
+// GetInvocationContext returns information about how a Tanzu CLI command is
+// invoked (from the CLI's perspective).
 // Note that at the moment a valid InvocationContext is only returned when the
 // invoked plugin command (or its ancestor) has been remapped
 func GetInvocationContext() *InvocationContext {

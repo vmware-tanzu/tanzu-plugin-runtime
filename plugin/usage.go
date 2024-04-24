@@ -4,6 +4,7 @@
 package plugin
 
 import (
+	"fmt"
 	"os"
 	"strings"
 	"text/template"
@@ -76,6 +77,59 @@ func buildInvocationString(parts ...string) string {
 	return strings.Join(nonEmptyParts, " ")
 }
 
+func matchOnCommandName(cmd *cobra.Command, value string) bool {
+	return cmd.Name() == value
+}
+
+func findSubCommandByHierarchy(cmd *cobra.Command, hierarchy []string, matcher func(*cobra.Command, string) bool) (*cobra.Command, *cobra.Command) {
+	childCmds := cmd.Commands()
+	for i := range childCmds {
+		if len(hierarchy) == 1 {
+			if matcher(childCmds[i], hierarchy[0]) {
+				return childCmds[i], childCmds[i].Parent()
+			}
+		} else {
+			if childCmds[i].Name() == hierarchy[0] {
+				return findSubCommandByHierarchy(childCmds[i], hierarchy[1:], matcher)
+			}
+		}
+	}
+	if len(hierarchy) == 1 {
+		return nil, cmd
+	}
+	return nil, nil
+}
+
+// hierarchyFromMappedCommand returns list of command names relative to the mapped
+// command (as indicated by mappedCommandPath) of subcommands to traverse to cmd
+func hierarchyFromMappedCommandPath(mappedCommandPath string, cmd *cobra.Command) ([]string, error) {
+	var fromCmd *cobra.Command
+	var additionalCmdNames []string
+
+	rootCmd := cmd
+	for rootCmd.HasParent() {
+		rootCmd = rootCmd.Parent()
+	}
+
+	if mappedCommandPath == "" {
+		fromCmd = rootCmd
+	} else {
+		hierarchy := strings.Fields(mappedCommandPath)
+		fromCmd, _ = findSubCommandByHierarchy(rootCmd, hierarchy, matchOnCommandName)
+	}
+
+	for cmd != fromCmd && cmd.HasParent() {
+		additionalCmdNames = append([]string{cmd.Name()}, additionalCmdNames...)
+		cmd = cmd.Parent()
+	}
+
+	if cmd != fromCmd {
+		return []string{}, fmt.Errorf("fail to locate mapped command path '%s'", mappedCommandPath)
+	}
+
+	return additionalCmdNames, nil
+}
+
 func useLineEx(cmd *cobra.Command, ic *InvocationContext) string {
 	// by checking sourceCommandPath we limit the use of the InvocationContext
 	// to only command-level (not plugin level) mapping
@@ -83,14 +137,40 @@ func useLineEx(cmd *cobra.Command, ic *InvocationContext) string {
 		return cmd.UseLine()
 	}
 
-	// TODO(vuil) look into still incorporating relevant parts of UseLine into output
-	return ic.CLIInvocationString()
+	hierarchy, err := hierarchyFromMappedCommandPath(ic.sourceCommandPath, cmd)
+	if err != nil {
+		return ic.CLIInvocationString()
+	}
+
+	// we are executing the actual mapped command
+	if len(hierarchy) == 0 {
+		found := strings.HasPrefix(cmd.Use, cmd.Name())
+
+		// in this case, it is acceptable to leverage command's .Use string if
+		// it is prefixed by the command name as long as the prefix is stripped
+		if found {
+			tail := strings.TrimPrefix(cmd.Use, cmd.Name())
+			return ic.CLIInvocationString() + tail
+		}
+		return ic.CLIInvocationString()
+	}
+
+	// if command is deeper than the mapped command, its .Use string is
+	// considered safe to use in replacement of the command name as long as the
+	// former is prefixed by the latter
+	lastCommandName := hierarchy[len(hierarchy)-1]
+	if strings.HasPrefix(cmd.Use, lastCommandName) {
+		hierarchy[len(hierarchy)-1] = cmd.Use
+	}
+
+	return ic.CLIInvocationString() + " " + strings.Join(hierarchy, " ")
 }
 
 func commandPathEx(cmd *cobra.Command, ic *InvocationContext) string {
 	if ic == nil || ic.sourceCommandPath == "" {
 		return cmd.CommandPath()
 	}
+
 	return ic.CLIInvocationString()
 }
 

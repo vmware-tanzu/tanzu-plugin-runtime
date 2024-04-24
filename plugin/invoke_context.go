@@ -31,7 +31,7 @@ type InvocationContext struct {
 }
 
 func (ic *InvocationContext) CLIInvocationString() string {
-	return strings.TrimSpace(ic.invokedGroup + " " + ic.invokedCommand)
+	return buildInvocationString(ic.invokedGroup, ic.invokedCommand)
 }
 
 func (ic *InvocationContext) MappedSourceCommandPath() string {
@@ -48,14 +48,14 @@ func (ic *InvocationContext) InvokedGroupPath() string {
 
 // CLIInvocationStringForCommand returns the CLI invocation string when cmd was
 // invoked under this invocation context.
-// Invoking "tanzu + (the string returned) as a CLI command would equivalent to
-// the running of cmd with no arguments
+// Invoking "tanzu + (the string returned) as a CLI command would be equivalent to
+// executing cmd with no arguments
 func (ic *InvocationContext) CLIInvocationStringForCommand(cmd *cobra.Command) string {
-	hierarchy, err := hierarchyFromMappedCommand(cmd, ic.sourceCommandPath)
-	if err != nil {
-		return strings.TrimSpace(ic.invokedGroup + " " + ic.invokedCommand)
+	hierarchy, err := hierarchyFromMappedCommandPath(ic.sourceCommandPath, cmd)
+	if err != nil || len(hierarchy) == 0 {
+		return buildInvocationString(ic.invokedGroup, ic.invokedCommand)
 	}
-	return strings.TrimSpace(ic.invokedGroup+" "+ic.invokedCommand) + " " + strings.Join(hierarchy, " ")
+	return buildInvocationString(ic.invokedGroup, ic.invokedCommand, strings.Join(hierarchy, " "))
 }
 
 // GetInvocationContext returns information about how a Tanzu CLI command is

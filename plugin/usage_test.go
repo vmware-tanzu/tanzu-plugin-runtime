@@ -62,13 +62,26 @@ func SampleTestPlugin(t *testing.T, target types.Target) *Plugin {
 	}
 
 	var pushCmd = &cobra.Command{
-		Use:   "push",
-		Short: "Push the plugin tests",
+		Use:     "push SOMESTUFF",
+		Aliases: []string{"psh"},
+		Short:   "Push the plugin tests",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			fmt.Println("push")
 			return nil
 		},
 	}
+
+	var pushMoreCmd = &cobra.Command{
+		Use:     "more",
+		Short:   "Push more",
+		Aliases: []string{"mo"},
+		RunE: func(cmd *cobra.Command, args []string) error {
+			fmt.Println("push more")
+			return nil
+		},
+	}
+
+	pushCmd.AddCommand(pushMoreCmd)
 
 	var descriptor = PluginDescriptor{
 		Name:        "testNotUserVisible",
@@ -99,6 +112,8 @@ func SampleTestPlugin(t *testing.T, target types.Target) *Plugin {
 	_ = fetchCmd.MarkFlagRequired("url")
 
 	fetchCmd.Example = "sample example usage of the fetch command"
+
+	pushCmd.Example = "sample example usage of the push command"
 
 	p, err := NewPlugin(&descriptor)
 	assert.Nil(t, err)
@@ -516,5 +531,129 @@ Flags:
 Global Flags:
   -e, --env string   env to test
 `
+	assert.Equal(t, expected, got)
+}
+
+func TestCommandMappedCommandWithInvocationContext(t *testing.T) {
+	r, w, err := os.Pipe()
+	if err != nil {
+		t.Error(err)
+	}
+	c := make(chan []byte)
+	go readOutput(t, r, c)
+
+	// Set up for our test
+	stdout := os.Stdout
+	stderr := os.Stderr
+
+	os.Setenv("TANZU_CLI_COMMAND_MAPPED_FROM", "push")
+	os.Setenv("TANZU_CLI_INVOKED_COMMAND", "pu")
+	os.Setenv("TANZU_CLI_INVOKED_GROUP", "")
+	defer func() {
+		os.Stdout = stdout
+		os.Stderr = stderr
+		os.Unsetenv("TANZU_CLI_COMMAND_MAPPED_FROM")
+		os.Unsetenv("TANZU_CLI_INVOKED_COMMAND")
+		os.Unsetenv("TANZU_CLI_INVOKED_GROUP")
+	}()
+	os.Stdout = w
+	os.Stderr = w
+
+	// Prepare the root command with Global target
+	p := SampleTestPlugin(t, types.TargetGlobal)
+
+	p.Cmd.SetArgs([]string{"push", "--help"})
+
+	// Execute the command which will trigger the help
+	err = p.Execute()
+	assert.Nil(t, err)
+
+	err = w.Close()
+	assert.Nil(t, err)
+
+	got := string(<-c)
+
+	expected := `Push the plugin tests
+
+Usage:
+  tanzu pu SOMESTUFF
+
+  tanzu pu [command]
+
+Aliases:
+  pu, psh
+
+Examples:
+  sample example usage of the push command
+
+Available Commands:
+  more        Push more
+
+Flags:
+  -h, --help   help for push
+
+Global Flags:
+  -e, --env string   env to test
+
+Use "tanzu pu [command] --help" for more information about a command.
+`
+
+	assert.Equal(t, expected, got)
+}
+
+func TestCommandMappedCommandSubCommandWithInvocationContext(t *testing.T) {
+	r, w, err := os.Pipe()
+	if err != nil {
+		t.Error(err)
+	}
+	c := make(chan []byte)
+	go readOutput(t, r, c)
+
+	// Set up for our test
+	stdout := os.Stdout
+	stderr := os.Stderr
+
+	os.Setenv("TANZU_CLI_COMMAND_MAPPED_FROM", "push")
+	os.Setenv("TANZU_CLI_INVOKED_COMMAND", "pu")
+	os.Setenv("TANZU_CLI_INVOKED_GROUP", "")
+	defer func() {
+		os.Stdout = stdout
+		os.Stderr = stderr
+		os.Unsetenv("TANZU_CLI_COMMAND_MAPPED_FROM")
+		os.Unsetenv("TANZU_CLI_INVOKED_COMMAND")
+		os.Unsetenv("TANZU_CLI_INVOKED_GROUP")
+	}()
+	os.Stdout = w
+	os.Stderr = w
+
+	// Prepare the root command with Global target
+	p := SampleTestPlugin(t, types.TargetGlobal)
+
+	p.Cmd.SetArgs([]string{"push", "more", "--help"})
+
+	// Execute the command which will trigger the help
+	err = p.Execute()
+	assert.Nil(t, err)
+
+	err = w.Close()
+	assert.Nil(t, err)
+
+	got := string(<-c)
+
+	expected := `Push more
+
+Usage:
+  tanzu pu more
+
+Aliases:
+  more, mo
+
+Flags:
+  -h, --help   help for more
+
+Global Flags:
+  -e, --env string   env to test
+`
+
 	assert.Equal(t, expected, got)
 }

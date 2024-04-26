@@ -19,6 +19,7 @@ import (
 
 const (
 	fakeOrgID            = "fake-org-id"
+	fakeOrgName          = "fake-org-name"
 	fakeProjectName      = "fake-project"
 	fakeProjectID        = "fake-project-id"
 	fakeSpace            = "fake-space"
@@ -226,6 +227,7 @@ func TestGetTanzuContextActiveResource(t *testing.T) {
 	activeResources, err := GetTanzuContextActiveResource("test-tanzu")
 	assert.NoError(t, err)
 	assert.Equal(t, activeResources.OrgID, fakeOrgID)
+	assert.Equal(t, activeResources.OrgName, fakeOrgName)
 	assert.Empty(t, activeResources.ProjectName)
 	assert.Empty(t, activeResources.ProjectID)
 	assert.Empty(t, activeResources.SpaceName)
@@ -239,6 +241,7 @@ func TestGetTanzuContextActiveResource(t *testing.T) {
 	activeResources, err = GetTanzuContextActiveResource("test-tanzu")
 	assert.NoError(t, err)
 	assert.Equal(t, activeResources.OrgID, fakeOrgID)
+	assert.Equal(t, activeResources.OrgName, fakeOrgName)
 	assert.Equal(t, activeResources.ProjectName, fakeProjectName)
 	assert.Equal(t, activeResources.ProjectID, fakeProjectID)
 	assert.Equal(t, activeResources.SpaceName, fakeSpace)
@@ -254,6 +257,7 @@ func TestGetTanzuContextActiveResource(t *testing.T) {
 	activeResources, err = GetTanzuContextActiveResource("test-tanzu")
 	assert.NoError(t, err)
 	assert.Equal(t, activeResources.OrgID, fakeOrgID)
+	assert.Equal(t, activeResources.OrgName, fakeOrgName)
 	assert.Equal(t, activeResources.ProjectName, fakeProjectName)
 	assert.Equal(t, activeResources.ProjectID, fakeProjectID)
 	assert.Equal(t, activeResources.ClusterGroupName, fakeClusterGroupName)

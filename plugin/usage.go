@@ -82,6 +82,11 @@ func matchOnCommandName(cmd *cobra.Command, value string) bool {
 }
 
 func findSubCommandByHierarchy(cmd *cobra.Command, hierarchy []string, matcher func(*cobra.Command, string) bool) (*cobra.Command, *cobra.Command) {
+	if len(hierarchy) == 0 {
+		parent := cmd.Parent()
+		return cmd, parent
+	}
+
 	childCmds := cmd.Commands()
 	for i := range childCmds {
 		if len(hierarchy) == 1 {
@@ -106,10 +111,7 @@ func hierarchyFromMappedCommandPath(mappedCommandPath string, cmd *cobra.Command
 	var fromCmd *cobra.Command
 	var additionalCmdNames []string
 
-	rootCmd := cmd
-	for rootCmd.HasParent() {
-		rootCmd = rootCmd.Parent()
-	}
+	rootCmd := cmd.Root()
 
 	if mappedCommandPath == "" {
 		fromCmd = rootCmd

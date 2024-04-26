@@ -30,7 +30,7 @@ func NewPlugin(descriptor *PluginDescriptor) (*Plugin, error) {
 		Cmd: newRootCmd(descriptor),
 	}
 	p.Cmd.AddCommand(lintCmd)
-	p.Cmd.AddCommand(genDocsCmd)
+	p.Cmd.AddCommand(newGenDocsCmd(descriptor))
 	p.Cmd.AddCommand(newPostInstallCmd(descriptor))
 	return p, nil
 }

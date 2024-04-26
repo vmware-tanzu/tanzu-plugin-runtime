@@ -39,6 +39,8 @@ const (
 type ResourceInfo struct {
 	// OrgID ID of the Organization
 	OrgID string
+	// OrgName name of the Organization
+	OrgName string
 	// ProjectName name of the Project
 	ProjectName string
 	// ProjectID ID of the Project.
@@ -321,6 +323,7 @@ func GetTanzuContextActiveResource(contextName string) (*ResourceInfo, error) {
 	}
 	activeResourceInfo := &ResourceInfo{
 		OrgID:            stringValue(ctx.AdditionalMetadata[OrgIDKey]),
+		OrgName:          stringValue(ctx.AdditionalMetadata[OrgNameKey]),
 		ProjectName:      stringValue(ctx.AdditionalMetadata[ProjectNameKey]),
 		ProjectID:        stringValue(ctx.AdditionalMetadata[ProjectIDKey]),
 		SpaceName:        stringValue(ctx.AdditionalMetadata[SpaceNameKey]),

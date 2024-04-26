@@ -502,7 +502,8 @@ func setupForGetContext() error {
 					Context:  "test-context",
 				},
 				AdditionalMetadata: map[string]interface{}{
-					OrgIDKey: "fake-org-id",
+					OrgIDKey:   "fake-org-id",
+					OrgNameKey: "fake-org-name",
 				},
 			},
 		},

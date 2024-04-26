@@ -13,12 +13,25 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
 
 func TestGenDocsCmd(t *testing.T) {
 	cmd := &cobra.Command{
 		Use:   "test",
 		Short: aurora.Bold(`Test plugin command`).String(),
+	}
+
+	descriptor := PluginDescriptor{
+		Name:        "test",
+		Target:      types.TargetGlobal,
+		Description: "test plugin",
+		Version:     "v1.2.3",
+		BuildSHA:    "cafecafe",
+		Group:       "TestGroup",
+		DocURL:      "https://docs.example.com",
+		Hidden:      false,
 	}
 
 	assert := assert.New(t)
@@ -43,7 +56,7 @@ func TestGenDocsCmd(t *testing.T) {
 	os.Stdout = w
 	os.Stderr = w
 
-	docsCmd := genDocsCmd
+	docsCmd := newGenDocsCmd(&descriptor)
 	cmd.AddCommand(docsCmd)
 	args := []string{}
 	args = append(args, "generate-docs")

@@ -271,6 +271,99 @@ func TestGenerateDocsWithPlugin(t *testing.T) {
 				},
 			},
 		},
+		{
+			test: "top level plugin command mapped to top level of CLI",
+			commandMap: []CommandMapEntry{
+				{
+					SourceCommandPath:      "foo",
+					DestinationCommandPath: "foo",
+				},
+			},
+			hiddenCommands: []string{"foo", "deeper baz"},
+			expected: markdownState{
+				expectedFiles: []string{"tanzu.md", "tanzu_plug.md", "tanzu_foo.md", "tanzu_plug_bar.md"},
+				filesContent: map[string]fileContent{
+					"tanzu.md": fileContent{
+						contains: []string{"tanzu", "[tanzu plug](tanzu_plug.md)", "[tanzu foo](tanzu_foo.md)"},
+					},
+					"tanzu_plug.md": fileContent{
+						contains: []string{"[tanzu plug bar](tanzu_plug_bar.md)"},
+						omits: []string{
+							"tanzu plug deeper",
+							"tanzu plug foo",
+						},
+					},
+					"tanzu_foo.md": fileContent{
+						contains: []string{"foo command", "[tanzu](tanzu.md)"},
+						omits:    []string{"tanzu plug foo"},
+					},
+				},
+			},
+		},
+		{
+			test: "command and plugin level mapping",
+			commandMap: []CommandMapEntry{
+				{
+					SourceCommandPath:      "",
+					DestinationCommandPath: "pi",
+				},
+				{
+					SourceCommandPath:      "foo",
+					DestinationCommandPath: "foo",
+				},
+			},
+			hiddenCommands: []string{"foo", "deeper baz"},
+			expected: markdownState{
+				expectedFiles: []string{"tanzu.md", "tanzu_pi.md", "tanzu_foo.md", "tanzu_pi_bar.md"},
+				filesContent: map[string]fileContent{
+					"tanzu.md": fileContent{
+						contains: []string{"tanzu", "[tanzu pi](tanzu_pi.md)", "[tanzu foo](tanzu_foo.md)"},
+					},
+					"tanzu_pi.md": fileContent{
+						contains: []string{"[tanzu pi bar](tanzu_pi_bar.md)"},
+						omits: []string{
+							"tanzu pi deeper",
+							"tanzu pi foo",
+						},
+					},
+					"tanzu_foo.md": fileContent{
+						contains: []string{"foo command", "[tanzu](tanzu.md)"},
+						omits:    []string{"tanzu pi foo"},
+					},
+				},
+			},
+		},
+		{
+			test: "plugin level mapping to multiple destination paths",
+			commandMap: []CommandMapEntry{
+				{
+					SourceCommandPath:      "",
+					DestinationCommandPath: "pi",
+				},
+				{
+					SourceCommandPath:      "",
+					DestinationCommandPath: "hi",
+				},
+			},
+			hiddenCommands: []string{"foo", "deeper baz"},
+			expected: markdownState{
+				expectedFiles: []string{"tanzu.md", "tanzu_pi.md", "tanzu_hi.md", "tanzu_pi_bar.md", "tanzu_hi_bar.md"},
+				filesContent: map[string]fileContent{
+					"tanzu.md": fileContent{
+						contains: []string{"tanzu", "[tanzu pi](tanzu_pi.md)", "[tanzu hi](tanzu_hi.md)"},
+						omits:    []string{"plug"},
+					},
+					"tanzu_pi.md": fileContent{
+						contains: []string{"[tanzu pi bar](tanzu_pi_bar.md)"},
+						omits:    []string{"tanzu pi deeper", "tanzu pi foo"},
+					},
+					"tanzu_hi.md": fileContent{
+						contains: []string{"[tanzu hi bar](tanzu_hi_bar.md)", "[tanzu](tanzu.md)"},
+						omits:    []string{"tanzu pi"},
+					},
+				},
+			},
+		},
 	}
 
 	for _, spec := range tests {

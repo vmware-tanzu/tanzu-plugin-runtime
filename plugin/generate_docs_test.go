@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/logrusorgru/aurora"
@@ -90,4 +91,205 @@ func checkDirectoryHasMDFiles(dirName string) error {
 		}
 	}
 	return errors.Errorf("directory is expected to have MD files")
+}
+
+func setupBasicCommand(cmdName string) *cobra.Command {
+	return &cobra.Command{
+		Use:   cmdName,
+		Short: fmt.Sprintf("%s command", cmdName),
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Printf("%s : %s", cmd.Use, args[0])
+		},
+		Example: fmt.Sprintf("example usage of the %s command", cmdName),
+	}
+}
+
+// geneate a Plugin with with customizable command map and command visibility
+//
+// plugin root command
+//   - foo
+//   - bar
+//   - deeper
+//     -- baz
+//
+// with supplied command map and visibility list affect how and if each command is invocable
+func genDocsTestPlugin(t *testing.T, mapEntries []CommandMapEntry, hiddenCommands []string) *Plugin {
+	var fooCmd = setupBasicCommand("foo")
+	var barCmd = setupBasicCommand("bar")
+	var bazCmd = setupBasicCommand("baz")
+	var deeperCmd = &cobra.Command{
+		Use:   "deeper",
+		Short: "deeper node",
+	}
+	deeperCmd.AddCommand(bazCmd)
+
+	var descriptor = PluginDescriptor{
+		Name:        "plug",
+		Target:      types.TargetGlobal,
+		Aliases:     []string{"t"},
+		Description: "Test the CLI generate-docs",
+		Group:       AdminCmdGroup,
+		Version:     "v1.1.0",
+		BuildSHA:    "1234567",
+	}
+
+	var value string
+	var bvalue string
+	fooCmd.Flags().StringVarP(&value, "value", "v", "", "value to pass")
+	bazCmd.Flags().StringVarP(&bvalue, "bvalue", "b", "", "bvalue to pass")
+
+	descriptor.CommandMap = mapEntries
+	p, err := NewPlugin(&descriptor)
+	assert.Nil(t, err)
+
+	p.AddCommands(
+		fooCmd,
+		barCmd,
+		deeperCmd,
+	)
+
+	for _, commandPath := range hiddenCommands {
+		hierarchy := strings.Fields(commandPath)
+		cmd, _ := findSubCommandByHierarchy(p.Cmd, hierarchy, matchOnCommandName)
+		assert.NotNil(t, cmd)
+		cmd.Hidden = true
+	}
+
+	return p
+}
+
+type fileContent struct {
+	contains []string
+	omits    []string
+}
+
+type markdownState struct {
+	expectedFiles []string
+	filesContent  map[string]fileContent
+}
+
+func checkMarkdownState(t *testing.T, docsDir string, ms markdownState) {
+	filesInfos, err := os.ReadDir(docsDir)
+	errorMsg := fmt.Sprintf("will processing doc output in %s\n", docsDir)
+
+	assert.Nil(t, err, errorMsg)
+
+	var foundFiles []string
+	for _, fileInfo := range filesInfos {
+		foundFiles = append(foundFiles, fileInfo.Name())
+	}
+	assert.ElementsMatch(t, ms.expectedFiles, foundFiles, errorMsg)
+
+	for _, fileName := range foundFiles {
+		b, err := os.ReadFile(filepath.Join(docsDir, fileName))
+		assert.Nil(t, err, errorMsg)
+		content := string(b)
+		for _, expectedString := range ms.filesContent[fileName].contains {
+			assert.Contains(t, content, expectedString, errorMsg)
+		}
+		for _, unexpectedString := range ms.filesContent[fileName].omits {
+			assert.NotContains(t, content, unexpectedString, errorMsg)
+		}
+	}
+}
+
+func TestGenerateDocsWithPlugin(t *testing.T) {
+	tests := []struct {
+		test           string
+		commandMap     []CommandMapEntry
+		hiddenCommands []string
+		expected       markdownState
+	}{
+		{
+			test:           "baseline:no command mapping and all commands visible",
+			commandMap:     []CommandMapEntry{},
+			hiddenCommands: []string{},
+			expected: markdownState{
+				expectedFiles: []string{"tanzu.md", "tanzu_plug.md", "tanzu_plug_bar.md", "tanzu_plug_foo.md", "tanzu_plug_deeper.md", "tanzu_plug_deeper_baz.md"},
+				filesContent: map[string]fileContent{
+					"tanzu.md": fileContent{
+						contains: []string{"tanzu", "[tanzu plug](tanzu_plug.md)"},
+					},
+					"tanzu_plug.md": fileContent{
+						contains: []string{
+							"[tanzu plug foo](tanzu_plug_foo.md)",
+							"[tanzu plug bar](tanzu_plug_bar.md)",
+							"[tanzu plug deeper](tanzu_plug_deeper.md)"},
+						omits: []string{"tanzu plug baz"},
+					},
+					"tanzu_plug_deeper.md": fileContent{
+						contains: []string{
+							"[tanzu plug](tanzu_plug.md)",
+							"- Test the CLI generate-docs",
+							"[tanzu plug deeper baz](tanzu_plug_deeper_baz.md)",
+							"- baz command"},
+					},
+					"tanzu_plug_foo.md": fileContent{
+						contains: []string{
+							"foo command",
+							"tanzu plug foo [flags]",
+							"example usage of the foo command",
+							"-v, --value string",
+							"### SEE ALSO",
+							"[tanzu plug](tanzu_plug.md)"},
+						omits: []string{"tanzu plug baz"},
+					},
+					"tanzu_plug_deep_baz.md": fileContent{
+						contains: []string{
+							"baz command",
+							"tanzu plug deeper baz [flags]",
+							"example usage of the baz command",
+							"-b, -b-value string",
+							"### SEE ALSO",
+							"[tanzu plug deeper](tanzu_plug_deeper.md)"},
+						omits: []string{"tanzu plug baz"},
+					},
+				},
+			},
+		},
+		{
+			test:           "base: no command mapping some hidden commands",
+			commandMap:     []CommandMapEntry{},
+			hiddenCommands: []string{"bar", "deeper baz"},
+			expected: markdownState{
+				expectedFiles: []string{"tanzu.md", "tanzu_plug.md", "tanzu_plug_foo.md"},
+				filesContent: map[string]fileContent{
+					"tanzu.md": fileContent{
+						contains: []string{"tanzu", "[tanzu plug](tanzu_plug.md)"},
+					},
+					"tanzu_plug.md": fileContent{
+						contains: []string{"[tanzu plug foo](tanzu_plug_foo.md)"},
+						omits: []string{
+							"tanzu plug baz",
+							"[tanzu plug bar](tanzu_plug_bar.md)",
+							"[tanzu plug deeper](tanzu_plug_deeper.md)"},
+					},
+					"tanzu_plug_foo.md": fileContent{
+						contains: []string{"foo command"},
+						omits:    []string{"tanzu plug baz"},
+					},
+				},
+			},
+		},
+	}
+
+	for _, spec := range tests {
+		t.Run(spec.test, func(t *testing.T) {
+			tmpDir, err := os.MkdirTemp("", "gendoctest")
+			if err != nil {
+				t.Fatalf("Failed to create tmpdir: %v", err)
+			}
+
+			p := genDocsTestPlugin(t, spec.commandMap, spec.hiddenCommands)
+
+			p.Cmd.SetArgs([]string{"generate-docs", "--docs-dir", tmpDir})
+			err = p.Execute()
+			assert.Nil(t, err)
+
+			checkMarkdownState(t, tmpDir, spec.expected)
+			if !t.Failed() {
+				os.RemoveAll(tmpDir)
+			}
+		})
+	}
 }

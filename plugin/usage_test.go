@@ -46,7 +46,7 @@ func TestUsageFunc(t *testing.T) {
 	assert.Contains(t, string(got), "Usage:")
 }
 
-func SampleTestPlugin(t *testing.T, target types.Target) *Plugin {
+func usageTestPlugin(t *testing.T, target types.Target) *Plugin {
 	var pluginsCmd = &cobra.Command{
 		Use:   "plugin",
 		Short: "Plugin tests",
@@ -92,10 +92,10 @@ func SampleTestPlugin(t *testing.T, target types.Target) *Plugin {
 		Version:     "v1.1.0",
 		BuildSHA:    "1234567",
 		CommandMap: []CommandMapEntry{
-			CommandMapEntry{
+			{
 				DestinationCommandPath: "test",
 			},
-			CommandMapEntry{
+			{
 				DestinationCommandPath: "fetch",
 				SourceCommandPath:      "fetch",
 			},
@@ -150,7 +150,7 @@ func TestGlobalTestPluginCommandHelpText(t *testing.T) {
 	os.Stderr = w
 
 	// Prepare the root command with Global target
-	p := SampleTestPlugin(t, types.TargetGlobal)
+	p := usageTestPlugin(t, types.TargetGlobal)
 
 	// Set the arguments as if the user typed them in the command line
 	p.Cmd.SetArgs([]string{"--help"})
@@ -216,7 +216,7 @@ func TestKubernetesTestPluginCommandHelpText(t *testing.T) {
 	os.Stderr = w
 
 	// Prepare the root command with Kubernetes target
-	p := SampleTestPlugin(t, types.TargetK8s)
+	p := usageTestPlugin(t, types.TargetK8s)
 
 	// Set the arguments as if the user typed them in the command line
 	p.Cmd.SetArgs([]string{"--help"})
@@ -278,7 +278,7 @@ func TestMissionControlTestPluginCommandHelpText(t *testing.T) {
 	os.Stderr = w
 
 	// Prepare the root command with MissionControl target
-	p := SampleTestPlugin(t, types.TargetTMC)
+	p := usageTestPlugin(t, types.TargetTMC)
 
 	// Set the arguments as if the user typed them in the command line
 	p.Cmd.SetArgs([]string{"--help"})
@@ -338,7 +338,7 @@ func TestGlobalTestPluginFetchCommandHelpText(t *testing.T) {
 	os.Stderr = w
 
 	// Prepare the root command with Global target
-	p := SampleTestPlugin(t, types.TargetGlobal)
+	p := usageTestPlugin(t, types.TargetGlobal)
 
 	// Set the arguments as if the user typed them in the command line
 	p.Cmd.SetArgs([]string{"fetch", "--help"})
@@ -396,7 +396,7 @@ func TestGlobalTestFetchCommandHelpTextWithInvocationContext(t *testing.T) {
 	os.Stderr = w
 
 	// Prepare the root command with Global target
-	p := SampleTestPlugin(t, types.TargetGlobal)
+	p := usageTestPlugin(t, types.TargetGlobal)
 
 	p.Cmd.SetArgs([]string{"fetch", "--help"})
 
@@ -448,7 +448,7 @@ func TestKubernetesTestPluginFetchCommandHelpText(t *testing.T) {
 	os.Stderr = w
 
 	// Prepare the root command with Kubernetes target
-	p := SampleTestPlugin(t, types.TargetK8s)
+	p := usageTestPlugin(t, types.TargetK8s)
 
 	// Set the arguments as if the user typed them in the command line
 	p.Cmd.SetArgs([]string{"fetch", "--help"})
@@ -501,7 +501,7 @@ func TestMissionControlTestPluginFetchCommandHelpText(t *testing.T) {
 	os.Stderr = w
 
 	// Prepare the root command with MissionControl target
-	p := SampleTestPlugin(t, types.TargetTMC)
+	p := usageTestPlugin(t, types.TargetTMC)
 
 	// Set the arguments as if the user typed them in the command line
 	p.Cmd.SetArgs([]string{"fetch", "--help"})
@@ -560,7 +560,7 @@ func TestCommandMappedCommandWithInvocationContext(t *testing.T) {
 	os.Stderr = w
 
 	// Prepare the root command with Global target
-	p := SampleTestPlugin(t, types.TargetGlobal)
+	p := usageTestPlugin(t, types.TargetGlobal)
 
 	p.Cmd.SetArgs([]string{"push", "--help"})
 
@@ -627,7 +627,7 @@ func TestCommandMappedCommandSubCommandWithInvocationContext(t *testing.T) {
 	os.Stderr = w
 
 	// Prepare the root command with Global target
-	p := SampleTestPlugin(t, types.TargetGlobal)
+	p := usageTestPlugin(t, types.TargetGlobal)
 
 	p.Cmd.SetArgs([]string{"push", "more", "--help"})
 

@@ -67,6 +67,39 @@ func mapCommand(tanzuCmd, subCommand *cobra.Command, mapEntry *CommandMapEntry) 
 	}
 }
 
+func cloneChildCommands(parentCloneCmd *cobra.Command) {
+	childCommands := parentCloneCmd.Commands()
+	for _, child := range childCommands {
+		newChild := *child
+		cloneChildCommands(&newChild)
+		childParent := child.Parent()
+		// child's parent pointer is wrong (still point to childParent, the
+		// source that parentCloneCmd is cloned from), so remove said child
+		parentCloneCmd.RemoveCommand(child)
+		// and add the properly updated clone of child instead
+		parentCloneCmd.AddCommand(&newChild)
+		// however, the removal has the side-effect of wiping the child's
+		// parent link, so remove then re-add back as child of the clone source
+		childParent.RemoveCommand(child)
+		childParent.AddCommand(child)
+
+		// there is currently no way to obtain the current help command so
+		// check the .Use field instead
+		// failure to update the help command to the clone will result in md
+		// generated for the clone (tanzu_xxx_help.md), something that is
+		// extraneous but not incorrect.
+		if child.Use == "help [command]" {
+			parentCloneCmd.SetHelpCommand(&newChild)
+		}
+	}
+}
+
+func deepCopy(cmd *cobra.Command) *cobra.Command {
+	clone := *cmd
+	cloneChildCommands(&clone)
+	return &clone
+}
+
 // rebuildTanzuCommandTree reconstructs the tanzu CLI's placement of the
 // plugin's commands after accounting for the plugin descriptor's CommandMap.
 // It is primarily used to prep a Command tree for cobra's doc generation APIs
@@ -86,7 +119,13 @@ func rebuildTanzuCommandTree(tanzuCmd, pluginRootCmd *cobra.Command, desc *Plugi
 	for _, v := range cmap {
 		mapEntry := v
 		cmd, _ := findSubCommandByHierarchy(pluginRootCmd, hierarchyFromPath(mapEntry.SourceCommandPath), matchOnCommandName)
-		mapCommand(tanzuCmd, cmd, &mapEntry)
+		copyOfCmd := deepCopy(cmd)
+		mapCommand(tanzuCmd, copyOfCmd, &mapEntry)
+		if cmd == pluginRootCmd {
+			// if this is a plugin level mapping, assume that the original
+			// plugin's command tree should not be made available anymore
+			cmd.Hidden = true
+		}
 	}
 }
 

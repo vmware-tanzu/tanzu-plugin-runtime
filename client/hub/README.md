@@ -1,17 +1,20 @@
 # Tanzu Hub Client
 
-This package provides plugin authors to create authenticated Tanzu Hub clients that will allow
-them to implement plugins that want to invoke graphQL queries against the Tanzu Hub endpoint for
-the `tanzu` context type.
+This package enables the creation of authenticated Tanzu Hub clients which in turn
+enables the interaction with Tanzu Hub endpoint through GraphQL queries for the
+`tanzu` context.
 
 ## Creating a Tanzu Hub Client
 
-To create a Tanzu Hub client, plugin authors can just use the `CreateHubClient(contextName string)` API
+To create a Tanzu Hub client, use the `CreateHubClient(contextName string)` API
 by providing the `tanzu` context name. An authenticated Tanzu Hub client for the specified tanzu context will be returned.
-This client includes an authenticated GraphQLClient from the `github.com/Khan/genqlient`
-that can be used to do GraphQL queries. Internally it configures the client with a CSP access token for each request.
+This client includes an authenticated GraphQLClient from the `github.com/Khan/genqlient` package
+that can be used to do GraphQL queries. Internally it configures the client with an access token for each request.
 By default, it will get the Tanzu Hub endpoint from the specified context metadata. To specify any custom Tanzu Hub
 endpoint for testing please configure the `TANZU_HUB_GRAPHQL_ENDPOINT` environment variable.
+
+Note that the authenticated client is assured to have at least 30 min access to the GraphQL endpoint.
+If you want a long running client beyond this period, recommendation is to reinitialize your client.
 
 ## Generating the golang stub to invoke graphQL queries
 

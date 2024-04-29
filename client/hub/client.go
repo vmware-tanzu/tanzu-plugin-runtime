@@ -34,6 +34,9 @@ type HubClient struct {
 // that can be used to do GraphQL queries.
 // Internally it configures the client with CSP access token for each request
 //
+// Note that the authenticated client is assured to have at least 30 min access to the GraphQL endpoint.
+// If you want a long running client beyond this period, recommendation is to reinitialize your client.
+//
 // EXPERIMENTAL: Both the function's signature and implementation are subjected to change/removal
 // if an alternative means to provide equivalent functionality can be introduced.
 func CreateHubClient(contextName string) (*HubClient, error) {

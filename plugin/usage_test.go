@@ -412,7 +412,7 @@ func TestGlobalTestFetchCommandHelpTextWithInvocationContext(t *testing.T) {
 	expected := `Fetch the plugin tests
 
 Usage:
-  tanzu fetch
+  tanzu fetch [flags]
 
 Examples:
   sample example usage of the fetch command
@@ -576,7 +576,7 @@ func TestCommandMappedCommandWithInvocationContext(t *testing.T) {
 	expected := `Push the plugin tests
 
 Usage:
-  tanzu pu SOMESTUFF
+  tanzu pu SOMESTUFF [flags]
 
   tanzu pu [command]
 
@@ -643,7 +643,7 @@ func TestCommandMappedCommandSubCommandWithInvocationContext(t *testing.T) {
 	expected := `Push more
 
 Usage:
-  tanzu pu more
+  tanzu pu more [flags]
 
 Aliases:
   more, mo

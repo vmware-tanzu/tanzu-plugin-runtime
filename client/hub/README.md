@@ -4,6 +4,10 @@ This package enables the creation of authenticated Tanzu Hub clients which in tu
 enables the interaction with Tanzu Hub endpoint through GraphQL queries for the
 `tanzu` context.
 
+**Note:** The Tanzu Hub Client feature is an EXPERIMENTAL feature. The API signature
+and implementation are subjected to change/removal if an alternative means to provide
+equivalent functionality can be introduced.
+
 ## Creating a Tanzu Hub Client
 
 To create a Tanzu Hub client, use the `CreateHubClient(contextName string)` API

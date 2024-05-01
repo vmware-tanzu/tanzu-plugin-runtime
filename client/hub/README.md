@@ -25,14 +25,14 @@ github.com/Khan/genqlient is a Go library to easily generate type-safe code to q
 
 To help plugin authors generate the stub for the Tanzu Hub endpoint, a [tanzuhub.mk](../../hack/hub/tanzuhub.mk) has been provided.
 This makefile provides an easy means for the plugin authors to initialize a `hub` package and also generate the stub from the graphQL queries.
-To use this library plugin authors can follow below steps:
+To use this library plugin authors can follow the below steps:
 
-1. Import [tanzuhub.mk](../../hack/hub/tanzuhub.mk) to your project's `Makefile`
+1. Copy the [tanzuhub.mk](../../hack/hub/tanzuhub.mk) to your project and import it to your `Makefile` with `include ./tanzuhub.mk`
 2. Configure the `TANZU_HUB_SCHEMA_FILE_URL` environment variable to the `schema.graphql` of the Tanzu Hub
 3. Run `make tanzu-hub-stub-init` to initialize a `hub` package. This will create the following files under the `hub` package:
     * `genqlient.yaml`: Configuration file for generating golang code from GraphQL query with `github.com/Khan/genqlient`
     * `queries.graphql`: File to write all graphQL queries
     * `main.go`: A golang file with necessary imports to easily run `go generate` to generate stub code
 4. Once the initialization is done, you can add your GraphQL queries to the `queries.graphql` file
-5. After adding new graphQL queries or updating an existing queries, run `make tanzu-hub-stub-generate` to generate a golang stub for the GraphQL queries
+5. After adding new graphQL queries or updating an existing query, run `make tanzu-hub-stub-generate` to generate a golang stub for the GraphQL queries
     * This will create a `generate.go` file under the `hub` package with golang APIs that can be consumed directly by other packages by passing the GraphQLClient available with TanzuHub client

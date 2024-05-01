@@ -16,6 +16,7 @@ import (
 
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/config/internal/kubeconfig"
 	configtypes "github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
+	internalcommand "github.com/vmware-tanzu/tanzu-plugin-runtime/internal/command"
 )
 
 // keys to Context's AdditionalMetadata map
@@ -26,6 +27,9 @@ const (
 	ProjectIDKey        = "tanzuProjectID"
 	SpaceNameKey        = "tanzuSpaceName"
 	ClusterGroupNameKey = "tanzuClusterGroupName"
+
+	TanzuMissionControlEndpointKey = "tanzuMissionControlEndpoint"
+	TanzuHubEndpointKey            = "tanzuHubEndpoint"
 )
 
 const (
@@ -330,6 +334,25 @@ func GetTanzuContextActiveResource(contextName string) (*ResourceInfo, error) {
 		ClusterGroupName: stringValue(ctx.AdditionalMetadata[ClusterGroupNameKey]),
 	}
 	return activeResourceInfo, nil
+}
+
+// GetTanzuContextAccessToken returns working access token for the specified Tanzu Context
+func GetTanzuContextAccessToken(contextName string) (string, error) {
+	_, _, err := internalcommand.RunTanzuCommand([]string{"context", "get-token", contextName}, internalcommand.WithNoStdout(), internalcommand.WithNoStderr())
+	if err != nil {
+		return "", err
+	}
+
+	tzCtx, err := GetContext(contextName)
+	if err != nil {
+		return "", err
+	}
+
+	if tzCtx == nil || tzCtx.GlobalOpts == nil {
+		return "", errors.Errorf("access token not configured for the context %q", contextName)
+	}
+
+	return tzCtx.GlobalOpts.Auth.AccessToken, nil
 }
 
 func stringValue(val interface{}) string {

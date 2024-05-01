@@ -135,6 +135,7 @@ func genDocsTestPlugin(t *testing.T, mapEntries []CommandMapEntry, hiddenCommand
 
 	var value string
 	var bvalue string
+	var noColor bool
 	fooCmd.Flags().StringVarP(&value, "value", "v", "", "value to pass")
 	bazCmd.Flags().StringVarP(&bvalue, "bvalue", "b", "", "bvalue to pass")
 
@@ -154,6 +155,9 @@ func genDocsTestPlugin(t *testing.T, mapEntries []CommandMapEntry, hiddenCommand
 		assert.NotNil(t, cmd)
 		cmd.Hidden = true
 	}
+
+	// for testing the effect of inherited flags
+	p.Cmd.PersistentFlags().BoolVar(&noColor, "n", false, "deactivate color, bold")
 
 	return p
 }
@@ -294,13 +298,20 @@ func TestGenerateDocsWithPlugin(t *testing.T) {
 						},
 					},
 					"tanzu_foo.md": fileContent{
-						contains: []string{"foo command", "[tanzu](tanzu.md)"},
-						omits:    []string{"tanzu plug foo"},
+						contains: []string{
+							"foo command",
+							"[tanzu](tanzu.md)",
+							// also check that inherited flags are captured
+							"### Options inherited from parent commands",
+							"deactivate color",
+						},
+						omits: []string{"tanzu plug foo"},
 					},
 				},
 			},
 		},
 		{
+			// includes check that global flags are fully propagated
 			test: "command and plugin level mapping",
 			commandMap: []CommandMapEntry{
 				{
@@ -320,15 +331,35 @@ func TestGenerateDocsWithPlugin(t *testing.T) {
 						contains: []string{"tanzu", "[tanzu pi](tanzu_pi.md)", "[tanzu foo](tanzu_foo.md)"},
 					},
 					"tanzu_pi.md": fileContent{
-						contains: []string{"[tanzu pi bar](tanzu_pi_bar.md)"},
+						contains: []string{
+							"[tanzu pi bar](tanzu_pi_bar.md)",
+							"deactivate color",
+						},
 						omits: []string{
 							"tanzu pi deeper",
 							"tanzu pi foo",
+							// this is the command where the nocolor persistent flag is
+							// defined, so flag is show in the regular options
+							// section, not under "Options inherited..."
+							"### Options inherited from parent commands",
+						},
+					},
+					"tanzu_pi_bar.md": fileContent{
+						contains: []string{
+							"[tanzu pi](tanzu_pi.md)",
+							"### Options inherited from parent commands",
+							"deactivate color",
 						},
 					},
 					"tanzu_foo.md": fileContent{
-						contains: []string{"foo command", "[tanzu](tanzu.md)"},
-						omits:    []string{"tanzu pi foo"},
+						contains: []string{
+							"foo command",
+							"[tanzu](tanzu.md)",
+							"### Options inherited from parent commands",
+							"deactivate color"},
+						omits: []string{
+							"tanzu pi foo",
+						},
 					},
 				},
 			},

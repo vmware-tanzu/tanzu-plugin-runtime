@@ -67,17 +67,33 @@ func mapCommand(tanzuCmd, subCommand *cobra.Command, mapEntry *CommandMapEntry) 
 	}
 }
 
+func cloneCommand(sourceCommand *cobra.Command) *cobra.Command {
+	// TODO(vuil): before cloning the command, we need the inherited flags
+	// (persistent flags from command's ancestors) to be captured in the
+	// command because once the clone is remapped and has a different
+	// ancestry, some of the inherited flags may not be dynamically
+	// discoverable anymore. Somewhat dubiously, until there is a means to
+	// better dictate what a cobra Command's inherited flags are, we rely
+	// on the side-effect of InheritedFlags() to populate the discovered
+	// inherited flags in Command.iFlags
+	_ = sourceCommand.InheritedFlags()
+
+	clone := *sourceCommand
+	return &clone
+}
+
 func cloneChildCommands(parentCloneCmd *cobra.Command) {
 	childCommands := parentCloneCmd.Commands()
 	for _, child := range childCommands {
-		newChild := *child
-		cloneChildCommands(&newChild)
+		newChild := cloneCommand(child)
+
+		cloneChildCommands(newChild)
 		childParent := child.Parent()
 		// child's parent pointer is wrong (still point to childParent, the
 		// source that parentCloneCmd is cloned from), so remove said child
 		parentCloneCmd.RemoveCommand(child)
 		// and add the properly updated clone of child instead
-		parentCloneCmd.AddCommand(&newChild)
+		parentCloneCmd.AddCommand(newChild)
 		// however, the removal has the side-effect of wiping the child's
 		// parent link, so remove then re-add back as child of the clone source
 		childParent.RemoveCommand(child)
@@ -89,15 +105,15 @@ func cloneChildCommands(parentCloneCmd *cobra.Command) {
 		// generated for the clone (tanzu_xxx_help.md), something that is
 		// extraneous but not incorrect.
 		if child.Use == "help [command]" {
-			parentCloneCmd.SetHelpCommand(&newChild)
+			parentCloneCmd.SetHelpCommand(newChild)
 		}
 	}
 }
 
 func deepCopy(cmd *cobra.Command) *cobra.Command {
-	clone := *cmd
-	cloneChildCommands(&clone)
-	return &clone
+	clone := cloneCommand(cmd)
+	cloneChildCommands(clone)
+	return clone
 }
 
 // rebuildTanzuCommandTree reconstructs the tanzu CLI's placement of the

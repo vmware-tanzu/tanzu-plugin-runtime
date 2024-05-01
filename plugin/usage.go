@@ -133,6 +133,20 @@ func hierarchyFromMappedCommandPath(mappedCommandPath string, cmd *cobra.Command
 }
 
 func useLineEx(cmd *cobra.Command, ic *InvocationContext) string {
+	useline := getInvocationStringForUseLine(cmd, ic)
+
+	if cmd.DisableFlagsInUseLine {
+		return useline
+	}
+
+	if cmd.HasAvailableFlags() && !strings.Contains(useline, "[flags]") {
+		useline += " [flags]"
+	}
+
+	return useline
+}
+
+func getInvocationStringForUseLine(cmd *cobra.Command, ic *InvocationContext) string {
 	// by checking sourceCommandPath we limit the use of the InvocationContext
 	// to only command-level (not plugin level) mapping
 	if ic == nil || ic.sourceCommandPath == "" {

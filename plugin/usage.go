@@ -289,7 +289,11 @@ func printHelp(cmd *cobra.Command) string {
 
 	if cmd.HasExample() {
 		output.WriteString("\n" + component.Bold(examplesStr) + "\n")
-		output.WriteString(indentStr + cmd.Example + "\n")
+
+		// matches cobra default help template's behavior of not indenting the
+		// Example value, which has the added benefit of ensuring multiline
+		// .Example values are aligned
+		output.WriteString(cmd.Example + "\n")
 	}
 
 	if cmd.HasAvailableSubCommands() {

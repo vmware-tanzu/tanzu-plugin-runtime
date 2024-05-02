@@ -113,7 +113,7 @@ func usageTestPlugin(t *testing.T, target types.Target) *Plugin {
 
 	fetchCmd.Example = "sample example usage of the fetch command"
 
-	pushCmd.Example = "sample example usage of the push command"
+	pushCmd.Example = "sample example usage of the push command\nmore sample example usage of the push command"
 
 	p, err := NewPlugin(&descriptor)
 	assert.Nil(t, err)
@@ -179,7 +179,7 @@ Aliases:
   test, t
 
 Examples:
-  sample example usage of the test command
+sample example usage of the test command
 
 Available Commands:
   fetch         Fetch the plugin tests
@@ -240,7 +240,7 @@ Aliases:
   test, t
 
 Examples:
-  sample example usage of the test command
+sample example usage of the test command
 
 Available Commands:
   fetch         Fetch the plugin tests
@@ -301,7 +301,7 @@ Aliases:
   test, t
 
 Examples:
-  sample example usage of the test command
+sample example usage of the test command
 
 Available Commands:
   fetch         Fetch the plugin tests
@@ -357,7 +357,7 @@ Usage:
   tanzu test fetch [flags]
 
 Examples:
-  sample example usage of the fetch command
+sample example usage of the fetch command
 
 Flags:
   -h, --help           help for fetch
@@ -415,7 +415,7 @@ Usage:
   tanzu fetch [flags]
 
 Examples:
-  sample example usage of the fetch command
+sample example usage of the fetch command
 
 Flags:
   -h, --help           help for fetch
@@ -469,7 +469,7 @@ Usage:
   tanzu kubernetes test fetch [flags]
 
 Examples:
-  sample example usage of the fetch command
+sample example usage of the fetch command
 
 Flags:
   -h, --help           help for fetch
@@ -521,7 +521,7 @@ Usage:
   tanzu mission-control test fetch [flags]
 
 Examples:
-  sample example usage of the fetch command
+sample example usage of the fetch command
 
 Flags:
   -h, --help           help for fetch
@@ -584,7 +584,8 @@ Aliases:
   pu, psh
 
 Examples:
-  sample example usage of the push command
+sample example usage of the push command
+more sample example usage of the push command
 
 Available Commands:
   more        Push more

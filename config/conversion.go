@@ -25,8 +25,8 @@ func PopulateContexts(cfg *configtypes.ClientConfig) bool {
 		cfg.KnownContexts = make([]*configtypes.Context, 0, len(cfg.KnownServers))
 	}
 	for _, s := range cfg.KnownServers {
-		if cfg.HasContext(s.Name) {
-			// server already present in known contexts; skip
+		if s.Type == configtypes.ServerType(configtypes.ContextTypeTanzu) || cfg.HasContext(s.Name) {
+			// server of type "tanzu" or server already present in known contexts; skip
 			continue
 		}
 
@@ -100,8 +100,8 @@ func populateServers(cfg *configtypes.ClientConfig) {
 		fillMissingContextTypeInContext(c)
 		fillMissingTargetInContext(c)
 
-		if cfg.HasServer(c.Name) {
-			// context already present in known servers; skip
+		if c.ContextType == configtypes.ContextTypeTanzu || cfg.HasServer(c.Name) {
+			// "tanzu" context type or context already present in known servers; skip
 			continue
 		}
 

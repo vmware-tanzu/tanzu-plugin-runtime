@@ -4,6 +4,7 @@
 package config
 
 import (
+	"fmt"
 	"testing"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -684,10 +685,11 @@ func TestSetContext(t *testing.T) {
 		cleanupDir(LocalDirName)
 	}()
 	tcs := []struct {
-		name    string
-		ctx     *configtypes.Context
-		current bool
-		errStr  string
+		name               string
+		ctx                *configtypes.Context
+		current            bool
+		errStr             string
+		shouldServerExists bool
 	}{
 		{
 			name: "should add new context and set current on empty config",
@@ -704,7 +706,8 @@ func TestSetContext(t *testing.T) {
 					"metaToken": "token1",
 				},
 			},
-			current: true,
+			current:            true,
+			shouldServerExists: true,
 		},
 
 		{
@@ -722,6 +725,7 @@ func TestSetContext(t *testing.T) {
 					"metaToken": "token1",
 				},
 			},
+			shouldServerExists: true,
 		},
 		{
 			name: "should add new context and configure missing Target from ContextType",
@@ -738,6 +742,7 @@ func TestSetContext(t *testing.T) {
 					"metaToken": "token1",
 				},
 			},
+			shouldServerExists: true,
 		},
 		{
 			name: "success tmc current",
@@ -748,7 +753,8 @@ func TestSetContext(t *testing.T) {
 					Endpoint: "test-endpoint",
 				},
 			},
-			current: true,
+			current:            true,
+			shouldServerExists: true,
 		},
 		{
 			name: "success tmc not_current",
@@ -760,6 +766,7 @@ func TestSetContext(t *testing.T) {
 					Endpoint: "test-endpoint",
 				},
 			},
+			shouldServerExists: true,
 		},
 		{
 			name: "success update test-mc",
@@ -776,6 +783,7 @@ func TestSetContext(t *testing.T) {
 					"metaToken": "updated-token1",
 				},
 			},
+			shouldServerExists: true,
 		},
 		{
 			name: "success update tmc",
@@ -786,6 +794,7 @@ func TestSetContext(t *testing.T) {
 					Endpoint: "updated-test-endpoint",
 				},
 			},
+			shouldServerExists: true,
 		},
 		{
 			name: "success tanzu current",
@@ -804,7 +813,8 @@ func TestSetContext(t *testing.T) {
 					"org": "fake-org-1",
 				},
 			},
-			current: true,
+			current:            true,
+			shouldServerExists: false,
 		},
 		{
 			name: "success tanzu not_current",
@@ -823,6 +833,7 @@ func TestSetContext(t *testing.T) {
 					"org": "fake-org-2",
 				},
 			},
+			shouldServerExists: false,
 		},
 		{
 			name: "error target and contexttype does not match",
@@ -859,9 +870,16 @@ func TestSetContext(t *testing.T) {
 				// Verify that even though only Target or ContextType was provided when
 				// setting context, retrieving the Context should have both set
 				assert.Equal(t, string(ctx.Target), string(ctx.ContextType))
+
 				s, err := GetServer(tc.ctx.Name)
-				assert.NoError(t, err)
-				assert.Equal(t, tc.ctx.Name, s.Name)
+				// Verify that for some context types(e.g "tanzu") the server entry in not populated
+				if !tc.shouldServerExists {
+					assert.Nil(t, s)
+					assert.EqualError(t, err, fmt.Sprintf("could not find server %q", tc.ctx.Name))
+				} else {
+					assert.NoError(t, err)
+					assert.Equal(t, tc.ctx.Name, s.Name)
+				}
 			}
 		})
 	}

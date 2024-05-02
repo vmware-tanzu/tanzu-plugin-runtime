@@ -197,6 +197,72 @@ func TestPopulateContexts(t *testing.T) {
 			},
 			delta: true,
 		},
+		{
+			name: "server of type 'tanzu' should be ignored for context population",
+			ip: &configtypes.ClientConfig{
+				KnownServers: []*configtypes.Server{
+					{
+						Name: "test-tanzu",
+						Type: configtypes.ServerType("tanzu"),
+						GlobalOpts: &configtypes.GlobalServer{
+							Endpoint: "test-tanzu-endpoint",
+						},
+					},
+					{
+						Name: "test-tmc",
+						Type: configtypes.GlobalServerType,
+						GlobalOpts: &configtypes.GlobalServer{
+							Endpoint: "test-endpoint",
+						},
+					},
+				},
+				CurrentServer: "test-tmc",
+				KnownContexts: []*configtypes.Context{
+					{
+						Name:   "test-tmc",
+						Target: configtypes.TargetTMC,
+						GlobalOpts: &configtypes.GlobalServer{
+							Endpoint: "test-endpoint",
+						},
+					},
+				},
+				CurrentContext: map[configtypes.ContextType]string{
+					configtypes.ContextTypeTMC: "test-tmc",
+				},
+			},
+			op: &configtypes.ClientConfig{
+				KnownServers: []*configtypes.Server{
+					{
+						Name: "test-tanzu",
+						Type: configtypes.ServerType("tanzu"),
+						GlobalOpts: &configtypes.GlobalServer{
+							Endpoint: "test-tanzu-endpoint",
+						},
+					},
+					{
+						Name: "test-tmc",
+						Type: configtypes.GlobalServerType,
+						GlobalOpts: &configtypes.GlobalServer{
+							Endpoint: "test-endpoint",
+						},
+					},
+				},
+				CurrentServer: "test-tmc",
+				KnownContexts: []*configtypes.Context{
+					{
+						Name:   "test-tmc",
+						Target: configtypes.TargetTMC,
+						GlobalOpts: &configtypes.GlobalServer{
+							Endpoint: "test-endpoint",
+						},
+					},
+				},
+				CurrentContext: map[configtypes.ContextType]string{
+					configtypes.ContextTypeTMC: "test-tmc",
+				},
+			},
+			delta: false,
+		},
 	}
 	for _, tc := range tcs {
 		t.Run(tc.name, func(t *testing.T) {
@@ -395,6 +461,94 @@ func TestPopulateServers(t *testing.T) {
 				CurrentContext: map[configtypes.ContextType]string{
 					configtypes.ContextTypeK8s: "test-mc",
 					configtypes.ContextTypeTMC: "test-tmc",
+				},
+			},
+		},
+		{
+			name: "context type of 'tanzu' should be ignored for server population",
+			ip: &configtypes.ClientConfig{
+				KnownServers: []*configtypes.Server{
+					{
+						Name: "test-mc",
+						Type: configtypes.ManagementClusterServerType,
+						ManagementClusterOpts: &configtypes.ManagementClusterServer{
+							Endpoint: "test-endpoint",
+							Path:     "test-path",
+							Context:  "test-context",
+						},
+					},
+				},
+				CurrentServer: "test-mc",
+				KnownContexts: []*configtypes.Context{
+					{
+						Name:   "test-tanzu",
+						Target: configtypes.Target(configtypes.ContextTypeTanzu),
+						GlobalOpts: &configtypes.GlobalServer{
+							Endpoint: "test--tanzu-endpoint",
+						},
+						ClusterOpts: &configtypes.ClusterServer{
+							Endpoint: "test-endpoint",
+							Path:     "test-path",
+							Context:  "test-context",
+						},
+					},
+					{
+						Name:   "test-tmc",
+						Target: configtypes.TargetTMC,
+						GlobalOpts: &configtypes.GlobalServer{
+							Endpoint: "test-endpoint",
+						},
+					},
+				},
+				CurrentContext: map[configtypes.ContextType]string{
+					configtypes.ContextTypeTanzu: "test-tanzu",
+					configtypes.ContextTypeTMC:   "test-tmc",
+				},
+			},
+			op: &configtypes.ClientConfig{
+				KnownServers: []*configtypes.Server{
+					{
+						Name: "test-mc",
+						Type: configtypes.ManagementClusterServerType,
+						ManagementClusterOpts: &configtypes.ManagementClusterServer{
+							Endpoint: "test-endpoint",
+							Path:     "test-path",
+							Context:  "test-context",
+						},
+					},
+					{
+						Name: "test-tmc",
+						Type: configtypes.GlobalServerType,
+						GlobalOpts: &configtypes.GlobalServer{
+							Endpoint: "test-endpoint",
+						},
+					},
+				},
+				CurrentServer: "test-mc",
+				KnownContexts: []*configtypes.Context{
+					{
+						Name:   "test-tanzu",
+						Target: configtypes.Target(configtypes.ContextTypeTanzu),
+						GlobalOpts: &configtypes.GlobalServer{
+							Endpoint: "test--tanzu-endpoint",
+						},
+						ClusterOpts: &configtypes.ClusterServer{
+							Endpoint: "test-endpoint",
+							Path:     "test-path",
+							Context:  "test-context",
+						},
+					},
+					{
+						Name:   "test-tmc",
+						Target: configtypes.TargetTMC,
+						GlobalOpts: &configtypes.GlobalServer{
+							Endpoint: "test-endpoint",
+						},
+					},
+				},
+				CurrentContext: map[configtypes.ContextType]string{
+					configtypes.ContextTypeTanzu: "test-tanzu",
+					configtypes.ContextTypeTMC:   "test-tmc",
 				},
 			},
 		},

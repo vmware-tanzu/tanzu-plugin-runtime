@@ -66,6 +66,9 @@ func SetContext(c *configtypes.Context, setCurrent bool) error {
 	}
 
 	// Back-fill servers based on contexts
+	if c.ContextType == configtypes.ContextTypeTanzu {
+		return nil
+	}
 	s := convertContextToServer(c)
 
 	// Add or update server

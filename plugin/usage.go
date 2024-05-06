@@ -276,6 +276,52 @@ func aliasesWithMappedName(cmd *cobra.Command) string {
 	return strings.Join(append([]string{cmdName}, cmd.Aliases...), ", ")
 }
 
+// ensure that the example string is left indented by the designated amount
+func alignExampleForUsage(exampleString string) string {
+	var result string
+
+	// always indent single line by designated amount
+	if !strings.Contains(strings.TrimSpace(exampleString), "\n") {
+		result = indentStr + strings.TrimLeft(exampleString, " ")
+		return result
+	}
+
+	var hasUnexpectedIndent bool
+	lines := strings.Split(exampleString, "\n")
+	numLines := len(lines)
+
+	for i := 1; i < numLines; i++ {
+		if lines[i] == "" {
+			continue
+		}
+		if strings.HasPrefix(lines[i], indentStr) && !strings.HasPrefix(lines[i], indentStr+" ") {
+			continue
+		}
+		hasUnexpectedIndent = true
+		break
+	}
+
+	if !hasUnexpectedIndent {
+		// A special case identified where all or all-but-first lines are
+		// indented exactly by 2 spaces. Opinionatedly, we treat this as
+		// attempts to address past indentation quirks, and hence will ensure
+		// all lines are uniformly indented instead.
+		result = indentStr + strings.TrimLeft(exampleString, " ")
+	} else {
+		// Otherwise we just indent all non-empty lines (include lines with
+		// leading spaces) by the same extra amount.
+		for _, l := range lines {
+			if l != "" {
+				l = indentStr + l
+			}
+			result = result + l + "\n"
+		}
+		result = strings.TrimSuffix(result, "\n")
+	}
+
+	return result
+}
+
 func printHelp(cmd *cobra.Command) string {
 	var output strings.Builder
 	target := types.StringToTarget(cmd.Annotations["target"])
@@ -289,11 +335,7 @@ func printHelp(cmd *cobra.Command) string {
 
 	if cmd.HasExample() {
 		output.WriteString("\n" + component.Bold(examplesStr) + "\n")
-
-		// matches cobra default help template's behavior of not indenting the
-		// Example value, which has the added benefit of ensuring multiline
-		// .Example values are aligned
-		output.WriteString(cmd.Example + "\n")
+		output.WriteString(alignExampleForUsage(cmd.Example) + "\n")
 	}
 
 	if cmd.HasAvailableSubCommands() {

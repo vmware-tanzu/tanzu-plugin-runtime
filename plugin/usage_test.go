@@ -179,7 +179,7 @@ Aliases:
   test, t
 
 Examples:
-sample example usage of the test command
+  sample example usage of the test command
 
 Available Commands:
   fetch         Fetch the plugin tests
@@ -240,7 +240,7 @@ Aliases:
   test, t
 
 Examples:
-sample example usage of the test command
+  sample example usage of the test command
 
 Available Commands:
   fetch         Fetch the plugin tests
@@ -301,7 +301,7 @@ Aliases:
   test, t
 
 Examples:
-sample example usage of the test command
+  sample example usage of the test command
 
 Available Commands:
   fetch         Fetch the plugin tests
@@ -357,7 +357,7 @@ Usage:
   tanzu test fetch [flags]
 
 Examples:
-sample example usage of the fetch command
+  sample example usage of the fetch command
 
 Flags:
   -h, --help           help for fetch
@@ -415,7 +415,7 @@ Usage:
   tanzu fetch [flags]
 
 Examples:
-sample example usage of the fetch command
+  sample example usage of the fetch command
 
 Flags:
   -h, --help           help for fetch
@@ -469,7 +469,7 @@ Usage:
   tanzu kubernetes test fetch [flags]
 
 Examples:
-sample example usage of the fetch command
+  sample example usage of the fetch command
 
 Flags:
   -h, --help           help for fetch
@@ -521,7 +521,7 @@ Usage:
   tanzu mission-control test fetch [flags]
 
 Examples:
-sample example usage of the fetch command
+  sample example usage of the fetch command
 
 Flags:
   -h, --help           help for fetch
@@ -584,8 +584,8 @@ Aliases:
   pu, psh
 
 Examples:
-sample example usage of the push command
-more sample example usage of the push command
+  sample example usage of the push command
+  more sample example usage of the push command
 
 Available Commands:
   more        Push more
@@ -657,4 +657,115 @@ Global Flags:
 `
 
 	assert.Equal(t, expected, got)
+}
+
+func TestExampleIndent(t *testing.T) {
+	tests := []struct {
+		test  string
+		input string
+		// add leading newline to align expected output for improved readability
+		expectedOutputWithLeadingNewline string
+	}{
+		{
+			test:  "single line - no indent",
+			input: "first line",
+			expectedOutputWithLeadingNewline: `
+  first line`,
+		},
+		{
+			test:  "single line - with indent",
+			input: "  first line",
+			expectedOutputWithLeadingNewline: `
+  first line`,
+		},
+		{
+			test:  "single line - with irregular indent",
+			input: "   first line",
+			expectedOutputWithLeadingNewline: `
+  first line`,
+		},
+		{
+			test:  "single line - with newline",
+			input: "first line\n",
+			expectedOutputWithLeadingNewline: `
+  first line
+`,
+		},
+		{
+			test:  "single line - with newlines",
+			input: "first line\n\n\n",
+			expectedOutputWithLeadingNewline: `
+  first line
+
+
+`,
+		},
+		{
+			test:  "multi line - no pre-indents",
+			input: "first line\nsecond line\nthird line",
+			expectedOutputWithLeadingNewline: `
+  first line
+  second line
+  third line`,
+		},
+		{
+			test:  "multi line - with pre-indents of all lines",
+			input: "  first line\n  second line\n  third line",
+			expectedOutputWithLeadingNewline: `
+  first line
+  second line
+  third line`,
+		},
+		{
+			test:  "multi line - with pre-indents of subsequent lines and newlines",
+			input: "first line\n\n  second line\n  third line\n\n\n",
+			expectedOutputWithLeadingNewline: `
+  first line
+
+  second line
+  third line
+
+
+`,
+		},
+
+		// when example lines have unrecognized indentation amounts
+		// no special handling other than shift all lines by same indent
+		{
+			test:  "multi line - lines having unexpected indent amounts - a",
+			input: "first line\n second line\n third line",
+			expectedOutputWithLeadingNewline: `
+  first line
+   second line
+   third line`,
+		},
+		{
+			test:  "multi line - lines having unexpected indent amounts - b",
+			input: "first line\n  para one\n  next\n    more indent\n    another",
+			expectedOutputWithLeadingNewline: `
+  first line
+    para one
+    next
+      more indent
+      another`,
+		},
+		{
+			test:  "multi line - lines having unexpected indent amounts and newlines",
+			input: "first line\n\n  second line\n    third line\n\n",
+			expectedOutputWithLeadingNewline: `
+  first line
+
+    second line
+      third line
+
+`,
+		},
+	}
+	for _, spec := range tests {
+		t.Run(spec.test, func(t *testing.T) {
+			assert := assert.New(t)
+			result := alignExampleForUsage(spec.input)
+			assert.Equal(spec.expectedOutputWithLeadingNewline, "\n"+result)
+		})
+	}
 }

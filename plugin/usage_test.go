@@ -170,6 +170,7 @@ func TestGlobalTestPluginCommandHelpText(t *testing.T) {
 	//
 	// is a known bug in cobra 1.8.0 that should be fixed in the next patch or
 	// minor release
+	//nolint:goconst
 	expected := `Test the CLI
 
 Usage:
@@ -234,7 +235,6 @@ func TestKubernetesTestPluginCommandHelpText(t *testing.T) {
 
 Usage:
   tanzu test [command]
-  tanzu kubernetes test [command]
 
 Aliases:
   test, t
@@ -254,7 +254,6 @@ Additional help topics:
   test plugin        Plugin tests
 
 Use "tanzu test [command] --help" for more information about a command.
-Use "tanzu kubernetes test [command] --help" for more information about a command.
 `
 	assert.Equal(t, expected, got)
 }
@@ -351,6 +350,7 @@ func TestGlobalTestPluginFetchCommandHelpText(t *testing.T) {
 	assert.Nil(t, err)
 
 	got := string(<-c)
+	//nolint:goconst
 	expected := `Fetch the plugin tests
 
 Usage:
@@ -466,7 +466,6 @@ func TestKubernetesTestPluginFetchCommandHelpText(t *testing.T) {
 
 Usage:
   tanzu test fetch [flags]
-  tanzu kubernetes test fetch [flags]
 
 Examples:
   sample example usage of the fetch command

@@ -199,13 +199,11 @@ func formatUsageHelpSection(cmd *cobra.Command, target types.Target) string {
 	base := indentStr + "tanzu"
 
 	if cmd.Runnable() {
-		// For kubernetes, k8s, global, or no target display tanzu command path without target
-		if target == types.TargetK8s || target == types.TargetGlobal || target == types.TargetUnknown {
+		if shouldPrintInvocationWithoutTarget(target) {
 			output.WriteString(buildInvocationString(base, useLineEx(cmd, ic)) + "\n")
 		}
 
-		// For non global, or no target ;display tanzu command path with target
-		if target != types.TargetGlobal && target != types.TargetUnknown {
+		if shouldPrintInvocationWithTarget(target) {
 			output.WriteString(buildInvocationString(base, string(target), useLineEx(cmd, ic)) + "\n")
 		}
 	}
@@ -216,13 +214,12 @@ func formatUsageHelpSection(cmd *cobra.Command, target types.Target) string {
 			// line between the usage for the Runnable and the one for the sub-commands
 			output.WriteString("\n")
 		}
-		// For kubernetes, k8s, global, or no target display tanzu command path without target
-		if target == types.TargetK8s || target == types.TargetGlobal || target == types.TargetUnknown {
+
+		if shouldPrintInvocationWithoutTarget(target) {
 			output.WriteString(buildInvocationString(base, commandPathEx(cmd, ic), "[command]") + "\n")
 		}
 
-		// For non global, or no target display tanzu command path with target
-		if target != types.TargetGlobal && target != types.TargetUnknown {
+		if shouldPrintInvocationWithTarget(target) {
 			output.WriteString(buildInvocationString(base, string(target), commandPathEx(cmd, ic), "[command]") + "\n")
 		}
 	}
@@ -244,13 +241,11 @@ func formatHelpFooter(cmd *cobra.Command, target types.Target) string {
 		base = "Use \"tanzu"
 	}
 
-	// For kubernetes, k8s, global, or no target display tanzu command path without target
-	if target == types.TargetK8s || target == types.TargetGlobal || target == types.TargetUnknown {
+	if shouldPrintInvocationWithoutTarget(target) {
 		footer.WriteString(buildInvocationString(base, commandPathEx(cmd, ic), `[command] --help" for more information about a command.`+"\n"))
 	}
 
-	// For non global, or no target display tanzu command path with target
-	if target != types.TargetGlobal && target != types.TargetUnknown {
+	if shouldPrintInvocationWithTarget(target) {
 		footer.WriteString(buildInvocationString(base, string(target), commandPathEx(cmd, ic), `[command] --help" for more information about a command.`+"\n"))
 	}
 
@@ -380,4 +375,15 @@ var TemplateFuncs = template.FuncMap{
 	"underline":               component.Underline,
 	"trimTrailingWhitespaces": component.TrimRightSpace,
 	"beginsWith":              component.BeginsWith,
+}
+
+func shouldPrintInvocationWithoutTarget(target types.Target) bool {
+	// For kubernetes, k8s, global, or no target, display tanzu command path without target
+	return target == types.TargetK8s || target == types.TargetGlobal || target == types.TargetUnknown
+}
+
+func shouldPrintInvocationWithTarget(target types.Target) bool {
+	// For non global, or no target display tanzu command path with target
+	// Also, for the deprecated invocation using the kubernetes target, no longer display the command path with the target
+	return target != types.TargetGlobal && target != types.TargetUnknown && target != types.TargetK8s
 }

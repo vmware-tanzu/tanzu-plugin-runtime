@@ -46,9 +46,11 @@ func TestInfo(t *testing.T) {
 		Hidden:               false,
 		SupportedContextType: []types.ContextType{types.ContextTypeTanzu},
 		CommandMap: []CommandMapEntry{
-			CommandMapEntry{
+			{
 				SourceCommandPath:      "subber",
 				DestinationCommandPath: "subber",
+				Overrides:              "somecommand",
+				RequiredContextType:    []types.ContextType{types.ContextTypeTanzu},
 			},
 		},
 	}
@@ -91,8 +93,11 @@ func TestInfo(t *testing.T) {
 	assert.Equal(expectedInfo.DocURL, gotInfo.DocURL)
 	assert.Equal(expectedInfo.Hidden, gotInfo.Hidden)
 	assert.Equal(expectedInfo.SupportedContextType, gotInfo.SupportedContextType)
+	assert.Equal("somecommand", gotInfo.CommandMap[0].Overrides)
+	assert.Equal([]types.ContextType{types.ContextTypeTanzu}, gotInfo.CommandMap[0].RequiredContextType)
 	assert.Equal(subCmd.Aliases, gotInfo.CommandMap[0].Aliases)
 	assert.Equal(subCmd.Short, gotInfo.CommandMap[0].Description)
+
 	assert.Equal(expectedInfo.BinaryArch, gotInfo.BinaryArch)
 	assert.Empty(gotInfo.PluginRuntimeVersion, "Should be empty since unit tests doesn't have the self (tanzu-plugin-runtime) module dependency")
 }

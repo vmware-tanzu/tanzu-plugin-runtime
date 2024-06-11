@@ -66,8 +66,8 @@ type CommandMapEntry struct {
 	DestinationCommandPath string `json:"dstPath" yaml:"dstPath"`
 	// By default, the command previously situated at the
 	// DestinationCommandPath of the Tanzu CLI, if one exist, will be the one
-	// overridden by this entry. If this mapping attempt is intended to
-	// override another part of the Tanzu CLI command tree, the override path should be used.
+	// overridden by this entry. If this mapping attempt is intended to override
+	// another part of the Tanzu CLI command tree, the override path should be used.
 	// Specified as a space-delimited path relative to the Tanzu CLI command tree.
 	Overrides string `json:"overrides" yaml:"overrides"`
 	// Required when remapping a subcommand of this plugin outside of the
@@ -83,6 +83,10 @@ type CommandMapEntry struct {
 	// sense that if unset, the aliases of the actual Command at the
 	// SourceCommandPath will be used.
 	Aliases []string `json:"aliases,omitempty" yaml:"aliases,omitempty"`
+	// RequiredContextType specifies one or more ContextType's that has to be active in order for this
+	// mapping to take effect. If unset, this entry's mapping will apply regardless of state of active
+	// contexts.
+	RequiredContextType []types.ContextType `json:"requiredContextType,omitempty" yaml:"requiredContextType,omitempty"`
 }
 
 // PluginDescriptor describes a plugin binary.

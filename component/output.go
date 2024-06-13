@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/olekukonko/tablewriter"
+	"github.com/anujc25/tablewriter"
 	"gopkg.in/yaml.v3"
 )
 

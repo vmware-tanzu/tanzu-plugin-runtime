@@ -9,7 +9,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/fatih/color"
 	"github.com/stretchr/testify/require"
+	"github.com/tj/assert"
 )
 
 var mapValue = map[string]string{
@@ -55,6 +57,54 @@ const (
   }
 ]`
 )
+
+func TestNewOutputWriterTableWithTabularApproach(t *testing.T) {
+	redColor := color.New(color.FgRed)
+	redColor.EnableColor()
+
+	tests := []struct {
+		name   string
+		header []string
+		rows   []interface{}
+		output string
+	}{
+		{
+			"verify header and row alignment",
+			[]string{"NAME", "STATUS", "AGE"},
+			[]interface{}{[]interface{}{"foo", "READY", "1d"}, []interface{}{"bar", "Not READY", "1d"}},
+			`
+  NAME  STATUS     AGE  
+  foo   READY      1d   
+  bar   Not READY  1d   
+		`,
+		},
+
+		{
+			"verify fields with colors",
+			[]string{"NAME", "STATUS", "AGE"},
+			[]interface{}{[]interface{}{"foo", "READY", "1d"}, []interface{}{"bar", redColor.Sprintf("Not READY"), "1d"}},
+			//nolint:stylecheck // Need to use unicode character to represent color
+			`
+  NAME  STATUS     AGE  
+  foo   READY      1d   
+  bar   [31mNot READY[0m  1d   
+`,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var b bytes.Buffer
+			tab := NewOutputWriter(&b, string(TableOutputType), "NAME", "STATUS", "AGE")
+			require.NotNil(t, tab)
+			for _, r := range tt.rows {
+				tab.AddRow(r.([]interface{})...)
+			}
+			tab.Render()
+			assert.Equal(t, strings.TrimSpace(tt.output), strings.TrimSpace(b.String()))
+		})
+	}
+}
 
 func TestNewOutputWriterTable(t *testing.T) {
 	var b bytes.Buffer

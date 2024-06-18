@@ -1,6 +1,9 @@
-// Copyright 2024 VMware, Inc. All Rights Reserved.
-// SPDX-License-Identifier: Apache-2.0
-
+// Package testing exports a GraphQL Mock Server that facilitates
+// the testing of client.
+//
+// NOTE: A portion of this file is adapted from github.com/getoutreach/goql
+//
+//nolint:goheader
 package testing
 
 // Operation Type Constants

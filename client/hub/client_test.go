@@ -29,14 +29,19 @@ import (
 
 // getProjects is a wrapper of an `QueryAllProjects“ API call to fetch project names
 // Note: This is only for the testing the MockServer with HubClient
-func getProjects(hc *hub.HubClient) ([]string, error) {
-	res, err := QueryAllProjects(context.Background(), hc.GraphQLClient)
+func getProjects(hc hub.Client) ([]string, error) {
+	req := &hub.Request{
+		OpName: "QueryAllProjects",
+		Query:  QueryAllProjects_Operation,
+	}
+	var responseData QueryAllProjectsResponse
+	err := hc.Request(context.Background(), req, &responseData)
 	if err != nil {
 		return nil, err
 	}
 
 	projects := []string{}
-	for _, p := range res.ApplicationEngineQuery.QueryProjects.Projects {
+	for _, p := range responseData.ApplicationEngineQuery.QueryProjects.Projects {
 		projects = append(projects, p.Name)
 	}
 
@@ -52,7 +57,7 @@ func TestTanzuHubClient(t *testing.T) {
 	defer mockServer.Close()
 
 	// Create the Hub Client using the above mock server
-	hc, err := hub.CreateHubClient("fake-context", hub.WithEndpoint(mockServer.URL), hub.WithAccessToken("fake-token"))
+	hc, err := hub.NewClient("fake-context", hub.WithEndpoint(mockServer.URL), hub.WithAccessToken("fake-token"))
 	if err != nil {
 		t.Fatalf("error while creating hub client. %s", err.Error())
 	}

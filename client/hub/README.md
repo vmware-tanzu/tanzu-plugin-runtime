@@ -12,10 +12,9 @@ equivalent functionality can be introduced.
 
 To create a Tanzu Hub client, use the `CreateHubClient(contextName string)` API
 by providing the `tanzu` context name. An authenticated Tanzu Hub client for the specified tanzu context will be returned.
-This client includes an authenticated GraphQLClient from the `github.com/Khan/genqlient` package
-that can be used to do GraphQL queries. Internally it configures the client with an access token for each request.
+Internally it configures the client with an access token for each request.
 By default, it will get the Tanzu Hub endpoint from the specified context metadata. To specify any custom Tanzu Hub
-endpoint for testing please configure the `TANZU_HUB_GRAPHQL_ENDPOINT` environment variable.
+endpoint for testing please configure the `TANZU_HUB_ENDPOINT` environment variable.
 
 Note that the authenticated client is assured to have at least 30 min access to the GraphQL endpoint.
 If you want a long running client beyond this period, recommendation is to reinitialize your client.
@@ -40,3 +39,77 @@ To use this library plugin authors can follow the below steps:
 4. Once the initialization is done, you can add your GraphQL queries to the `queries.graphql` file
 5. After adding new graphQL queries or updating an existing query, run `make tanzu-hub-stub-generate` to generate a golang stub for the GraphQL queries
     * This will create a `generate.go` file under the `hub` package with golang APIs that can be consumed directly by other packages by passing the GraphQLClient available with TanzuHub client
+
+## Examples
+
+### Query/Mutation
+
+```golang
+const QueryAllProjects_Operation = `
+query QueryAllProjects {
+    applicationEngineQuery {
+        queryProjects(first: 1000) {
+            projects {
+                name
+            }
+        }
+    }
+}`
+
+// getProjects is a wrapper of an `QueryAllProjects“ API call to fetch project names
+func getProjects(contextName string) ([]string, error) {
+    hc, err := NewClient(contextName )
+
+	req := &hub.Request{
+		OpName: "QueryAllProjects",
+		Query:  QueryAllProjects_Operation,
+	}
+	var responseData QueryAllProjectsResponse // Assuming the response type is already defined
+	err := hc.Request(context.Background(), req, &responseData)
+	if err != nil {
+		return nil, err
+	}
+
+    // Process the response
+	projects := []string{}
+	for _, p := range responseData.ApplicationEngineQuery.QueryProjects.Projects {
+		projects = append(projects, p.Name)
+	}
+
+	return projects, nil
+}
+```
+
+### Subscriptions
+
+```golang
+const SubscribeAppLogs_Operation = `
+subscription appLogs($appEntityId: EntityId!) {
+  kubernetesAppLogs(appEntityId: $appEntityId, logParams: {includeTimestamps: true, tailLines: 50, includePrevious: false}) {
+    value
+    timestamp
+  }
+}`
+
+func subscribeAppLogs(contextName, appEntityId string) ([]string, error) {
+    hc, err := NewClient(contextName )
+
+	req := &hub.Request{
+		OpName: "SubscribeAppLogs",
+		Query:  SubscribeAppLogs_Operation,
+        Variables: map[string]string{"appEntityId": appEntityId}
+	}
+
+	err := hc.Subscribe(context.Background(), req, logEventHandler)
+	if err != nil {
+		return nil, err
+	}
+
+	return nil
+}
+
+func logEventHandler(eventResponse EventResponse) {
+    respData := eventResponse.Data
+    fmt.Println(respData) 
+}
+```

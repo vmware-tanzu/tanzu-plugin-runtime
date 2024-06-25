@@ -126,13 +126,15 @@ func waitForEvents(reader *bufio.Reader, eventChan chan EventResponse) error {
 	for {
 		line, err := reader.ReadBytes('\n')
 		if err != nil {
-			return errors.Errorf("error during resp.Body read:%s\n", err.Error())
+			return errors.Errorf("Error during resp.Body read: %s", err.Error())
 		}
 
 		switch {
 		case hasPrefix(line, ":"):
 			// Comment, do nothing
 		case hasPrefix(line, "retry:"):
+			// Retry, do nothing for now
+		case hasPrefix(line, "event:"):
 			// Retry, do nothing for now
 
 		// event data
@@ -149,13 +151,12 @@ func waitForEvents(reader *bufio.Reader, eventChan chan EventResponse) error {
 				var resp Response
 				err := json.Unmarshal(b, &resp)
 				if err != nil {
-					return errors.Errorf("error unmarshaling the event response. Error:%s\n", err.Error())
+					return errors.Errorf("Error unmarshaling the event response. Error:%s", err.Error())
 				}
 				ev.Data = resp
 				buf.Reset()
 				eventChan <- ev
 				ev = EventResponse{}
-
 			}
 
 		default:

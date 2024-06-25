@@ -60,23 +60,23 @@ query QueryAllProjects {
 func getProjects(contextName string) ([]string, error) {
     hc, err := NewClient(contextName )
 
-	req := &hub.Request{
-		OpName: "QueryAllProjects",
-		Query:  QueryAllProjects_Operation,
-	}
-	var responseData QueryAllProjectsResponse // Assuming the response type is already defined
-	err := hc.Request(context.Background(), req, &responseData)
-	if err != nil {
-		return nil, err
-	}
+    req := &hub.Request{
+        OpName: "QueryAllProjects",
+        Query:  QueryAllProjects_Operation,
+    }
+    var responseData QueryAllProjectsResponse // Assuming the response type is already defined
+    err := hc.Request(context.Background(), req, &responseData)
+    if err != nil {
+        return nil, err
+    }
 
     // Process the response
-	projects := []string{}
-	for _, p := range responseData.ApplicationEngineQuery.QueryProjects.Projects {
-		projects = append(projects, p.Name)
-	}
+    projects := []string{}
+    for _, p := range responseData.ApplicationEngineQuery.QueryProjects.Projects {
+        projects = append(projects, p.Name)
+    }
 
-	return projects, nil
+    return projects, nil
 }
 ```
 
@@ -94,22 +94,22 @@ subscription appLogs($appEntityId: EntityId!) {
 func subscribeAppLogs(contextName, appEntityId string) ([]string, error) {
     hc, err := NewClient(contextName )
 
-	req := &hub.Request{
-		OpName: "SubscribeAppLogs",
-		Query:  SubscribeAppLogs_Operation,
+    req := &hub.Request{
+        OpName: "SubscribeAppLogs",
+        Query:  SubscribeAppLogs_Operation,
         Variables: map[string]string{"appEntityId": appEntityId}
-	}
+    }
 
-	err := hc.Subscribe(context.Background(), req, logEventHandler)
-	if err != nil {
-		return nil, err
-	}
+    err := hc.Subscribe(context.Background(), req, logEventHandler)
+    if err != nil {
+        return nil, err
+    }
 
-	return nil
+    return nil
 }
 
 func logEventHandler(eventResponse EventResponse) {
     respData := eventResponse.Data
-    fmt.Println(respData) 
+    fmt.Println(respData)
 }
 ```

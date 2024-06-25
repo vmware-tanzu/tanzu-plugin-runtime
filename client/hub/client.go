@@ -18,10 +18,20 @@ const (
 	EnvTanzuHubEndpoint = "TANZU_HUB_ENDPOINT"
 )
 
-// Client
+// Client is an interface for the Tanzu Hub Client
 type Client interface {
+	// Request Sends a GraphQL request to the Tanzu Hub endpoint
+	//
+	//	ctx context.Context: The context for the request. If provided, it will be used to cancel the request if the context is canceled.
+	//	req *Request: The GraphQL request to be sent.
+	//	responseData interface{}: The interface to store the response data. The response data will be unmarshaled into this interface.
 	Request(ctx context.Context, req *Request, responseData interface{}) error
 
+	// Subscribe to a GraphQL endpoint and streams events to the provided handler
+	//
+	//	ctx context.Context: The context for the subscription. If provided, it will be used to cancel the subscription if the context is canceled.
+	//	req *Request: The GraphQL subscription request to be sent.
+	//	handler EventResponseHandler: The handler function to process incoming events.
 	Subscribe(ctx context.Context, req *Request, handler EventResponseHandler) error
 }
 
@@ -84,21 +94,21 @@ func NewClient(contextName string, opts ...ClientOptions) (Client, error) {
 	return hc, nil
 }
 
-func (hc *HubClient) getHTTPClient(contextName string) (*http.Client, error) {
+func (c *HubClient) getHTTPClient(contextName string) (*http.Client, error) {
 	var err error
-	if hc.httpClient != nil {
-		return hc.httpClient, nil
+	if c.httpClient != nil {
+		return c.httpClient, nil
 	}
 
-	if hc.accessToken == "" {
-		hc.accessToken, err = config.GetTanzuContextAccessToken(contextName)
+	if c.accessToken == "" {
+		c.accessToken, err = config.GetTanzuContextAccessToken(contextName)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	if hc.tanzuHubEndpoint == "" {
-		hc.tanzuHubEndpoint, err = getTanzuHubEndpointFromContext(contextName)
+	if c.tanzuHubEndpoint == "" {
+		c.tanzuHubEndpoint, err = getTanzuHubEndpointFromContext(contextName)
 		if err != nil {
 			return nil, err
 		}
@@ -106,7 +116,7 @@ func (hc *HubClient) getHTTPClient(contextName string) (*http.Client, error) {
 
 	return &http.Client{
 		Transport: &authTransport{
-			accessToken: hc.accessToken,
+			accessToken: c.accessToken,
 			wrapped:     http.DefaultTransport,
 		},
 		Timeout: 0,

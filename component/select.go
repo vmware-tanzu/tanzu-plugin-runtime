@@ -4,6 +4,8 @@
 package component
 
 import (
+	"errors"
+
 	"github.com/AlecAivazis/survey/v2"
 )
 
@@ -35,11 +37,25 @@ func (p *SelectConfig) Run(response interface{}) error {
 
 // Select an option.
 func Select(p *SelectConfig, response interface{}) error {
-	prompt := translateSelectConfig(p)
+	if response == nil {
+		return errors.New("no response reference provided to record answers")
+	}
+	needMultipleSelect := isPointerToSlice(response)
+
+	prompt := buildSelect(p, needMultipleSelect)
 	return survey.AskOne(prompt, response)
 }
 
-func translateSelectConfig(p *SelectConfig) survey.Prompt {
+func buildSelect(p *SelectConfig, enableMultiSelect bool) survey.Prompt {
+	if enableMultiSelect {
+		return &survey.MultiSelect{
+			Message:  p.Message,
+			Options:  p.Options,
+			Default:  p.Default,
+			Help:     p.Help,
+			PageSize: p.PageSize,
+		}
+	}
 	return &survey.Select{
 		Message:  p.Message,
 		Options:  p.Options,

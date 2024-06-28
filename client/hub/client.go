@@ -27,6 +27,33 @@ type HubClient struct {
 	ContextName string
 	// GraphQLClient can be used to do graphql queries
 	GraphQLClient graphql.Client
+
+	accessToken      string
+	tanzuHubEndpoint string
+	httpClient       *http.Client
+}
+
+type ClientOptions func(o *HubClient)
+
+// WithAccessToken creates the HubClient using the specified Access Token
+func WithAccessToken(token string) ClientOptions {
+	return func(c *HubClient) {
+		c.accessToken = token
+	}
+}
+
+// WithEndpoint creates the HubClient using the specified Endpoint
+func WithEndpoint(endpoint string) ClientOptions {
+	return func(c *HubClient) {
+		c.tanzuHubEndpoint = endpoint
+	}
+}
+
+// WithHTTPClient creates the HubClient using the specified HttpClient
+func WithHTTPClient(httpClient *http.Client) ClientOptions {
+	return func(c *HubClient) {
+		c.httpClient = httpClient
+	}
 }
 
 // CreateHubClient returns an authenticated Tanzu Hub client for the specified
@@ -39,27 +66,49 @@ type HubClient struct {
 //
 // EXPERIMENTAL: Both the function's signature and implementation are subjected to change/removal
 // if an alternative means to provide equivalent functionality can be introduced.
-func CreateHubClient(contextName string) (*HubClient, error) {
-	accessToken, err := config.GetTanzuContextAccessToken(contextName)
+func CreateHubClient(contextName string, opts ...ClientOptions) (*HubClient, error) {
+	hc := &HubClient{
+		ContextName: contextName,
+	}
+
+	// configure all options for the HubClient
+	for _, o := range opts {
+		o(hc)
+	}
+
+	httpClient, err := hc.getHTTPClient(contextName)
 	if err != nil {
 		return nil, err
 	}
+	hc.GraphQLClient = graphql.NewClient(fmt.Sprintf("%s/graphql", hc.tanzuHubEndpoint), httpClient)
+	return hc, nil
+}
 
-	tanzuHubEndpoint, err := getTanzuHubEndpointFromContext(contextName)
-	if err != nil {
-		return nil, err
+func (hc *HubClient) getHTTPClient(contextName string) (*http.Client, error) {
+	var err error
+	if hc.httpClient != nil {
+		return hc.httpClient, nil
 	}
 
-	httpClient := http.Client{
+	if hc.accessToken == "" {
+		hc.accessToken, err = config.GetTanzuContextAccessToken(contextName)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if hc.tanzuHubEndpoint == "" {
+		hc.tanzuHubEndpoint, err = getTanzuHubEndpointFromContext(contextName)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return &http.Client{
 		Transport: &authTransport{
-			accessToken: accessToken,
+			accessToken: hc.accessToken,
 			wrapped:     http.DefaultTransport,
 		},
-	}
-	graphqlClient := graphql.NewClient(fmt.Sprintf("%s/graphql", tanzuHubEndpoint), &httpClient)
-	return &HubClient{
-		ContextName:   contextName,
-		GraphQLClient: graphqlClient,
 	}, nil
 }
 

@@ -23,7 +23,7 @@ func Test_translatePromptConfig_Sensitive(t *testing.T) {
 		Help:      "Help will be given to those who need it",
 	}
 
-	prompt := translatePromptConfig(&promptConfig)
+	prompt := buildPrompt(&promptConfig, false)
 	assert.NotNil(prompt)
 
 	// Secure should return a password prompt
@@ -42,13 +42,19 @@ func Test_translatePromptConfig_OptionsSelect(t *testing.T) {
 		Help:      "Help will be given to those who need it",
 	}
 
-	prompt := translatePromptConfig(&promptConfig)
+	// Prompt with options should return a Select or MultiSelect prompt
+	// depending on whether multiselection is needed
+	prompt := buildPrompt(&promptConfig, false)
 	assert.NotNil(prompt)
-
-	// Prompt with options should return a select prompt
 	selectPrompt, ok := prompt.(*survey.Select)
 	assert.True(ok)
 	assert.Equal(len(promptConfig.Options), len(selectPrompt.Options))
+
+	prompt = buildPrompt(&promptConfig, true)
+	assert.NotNil(prompt)
+	multiSelectPrompt, ok := prompt.(*survey.MultiSelect)
+	assert.True(ok)
+	assert.Equal(len(promptConfig.Options), len(multiSelectPrompt.Options))
 }
 
 func Test_translatePromptConfig_Input(t *testing.T) {
@@ -61,7 +67,7 @@ func Test_translatePromptConfig_Input(t *testing.T) {
 		Help:      "Help will be given to those who need it",
 	}
 
-	prompt := translatePromptConfig(&promptConfig)
+	prompt := buildPrompt(&promptConfig, false)
 	assert.NotNil(prompt)
 
 	// Prompt without options should return an input prompt

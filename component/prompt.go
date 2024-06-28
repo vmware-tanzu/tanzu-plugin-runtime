@@ -7,6 +7,7 @@ import (
 	"errors"
 	"io"
 	"os"
+	"reflect"
 	"strings"
 
 	"github.com/AlecAivazis/survey/v2"
@@ -37,9 +38,23 @@ func (p *PromptConfig) Run(response interface{}, opts ...PromptOpt) error {
 	return Prompt(p, response, opts...)
 }
 
+func isPointerToSlice(obj interface{}) bool {
+	isPtrToSlice := false
+	t := reflect.TypeOf(obj)
+	if t.Kind() == reflect.Ptr {
+		isPtrToSlice = t.Elem().Kind() == reflect.Slice
+	}
+	return isPtrToSlice
+}
+
 // Prompt for input, reads input value, without trimming any characters (may include leading/tailing spaces)
 func Prompt(p *PromptConfig, response interface{}, opts ...PromptOpt) error {
-	prompt := translatePromptConfig(p)
+	if response == nil {
+		return errors.New("no response reference provided to record answers")
+	}
+	needMultipleSelect := isPointerToSlice(response)
+
+	prompt := buildPrompt(p, needMultipleSelect)
 	options := defaultPromptOptions()
 	for _, opt := range opts {
 		err := opt(options)
@@ -52,7 +67,7 @@ func Prompt(p *PromptConfig, response interface{}, opts ...PromptOpt) error {
 	return survey.AskOne(prompt, response, surveyOpts...)
 }
 
-func translatePromptConfig(p *PromptConfig) survey.Prompt {
+func buildPrompt(p *PromptConfig, enableMultiSelect bool) survey.Prompt {
 	if p.Sensitive {
 		return &survey.Password{
 			Message: p.Message,
@@ -60,6 +75,14 @@ func translatePromptConfig(p *PromptConfig) survey.Prompt {
 		}
 	}
 	if len(p.Options) != 0 {
+		if enableMultiSelect {
+			return &survey.MultiSelect{
+				Message: p.Message,
+				Options: p.Options,
+				Default: p.Default,
+				Help:    p.Help,
+			}
+		}
 		return &survey.Select{
 			Message: p.Message,
 			Options: p.Options,

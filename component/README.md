@@ -277,7 +277,7 @@ fmt.Println("You entered:", response)
 
 The `PromptConfig` struct also provides the Sensitive option to hide user input, and the `Options` field to provide a list of choices for the user to select from.
 
-``` go
+```go
 var response string
 p := &PromptConfig{
     Message: "Enter your password:",
@@ -298,6 +298,26 @@ if err != nil {
     // Handle error
 }
 fmt.Println("You selected:", response)
+```
+
+### Multi-selection support
+
+When the prompt is configured with a valid Options list, how the prompt is
+presented depends on whether the variable used to collect the response(s) is a
+scalar or a slice. In other words, in the preceding example, had the response
+variable been declared as
+
+```go
+    var response []string
+```
+
+instead, the displayed prompt will allow multiple selection
+
+```bash
+? Please select an option:  [Use arrows to move, space to select, <right> to all, <left> to none, type to filter, ? for more help]
+> [x]  Option 1
+  [ ]  Option 2
+  [x]  Option 3
 ```
 
 ### Example
@@ -424,3 +444,7 @@ func main() {
     fmt.Println(response)
 }
 ```
+
+### Multi-selection support
+
+Like the Prompt component, multiple-selection can be provided by the component if it is invoked to collect a slice of values.

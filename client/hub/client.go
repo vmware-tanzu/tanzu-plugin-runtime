@@ -5,28 +5,40 @@
 package hub
 
 import (
-	"fmt"
+	"context"
 	"net/http"
 	"os"
 
-	"github.com/Khan/genqlient/graphql"
 	"github.com/pkg/errors"
 
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/config"
 )
 
 const (
-	EnvTanzuHubGraphQLEndpoint = "TANZU_HUB_GRAPHQL_ENDPOINT"
+	EnvTanzuHubEndpoint = "TANZU_HUB_ENDPOINT"
 )
 
-// HubClient client to talk to Tanzu Hub through GraphQL apis
-// It includes authenticated GraphQL client from github.com/Khan/genqlient
-// that can be used to do GraphQL queries
+// Client is an interface for the Tanzu Hub Client
+type Client interface {
+	// Request Sends a GraphQL request to the Tanzu Hub endpoint
+	//
+	//	ctx context.Context: The context for the request. If provided, it will be used to cancel the request if the context is canceled.
+	//	req *Request: The GraphQL request to be sent.
+	//	responseData interface{}: The interface to store the response data. The response data will be unmarshaled into this interface.
+	Request(ctx context.Context, req *Request, responseData interface{}) error
+
+	// Subscribe to a GraphQL endpoint and streams events to the provided handler
+	//
+	//	ctx context.Context: The context for the subscription. If provided, it will be used to cancel the subscription if the context is canceled.
+	//	req *Request: The GraphQL subscription request to be sent.
+	//	handler EventResponseHandler: The handler function to process incoming events.
+	Subscribe(ctx context.Context, req *Request, handler EventResponseHandler) error
+}
+
+// HubClient client to talk to Tanzu Hub through GraphQL APIs
 type HubClient struct {
 	// ContextName is Tanzu CLI context name
 	ContextName string
-	// GraphQLClient can be used to do graphql queries
-	GraphQLClient graphql.Client
 
 	accessToken      string
 	tanzuHubEndpoint string
@@ -56,17 +68,15 @@ func WithHTTPClient(httpClient *http.Client) ClientOptions {
 	}
 }
 
-// CreateHubClient returns an authenticated Tanzu Hub client for the specified
-// tanzu context. This client includes an authenticated GraphQLClient from github.com/Khan/genqlient
-// that can be used to do GraphQL queries.
-// Internally it configures the client with CSP access token for each request
+// NewClient returns an authenticated Tanzu Hub client for the specified
+// tanzu context. Internally it configures the client with CSP access token for each request
 //
 // Note that the authenticated client is assured to have at least 30 min access to the GraphQL endpoint.
 // If you want a long running client beyond this period, recommendation is to reinitialize your client.
 //
 // EXPERIMENTAL: Both the function's signature and implementation are subjected to change/removal
 // if an alternative means to provide equivalent functionality can be introduced.
-func CreateHubClient(contextName string, opts ...ClientOptions) (*HubClient, error) {
+func NewClient(contextName string, opts ...ClientOptions) (Client, error) {
 	hc := &HubClient{
 		ContextName: contextName,
 	}
@@ -80,25 +90,25 @@ func CreateHubClient(contextName string, opts ...ClientOptions) (*HubClient, err
 	if err != nil {
 		return nil, err
 	}
-	hc.GraphQLClient = graphql.NewClient(fmt.Sprintf("%s/graphql", hc.tanzuHubEndpoint), httpClient)
+	hc.httpClient = httpClient
 	return hc, nil
 }
 
-func (hc *HubClient) getHTTPClient(contextName string) (*http.Client, error) {
+func (c *HubClient) getHTTPClient(contextName string) (*http.Client, error) {
 	var err error
-	if hc.httpClient != nil {
-		return hc.httpClient, nil
+	if c.httpClient != nil {
+		return c.httpClient, nil
 	}
 
-	if hc.accessToken == "" {
-		hc.accessToken, err = config.GetTanzuContextAccessToken(contextName)
+	if c.accessToken == "" {
+		c.accessToken, err = config.GetTanzuContextAccessToken(contextName)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	if hc.tanzuHubEndpoint == "" {
-		hc.tanzuHubEndpoint, err = getTanzuHubEndpointFromContext(contextName)
+	if c.tanzuHubEndpoint == "" {
+		c.tanzuHubEndpoint, err = getTanzuHubEndpointFromContext(contextName)
 		if err != nil {
 			return nil, err
 		}
@@ -106,15 +116,16 @@ func (hc *HubClient) getHTTPClient(contextName string) (*http.Client, error) {
 
 	return &http.Client{
 		Transport: &authTransport{
-			accessToken: hc.accessToken,
+			accessToken: c.accessToken,
 			wrapped:     http.DefaultTransport,
 		},
+		Timeout: 0,
 	}, nil
 }
 
 func getTanzuHubEndpointFromContext(contextName string) (string, error) {
-	// If `TANZU_HUB_GRAPHQL_ENDPOINT` environment variable is configured use that
-	if endpoint := os.Getenv(EnvTanzuHubGraphQLEndpoint); endpoint != "" {
+	// If `TANZU_HUB_ENDPOINT` environment variable is configured use that
+	if endpoint := os.Getenv(EnvTanzuHubEndpoint); endpoint != "" {
 		return endpoint, nil
 	}
 

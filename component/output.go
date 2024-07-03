@@ -269,7 +269,9 @@ func renderListTable(ow *outputwriter) {
 // renderTable prints output as a table
 func renderTable(ow *outputwriter) {
 	// Filter keys and values based on dynamic keys
-	ow.keys, ow.values = filterDynamicColumns(ow.keys, ow.dynamicKeys, ow.values)
+	if len(ow.keys) != 0 {
+		ow.keys, ow.values = filterDynamicColumns(ow.keys, ow.dynamicKeys, ow.values)
+	}
 
 	table := tablewriter.NewWriter(ow.out)
 	table.SetBorder(false)

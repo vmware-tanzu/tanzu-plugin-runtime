@@ -76,7 +76,7 @@ func TestNewOutputWriterTableWithTabularApproach(t *testing.T) {
   NAME  STATUS     AGE  
   foo   READY      1d   
   bar   Not READY  1d   
-		`,
+`,
 		},
 
 		{
@@ -90,18 +90,48 @@ func TestNewOutputWriterTableWithTabularApproach(t *testing.T) {
   bar   [31mNot READY[0m  1d   
 `,
 		},
+
+		{
+			"verify table without headers with 2 columns",
+			[]string{},
+			[]interface{}{[]interface{}{"foo", "READY"}, []interface{}{"bar", "Not READY"}},
+			`
+  foo  READY      
+  bar  Not READY  
+`,
+		},
+		{
+			"verify table without headers with 1 columns",
+			[]string{},
+			[]interface{}{[]interface{}{"row1"}, []interface{}{"row2"}, []interface{}{"row3"}},
+			`
+  row1  
+  row2  
+  row3  
+`,
+		},
+		{
+			"verify table without headers with different columns per row",
+			[]string{},
+			[]interface{}{[]interface{}{"row1a", "row1b"}, []interface{}{"row2a", "row2b", "row2c"}, []interface{}{"row3"}},
+			`
+  row1a  row1b  
+  row2a  row2b  row2c  
+  row3   
+`,
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var b bytes.Buffer
-			tab := NewOutputWriter(&b, string(TableOutputType), "NAME", "STATUS", "AGE")
+			tab := NewOutputWriter(&b, string(TableOutputType), tt.header...)
 			require.NotNil(t, tab)
 			for _, r := range tt.rows {
 				tab.AddRow(r.([]interface{})...)
 			}
 			tab.Render()
-			assert.Equal(t, strings.TrimSpace(tt.output), strings.TrimSpace(b.String()))
+			assert.Equal(t, strings.Replace(tt.output, "\n", "", 1), b.String())
 		})
 	}
 }

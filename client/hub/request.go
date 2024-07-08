@@ -16,7 +16,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Request Sends a GraphQL request to the Tanzu Hub endpoint
+// Request sends a GraphQL request to the Tanzu Hub endpoint
 //
 //	ctx context.Context: The context for the request. If provided, it will be used to cancel the request if the context is canceled.
 //	req *Request: The GraphQL request to be sent.

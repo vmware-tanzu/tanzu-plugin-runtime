@@ -188,8 +188,9 @@ func subscribeAppLogs(hc hub.Client) string {
 	ctxSubscription := context.Background()
 
 	_ = hc.Subscribe(ctxSubscription, req, logProcessor)
-	// TODO: Figure how errors should be handled because if server closes the connection
-	// this will always return error.
+	// TODO: Figure how errors should be handled
+	//  1. if server closes the connection this will always return error.
+	//  2. if client closes the connection by closing ctxSubscription context
 
 	return logs
 }

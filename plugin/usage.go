@@ -199,11 +199,11 @@ func formatUsageHelpSection(cmd *cobra.Command, target types.Target) string {
 	base := indentStr + "tanzu"
 
 	if cmd.Runnable() {
-		if shouldPrintInvocationWithoutTarget(target) {
+		if shouldPrintInvocationWithoutTarget(target, ic) {
 			output.WriteString(buildInvocationString(base, useLineEx(cmd, ic)) + "\n")
 		}
 
-		if shouldPrintInvocationWithTarget(target) {
+		if shouldPrintInvocationWithTarget(target, ic) {
 			output.WriteString(buildInvocationString(base, string(target), useLineEx(cmd, ic)) + "\n")
 		}
 	}
@@ -215,11 +215,11 @@ func formatUsageHelpSection(cmd *cobra.Command, target types.Target) string {
 			output.WriteString("\n")
 		}
 
-		if shouldPrintInvocationWithoutTarget(target) {
+		if shouldPrintInvocationWithoutTarget(target, ic) {
 			output.WriteString(buildInvocationString(base, commandPathEx(cmd, ic), "[command]") + "\n")
 		}
 
-		if shouldPrintInvocationWithTarget(target) {
+		if shouldPrintInvocationWithTarget(target, ic) {
 			output.WriteString(buildInvocationString(base, string(target), commandPathEx(cmd, ic), "[command]") + "\n")
 		}
 	}
@@ -241,11 +241,11 @@ func formatHelpFooter(cmd *cobra.Command, target types.Target) string {
 		base = "Use \"tanzu"
 	}
 
-	if shouldPrintInvocationWithoutTarget(target) {
+	if shouldPrintInvocationWithoutTarget(target, ic) {
 		footer.WriteString(buildInvocationString(base, commandPathEx(cmd, ic), `[command] --help" for more information about a command.`+"\n"))
 	}
 
-	if shouldPrintInvocationWithTarget(target) {
+	if shouldPrintInvocationWithTarget(target, ic) {
 		footer.WriteString(buildInvocationString(base, string(target), commandPathEx(cmd, ic), `[command] --help" for more information about a command.`+"\n"))
 	}
 
@@ -377,12 +377,20 @@ var TemplateFuncs = template.FuncMap{
 	"beginsWith":              component.BeginsWith,
 }
 
-func shouldPrintInvocationWithoutTarget(target types.Target) bool {
+func shouldPrintInvocationWithoutTarget(target types.Target, ic *InvocationContext) bool {
+	// Do not show the target information if the InvocationContext is specified
+	if ic != nil && ic.invokedCommand != "" {
+		return true
+	}
 	// For kubernetes, k8s, global, or no target, display tanzu command path without target
 	return target == types.TargetK8s || target == types.TargetGlobal || target == types.TargetUnknown
 }
 
-func shouldPrintInvocationWithTarget(target types.Target) bool {
+func shouldPrintInvocationWithTarget(target types.Target, ic *InvocationContext) bool {
+	// Do not show the target information if the InvocationContext is specified
+	if ic != nil && ic.invokedCommand != "" {
+		return false
+	}
 	// For non global, or no target display tanzu command path with target
 	// Also, for the deprecated invocation using the kubernetes target, no longer display the command path with the target
 	return target != types.TargetGlobal && target != types.TargetUnknown && target != types.TargetK8s

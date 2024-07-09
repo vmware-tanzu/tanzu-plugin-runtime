@@ -37,8 +37,8 @@ type Client interface {
 
 // HubClient client to talk to Tanzu Hub through GraphQL APIs
 type HubClient struct {
-	// ContextName is Tanzu CLI context name
-	ContextName string
+	// contextName is Tanzu CLI context name
+	contextName string
 
 	accessToken      string
 	tanzuHubEndpoint string
@@ -47,21 +47,21 @@ type HubClient struct {
 
 type ClientOptions func(o *HubClient)
 
-// WithAccessToken creates the HubClient using the specified Access Token
+// WithAccessToken creates the Client using the specified Access Token
 func WithAccessToken(token string) ClientOptions {
 	return func(c *HubClient) {
 		c.accessToken = token
 	}
 }
 
-// WithEndpoint creates the HubClient using the specified Endpoint
+// WithEndpoint creates the Client using the specified Endpoint
 func WithEndpoint(endpoint string) ClientOptions {
 	return func(c *HubClient) {
 		c.tanzuHubEndpoint = endpoint
 	}
 }
 
-// WithHTTPClient creates the HubClient using the specified HttpClient
+// WithHTTPClient creates the Client using the specified HttpClient
 func WithHTTPClient(httpClient *http.Client) ClientOptions {
 	return func(c *HubClient) {
 		c.httpClient = httpClient
@@ -77,50 +77,53 @@ func WithHTTPClient(httpClient *http.Client) ClientOptions {
 // EXPERIMENTAL: Both the function's signature and implementation are subjected to change/removal
 // if an alternative means to provide equivalent functionality can be introduced.
 func NewClient(contextName string, opts ...ClientOptions) (Client, error) {
-	hc := &HubClient{
-		ContextName: contextName,
+	c := &HubClient{
+		contextName: contextName,
 	}
 
 	// configure all options for the HubClient
 	for _, o := range opts {
-		o(hc)
+		o(c)
 	}
 
-	httpClient, err := hc.getHTTPClient(contextName)
+	err := c.initializeClient(contextName)
 	if err != nil {
 		return nil, err
 	}
-	hc.httpClient = httpClient
-	return hc, nil
+	return c, nil
 }
 
-func (c *HubClient) getHTTPClient(contextName string) (*http.Client, error) {
+func (c *HubClient) initializeClient(contextName string) error {
 	var err error
-	if c.httpClient != nil {
-		return c.httpClient, nil
-	}
 
+	// Set accessToken if it is not already set
 	if c.accessToken == "" {
 		c.accessToken, err = config.GetTanzuContextAccessToken(contextName)
 		if err != nil {
-			return nil, err
+			return err
 		}
 	}
 
+	// Set tanzuHubEndpoint if it is not already set
 	if c.tanzuHubEndpoint == "" {
 		c.tanzuHubEndpoint, err = getTanzuHubEndpointFromContext(contextName)
 		if err != nil {
-			return nil, err
+			return err
 		}
 	}
 
-	return &http.Client{
-		Transport: &authTransport{
-			accessToken: c.accessToken,
-			wrapped:     http.DefaultTransport,
-		},
-		Timeout: 0,
-	}, nil
+	// Set httpClient if it is not already set
+	if c.httpClient == nil {
+		c.httpClient = &http.Client{
+			Transport: &authTransport{
+				accessToken: c.accessToken,
+				wrapped:     http.DefaultTransport,
+			},
+			Timeout: 0,
+		}
+	}
+
+	return nil
 }
 
 func getTanzuHubEndpointFromContext(contextName string) (string, error) {

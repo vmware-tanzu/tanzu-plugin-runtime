@@ -85,7 +85,7 @@ func WithMutation(operations ...Operation) ServerOptions {
 func WithSubscriptions(operations ...Operation) ServerOptions {
 	return func(s *Server) {
 		for _, o := range operations {
-			s.RegisterMutation(o)
+			s.RegisterSubscription(o)
 		}
 	}
 }

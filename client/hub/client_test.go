@@ -169,7 +169,7 @@ func subscribeAppLogs(hc hub.Client) string {
 
 	logs := ""
 	logProcessor := func(eventResponse hub.EventResponse) {
-		resp := eventResponse.Data
+		resp := eventResponse.ResponseData
 		b, err := json.Marshal(resp)
 		if err != nil {
 			return
@@ -228,6 +228,7 @@ log 1
 log 2
 log 3
 log 4
+
 `,
 		},
 	}

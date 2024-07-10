@@ -5,7 +5,6 @@
 package hub
 
 import (
-	"bufio"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -14,6 +13,7 @@ import (
 	"net/http"
 
 	"github.com/pkg/errors"
+	"github.com/r3labs/sse/v2"
 )
 
 // Request sends a GraphQL request to the Tanzu Hub endpoint
@@ -96,7 +96,7 @@ func (c *HubClient) Subscribe(ctx context.Context, req *Request, handler EventRe
 
 	eventChan := make(chan EventResponse)
 	errChan := make(chan error)
-	reader := bufio.NewReader(httpResp.Body)
+	reader := sse.NewEventStreamReader(httpResp.Body, 1024)
 
 	go func() {
 		errChan <- waitForEvents(reader, eventChan)
@@ -119,52 +119,90 @@ func (c *HubClient) Subscribe(ctx context.Context, req *Request, handler EventRe
 	}
 }
 
-func waitForEvents(reader *bufio.Reader, eventChan chan EventResponse) error {
-	ev := EventResponse{}
-	buf := bytes.NewBuffer(make([]byte, 0, 1024))
-
+func waitForEvents(reader *sse.EventStreamReader, eventChan chan EventResponse) error {
 	for {
-		line, err := reader.ReadBytes('\n')
+		// Read each new line and process the type of event
+		event, err := reader.ReadEvent()
 		if err != nil {
-			return errors.Errorf("Error during resp.Body read: %s", err.Error())
+			if err == io.EOF {
+				return nil
+			}
+			return err
 		}
 
-		switch {
-		case hasPrefix(line, ":"):
-			// Comment, do nothing
-		case hasPrefix(line, "retry:"):
-			// Retry, do nothing for now
-		case hasPrefix(line, "event:"):
-			// Retry, do nothing for now
-
-		// event data
-		case hasPrefix(line, "data: "):
-			buf.Write(line[6:])
-		case hasPrefix(line, "data:"):
-			buf.Write(line[5:])
-
-		// end of event
-		case bytes.Equal(line, []byte("\n")):
-			b := buf.Bytes()
-
-			if hasPrefix(b, "{") {
-				var resp Response
-				err := json.Unmarshal(b, &resp)
-				if err != nil {
-					return errors.Errorf("Error unmarshaling the event response. Error:%s", err.Error())
+		// If we get an error, ignore it.
+		var eventMsg *EventResponse
+		if eventMsg, err = processEvent(event); err == nil {
+			// Send downstream if the event has something useful
+			if eventMsg != nil {
+				// Try to unMarshal the event Data into Response format
+				if bytes.HasPrefix(eventMsg.Data, []byte("{")) {
+					var resp Response
+					err := json.Unmarshal(eventMsg.Data, &resp)
+					if err == nil {
+						eventMsg.ResponseData = &resp
+					}
 				}
-				ev.Data = resp
-				buf.Reset()
-				eventChan <- ev
-				ev = EventResponse{}
+				eventChan <- *eventMsg
 			}
-
-		default:
-			return errors.Errorf("Error: len:%d\n%s", len(line), line)
 		}
 	}
 }
 
-func hasPrefix(s []byte, prefix string) bool {
-	return bytes.HasPrefix(s, []byte(prefix))
+var (
+	headerID    = []byte("id:")
+	headerData  = []byte("data:")
+	headerEvent = []byte("event:")
+	headerRetry = []byte("retry:")
+)
+
+func processEvent(msg []byte) (event *EventResponse, err error) {
+	var e EventResponse
+
+	if len(msg) < 1 {
+		return nil, errors.New("event message was empty")
+	}
+
+	// Normalize the crlf to lf to make it easier to split the lines.
+	// Split the line by "\n" or "\r", per the spec.
+	for _, line := range bytes.FieldsFunc(msg, func(r rune) bool { return r == '\n' || r == '\r' }) {
+		switch {
+		case bytes.HasPrefix(line, headerID):
+			e.ID = append([]byte(nil), trimHeader(len(headerID), line)...)
+		case bytes.HasPrefix(line, headerData):
+			// The spec allows for multiple data fields per event, concatenated them with "\n".
+			e.Data = append(e.Data, append(trimHeader(len(headerData), line), byte('\n'))...)
+		// The spec says that a line that simply contains the string "data" should be treated as a data field with an empty body.
+		case bytes.Equal(line, bytes.TrimSuffix(headerData, []byte(":"))):
+			e.Data = append(e.Data, byte('\n'))
+		case bytes.HasPrefix(line, headerEvent):
+			e.Name = append([]byte(nil), trimHeader(len(headerEvent), line)...)
+		case bytes.HasPrefix(line, headerRetry):
+			e.Retry = append([]byte(nil), trimHeader(len(headerRetry), line)...)
+		default:
+			// Ignore any garbage that doesn't match what we're looking for.
+		}
+	}
+
+	// Trim the last "\n" per the spec.
+	e.Data = bytes.TrimSuffix(e.Data, []byte("\n"))
+
+	return &e, err
+}
+
+func trimHeader(size int, data []byte) []byte {
+	if data == nil || len(data) < size {
+		return data
+	}
+
+	data = data[size:]
+	// Remove optional leading whitespace
+	if len(data) > 0 && data[0] == 32 {
+		data = data[1:]
+	}
+	// Remove trailing new line
+	if len(data) > 0 && data[len(data)-1] == 10 {
+		data = data[:len(data)-1]
+	}
+	return data
 }

@@ -88,8 +88,10 @@ func subscribeAppLogs(contextName, appEntityId string) ([]string, error) {
 }
 
 func logEventHandler(eventResponse EventResponse) {
-    respData := eventResponse.Data
-    fmt.Println(respData)
+    rawData := eventResponse.Data
+    responseData := eventResponse.ResponseData
+    fmt.Println(rawData)
+    fmt.Println(responseData)
 }
 ```
 

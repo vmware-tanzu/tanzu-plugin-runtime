@@ -23,7 +23,7 @@ type Request struct {
 	Variables interface{} `json:"variables,omitempty"`
 	// The GraphQL operation name. The server typically doesn't
 	// require this unless there are multiple queries in the
-	// document, but genqlient sets it unconditionally anyway.
+	// document.
 	OpName string `json:"operationName"`
 }
 
@@ -44,9 +44,11 @@ type Response struct {
 
 // EventResponse represents a Server-Sent event response
 type EventResponse struct {
-	Name string
-	ID   string
-	Data Response
+	Name         []byte
+	ID           []byte
+	Data         []byte
+	ResponseData *Response
+	Retry        []byte
 }
 
 // EventResponseHandler represents a Subscription event handler function

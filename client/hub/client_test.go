@@ -6,7 +6,10 @@ package hub_test
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -29,21 +32,26 @@ import (
 
 // getProjects is a wrapper of an `QueryAllProjects“ API call to fetch project names
 // Note: This is only for the testing the MockServer with HubClient
-func getProjects(hc *hub.HubClient) ([]string, error) {
-	res, err := QueryAllProjects(context.Background(), hc.GraphQLClient)
+func getProjects(hc hub.Client) ([]string, error) {
+	req := &hub.Request{
+		OpName: "QueryAllProjects",
+		Query:  QueryAllProjects_Operation,
+	}
+	var responseData QueryAllProjectsResponse
+	err := hc.Request(context.Background(), req, &responseData)
 	if err != nil {
 		return nil, err
 	}
 
 	projects := []string{}
-	for _, p := range res.ApplicationEngineQuery.QueryProjects.Projects {
+	for _, p := range responseData.ApplicationEngineQuery.QueryProjects.Projects {
 		projects = append(projects, p.Name)
 	}
 
 	return projects, nil
 }
 
-func TestTanzuHubClient(t *testing.T) {
+func TestQueryWithTanzuHubClient(t *testing.T) {
 	// Start Mock GraphQL Server
 	mockServer := hubtesting.NewServer(t)
 	if mockServer == nil {
@@ -52,7 +60,7 @@ func TestTanzuHubClient(t *testing.T) {
 	defer mockServer.Close()
 
 	// Create the Hub Client using the above mock server
-	hc, err := hub.CreateHubClient("fake-context", hub.WithEndpoint(mockServer.URL), hub.WithAccessToken("fake-token"))
+	hc, err := hub.NewClient("fake-context", hub.WithEndpoint(mockServer.URL), hub.WithAccessToken("fake-token"))
 	if err != nil {
 		t.Fatalf("error while creating hub client. %s", err.Error())
 	}
@@ -132,4 +140,124 @@ func TestTanzuHubClient(t *testing.T) {
 			}
 		})
 	}
+}
+
+// The query or mutation executed by QueryAllProjects.
+const SubscriptionLogsOperation = `
+subscription SubscribeAppLogs {
+	appLogs {
+		value
+	}
+}
+`
+
+type Log struct {
+	Value string
+}
+
+type AppLogs struct {
+	AppLog Log `json:"appLogs"`
+}
+
+// subscribeAppLogs is a wrapper of an `SubscribeAppLogs API call to fetch logs
+// Note: This is only for the testing the MockServer with HubClient
+func subscribeAppLogs(hc hub.Client) string {
+	req := &hub.Request{
+		OpName: "SubscribeAppLogs",
+		Query:  SubscriptionLogsOperation,
+	}
+
+	logs := ""
+	logProcessor := func(eventResponse hub.EventResponse) {
+		resp := eventResponse.ResponseData
+		b, err := json.Marshal(resp)
+		if err != nil {
+			return
+		}
+
+		data := AppLogs{}
+		responseTyped := &hub.Response{Data: &data}
+		err = json.Unmarshal(b, responseTyped)
+		if err != nil {
+			return
+		}
+		logs += fmt.Sprintln(data.AppLog.Value)
+	}
+
+	// ctxSubscription, _ := context.WithCancel(context.Background())
+	ctxSubscription := context.Background()
+
+	_ = hc.Subscribe(ctxSubscription, req, logProcessor)
+	// TODO: Figure how errors should be handled
+	//  1. if server closes the connection this will always return error.
+	//  2. if client closes the connection by closing ctxSubscription context
+
+	return logs
+}
+
+func TestSubscriptionWithTanzuHubClient(t *testing.T) {
+	// Start Mock GraphQL Server
+	mockServer := hubtesting.NewServer(t)
+	if mockServer == nil {
+		t.Fatalf("error while starting a mock graphql server")
+	}
+	defer mockServer.Close()
+
+	// Create the Hub Client using the above mock server
+	hc, err := hub.NewClient("fake-context", hub.WithEndpoint(mockServer.URL), hub.WithAccessToken("fake-token"))
+	if err != nil {
+		t.Fatalf("error while creating hub client. %s", err.Error())
+	}
+
+	var tests = []struct {
+		name          string
+		mockResponses []hubtesting.Operation
+		expectedLogs  string
+	}{
+		{
+			name: "app logs",
+			mockResponses: []hubtesting.Operation{
+				{
+					Identifier:     "SubscribeAppLogs",
+					Response:       nil,
+					EventGenerator: mockAppLogGenerator,
+				},
+			},
+			expectedLogs: `log 0
+log 1
+log 2
+log 3
+log 4
+
+`,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Reset all the registered queries before running a new test
+			mockServer.Reset()
+
+			// Register all the mock responses for this test
+			mockServer.RegisterSubscription(tt.mockResponses...)
+
+			// Try to get projects using the hub client
+			logs := subscribeAppLogs(hc)
+
+			// Compare the results
+			assert.Equal(t, tt.expectedLogs, logs)
+		})
+	}
+}
+
+func mockAppLogGenerator(ctx context.Context, eventData chan<- hubtesting.Response) {
+	i := 0
+	for i < 5 {
+		time.Sleep(1 * time.Second)
+		eventData <- hubtesting.Response{
+			Data: AppLogs{AppLog: Log{Value: fmt.Sprintf("log %v", i)}},
+		}
+		i++
+	}
+	close(eventData)
 }

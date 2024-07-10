@@ -22,7 +22,7 @@ defer hubMockServer.Close()
 ```go
 import "github.com/vmware-tanzu/tanzu-plugin-runtime/client/hub"
 
-mockHubClient, err = hub.CreateHubClient(c.CurrentContext, hub.WithEndpoint(hubMockServer.URL), hub.WithAccessToken("fake-token"))
+mockHubClient, err = hub.NewClient(c.CurrentContext, hub.WithEndpoint(hubMockServer.URL), hub.WithAccessToken("fake-token"))
 ```
 
 1. To reuse a server across multiple unit tests, use `hubMockServer.Reset()` to clean up any previously registered queries, mutations, or errors.

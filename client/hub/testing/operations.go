@@ -18,18 +18,21 @@
 
 package testing
 
+import "context"
+
 // Operation Type Constants
 const (
 	opQuery = iota + 1
 	opMutation
+	opSubscription
 )
 
 // Operation is a general type that encompasses the Operation type and Response which
 // is of the same type, but with data.
 type Operation struct {
-	// opType denotes whether the operation is a query or a mutation, using the opQuery
-	// and opMutation constants. This is unexported as it is set by the *Server.RegisterQuery
-	// and *Server.RegisterMutation functions, respectively.
+	// opType denotes whether the operation is a query, a mutation or a subscription, using the opQuery,
+	// opMutation and opSubscription constants. This is unexported as it is set by the *Server.RegisterQuery,
+	// *Server.RegisterMutation and *Server.RegisterSubscription functions, respectively.
 	opType int
 
 	// Identifier helps identify the operation in a request when coming through the Server.
@@ -53,7 +56,13 @@ type Operation struct {
 
 	// Response represents the response that should be returned whenever the server makes
 	// a match on Operation.opType, Operation.Name, and Operation.Variables.
+	// Note: This is to be used for Query and Mutation operations only.
 	Response interface{}
+
+	// EventGenerator should generate mock events for Subscription operation type
+	// Note: This is only to be used for the Subscription where you will need to
+	// mock the generation of the events. This should not be used with Query or Mutation.
+	EventGenerator EventGenerator
 }
 
 // OperationError is a special type that brings together the properties that a
@@ -86,3 +95,8 @@ type OperationError struct {
 	// as part of the api error whenever the server makes a match on OperationError.Extensions
 	Extensions interface{}
 }
+
+// EventGenerator should implement a eventData generator for testing and
+// send mock event response to the `eventData` channel. To suggest end of
+// the event responses from server side, you can close the eventData channel
+type EventGenerator func(ctx context.Context, eventData chan<- Response)

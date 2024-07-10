@@ -35,8 +35,8 @@ type Client interface {
 	Subscribe(ctx context.Context, req *Request, handler EventResponseHandler) error
 }
 
-// HubClient client to talk to Tanzu Hub through GraphQL APIs
-type HubClient struct {
+// hubClient client to talk to Tanzu Hub through GraphQL APIs
+type hubClient struct {
 	// contextName is Tanzu CLI context name
 	contextName string
 
@@ -45,25 +45,25 @@ type HubClient struct {
 	httpClient       *http.Client
 }
 
-type ClientOptions func(o *HubClient)
+type ClientOptions func(o *hubClient)
 
 // WithAccessToken creates the Client using the specified Access Token
 func WithAccessToken(token string) ClientOptions {
-	return func(c *HubClient) {
+	return func(c *hubClient) {
 		c.accessToken = token
 	}
 }
 
 // WithEndpoint creates the Client using the specified Endpoint
 func WithEndpoint(endpoint string) ClientOptions {
-	return func(c *HubClient) {
+	return func(c *hubClient) {
 		c.tanzuHubEndpoint = endpoint
 	}
 }
 
 // WithHTTPClient creates the Client using the specified HttpClient
 func WithHTTPClient(httpClient *http.Client) ClientOptions {
-	return func(c *HubClient) {
+	return func(c *hubClient) {
 		c.httpClient = httpClient
 	}
 }
@@ -77,7 +77,7 @@ func WithHTTPClient(httpClient *http.Client) ClientOptions {
 // EXPERIMENTAL: Both the function's signature and implementation are subjected to change/removal
 // if an alternative means to provide equivalent functionality can be introduced.
 func NewClient(contextName string, opts ...ClientOptions) (Client, error) {
-	c := &HubClient{
+	c := &hubClient{
 		contextName: contextName,
 	}
 
@@ -93,7 +93,7 @@ func NewClient(contextName string, opts ...ClientOptions) (Client, error) {
 	return c, nil
 }
 
-func (c *HubClient) initializeClient(contextName string) error {
+func (c *hubClient) initializeClient(contextName string) error {
 	var err error
 
 	// Set accessToken if it is not already set

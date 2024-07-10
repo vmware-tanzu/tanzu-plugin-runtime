@@ -21,7 +21,7 @@ import (
 //	ctx context.Context: The context for the request. If provided, it will be used to cancel the request if the context is canceled.
 //	req *Request: The GraphQL request to be sent.
 //	responseData interface{}: The interface to store the response data. The response data will be unmarshaled into this interface.
-func (c *HubClient) Request(ctx context.Context, req *Request, responseData interface{}) error {
+func (c *hubClient) Request(ctx context.Context, req *Request, responseData interface{}) error {
 	resp := &Response{Data: responseData}
 
 	body, err := json.Marshal(req)
@@ -65,7 +65,7 @@ func (c *HubClient) Request(ctx context.Context, req *Request, responseData inte
 //	ctx context.Context: The context for the subscription. If provided, it will be used to cancel the subscription if the context is canceled.
 //	req *Request: The GraphQL subscription request to be sent.
 //	handler EventResponseHandler: The handler function to process incoming events.
-func (c *HubClient) Subscribe(ctx context.Context, req *Request, handler EventResponseHandler) error {
+func (c *hubClient) Subscribe(ctx context.Context, req *Request, handler EventResponseHandler) error {
 	body, err := json.Marshal(req)
 	if err != nil {
 		return err

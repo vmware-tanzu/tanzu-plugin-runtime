@@ -136,9 +136,9 @@ func waitForEvents(reader *sse.EventStreamReader, eventChan chan EventResponse) 
 			// Send downstream if the event has something useful
 			if eventMsg != nil {
 				// Try to unMarshal the event Data into Response format
-				if bytes.HasPrefix(eventMsg.Data, []byte("{")) {
+				if bytes.HasPrefix(eventMsg.RawData, []byte("{")) {
 					var resp Response
-					err := json.Unmarshal(eventMsg.Data, &resp)
+					err := json.Unmarshal(eventMsg.RawData, &resp)
 					if err == nil {
 						eventMsg.ResponseData = &resp
 					}
@@ -168,24 +168,24 @@ func processEvent(msg []byte) (event *EventResponse, err error) {
 	for _, line := range bytes.FieldsFunc(msg, func(r rune) bool { return r == '\n' || r == '\r' }) {
 		switch {
 		case bytes.HasPrefix(line, headerID):
-			e.ID = append([]byte(nil), trimHeader(len(headerID), line)...)
+			e.ID = string(trimHeader(len(headerID), line))
 		case bytes.HasPrefix(line, headerData):
 			// The spec allows for multiple data fields per event, concatenated them with "\n".
-			e.Data = append(e.Data, append(trimHeader(len(headerData), line), byte('\n'))...)
+			e.RawData = append(e.RawData, append(trimHeader(len(headerData), line), byte('\n'))...)
 		// The spec says that a line that simply contains the string "data" should be treated as a data field with an empty body.
 		case bytes.Equal(line, bytes.TrimSuffix(headerData, []byte(":"))):
-			e.Data = append(e.Data, byte('\n'))
+			e.RawData = append(e.RawData, byte('\n'))
 		case bytes.HasPrefix(line, headerEvent):
-			e.Name = append([]byte(nil), trimHeader(len(headerEvent), line)...)
+			e.Name = string(trimHeader(len(headerEvent), line))
 		case bytes.HasPrefix(line, headerRetry):
-			e.Retry = append([]byte(nil), trimHeader(len(headerRetry), line)...)
+			e.Retry = string(trimHeader(len(headerRetry), line))
 		default:
 			// Ignore any garbage that doesn't match what we're looking for.
 		}
 	}
 
 	// Trim the last "\n" per the spec.
-	e.Data = bytes.TrimSuffix(e.Data, []byte("\n"))
+	e.RawData = bytes.TrimSuffix(e.RawData, []byte("\n"))
 
 	return &e, err
 }

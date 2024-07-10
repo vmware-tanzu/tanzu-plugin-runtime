@@ -44,11 +44,16 @@ type Response struct {
 
 // EventResponse represents a Server-Sent event response
 type EventResponse struct {
-	Name         []byte
-	ID           []byte
-	Data         []byte
+	// Name contains the value of the "event:" header from the event stream.
+	Name string
+	// ID contains the value of the "id:" header from the event stream.
+	ID string
+	// RawData contains the concatenated payload from the "data:" headers received as part of the event stream.
+	RawData []byte
+	// ResponseData contains the parsed GraphQL response object if the RawData can be successfully parsed to Response object, otherwise it is nil.
 	ResponseData *Response
-	Retry        []byte
+	// Retry contains the value of the "retry:" header from the event stream.
+	Retry string
 }
 
 // EventResponseHandler represents a Subscription event handler function

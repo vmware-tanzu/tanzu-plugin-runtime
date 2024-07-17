@@ -31,6 +31,7 @@ require (
 require (
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/alexflint/go-arg v1.4.2 // indirect
+	github.com/alexflint/go-filemutex v1.3.0 // indirect
 	github.com/alexflint/go-scalar v1.0.0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.3 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect

@@ -10,8 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/juju/fslock"
-	"github.com/pkg/errors"
+	"github.com/alexflint/go-filemutex"
 )
 
 const (
@@ -22,9 +21,12 @@ const (
 
 var tanzuConfigLockFile string
 
+// testDefaultTimeout used for unit test only
+var testDefaultTimeout time.Duration
+
 // tanzuConfigLock used as a static lock variable that stores fslock
 // This is used for interprocess locking of the config file
-var tanzuConfigLock *fslock.Lock
+var tanzuConfigLock *filemutex.FileMutex
 
 // mutex is used to handle the locking behavior between concurrent calls
 // within the existing process trying to acquire the lock
@@ -43,7 +45,13 @@ func AcquireTanzuConfigLock() {
 	}
 
 	// using fslock to handle interprocess locking
-	lock, err := getFileLockWithTimeOut(tanzuConfigLockFile, DefaultLockTimeout)
+	var timeout time.Duration
+	timeout = DefaultLockTimeout
+	// To enable testing use testDefaultTimeout, if set use it else use the default
+	if testDefaultTimeout.Seconds() != 0 {
+		timeout = testDefaultTimeout
+	}
+	lock, err := getFileLockWithTimeOut(tanzuConfigLockFile, timeout)
 	if err != nil {
 		panic(fmt.Sprintf("cannot acquire lock for tanzu config file, reason: %v", err))
 	}
@@ -74,7 +82,7 @@ func ReleaseTanzuConfigLock() {
 }
 
 // getFileLockWithTimeOut returns a file lock with timeout
-func getFileLockWithTimeOut(lockPath string, lockDuration time.Duration) (*fslock.Lock, error) {
+func getFileLockWithTimeOut(lockPath string, lockDuration time.Duration) (*filemutex.FileMutex, error) {
 	dir := filepath.Dir(lockPath)
 
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
@@ -83,10 +91,28 @@ func getFileLockWithTimeOut(lockPath string, lockDuration time.Duration) (*fsloc
 		}
 	}
 
-	lock := fslock.New(lockPath)
-
-	if err := lock.LockWithTimeout(lockDuration); err != nil {
-		return nil, errors.Wrap(err, "failed to acquire a lock with timeout")
+	flock, err := filemutex.New(lockPath)
+	if err != nil {
+		return nil, err
 	}
-	return lock, nil
+
+	result := make(chan error)
+	cancel := make(chan struct{})
+	go func() {
+		err := flock.Lock()
+		select {
+		case <-cancel:
+			// Timed out, cleanup if necessary.
+			_ = flock.Unlock()
+		case result <- err:
+		}
+	}()
+
+	select {
+	case err := <-result:
+		return flock, err
+	case <-time.After(lockDuration):
+		close(cancel)
+		return flock, fmt.Errorf("timeout waiting for lock")
+	}
 }

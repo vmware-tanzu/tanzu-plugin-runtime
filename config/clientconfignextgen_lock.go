@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/juju/fslock"
+	"github.com/alexflint/go-filemutex"
 )
 
 const (
@@ -23,7 +23,7 @@ var cfgNextGenLockFile string
 
 // cfgNextGenLock used as a static lock variable that stores fslock
 // This is used for interprocess locking of the config file
-var cfgNextGenLock *fslock.Lock
+var cfgNextGenLock *filemutex.FileMutex
 
 // cfgNextGenMutex is used to handle the locking behavior between concurrent calls
 // within the existing process trying to acquire the lock

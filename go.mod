@@ -5,12 +5,12 @@ go 1.18
 require (
 	github.com/AlecAivazis/survey/v2 v2.3.6
 	github.com/Khan/genqlient v0.7.0
+	github.com/alexflint/go-filemutex v1.3.0
 	github.com/anujc25/tablewriter v0.0.1
 	github.com/briandowns/spinner v1.19.0
 	github.com/fatih/color v1.9.0
 	github.com/google/go-cmp v0.5.9
 	github.com/google/uuid v1.6.0
-	github.com/juju/fslock v0.0.0-20160525022230-4d5c94c67b4b
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/mattn/go-isatty v0.0.11
 	github.com/onsi/ginkgo/v2 v2.9.2
@@ -31,7 +31,6 @@ require (
 require (
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/alexflint/go-arg v1.4.2 // indirect
-	github.com/alexflint/go-filemutex v1.3.0 // indirect
 	github.com/alexflint/go-scalar v1.0.0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.3 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect

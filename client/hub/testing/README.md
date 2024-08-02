@@ -13,7 +13,7 @@ To mock a response for GraphQL queries, plugin authors can follow these simple s
 ```go
 import hubtesting "github.com/vmware-tanzu/tanzu-plugin-runtime/client/hub/testing"
 
-hubMockServer := hubtesting.NewServer(t, WithQuery(...))
+hubMockServer := hubtesting.NewServer(t, hubtesting.WithQuery(...))
 defer hubMockServer.Close()
 ```
 
@@ -27,7 +27,7 @@ mockHubClient, err = hub.NewClient(c.CurrentContext, hub.WithEndpoint(hubMockSer
 
 1. To reuse a server across multiple unit tests, use `hubMockServer.Reset()` to clean up any previously registered queries, mutations, or errors.
 
-1. To register mock queries or mutations, use the `hubMockServer.RegisterQuery` or `hubMockServer.RegisterMutation` APIs, which accept Operation objects.
+1. To register mock queries, mutations or subscriptions, use the `hubMockServer.RegisterQuery`, `hubMockServer.RegisterMutation` or `hubMockServer.RegisterSubscription` APIs, which accept Operation objects.
 
 ## Defining an `Operation` Object to Mock a Response
 
@@ -51,9 +51,9 @@ The following Operation type defines what values should be provided to the objec
 // Operation is a general type that encompasses the Operation type and Response which
 // is of the same type, but with data.
 type Operation struct {
-    // opType denotes whether the operation is a query or a mutation, using the opQuery
-    // and opMutation constants. This is unexported as it is set by the *Server.RegisterQuery
-    // and *Server.RegisterMutation functions, respectively.
+    // opType denotes whether the operation is a query, a mutation or a subscription, using the opQuery,
+    // opMutation and opSubscription constants. This is unexported as it is set by the *Server.RegisterQuery,
+    // *Server.RegisterMutation and *Server.RegisterSubscription functions, respectively.
     opType int
 
     // Identifier helps identify the operation in a request when coming through the Server.
@@ -62,11 +62,11 @@ type Operation struct {
     //   query {
     //     myOperation(foo: $foo) {
     //       fieldOne
-    //        fieldTwo
+    //       fieldTwo
     //     }
-    //  }
+    //   }
     //
-    // Then this field should be set to myOperation. It can also be more specific, a simple
+    // then this field should be set to myOperation. It can also be more specific, a simple
     // strings.Contains check occurs to match operations. A more specific example of a
     // valid Identifier for the same operation given above would be myOperation(foo: $foo).
     Identifier string
@@ -76,9 +76,16 @@ type Operation struct {
     Variables map[string]interface{}
 
     // Response represents the response that should be returned whenever the server makes
-    // a match on Operation.opType, Operation.Name, and Operation.Variables.
+    // a match on Operation.opType, Operation.Identifier, and Operation.Variables.
+    // Note: This is to be used for Query and Mutation operations only.
     Response interface{}
+
+    // EventGenerator should generate mock events for Subscription operation type
+    // Note: This is only to be used for the Subscription where you will need to
+    // mock the generation of the events. This should not be used with Query or Mutation.
+    EventGenerator EventGenerator
 }
+
 ```
 
 If you have already generated the Go stubs using make tanzu-hub-stub-generate, all the Go type definitions necessary for writing the sample response should be available to you. These definitions might look like this based on the defined schema:

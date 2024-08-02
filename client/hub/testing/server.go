@@ -164,14 +164,14 @@ func NewServer(t *testing.T, opts ...ServerOptions) *Server { //nolint:gocyclo
 							if err != nil {
 								fmt.Println(err)
 								s.respond(w, http.StatusInternalServerError, err.Error())
-								break
+								return
 							}
 
 							_, err = fmt.Fprint(w, event)
 							if err != nil {
 								fmt.Println(err)
 								s.respond(w, http.StatusInternalServerError, err.Error())
-								break
+								return
 							}
 
 							flusher.Flush()

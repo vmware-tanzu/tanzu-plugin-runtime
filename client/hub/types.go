@@ -24,7 +24,7 @@ type Request struct {
 	// The GraphQL operation name. The server typically doesn't
 	// require this unless there are multiple queries in the
 	// document.
-	OpName string `json:"operationName"`
+	OpName string `json:"operationName,omitempty"`
 }
 
 // Response that contains data returned by the GraphQL API.

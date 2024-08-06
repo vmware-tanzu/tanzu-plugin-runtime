@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/vektah/gqlparser/v2/gqlerror"
 
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/client/hub"
 	hubtesting "github.com/vmware-tanzu/tanzu-plugin-runtime/client/hub/testing"
@@ -76,10 +77,12 @@ func TestQueryWithTanzuHubClient(t *testing.T) {
 			mockResponses: []hubtesting.Operation{
 				{
 					Identifier: "QueryAllProjects",
-					Response: QueryAllProjectsResponse{
-						ApplicationEngineQuery: QueryAllProjectsApplicationEngineQuery{
-							QueryProjects: QueryAllProjectsApplicationEngineQueryQueryProjectsKubernetesKindProjectConnection{
-								Projects: []QueryAllProjectsApplicationEngineQueryQueryProjectsKubernetesKindProjectConnectionProjectsKubernetesKindProject{},
+					Response: hub.Response{
+						Data: QueryAllProjectsResponse{
+							ApplicationEngineQuery: QueryAllProjectsApplicationEngineQuery{
+								QueryProjects: QueryAllProjectsApplicationEngineQueryQueryProjectsKubernetesKindProjectConnection{
+									Projects: []QueryAllProjectsApplicationEngineQueryQueryProjectsKubernetesKindProjectConnectionProjectsKubernetesKindProject{},
+								},
 							},
 						},
 					},
@@ -92,18 +95,20 @@ func TestQueryWithTanzuHubClient(t *testing.T) {
 			mockResponses: []hubtesting.Operation{
 				{
 					Identifier: "QueryAllProjects",
-					Response: QueryAllProjectsResponse{
-						ApplicationEngineQuery: QueryAllProjectsApplicationEngineQuery{
-							QueryProjects: QueryAllProjectsApplicationEngineQueryQueryProjectsKubernetesKindProjectConnection{
-								Projects: []QueryAllProjectsApplicationEngineQueryQueryProjectsKubernetesKindProjectConnectionProjectsKubernetesKindProject{
-									{
-										Name: "project1",
-									},
-									{
-										Name: "project2",
-									},
-									{
-										Name: "project3",
+					Response: hub.Response{
+						Data: QueryAllProjectsResponse{
+							ApplicationEngineQuery: QueryAllProjectsApplicationEngineQuery{
+								QueryProjects: QueryAllProjectsApplicationEngineQueryQueryProjectsKubernetesKindProjectConnection{
+									Projects: []QueryAllProjectsApplicationEngineQueryQueryProjectsKubernetesKindProjectConnectionProjectsKubernetesKindProject{
+										{
+											Name: "project1",
+										},
+										{
+											Name: "project2",
+										},
+										{
+											Name: "project3",
+										},
 									},
 								},
 							},
@@ -112,6 +117,32 @@ func TestQueryWithTanzuHubClient(t *testing.T) {
 				},
 			},
 			expectedOutput: []string{"project1", "project2", "project3"},
+		},
+		{
+			name: "when query returns error response",
+			mockResponses: []hubtesting.Operation{
+				{
+					Identifier: "QueryAllProjects",
+					Response: hub.Response{
+						Errors: gqlerror.List{{Message: "fake-error-message"}},
+					},
+				},
+			},
+			expectedErrString: "fake-error-message",
+		},
+		{
+			name: "when query returns error response - use responder implementation",
+			mockResponses: []hubtesting.Operation{
+				{
+					Identifier: "QueryAllProjects",
+					Responder: func(ctx context.Context, op hubtesting.Operation) hub.Response {
+						return hub.Response{
+							Errors: gqlerror.List{{Message: fmt.Sprintf("operation %s failed with error %s", op.Identifier, "fake-error-message")}},
+						}
+					},
+				},
+			},
+			expectedErrString: "operation QueryAllProjects failed with error fake-error-message",
 		},
 		{
 			name:              "when the query is not registered with the server or incorrect query is used",
@@ -219,7 +250,6 @@ func TestSubscriptionWithTanzuHubClient(t *testing.T) {
 			mockResponses: []hubtesting.Operation{
 				{
 					Identifier:     "SubscribeAppLogs",
-					Response:       nil,
 					EventGenerator: mockAppLogGenerator,
 				},
 			},
@@ -250,7 +280,7 @@ log 4
 	}
 }
 
-func mockAppLogGenerator(ctx context.Context, eventData chan<- hubtesting.Response) {
+func mockAppLogGenerator(ctx context.Context, _ hubtesting.Operation, eventData chan<- hubtesting.Response) {
 	i := 0
 	for i < 5 {
 		time.Sleep(1 * time.Second)

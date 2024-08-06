@@ -45,7 +45,7 @@ type Operation struct {
 	//		}
 	//	}
 	//
-	// Then this field should be set to myOperation. It can also be more specific, a simple
+	// then this field should be set to myOperation. It can also be more specific, a simple
 	// strings.Contains check occurs to match operations. A more specific example of a
 	// valid Identifier for the same operation given above would be myOperation(foo: $foo).
 	Identifier string
@@ -55,7 +55,7 @@ type Operation struct {
 	Variables map[string]interface{}
 
 	// Response represents the response that should be returned whenever the server makes
-	// a match on Operation.opType, Operation.Name, and Operation.Variables.
+	// a match on Operation.opType, Operation.Identifier, and Operation.Variables.
 	// Note: This is to be used for Query and Mutation operations only.
 	Response interface{}
 

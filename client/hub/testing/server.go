@@ -31,6 +31,9 @@ import (
 	"testing"
 
 	"github.com/pkg/errors"
+	"github.com/vektah/gqlparser/v2/gqlerror"
+
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/client/hub"
 )
 
 type Server struct {
@@ -126,20 +129,28 @@ func NewServer(t *testing.T, opts ...ServerOptions) *Server { //nolint:gocyclo
 		}
 
 		switch {
-		case strings.HasPrefix(strings.TrimSpace(reqBody.Query), "mutation"):
+		case strings.HasPrefix(strings.TrimSpace(reqBody.Query), "mutation"): //nolint:dupl
 			for i := range s.mutations {
 				if strings.Contains(reqBody.Query, s.mutations[i].Identifier) {
 					if s.equalVariables(s.mutations[i].Variables, reqBody.Variables) {
-						s.respond(w, http.StatusOK, s.mutations[i].Response)
+						if s.mutations[i].Responder != nil {
+							s.respond(w, http.StatusOK, s.mutations[i].Responder(r.Context(), s.mutations[i]))
+						} else {
+							s.respond(w, http.StatusOK, s.mutations[i].Response)
+						}
 						return
 					}
 				}
 			}
-		case strings.HasPrefix(strings.TrimSpace(reqBody.Query), "query"):
+		case strings.HasPrefix(strings.TrimSpace(reqBody.Query), "query"): //nolint:dupl
 			for i := range s.queries {
 				if strings.Contains(reqBody.Query, s.queries[i].Identifier) {
 					if s.equalVariables(s.queries[i].Variables, reqBody.Variables) {
-						s.respond(w, http.StatusOK, s.queries[i].Response)
+						if s.queries[i].Responder != nil {
+							s.respond(w, http.StatusOK, s.queries[i].Responder(r.Context(), s.queries[i]))
+						} else {
+							s.respond(w, http.StatusOK, s.queries[i].Response)
+						}
 						return
 					}
 				}
@@ -157,20 +168,21 @@ func NewServer(t *testing.T, opts ...ServerOptions) *Server { //nolint:gocyclo
 						w.Header().Set("Content-Type", "text/event-stream")
 
 						respChan := make(chan Response)
-						go s.subscriptions[i].EventGenerator(r.Context(), respChan)
+
+						go s.subscriptions[i].EventGenerator(r.Context(), s.subscriptions[i], respChan)
 
 						for eventResp := range respChan {
 							event, err := formatServerSentEvent("update", eventResp)
 							if err != nil {
 								fmt.Println(err)
-								s.respond(w, http.StatusInternalServerError, err.Error())
+								s.respond(w, http.StatusInternalServerError, hub.Response{Errors: gqlerror.List{{Message: err.Error()}}})
 								return
 							}
 
 							_, err = fmt.Fprint(w, event)
 							if err != nil {
 								fmt.Println(err)
-								s.respond(w, http.StatusInternalServerError, err.Error())
+								s.respond(w, http.StatusInternalServerError, hub.Response{Errors: gqlerror.List{{Message: err.Error()}}})
 								return
 							}
 
@@ -330,13 +342,8 @@ func (s *Server) respondError(w http.ResponseWriter, status int, err error, exte
 	}
 }
 
-func (s *Server) respond(w http.ResponseWriter, status int, data interface{}) {
+func (s *Server) respond(w http.ResponseWriter, status int, res hub.Response) {
 	s.t.Helper()
-
-	res := Response{
-		Data:   data,
-		Errors: nil,
-	}
 
 	w.WriteHeader(status)
 	if err := json.NewEncoder(w).Encode(res); err != nil {

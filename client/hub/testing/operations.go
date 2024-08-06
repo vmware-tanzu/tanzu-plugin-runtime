@@ -18,7 +18,11 @@
 
 package testing
 
-import "context"
+import (
+	"context"
+
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/client/hub"
+)
 
 // Operation Type Constants
 const (
@@ -56,10 +60,23 @@ type Operation struct {
 
 	// Response represents the response that should be returned whenever the server makes
 	// a match on Operation.opType, Operation.Identifier, and Operation.Variables.
-	// Note: This is to be used for Query and Mutation operations only.
-	Response interface{}
+	// Response is to be used for Query and Mutation operations only.
+	// Note: User can define either `Response` or implement `Responder` function but should
+	// not be defining both.
+	Response hub.Response
 
-	// EventGenerator should generate mock events for Subscription operation type
+	// Responder implements the function that based on some operation parameters should respond
+	// differently.
+	// Tests that do not need flexibility in returning different responses based on the Operation
+	// should just configure the `Response` field instead.
+	// Responder is to be used for Query and Mutation operations only.
+	// Note: User can define either `Response` or implement `Responder` function but should
+	// not be defining both.
+	Responder Responder
+
+	// EventGenerator should implement a eventData generator for testing and
+	// send mock event response to the `eventData` channel. To suggest end of
+	// the event responses from server side, you can close the eventData channel
 	// Note: This is only to be used for the Subscription where you will need to
 	// mock the generation of the events. This should not be used with Query or Mutation.
 	EventGenerator EventGenerator
@@ -96,7 +113,12 @@ type OperationError struct {
 	Extensions interface{}
 }
 
+// Responder implements the function that based on some operation parameters should respond
+// differently. This type of Responder implementation is more useful when you want
+// to implement a generic function that returns data based on the operation
+type Responder func(ctx context.Context, op Operation) hub.Response
+
 // EventGenerator should implement a eventData generator for testing and
 // send mock event response to the `eventData` channel. To suggest end of
 // the event responses from server side, you can close the eventData channel
-type EventGenerator func(ctx context.Context, eventData chan<- Response)
+type EventGenerator func(ctx context.Context, op Operation, eventData chan<- Response)

@@ -69,7 +69,7 @@ func ReleaseTanzuConfigLock() {
 	if tanzuConfigLock == nil {
 		return
 	}
-	if errUnlock := tanzuConfigLock.Unlock(); errUnlock != nil {
+	if errUnlock := tanzuConfigLock.Close(); errUnlock != nil {
 		panic(fmt.Sprintf("cannot release lock for tanzu config file, reason: %v", errUnlock))
 	}
 
@@ -103,7 +103,7 @@ func getFileLockWithTimeOut(lockPath string, lockDuration time.Duration) (*filem
 		select {
 		case <-cancel:
 			// Timed out, cleanup if necessary.
-			_ = flock.Unlock()
+			_ = flock.Close()
 		case result <- err:
 		}
 	}()

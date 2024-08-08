@@ -57,7 +57,7 @@ func ReleaseTanzuConfigNextGenLock() {
 	if cfgNextGenLock == nil {
 		return
 	}
-	if errUnlock := cfgNextGenLock.Unlock(); errUnlock != nil {
+	if errUnlock := cfgNextGenLock.Close(); errUnlock != nil {
 		panic(fmt.Sprintf("cannot release lock for tanzu config file, reason: %v", errUnlock))
 	}
 

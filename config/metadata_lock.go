@@ -57,7 +57,7 @@ func ReleaseTanzuMetadataLock() {
 	if tanzuMetadataLock == nil {
 		return
 	}
-	if errUnlock := tanzuMetadataLock.Unlock(); errUnlock != nil {
+	if errUnlock := tanzuMetadataLock.Close(); errUnlock != nil {
 		panic(fmt.Sprintf("cannot release lock for tanzu config metadata file, reason: %v", errUnlock))
 	}
 

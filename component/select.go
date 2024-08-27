@@ -31,19 +31,29 @@ type SelectConfig struct {
 }
 
 // Run the selection.
-func (p *SelectConfig) Run(response interface{}) error {
-	return Select(p, response)
+func (p *SelectConfig) Run(response interface{}, opts ...PromptOpt) error {
+	return Select(p, response, opts...)
 }
 
 // Select an option.
-func Select(p *SelectConfig, response interface{}) error {
+func Select(p *SelectConfig, response interface{}, opts ...PromptOpt) error {
 	if response == nil {
 		return errors.New("no response reference provided to record answers")
 	}
 	needMultipleSelect := isPointerToSlice(response)
 
 	prompt := buildSelect(p, needMultipleSelect)
-	return survey.AskOne(prompt, response)
+	options := defaultPromptOptions()
+	for _, opt := range opts {
+		err := opt(options)
+		if err != nil {
+			return err
+		}
+	}
+
+	surveyOpts := translatePromptOpts(options)
+
+	return survey.AskOne(prompt, response, surveyOpts...)
 }
 
 func buildSelect(p *SelectConfig, enableMultiSelect bool) survey.Prompt {

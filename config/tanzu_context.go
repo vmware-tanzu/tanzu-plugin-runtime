@@ -30,6 +30,8 @@ const (
 
 	TanzuMissionControlEndpointKey = "tanzuMissionControlEndpoint"
 	TanzuHubEndpointKey            = "tanzuHubEndpoint"
+	TanzuAuthEndpointKey           = "tanzuAuthEndpoint"
+	TanzuIdpTypeKey                = "tanzuIdpType"
 )
 
 const (
@@ -54,6 +56,16 @@ type ResourceInfo struct {
 	// ClusterGroupName name of the ClusterGroup
 	ClusterGroupName string
 }
+
+type IdpType string
+
+const (
+	// UAAIdpType indicates that IDP is UAA (User Account and Authentication)
+	UAAIdpType IdpType = "uaa"
+
+	// CSPIdpType indicsates the IDP is CSP (Cloud Service Provider)
+	CSPIdpType IdpType = "csp"
+)
 
 // cmdOptions specifies the command options
 type cmdOptions struct {

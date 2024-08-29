@@ -5,6 +5,7 @@ package config
 
 import (
 	"fmt"
+	"net/url"
 
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v3"
@@ -30,6 +31,11 @@ func GetCert(host string) (*configtypes.Cert, error) {
 	if host == "" {
 		return nil, errors.New("host is empty")
 	}
+	u, err := url.Parse(host)
+	if err == nil && u.Hostname() != "" {
+		host = u.Hostname()
+	}
+
 	// Retrieve client config node
 	node, err := getClientConfigNode()
 	if err != nil {

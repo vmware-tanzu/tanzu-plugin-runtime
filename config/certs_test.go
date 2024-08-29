@@ -43,6 +43,14 @@ func TestSetGetDeleteCerts(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, cert1, ctx)
 
+	ctx, err = GetCert("https://test1")
+	assert.Nil(t, err)
+	assert.Equal(t, cert1, ctx)
+
+	ctx, err = GetCert("https://test1/fake")
+	assert.Nil(t, err)
+	assert.Equal(t, cert1, ctx)
+
 	err = SetCert(cert2)
 	assert.NoError(t, err)
 

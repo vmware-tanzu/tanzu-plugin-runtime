@@ -6,8 +6,11 @@ package hub
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/pkg/errors"
 
@@ -112,12 +115,15 @@ func (c *hubClient) initializeClient(contextName string) error {
 		}
 	}
 
+	transport := http.DefaultTransport.(*http.Transport)
+	transport.TLSClientConfig = c.getTLSConfig()
+
 	// Set httpClient if it is not already set
 	if c.httpClient == nil {
 		c.httpClient = &http.Client{
 			Transport: &authTransport{
 				accessToken: c.accessToken,
-				wrapped:     http.DefaultTransport,
+				wrapped:     transport,
 			},
 			Timeout: 0,
 		}
@@ -145,10 +151,40 @@ func getTanzuHubEndpointFromContext(contextName string) (string, error) {
 	return tanzuHubEndpoint.(string), nil
 }
 
+func (c *hubClient) getTLSConfig() *tls.Config {
+	// If the certificate information is found for the hub endpoint
+	// then configure TLSConfig and return it
+	certData, err := config.GetCert(c.tanzuHubEndpoint)
+	if err != nil || certData == nil {
+		return nil
+	}
+
+	// If CACertData is present use it
+	if certData.CACertData != "" {
+		var pool *x509.CertPool
+		var err error
+		pool, err = x509.SystemCertPool()
+		if err != nil || pool == nil {
+			pool = x509.NewCertPool()
+		}
+		pool.AppendCertsFromPEM([]byte(certData.CACertData))
+		return &tls.Config{RootCAs: pool, MinVersion: tls.VersionTLS12}
+	}
+
+	skipCertVerify, _ := strconv.ParseBool(certData.SkipCertVerify)
+	if skipCertVerify {
+		//nolint:gosec
+		// skipTLSVerify: true is only possible if the user has explicitly enabled it
+		return &tls.Config{InsecureSkipVerify: skipCertVerify, MinVersion: tls.VersionTLS12}
+	}
+
+	return nil
+}
+
 // Configure the auth Transport to include authorization token when invoking GraphQL requests
 type authTransport struct {
 	accessToken string
-	wrapped     http.RoundTripper
+	wrapped     *http.Transport
 }
 
 // Sets authentication bearer token to each http request

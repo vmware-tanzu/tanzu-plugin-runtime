@@ -32,31 +32,47 @@ func TestSetGetDeleteCerts(t *testing.T) {
 		Insecure:       "false",
 	}
 
-	ctx, err := GetCert("test1")
+	cert, err := GetCert("test1")
 	assert.Equal(t, "cert configuration for test1 not found", err.Error())
-	assert.Nil(t, ctx)
+	assert.Nil(t, cert)
 
 	err = SetCert(cert1)
 	assert.NoError(t, err)
 
-	ctx, err = GetCert("test1")
+	cert, err = GetCert("test1")
 	assert.Nil(t, err)
-	assert.Equal(t, cert1, ctx)
+	assert.Equal(t, cert1, cert)
 
-	ctx, err = GetCert("https://test1")
+	cert, err = GetCert("https://test1")
 	assert.Nil(t, err)
-	assert.Equal(t, cert1, ctx)
+	assert.Equal(t, cert1, cert)
 
-	ctx, err = GetCert("https://test1/fake")
+	cert, err = GetCert("https://test1/fake")
 	assert.Nil(t, err)
-	assert.Equal(t, cert1, ctx)
+	assert.Equal(t, cert1, cert)
+
+	cert, err = GetCert("https://test1:1234/fake")
+	assert.Nil(t, err)
+	assert.Equal(t, cert1, cert)
+
+	cert, err = GetCert("ws://test1/fake")
+	assert.Nil(t, err)
+	assert.Equal(t, cert1, cert)
+
+	cert, err = GetCert("wss://test1/fake")
+	assert.Nil(t, err)
+	assert.Equal(t, cert1, cert)
 
 	err = SetCert(cert2)
 	assert.NoError(t, err)
 
-	ctx, err = GetCert("test2")
+	cert, err = GetCert("test2")
 	assert.Nil(t, err)
-	assert.Equal(t, cert2, ctx)
+	assert.Equal(t, cert2, cert)
+
+	cert, err = GetCert("https://tes t1/fak e")
+	assert.Nil(t, cert)
+	assert.Equal(t, "parse \"https://tes t1/fak e\": invalid character \" \" in host name", err.Error())
 
 	_, err = GetCert("")
 	assert.Equal(t, "host is empty", err.Error())
@@ -70,8 +86,8 @@ func TestSetGetDeleteCerts(t *testing.T) {
 	err = DeleteCert("test1")
 	assert.Nil(t, err)
 
-	ctx, err = GetCert("test1")
-	assert.Nil(t, ctx)
+	cert, err = GetCert("test1")
+	assert.Nil(t, cert)
 	assert.Equal(t, "cert configuration for test1 not found", err.Error())
 }
 

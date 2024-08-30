@@ -26,13 +26,16 @@ func GetCerts() ([]*configtypes.Cert, error) {
 	return getCerts(node)
 }
 
-// GetCert retrieves the cert configuration by host
+// GetCert retrieves the cert configuration by host or URI
 func GetCert(host string) (*configtypes.Cert, error) {
 	if host == "" {
 		return nil, errors.New("host is empty")
 	}
 	u, err := url.Parse(host)
-	if err == nil && u.Hostname() != "" {
+	if err != nil {
+		return nil, err
+	}
+	if u.Hostname() != "" {
 		host = u.Hostname()
 	}
 
@@ -96,7 +99,7 @@ func DeleteCert(host string) error {
 	return persistConfig(node)
 }
 
-// CertExists checks if cert config by host already exists
+// CertExists checks if cert config by host or URI already exists
 func CertExists(host string) (bool, error) {
 	if host == "" {
 		return false, errors.New("host is empty")

@@ -89,6 +89,13 @@ func GetEnvConfigurations() map[string]string
 func GetEdition() (string, error)
 func SetEdition(val string) (err error)
 
+// Cert APIs
+func GetCert(host string) (*configtypes.Cert, error)
+func GetCerts() ([]*configtypes.Cert, error)
+func SetCert(c *configtypes.Cert) error
+func DeleteCert(host string) error
+func CertExists(host string) (bool, error)
+
 // Telemetry APIs
 func GetCEIPOptIn() (string, error)
 func SetCEIPOptIn(val string) (err error)

@@ -117,7 +117,7 @@ func (c *hubClient) initializeClient(contextName string) error {
 		}
 	}
 
-	transport := http.DefaultTransport.(*http.Transport)
+	transport := http.DefaultTransport.(*http.Transport).Clone()
 	transport.TLSClientConfig = c.getTLSConfig()
 
 	// Set httpClient if it is not already set

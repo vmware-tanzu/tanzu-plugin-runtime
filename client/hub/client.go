@@ -8,6 +8,7 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/base64"
 	"net/http"
 	"os"
 	"strconv"
@@ -15,6 +16,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/config"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/log"
 )
 
 const (
@@ -162,12 +164,22 @@ func (c *hubClient) getTLSConfig() *tls.Config {
 	// If CACertData is present use it
 	if certData.CACertData != "" {
 		var pool *x509.CertPool
-		var err error
+
+		decodedCACertData, err := base64.StdEncoding.DecodeString(certData.CACertData)
+		if err != nil {
+			log.Infof("unable to use custom cert for '%s' endpoint. Error: %s", c.tanzuHubEndpoint, err.Error())
+			return nil
+		}
+
 		pool, err = x509.SystemCertPool()
 		if err != nil || pool == nil {
 			pool = x509.NewCertPool()
 		}
-		pool.AppendCertsFromPEM([]byte(certData.CACertData))
+
+		if ok := pool.AppendCertsFromPEM(decodedCACertData); !ok {
+			log.Infof("unable to use custom cert for %s endpoint", c.tanzuHubEndpoint)
+			return nil
+		}
 		return &tls.Config{RootCAs: pool, MinVersion: tls.VersionTLS12}
 	}
 

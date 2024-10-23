@@ -31,12 +31,21 @@ import (
 //     }
 //   }
 
+// A set of variables that are sent with the query.
+// This allows us to test that the mock server returns these
+// variables in the response.
+var defaultVariables = map[string]interface{}{
+	"name":  "john",
+	"lines": 100,
+}
+
 // getProjects is a wrapper of an `QueryAllProjects“ API call to fetch project names
 // Note: This is only for the testing the MockServer with HubClient
 func getProjects(hc hub.Client) ([]string, error) {
 	req := &hub.Request{
-		OpName: "QueryAllProjects",
-		Query:  QueryAllProjects_Operation,
+		OpName:    "QueryAllProjects",
+		Query:     QueryAllProjects_Operation,
+		Variables: defaultVariables,
 	}
 	var responseData QueryAllProjectsResponse
 	err := hc.Request(context.Background(), req, &responseData)
@@ -77,6 +86,7 @@ func TestQueryWithTanzuHubClient(t *testing.T) {
 			mockResponses: []hubtesting.Operation{
 				{
 					Identifier: "QueryAllProjects",
+					Variables:  defaultVariables,
 					Response: hub.Response{
 						Data: QueryAllProjectsResponse{
 							ApplicationEngineQuery: QueryAllProjectsApplicationEngineQuery{
@@ -95,6 +105,7 @@ func TestQueryWithTanzuHubClient(t *testing.T) {
 			mockResponses: []hubtesting.Operation{
 				{
 					Identifier: "QueryAllProjects",
+					Variables:  defaultVariables,
 					Response: hub.Response{
 						Data: QueryAllProjectsResponse{
 							ApplicationEngineQuery: QueryAllProjectsApplicationEngineQuery{
@@ -119,10 +130,62 @@ func TestQueryWithTanzuHubClient(t *testing.T) {
 			expectedOutput: []string{"project1", "project2", "project3"},
 		},
 		{
+			name: "when projects found and query returns response - use responder implementation",
+			mockResponses: []hubtesting.Operation{
+				{
+					Identifier: "QueryAllProjects",
+					// Change the value of the default variables
+					// to make sure the mock server returns the variables that were
+					// received in the query and NOT the ones that are registered here.
+					// Note that the variable keys must match the ones in the query, but
+					// the values can be different.
+					Variables: map[string]interface{}{
+						"name":  "notjohn",
+						"lines": 0,
+					},
+					Responder: func(_ context.Context, receivedReq hubtesting.Request) hub.Response {
+						return hub.Response{
+							Data: QueryAllProjectsResponse{
+								ApplicationEngineQuery: QueryAllProjectsApplicationEngineQuery{
+									QueryProjects: QueryAllProjectsApplicationEngineQueryQueryProjectsKubernetesKindProjectConnection{
+										Projects: []QueryAllProjectsApplicationEngineQueryQueryProjectsKubernetesKindProjectConnectionProjectsKubernetesKindProject{
+											{
+												Name: "project1",
+											},
+											{
+												Name: "project2",
+											},
+											{
+												// Check that the mock server returns the received query to the Responder
+												// by putting the received query as a project name.
+												Name: fmt.Sprintf("%v", receivedReq),
+											},
+										},
+									},
+								},
+							},
+						}
+					},
+				},
+			},
+			expectedOutput: []string{"project1", "project2", `{
+query QueryAllProjects {
+	applicationEngineQuery {
+		queryProjects(first: 1000) {
+			projects {
+				name
+			}
+		}
+	}
+}
+ map[lines:100 name:john]}`},
+		},
+		{
 			name: "when query returns error response",
 			mockResponses: []hubtesting.Operation{
 				{
 					Identifier: "QueryAllProjects",
+					Variables:  defaultVariables,
 					Response: hub.Response{
 						Errors: gqlerror.List{{Message: "fake-error-message"}},
 					},
@@ -135,20 +198,79 @@ func TestQueryWithTanzuHubClient(t *testing.T) {
 			mockResponses: []hubtesting.Operation{
 				{
 					Identifier: "QueryAllProjects",
-					Responder: func(ctx context.Context, op hubtesting.Operation) hub.Response {
+					// Change the value of the default variables
+					// to make sure the mock server returns the variables that were
+					// received in the query and NOT the ones that are registered here.
+					// Note that the variable keys must match the ones in the query, but
+					// the values can be different.
+					Variables: map[string]interface{}{
+						"name":  "notjohn",
+						"lines": 0,
+					},
+					Responder: func(_ context.Context, receivedReq hubtesting.Request) hub.Response {
 						return hub.Response{
-							Errors: gqlerror.List{{Message: fmt.Sprintf("operation %s failed with error %s", op.Identifier, "fake-error-message")}},
+							Errors: gqlerror.List{{Message: fmt.Sprintf("operation failed with error and received %v", receivedReq)}},
 						}
 					},
 				},
 			},
-			expectedErrString: "operation QueryAllProjects failed with error fake-error-message",
+			expectedErrString: `operation failed with error and received {
+query QueryAllProjects {
+	applicationEngineQuery {
+		queryProjects(first: 1000) {
+			projects {
+				name
+			}
+		}
+	}
+}
+ map[lines:100 name:john]}
+`,
 		},
 		{
 			name:              "when the query is not registered with the server or incorrect query is used",
 			mockResponses:     []hubtesting.Operation{},
 			expectedOutput:    []string{},
 			expectedErrString: "operation not found",
+		},
+		{
+			name: "when the query is registered but has variables that use different keys",
+			mockResponses: []hubtesting.Operation{
+				{
+					Identifier: "QueryAllProjects",
+					Variables: map[string]interface{}{
+						"differentkey": "anothervalue",
+						"name":         "john",
+						"lines":        100,
+					},
+					Response: hub.Response{
+						Errors: gqlerror.List{{Message: "fake-error-message"}},
+					},
+				},
+			},
+			expectedOutput: []string{},
+			// The error should not be the error returned by the registered query
+			// because we are testing that the registered query does not match
+			// because it uses different variable keys that the real query.
+			expectedErrString: "operation not found",
+		},
+		{
+			name: "when the query is registered but has variables that use different values",
+			mockResponses: []hubtesting.Operation{
+				{
+					Identifier: "QueryAllProjects",
+					// Change the value of the default variables but use the same keys
+					// This should still match the registered query and return the error
+					Variables: map[string]interface{}{
+						"name":  "notjohn",
+						"lines": 0,
+					},
+					Response: hub.Response{
+						Errors: gqlerror.List{{Message: "fake-error-message"}},
+					},
+				},
+			},
+			expectedErrString: "fake-error-message",
 		},
 	}
 
@@ -280,7 +402,7 @@ log 4
 	}
 }
 
-func mockAppLogGenerator(ctx context.Context, _ hubtesting.Operation, eventData chan<- hubtesting.Response) {
+func mockAppLogGenerator(_ context.Context, _ hubtesting.Request, eventData chan<- hubtesting.Response) {
 	i := 0
 	for i < 5 {
 		time.Sleep(1 * time.Second)

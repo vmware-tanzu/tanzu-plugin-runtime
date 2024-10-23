@@ -59,7 +59,7 @@ type Operation struct {
 	Variables map[string]interface{}
 
 	// Response represents the response that should be returned whenever the server makes
-	// a match on Operation.opType, Operation.Identifier, and Operation.Variables.
+	// a match on Operation.opType, Operation.Identifier, and Operation.Variables keys.
 	// Response is to be used for Query and Mutation operations only.
 	// Note: User can define either `Response` or implement `Responder` function but should
 	// not be defining both.
@@ -67,15 +67,15 @@ type Operation struct {
 
 	// Responder implements the function that based on some operation parameters should respond
 	// differently.
-	// Tests that do not need flexibility in returning different responses based on the Operation
-	// should just configure the `Response` field instead.
+	// Tests that do not need flexibility in returning different responses based on the received
+	// request should just configure the `Response` field instead.
 	// Responder is to be used for Query and Mutation operations only.
 	// Note: User can define either `Response` or implement `Responder` function but should
 	// not be defining both.
 	Responder Responder
 
 	// EventGenerator should implement a eventData generator for testing and
-	// send mock event response to the `eventData` channel. To suggest end of
+	// send mock event response to the `eventData` channel. To suggest the end of
 	// the event responses from server side, you can close the eventData channel
 	// Note: This is only to be used for the Subscription where you will need to
 	// mock the generation of the events. This should not be used with Query or Mutation.
@@ -115,10 +115,10 @@ type OperationError struct {
 
 // Responder implements the function that based on some operation parameters should respond
 // differently. This type of Responder implementation is more useful when you want
-// to implement a generic function that returns data based on the operation
-type Responder func(ctx context.Context, op Operation) hub.Response
+// to implement a generic function that returns data based on the received Request
+type Responder func(ctx context.Context, receivedRequest Request) hub.Response
 
 // EventGenerator should implement a eventData generator for testing and
-// send mock event response to the `eventData` channel. To suggest end of
-// the event responses from server side, you can close the eventData channel
-type EventGenerator func(ctx context.Context, op Operation, eventData chan<- Response)
+// send mock event response to the `eventData` channel. To suggest the end of
+// the event responses from the server side, you can close the eventData channel
+type EventGenerator func(ctx context.Context, receivedRequest Request, eventData chan<- Response)

@@ -134,7 +134,7 @@ func NewServer(t *testing.T, opts ...ServerOptions) *Server { //nolint:gocyclo
 				if strings.Contains(reqBody.Query, s.mutations[i].Identifier) {
 					if s.equalVariables(s.mutations[i].Variables, reqBody.Variables) {
 						if s.mutations[i].Responder != nil {
-							s.respond(w, http.StatusOK, s.mutations[i].Responder(r.Context(), s.mutations[i]))
+							s.respond(w, http.StatusOK, s.mutations[i].Responder(r.Context(), reqBody))
 						} else {
 							s.respond(w, http.StatusOK, s.mutations[i].Response)
 						}
@@ -147,7 +147,7 @@ func NewServer(t *testing.T, opts ...ServerOptions) *Server { //nolint:gocyclo
 				if strings.Contains(reqBody.Query, s.queries[i].Identifier) {
 					if s.equalVariables(s.queries[i].Variables, reqBody.Variables) {
 						if s.queries[i].Responder != nil {
-							s.respond(w, http.StatusOK, s.queries[i].Responder(r.Context(), s.queries[i]))
+							s.respond(w, http.StatusOK, s.queries[i].Responder(r.Context(), reqBody))
 						} else {
 							s.respond(w, http.StatusOK, s.queries[i].Response)
 						}
@@ -169,7 +169,7 @@ func NewServer(t *testing.T, opts ...ServerOptions) *Server { //nolint:gocyclo
 
 						respChan := make(chan Response)
 
-						go s.subscriptions[i].EventGenerator(r.Context(), s.subscriptions[i], respChan)
+						go s.subscriptions[i].EventGenerator(r.Context(), reqBody, respChan)
 
 						for eventResp := range respChan {
 							event, err := formatServerSentEvent("update", eventResp)

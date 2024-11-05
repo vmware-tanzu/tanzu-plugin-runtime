@@ -31,6 +31,22 @@ func Test_translatePromptConfig_Sensitive(t *testing.T) {
 	assert.True(ok)
 }
 
+func Test_PromptConfig_WithMultilineResponse(t *testing.T) {
+	assert := assert.New(t)
+
+	promptConfig := PromptConfig{
+		Message:   "Write me a poem",
+		Default:   "Foo bar,\nbar foo",
+		Sensitive: false,
+		Help:      "Help will be given to those who need it",
+		Multiline: true,
+	}
+	prompt := buildPrompt(&promptConfig, true)
+	assert.NotNil(prompt)
+	_, ok := prompt.(*survey.Multiline)
+	assert.True(ok)
+}
+
 func Test_translatePromptConfig_OptionsSelect(t *testing.T) {
 	assert := assert.New(t)
 

@@ -29,6 +29,9 @@ type PromptConfig struct {
 	// Sensitive information.
 	Sensitive bool
 
+	// Multiline response
+	Multiline bool
+
 	// Help for the prompt.
 	Help string
 }
@@ -86,6 +89,13 @@ func buildPrompt(p *PromptConfig, enableMultiSelect bool) survey.Prompt {
 		return &survey.Select{
 			Message: p.Message,
 			Options: p.Options,
+			Default: p.Default,
+			Help:    p.Help,
+		}
+	}
+	if p.Multiline {
+		return &survey.Multiline{
+			Message: p.Message,
 			Default: p.Default,
 			Help:    p.Help,
 		}

@@ -96,7 +96,7 @@ func (c *hubClient) Subscribe(ctx context.Context, req *Request, handler EventRe
 
 	eventChan := make(chan EventResponse)
 	errChan := make(chan error)
-	reader := sse.NewEventStreamReader(httpResp.Body, 1024)
+	reader := sse.NewEventStreamReader(httpResp.Body, 1024*1024)
 
 	go func() {
 		errChan <- waitForEvents(reader, eventChan)

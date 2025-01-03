@@ -32,7 +32,7 @@ func FindNode(node *yaml.Node, opts ...Options) *yaml.Node {
 
 // getNode parse the yaml node and return the node matched by key
 func getNode(node *yaml.Node, key string) *yaml.Node {
-	if node.Content == nil || len(node.Content) == 0 {
+	if len(node.Content) == 0 {
 		return nil
 	}
 	nodeIndex := GetNodeIndex(node.Content, key)

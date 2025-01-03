@@ -130,12 +130,12 @@ func (l *TKGFlags) lint(cmd *cobra.Command) {
 
 	for _, subCmd := range cmd.Commands() {
 		if subCmd.HasFlags() {
-			subCmd.Flags().VisitAll(func(f *flag.Flag) {
+			subCmd.Flags().VisitAll(func(_ *flag.Flag) {
 				l.lint(subCmd)
 			})
 		}
 		if subCmd.HasPersistentFlags() {
-			subCmd.PersistentFlags().VisitAll(func(f *flag.Flag) {
+			subCmd.PersistentFlags().VisitAll(func(_ *flag.Flag) {
 				l.lint(subCmd)
 			})
 		}

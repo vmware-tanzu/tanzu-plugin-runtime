@@ -14,7 +14,7 @@ func newPostInstallCmd(desc *PluginDescriptor) *cobra.Command {
 		Long:         "Run post install configuration for a plugin",
 		Hidden:       true,
 		SilenceUsage: true,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			// invoke postInstall for the plugin
 			return desc.PostInstallHook()
 		},

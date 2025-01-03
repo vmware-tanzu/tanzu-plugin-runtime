@@ -38,7 +38,7 @@ func newInfoCmd(desc *PluginDescriptor) *cobra.Command {
 		Use:    "info",
 		Short:  "Plugin info",
 		Hidden: true,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			updateCommandLevelMapEntries(cmd, desc)
 			pi := pluginInfo{
 				PluginDescriptor:     *desc,

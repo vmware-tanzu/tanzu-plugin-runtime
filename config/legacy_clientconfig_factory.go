@@ -95,7 +95,7 @@ func clientConfigSetCLI(cfg *configtypes.ClientConfig, node *yaml.Node) (err err
 
 // Deprecated: This method is deprecated
 func clientConfigSetCLIRepositories(cfg *configtypes.ClientConfig, node *yaml.Node) error {
-	if cfg.ClientOptions.CLI.Repositories != nil && len(cfg.ClientOptions.CLI.Repositories) != 0 {
+	if len(cfg.ClientOptions.CLI.Repositories) != 0 {
 		err := setCLIRepositories(node, cfg.ClientOptions.CLI.Repositories)
 		if err != nil {
 			return err

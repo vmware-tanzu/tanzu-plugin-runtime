@@ -1,6 +1,8 @@
 module github.com/vmware-tanzu/tanzu-plugin-runtime/test/plugins/helloworld
 
-go 1.18
+go 1.22.0
+
+toolchain go1.23.1
 
 replace github.com/vmware-tanzu/tanzu-plugin-runtime => ../../../
 

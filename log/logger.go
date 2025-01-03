@@ -46,7 +46,7 @@ func getLogThreshold() int32 {
 	if reqLogLevelStr != "" {
 		requestedLogLevel, err := strconv.ParseUint(reqLogLevelStr, 10, 32)
 		if err == nil {
-			return int32(requestedLogLevel)
+			return int32(requestedLogLevel) //nolint:gosec // overflow conversion does not apply
 		}
 		fmt.Fprintf(os.Stderr, "invalid value %q for %s\n", reqLogLevelStr, EnvTanzuCLILogLevel)
 	}
@@ -145,7 +145,7 @@ func (l *logger) Outputf(format string, args ...interface{}) {
 // V returns an InfoLogger value for a specific verbosity level.
 func (l *logger) V(level int) LoggerImpl {
 	nl := l.clone()
-	nl.level = int32(level)
+	nl.level = int32(level) //nolint:gosec // overflow conversion does not apply
 	return nl
 }
 
@@ -184,7 +184,7 @@ func (l *logger) Clone() LoggerImpl {
 func (l *logger) CloneWithLevel(level int) LoggerImpl {
 	return &logger{
 		threshold:  l.threshold,
-		level:      int32(level),
+		level:      int32(level), //nolint:gosec // overflow conversion does not apply
 		prefix:     l.prefix,
 		values:     copySlice(l.values),
 		callDepth:  l.callDepth,

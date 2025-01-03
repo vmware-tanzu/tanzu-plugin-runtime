@@ -196,7 +196,7 @@ func (obw *objectwriter) SetKeys(_ ...string) {
 }
 
 // MarkDynamicKeys marks the headers as dynamic
-func (obw *objectwriter) MarkDynamicKeys(dynamicKeys ...string) {
+func (obw *objectwriter) MarkDynamicKeys(_ ...string) {
 	// Object writer does not have the concept of dynamic keys
 	fmt.Fprintln(obw.out, "Programming error, attempt to mark dynamic headers to object output")
 }

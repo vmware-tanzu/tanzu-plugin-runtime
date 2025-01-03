@@ -1,6 +1,6 @@
 module github.com/vmware-tanzu/tanzu-plugin-runtime/test/compatibility/testplugins/runtime-test-plugin-latest
 
-go 1.22.0
+go 1.18
 
 replace github.com/vmware-tanzu/tanzu-plugin-runtime => ./../../../../../tanzu-plugin-runtime
 

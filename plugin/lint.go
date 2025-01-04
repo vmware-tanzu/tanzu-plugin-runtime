@@ -19,7 +19,7 @@ var lintCmd = &cobra.Command{
 	Long:         "Lint this command's full flag and cmd tree. The cmd or flag will be skipped when annotated with 'no-lint'",
 	Hidden:       true,
 	SilenceUsage: true,
-	RunE: func(cmd *cobra.Command, args []string) error {
+	RunE: func(cmd *cobra.Command, _ []string) error {
 		linter, err := lint.NewCobraLinter(cmd)
 		if err != nil {
 			return err

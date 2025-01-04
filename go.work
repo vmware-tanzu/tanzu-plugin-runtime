@@ -1,8 +1,0 @@
-go 1.19
-
-use (
-	.
-	test/plugins/helloworld
-	test/compatibility/core
-	test/compatibility/framework
-)

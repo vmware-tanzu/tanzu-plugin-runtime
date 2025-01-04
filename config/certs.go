@@ -92,10 +92,8 @@ func DeleteCert(host string) error {
 	if err != nil {
 		return err
 	}
-	err = removeCert(node, host)
-	if err != nil {
-		return err
-	}
+	removeCert(node, host)
+
 	return persistConfig(node)
 }
 
@@ -187,14 +185,14 @@ func setCert(node *yaml.Node, cert *configtypes.Cert) (persist bool, err error) 
 	return persist, err
 }
 
-func removeCert(node *yaml.Node, host string) error {
+func removeCert(node *yaml.Node, host string) {
 	// Find the certs node in the yaml node
 	keys := []nodeutils.Key{
 		{Name: KeyCerts},
 	}
 	certsNode := nodeutils.FindNode(node.Content[0], nodeutils.WithKeys(keys))
 	if certsNode == nil {
-		return nil
+		return
 	}
 	var certs []*yaml.Node
 	for _, certNode := range certsNode.Content {
@@ -204,5 +202,4 @@ func removeCert(node *yaml.Node, host string) error {
 		certs = append(certs, certNode)
 	}
 	certsNode.Content = certs
-	return nil
 }

@@ -58,10 +58,8 @@ func DeleteTelemetryOptions() error {
 		return err
 	}
 
-	err = deleteTelemetryOptionsNode(node)
-	if err != nil {
-		return err
-	}
+	deleteTelemetryOptionsNode(node)
+
 	return persistConfig(node)
 }
 
@@ -115,21 +113,19 @@ func setCLITelemetryOptions(node *yaml.Node, telemetryOptions *configtypes.Telem
 
 // deleteTelemetryOptionsNode removes the telemetry options in the configuration
 // Pre-reqs: node != nil
-func deleteTelemetryOptionsNode(node *yaml.Node) error {
+func deleteTelemetryOptionsNode(node *yaml.Node) {
 	// Find the telemetry node from the root node
 	keys := []nodeutils.Key{
 		{Name: KeyCLI, Type: yaml.MappingNode},
 	}
 	cliOptionsNode := nodeutils.FindNode(node.Content[0], nodeutils.WithKeys(keys))
 	if cliOptionsNode == nil {
-		return nil
+		return
 	}
 	targetNodeIndex := nodeutils.GetNodeIndex(cliOptionsNode.Content, KeyTelemetry)
 	if targetNodeIndex == -1 {
-		return nil
+		return
 	}
 	targetNodeIndex--
 	cliOptionsNode.Content = append(cliOptionsNode.Content[:targetNodeIndex], cliOptionsNode.Content[targetNodeIndex+2:]...)
-
-	return nil
 }

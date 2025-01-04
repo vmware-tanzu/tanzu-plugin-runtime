@@ -14,7 +14,7 @@ func newVersionCmd(version string) *cobra.Command {
 		Use:    "version",
 		Short:  "Version the plugin",
 		Hidden: true,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			fmt.Println(version)
 			return nil
 		},

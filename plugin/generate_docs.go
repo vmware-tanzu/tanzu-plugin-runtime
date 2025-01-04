@@ -146,7 +146,7 @@ func rebuildTanzuCommandTree(tanzuCmd, pluginRootCmd *cobra.Command, desc *Plugi
 }
 
 func getGenDocFn(desc *PluginDescriptor) func(cmd *cobra.Command, args []string) error {
-	return func(cmd *cobra.Command, args []string) error {
+	return func(cmd *cobra.Command, _ []string) error {
 		if docsDir == "" {
 			docsDir = DefaultDocsDir
 		}
@@ -159,7 +159,7 @@ func getGenDocFn(desc *PluginDescriptor) func(cmd *cobra.Command, args []string)
 			}
 			return s
 		}
-		emptyStr := func(s string) string { return "" }
+		emptyStr := func(_ string) string { return "" }
 
 		tanzuCmd := cobra.Command{
 			Use:               "tanzu",

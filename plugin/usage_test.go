@@ -55,7 +55,7 @@ func usageTestPlugin(t *testing.T, target types.Target) *Plugin {
 	var fetchCmd = &cobra.Command{
 		Use:   "fetch",
 		Short: "Fetch the plugin tests",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			fmt.Println("fetch")
 			return nil
 		},
@@ -65,7 +65,7 @@ func usageTestPlugin(t *testing.T, target types.Target) *Plugin {
 		Use:     "push SOMESTUFF",
 		Aliases: []string{"psh"},
 		Short:   "Push the plugin tests",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			fmt.Println("push")
 			return nil
 		},
@@ -75,7 +75,7 @@ func usageTestPlugin(t *testing.T, target types.Target) *Plugin {
 		Use:     "more",
 		Short:   "Push more",
 		Aliases: []string{"mo"},
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			fmt.Println("push more")
 			return nil
 		},

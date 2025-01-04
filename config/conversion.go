@@ -38,7 +38,7 @@ func PopulateContexts(cfg *configtypes.ClientConfig) bool {
 		if s.Name == cfg.CurrentServer {
 			err := cfg.SetActiveContext(c.ContextType, c.Name)
 			if err != nil {
-				log.Warningf(err.Error())
+				log.Warningf("%s", err.Error())
 			}
 		}
 	}

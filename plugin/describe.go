@@ -14,7 +14,7 @@ func newDescribeCmd(description string) *cobra.Command {
 		Use:    "describe",
 		Short:  "Describes the plugin",
 		Hidden: true,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			fmt.Println(description)
 			return nil
 		},

@@ -18,7 +18,7 @@ var (
 	testCmd  = &cobra.Command{
 		Use:   "test",
 		Short: "A test command that parse the file and trigger the runtime apis",
-		Run: func(cmd *cobra.Command, args []string) {
+		Run: func(_ *cobra.Command, _ []string) {
 			// Parse the file into array of apis struct
 			apis, err := compatibilitytestingcore.ParseRuntimeAPIsFromFile(filepath)
 			if err != nil {

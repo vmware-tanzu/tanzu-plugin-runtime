@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/AlecAivazis/survey/v2 v2.3.6
 	github.com/Khan/genqlient v0.7.0
+	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
 	github.com/alexflint/go-filemutex v1.3.0
 	github.com/anujc25/tablewriter v0.0.1
 	github.com/briandowns/spinner v1.19.0

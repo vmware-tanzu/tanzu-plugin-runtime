@@ -5,7 +5,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package tabwriter implements a write filter (tabwriter.Writer) that
+// Package implements a write filter (tabwriter.Writer) that
 // translates tabbed columns in input into properly aligned text.
 //
 // It is a drop-in replacement for the golang text/tabwriter package (https://golang.org/pkg/text/tabwriter),
@@ -18,7 +18,10 @@
 // repackaged from https://github.com/liggitt/tabwriter/tree/6880f16551ff10c60d3989df2bbd68a55bb3517f
 // adds IgnoreAnsiCodes
 
-package tabwriter
+// Package internal is repackaged from https://github.com/liggitt/tabwriter/tree/6880f16551ff10c60d3989df2bbd68a55bb3517f and adds IgnoreAnsiCodes
+//
+//nolint:gocyclo,gocritic,unused,nakedret,stylecheck,whitespace
+package internal
 
 import (
 	"io"

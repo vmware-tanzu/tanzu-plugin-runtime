@@ -127,7 +127,7 @@ func TestVisit(t *testing.T) {
 			return &cobra.Command{Use: "root"}
 		},
 		visitor: func(cmd *cobra.Command) error {
-			return fmt.Errorf(cmd.Name())
+			return fmt.Errorf("%s", cmd.Name())
 		},
 		err: fmt.Errorf("root"),
 	}, {
@@ -139,7 +139,7 @@ func TestVisit(t *testing.T) {
 		},
 		visitor: func(cmd *cobra.Command) error {
 			if cmd.Name() == "child" {
-				return fmt.Errorf(cmd.Name())
+				return fmt.Errorf("%s", cmd.Name())
 			}
 			return nil
 		},
@@ -155,29 +155,6 @@ func TestVisit(t *testing.T) {
 		})
 	}
 }
-
-// func TestReadStdin(t *testing.T) {
-// 	// TODO is it possible to test the IsTerminal branch?
-// 	expected := []byte("hello")
-// 	var actual []byte
-
-// 	scheme := runtime.NewScheme()
-// 	c := NewDefaultConfig("test", scheme)
-// 	c.Stdin = bytes.NewBuffer(expected)
-// 	runE := ReadStdin(c, &actual, "> ")
-
-// 	cmd := &cobra.Command{}
-// 	args := []string{}
-
-// 	err := runE(cmd, args)
-
-// 	if err != nil {
-// 		t.Errorf("expected no error, actually %v", err)
-// 	}
-// 	if string(expected) != string(actual) {
-// 		t.Errorf("expected input %q, actually %q", expected, actual)
-// 	}
-// }
 
 func TestCommandFromContext_WithCommand(t *testing.T) {
 	cmd := &cobra.Command{}

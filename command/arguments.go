@@ -86,6 +86,40 @@ func NamesArg(names *[]string) Arg {
 	}
 }
 
+func Argument(name string, val *string) Arg {
+	return Arg{
+		Name:  name,
+		Arity: 1,
+		Set: func(_ *cobra.Command, args []string, offset int) error {
+			*val = args[offset]
+			return nil
+		},
+	}
+}
+
+func OptionalArgument(name string, val *string) Arg {
+	arg := Argument(name, val)
+	arg.Optional = true
+	return arg
+}
+
+func RemainingArguments(name string, values *[]string) Arg {
+	return Arg{
+		Name:  name,
+		Arity: -1,
+		Set: func(_ *cobra.Command, args []string, offset int) error {
+			*values = args[offset:]
+			return nil
+		},
+	}
+}
+
+func OptionalRemainingArguments(name string, values *[]string) Arg {
+	arg := RemainingArguments(name, values)
+	arg.Optional = true
+	return arg
+}
+
 func BareDoubleDashArgs(values *[]string) Arg {
 	return Arg{
 		Arity: -1,

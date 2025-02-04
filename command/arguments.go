@@ -9,11 +9,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const (
-	NameArgumentName  = "name"
-	NamesArgumentName = "name(s)"
-)
-
 var ErrIgnoreArg = fmt.Errorf("ignore argument")
 
 type Arg struct {
@@ -56,34 +51,6 @@ func Args(cmd *cobra.Command, argDefs ...Arg) {
 	}
 
 	addArgsToUseString(cmd, argDefs)
-}
-
-func NameArg(name *string) Arg {
-	return Arg{
-		Name:  NameArgumentName,
-		Arity: 1,
-		Set: func(_ *cobra.Command, args []string, offset int) error {
-			*name = args[offset]
-			return nil
-		},
-	}
-}
-
-func OptionalNameArg(name *string) Arg {
-	arg := NameArg(name)
-	arg.Optional = true
-	return arg
-}
-
-func NamesArg(names *[]string) Arg {
-	return Arg{
-		Name:  NamesArgumentName,
-		Arity: -1,
-		Set: func(_ *cobra.Command, args []string, offset int) error {
-			*names = args[offset:]
-			return nil
-		},
-	}
 }
 
 func Argument(name string, val *string) Arg {
@@ -149,4 +116,25 @@ func addArgsToUseString(cmd *cobra.Command, argDefs []Arg) {
 
 		cmd.Use += " " + name
 	}
+}
+
+// Name argument specific helpers
+
+const (
+	NameArgumentName  = "name"
+	NamesArgumentName = "name(s)"
+)
+
+func NameArg(val *string) Arg {
+	return Argument(NameArgumentName, val)
+}
+
+func OptionalNameArg(val *string) Arg {
+	arg := NameArg(val)
+	arg.Optional = true
+	return arg
+}
+
+func NamesArg(vals *[]string) Arg {
+	return RemainingArguments(NamesArgumentName, vals)
 }

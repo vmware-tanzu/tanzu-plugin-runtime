@@ -374,7 +374,7 @@ var TemplateFuncs = template.FuncMap{
 	"bold":                    stringutils.Sboldf,
 	"underline":               stringutils.Sunderlinef,
 	"trimTrailingWhitespaces": stringutils.TrimRightSpace,
-	"beginsWith":              stringutils.BeginsWith,
+	"beginsWith":              strings.HasPrefix,
 }
 
 func shouldPrintInvocationWithoutTarget(target types.Target, ic *InvocationContext) bool {

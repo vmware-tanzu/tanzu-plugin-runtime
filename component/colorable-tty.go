@@ -36,7 +36,7 @@ func IsTTYEnabled() bool {
 }
 
 // Rpad adds padding to the right of a string.
-// from https://github.com/spf13/cobra/blob/993cc5372a05240dfd59e3ba952748b36b2cd117/cobra.go#L29
+// from https://github.com/spf13/cobra/blob/4ba5566f5704a9c0d205e1ef3efc4896156d33fa/cobra.go#L173-L177
 //
 // Deprecated: Rpad is being moved under `github.com/vmware-tanzu/tanzu-plugin-runtime/component/stringutils` package
 func Rpad(s string, padding int) string {
@@ -59,7 +59,7 @@ func TrimRightSpace(s string) string {
 	return strings.TrimRightFunc(s, unicode.IsSpace)
 }
 
-// Deprecated: BeginsWith is being moved under `github.com/vmware-tanzu/tanzu-plugin-runtime/component/stringutils` package
+// Deprecated: BeginsWith is being deprecated. Use strings.HasPrefix instead
 func BeginsWith(s, prefix string) bool {
 	return strings.HasPrefix(s, prefix)
 }

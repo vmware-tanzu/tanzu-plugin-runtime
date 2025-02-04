@@ -36,26 +36,30 @@ The function takes a message string as its argument and returns an error if the 
 
 If an error occurs during the function's execution, it will return a new error wrapped with the `github.com/pkg/errors` package.
 
-## Colorable-TTY
+## StringUtils (includes string colors and formatting)
 
-`Colorable-TTY` is a Golang package that provides utilities for creating colorized and formatted console output. This package uses the `logrusorgru/aurora` package to generate the colorized output. It also includes several functions for formatting strings such as `Rpad`, `Underline`, `Bold`, `TrimRightSpace`, and `BeginsWith`.
+This package that provides string utility functions for creating colorized and formatted console output. This include following predefined formatting options like `Faint`, `Bold` , `Underline` and `Italic` as well as color options like `InfoColor`, `SuccessColor`, `WarnColor` and `ErrorColor`.
 
-Then, you can use the functions provided by this package. For example:
+You can use the functions provided by this package to easily format your string. For example:
 
 ``` go
 package main
 
 import (
     "fmt"
-    "github.com/vmware-tanzu/tanzu-plugin-runtime/component"
+    "github.com/vmware-tanzu/tanzu-plugin-runtime/component/stringutils"
 )
 
 func main() {
-    fmt.Println(component.Underline("This text is underlined!"))
-    fmt.Println(component.Bold("This text is bold!"))
-    fmt.Println(component.Rpad("Right padded text", 20))
-    fmt.Println(component.TrimRightSpace("Trim the whitespace at the end   "))
-    fmt.Println(component.BeginsWith("This is a test", "This"))
+    fmt.Println(stringutils.Sinfof("This text is info text!"))
+    fmt.Println(stringutils.Ssuccessf("This text is success text!"))
+    fmt.Println(stringutils.Swarnf("This text is warning text!"))
+    fmt.Println(stringutils.Serrorf("This text is error text!"))
+    fmt.Println(stringutils.Sunderlinef("This text is underlined!"))
+    fmt.Println(stringutils.Sboldf("This text is bold!"))
+
+    fmt.Println(stringutils.Rpad("Right padded text", 20))
+    fmt.Println(stringutils.TrimRightSpace("Trim the whitespace at the end   "))
 }
 ```
 

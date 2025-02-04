@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // Package tabwriter exposes an tabwriter functionality
+// from https://github.com/kubernetes/cli-runtime/blob/v0.28.1/pkg/printers/tabwriter.go
 package tabwriter
 
 import (

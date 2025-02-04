@@ -15,23 +15,23 @@ import (
 func init() {
 	// Configure the global `NoColor` option within github.com/fatih/color library
 	// based on the user's terminal and provided options
-	color.NoColor = !component.IsTTYEnabled()
+	color.NoColor = color.NoColor || !component.IsTTYEnabled()
 }
 
 var (
-	FaintColor   = color.New(color.Faint)
 	InfoColor    = color.New(color.FgCyan)
 	SuccessColor = color.New(color.FgGreen)
 	WarnColor    = color.New(color.FgYellow)
 	ErrorColor   = color.New(color.FgRed)
-	BoldColor    = color.New(color.Bold)
 
+	Bold      = color.New(color.Bold)
+	Faint     = color.New(color.Faint)
 	Underline = color.New(color.Underline)
 	Italic    = color.New(color.Italic)
 )
 
 func Sfaintf(format string, a ...interface{}) string {
-	return FaintColor.Sprintf(format, a...)
+	return Faint.Sprintf(format, a...)
 }
 
 func Sinfof(format string, a ...interface{}) string {
@@ -51,7 +51,7 @@ func Serrorf(format string, a ...interface{}) string {
 }
 
 func Sboldf(format string, a ...interface{}) string {
-	return BoldColor.Sprintf(format, a...)
+	return Bold.Sprintf(format, a...)
 }
 
 func Sunderlinef(format string, a ...interface{}) string {

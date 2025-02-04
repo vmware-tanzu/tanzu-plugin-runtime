@@ -26,27 +26,6 @@ func TestTrimRightSpace(t *testing.T) {
 	}
 }
 
-func TestBeginsWith(t *testing.T) {
-	tests := []struct {
-		s        string
-		prefix   string
-		expected bool
-	}{
-		{"hello world", "hello", true},
-		{"hello world", "world", false},
-		{"", "", true},
-		{"", "nonempty", false},
-		{"prefix test", "prefix", true},
-	}
-
-	for _, tt := range tests {
-		result := BeginsWith(tt.s, tt.prefix)
-		if result != tt.expected {
-			t.Errorf("BeginsWith(%q, %q) = %v; want %v", tt.s, tt.prefix, result, tt.expected)
-		}
-	}
-}
-
 func TestRpad(t *testing.T) {
 	tests := []struct {
 		s        string

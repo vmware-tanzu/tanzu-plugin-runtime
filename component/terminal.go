@@ -8,10 +8,12 @@ import (
 	"strings"
 )
 
+// From https://github.com/kubernetes/cli-runtime/blob/v0.28.1/pkg/printers/terminal.go"
+
 // terminalEscaper replaces ANSI escape sequences and other terminal special
-// characters to avoid terminal escape character attacks (issue #101695).
-// Add "\x1b", "^[" to the `NewReplacer` params to scape color
-var terminalEscaper = strings.NewReplacer("\r", "\\r")
+// characters to avoid terminal escape character attacks (https://github.com/kubernetes/kubernetes/issues/101695).
+// Add "\x1b", "^[" to the `NewReplacer` params to escape color
+var terminalEscaper = strings.NewReplacer("\x1b", "^[", "\r", "\\r")
 
 // WriteEscaped replaces unsafe terminal characters with replacement strings
 // and writes them to the given writer.

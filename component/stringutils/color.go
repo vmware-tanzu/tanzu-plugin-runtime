@@ -1,14 +1,21 @@
 // Copyright 2025 VMware, Inc. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-// Package printer provides helpers to get different prints with different colors
-package printer
+// Package stringutils provides helpers to format strings
+package stringutils
 
 import (
 	"regexp"
 
 	"github.com/fatih/color"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/component"
 )
+
+func init() {
+	// Configure the global `NoColor` option within github.com/fatih/color library
+	// based on the user's terminal and provided options
+	color.NoColor = !component.IsTTYEnabled()
+}
 
 var (
 	FaintColor   = color.New(color.Faint)
@@ -17,6 +24,9 @@ var (
 	WarnColor    = color.New(color.FgYellow)
 	ErrorColor   = color.New(color.FgRed)
 	BoldColor    = color.New(color.Bold)
+
+	Underline = color.New(color.Underline)
+	Italic    = color.New(color.Italic)
 )
 
 func Sfaintf(format string, a ...interface{}) string {
@@ -41,6 +51,14 @@ func Serrorf(format string, a ...interface{}) string {
 
 func Sboldf(format string, a ...interface{}) string {
 	return BoldColor.Sprintf(format, a...)
+}
+
+func Sunderlinef(format string, a ...interface{}) string {
+	return Underline.Sprintf(format, a...)
+}
+
+func Sitalic(format string, a ...interface{}) string {
+	return Italic.Sprintf(format, a...)
 }
 
 // StripColor removes ANSI escape codes from a string

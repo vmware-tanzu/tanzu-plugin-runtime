@@ -159,7 +159,7 @@ func TestVisit(t *testing.T) {
 func TestCommandFromContext_WithCommand(t *testing.T) {
 	cmd := &cobra.Command{}
 	parentCtx := context.Background()
-	childCtx := WithCommand(parentCtx, cmd)
+	childCtx := ContextWithCommand(parentCtx, cmd)
 
 	if expected, actual := (*cobra.Command)(nil), CommandFromContext(parentCtx); expected != actual {
 		t.Errorf("expected command %v, actually %v", expected, actual)

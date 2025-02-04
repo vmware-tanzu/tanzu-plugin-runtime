@@ -11,7 +11,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/vmware-tanzu/tanzu-plugin-runtime/component"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/component/stringutils"
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
 )
 
@@ -195,7 +195,7 @@ func formatUsageHelpSection(cmd *cobra.Command, target types.Target) string {
 	var output strings.Builder
 	ic := GetInvocationContext()
 
-	output.WriteString(component.Bold(usageStr) + "\n")
+	output.WriteString(stringutils.Sboldf(usageStr) + "\n")
 	base := indentStr + "tanzu"
 
 	if cmd.Runnable() {
@@ -324,39 +324,39 @@ func printHelp(cmd *cobra.Command) string {
 	output.WriteString(formatUsageHelpSection(cmd, target))
 
 	if len(cmd.Aliases) > 0 {
-		output.WriteString("\n" + component.Bold(aliasesStr) + "\n")
+		output.WriteString("\n" + stringutils.Sboldf(aliasesStr) + "\n")
 		output.WriteString(indentStr + aliasesWithMappedName(cmd) + "\n")
 	}
 
 	if cmd.HasExample() {
-		output.WriteString("\n" + component.Bold(examplesStr) + "\n")
+		output.WriteString("\n" + stringutils.Sboldf(examplesStr) + "\n")
 		output.WriteString(alignExampleForUsage(cmd.Example) + "\n")
 	}
 
 	if cmd.HasAvailableSubCommands() {
-		output.WriteString("\n" + component.Bold(availableCommandsStr) + "\n")
+		output.WriteString("\n" + stringutils.Sboldf(availableCommandsStr) + "\n")
 		for _, c := range cmd.Commands() {
 			if c.IsAvailableCommand() {
-				output.WriteString(indentStr + component.Rpad(c.Name(), c.NamePadding()) + " " + c.Short + "\n")
+				output.WriteString(indentStr + stringutils.Rpad(c.Name(), c.NamePadding()) + " " + c.Short + "\n")
 			}
 		}
 	}
 
 	if cmd.HasAvailableLocalFlags() {
-		output.WriteString("\n" + component.Bold(flagsStr) + "\n")
+		output.WriteString("\n" + stringutils.Sboldf(flagsStr) + "\n")
 		output.WriteString(strings.TrimRight(cmd.LocalFlags().FlagUsages(), " "))
 	}
 
 	if cmd.HasAvailableInheritedFlags() {
-		output.WriteString("\n" + component.Bold(globalFlagsStr) + "\n")
+		output.WriteString("\n" + stringutils.Sboldf(globalFlagsStr) + "\n")
 		output.WriteString(strings.TrimRight(cmd.InheritedFlags().FlagUsages(), " "))
 	}
 
 	if cmd.HasHelpSubCommands() {
-		output.WriteString("\n" + component.Bold(additionalHelpTopicsStr) + "\n")
+		output.WriteString("\n" + stringutils.Sboldf(additionalHelpTopicsStr) + "\n")
 		for _, c := range cmd.Commands() {
 			if c.IsAdditionalHelpTopicCommand() {
-				output.WriteString(indentStr + component.Rpad(c.CommandPath(), c.CommandPathPadding()) + " " + c.Short + "\n")
+				output.WriteString(indentStr + stringutils.Rpad(c.CommandPath(), c.CommandPathPadding()) + " " + c.Short + "\n")
 			}
 		}
 	}
@@ -370,11 +370,11 @@ var TemplateFuncs = template.FuncMap{
 	"printHelp": printHelp,
 	// The below are not needed but are kept for backwards-compatibility
 	// in case it is being used through the API
-	"rpad":                    component.Rpad,
-	"bold":                    component.Bold,
-	"underline":               component.Underline,
-	"trimTrailingWhitespaces": component.TrimRightSpace,
-	"beginsWith":              component.BeginsWith,
+	"rpad":                    stringutils.Rpad,
+	"bold":                    stringutils.Sboldf,
+	"underline":               stringutils.Sunderlinef,
+	"trimTrailingWhitespaces": stringutils.TrimRightSpace,
+	"beginsWith":              stringutils.BeginsWith,
 }
 
 func shouldPrintInvocationWithoutTarget(target types.Target, ic *InvocationContext) bool {

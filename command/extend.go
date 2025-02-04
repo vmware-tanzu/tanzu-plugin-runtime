@@ -36,7 +36,7 @@ func Visit(cmd *cobra.Command, f func(c *cobra.Command) error) error {
 
 type commandKey struct{}
 
-func WithCommand(ctx context.Context, cmd *cobra.Command) context.Context {
+func ContextWithCommand(ctx context.Context, cmd *cobra.Command) context.Context {
 	return context.WithValue(ctx, commandKey{}, cmd)
 }
 

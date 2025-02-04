@@ -8,6 +8,7 @@ import (
 	"regexp"
 
 	"github.com/fatih/color"
+
 	"github.com/vmware-tanzu/tanzu-plugin-runtime/component"
 )
 

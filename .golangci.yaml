@@ -149,6 +149,11 @@ issues:
         - staticcheck
       text: "SA1019:"
 
+    # Ignore the copyright header checks in following files
+    - path: component/tabwriter/internal/tabwriter.go
+      linters:
+        - goheader
+
   include:
     - EXC0011 # disable excluding of issues about missing package comments from stylecheck
 

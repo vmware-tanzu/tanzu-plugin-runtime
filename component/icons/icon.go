@@ -1,7 +1,7 @@
 // Copyright 2025 VMware, Inc. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-// Package icon is predefined set of icons that can be used for consistency
+// Package icons is predefined set of icons that can be used for consistency
 package icons
 
 type Icon rune

@@ -38,7 +38,7 @@ If an error occurs during the function's execution, it will return a new error w
 
 ## StringUtils (includes string colors and formatting)
 
-This package that provides string utility functions for creating colorized and formatted console output. This include following predefined formatting options like `Faint`, `Bold` , `Underline` and `Italic` as well as color options like `InfoColor`, `SuccessColor`, `WarnColor` and `ErrorColor`.
+The `stringutils` package provides string utility functions for creating colorized and formatted console output. These include the following predefined formatting options like `Faint`, `Bold` , `Underline` and `Italic` as well as color options like `InfoColor`, `SuccessColor`, `WarnColor` and `ErrorColor`.
 
 You can use the functions provided by this package to easily format your string. For example:
 

@@ -12,8 +12,7 @@ import (
 
 // terminalEscaper replaces ANSI escape sequences and other terminal special
 // characters to avoid terminal escape character attacks (https://github.com/kubernetes/kubernetes/issues/101695).
-// Add "\x1b", "^[" to the `NewReplacer` params to escape color
-var terminalEscaper = strings.NewReplacer("\x1b", "^[", "\r", "\\r")
+var terminalEscaper = strings.NewReplacer("\r", "\\r")
 
 // WriteEscaped replaces unsafe terminal characters with replacement strings
 // and writes them to the given writer.

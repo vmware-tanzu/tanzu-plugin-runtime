@@ -164,12 +164,6 @@ func TestGlobalTestPluginCommandHelpText(t *testing.T) {
 
 	got := string(<-c)
 
-	// note: reference to the unmapped name, as in
-	//
-	// '-h, --help         help for testNotUserVisible'
-	//
-	// is a known bug in cobra 1.8.0 that should be fixed in the next patch or
-	// minor release
 	//nolint:goconst
 	expected := `Test the CLI
 
@@ -188,7 +182,7 @@ Available Commands:
 
 Flags:
   -e, --env string   env to test
-  -h, --help         help for testNotUserVisible
+  -h, --help         help for test
 
 Additional help topics:
   test plugin        Plugin tests
@@ -248,7 +242,7 @@ Available Commands:
 
 Flags:
   -e, --env string   env to test
-  -h, --help         help for testNotUserVisible
+  -h, --help         help for test
 
 Additional help topics:
   test plugin        Plugin tests
@@ -308,7 +302,7 @@ Available Commands:
 
 Flags:
   -e, --env string   env to test
-  -h, --help         help for testNotUserVisible
+  -h, --help         help for test
 
 Additional help topics:
   test plugin        Plugin tests

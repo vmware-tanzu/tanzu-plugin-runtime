@@ -5,7 +5,6 @@ package plugin
 
 import (
 	"fmt"
-	"os"
 	"strings"
 	"text/template"
 
@@ -17,11 +16,11 @@ import (
 
 // UsageFunc is the usage func for a plugin.
 var UsageFunc = func(c *cobra.Command) error {
-	t, err := template.New("usage").Funcs(TemplateFuncs).Parse(cmdTemplate)
-	if err != nil {
-		return err
-	}
-	return t.Execute(os.Stdout, c)
+	// Instead of using templates, use a go function to generate the usage string.
+	// This allows for dead-code-elimination.
+	helpMsg := printHelp(c)
+	_, err := fmt.Fprintf(c.OutOrStdout(), "%s", helpMsg)
+	return err
 }
 
 // CmdTemplate is the template for plugin commands.
@@ -49,9 +48,6 @@ const CmdTemplate = `{{ bold "Usage:" }}
 
 {{ $target := index .Annotations "target" }}{{ if or (eq $target "kubernetes") (eq $target "k8s") }}Use "{{if beginsWith .CommandPath "tanzu "}}{{.CommandPath}}{{else}}tanzu {{.CommandPath}}{{end}} [command] --help" for more information about a command.{{end}}Use "{{if beginsWith .CommandPath "tanzu "}}{{.CommandPath}}{{else}}tanzu{{ $target := index .Annotations "target" }}{{ if and (ne $target "global") (ne $target "") }} {{ $target }} {{ else }} {{ end }}{{.CommandPath}}{{end}} [command] --help" for more information about a command.{{end}}
 `
-
-// cmdTemplate is the template for plugin commands.
-const cmdTemplate = `{{ printHelp . }}`
 
 // Constants for help text labels
 const (
@@ -367,9 +363,9 @@ func printHelp(cmd *cobra.Command) string {
 
 // TemplateFuncs are the template usage funcs.
 var TemplateFuncs = template.FuncMap{
-	"printHelp": printHelp,
 	// The below are not needed but are kept for backwards-compatibility
 	// in case it is being used through the API
+	"printHelp":               printHelp,
 	"rpad":                    stringutils.Rpad,
 	"bold":                    stringutils.Sboldf,
 	"underline":               stringutils.Sunderlinef,

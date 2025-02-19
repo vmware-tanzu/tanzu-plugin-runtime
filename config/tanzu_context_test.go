@@ -157,12 +157,29 @@ func TestGetKubeconfigForContext(t *testing.T) {
 	cluster = kubeconfig.GetCluster(&kc, "tanzu-cli-mytanzu/current")
 	assert.Equal(t, cluster.Cluster.Server, c.ClusterOpts.Endpoint+"/project/project2-id/clustergroup/clustergroup1")
 
+	// Test getting the kubeconfig for a foundation within a project
+	kubeconfigBytes, err = GetKubeconfigForContext(c.Name, ForProject("project2-id"), ForFoundationGroup("foundationgroup1"))
+	assert.NoError(t, err)
+	c, err = GetContext("test-tanzu")
+	assert.NoError(t, err)
+	err = yaml.Unmarshal(kubeconfigBytes, &kc)
+	assert.NoError(t, err)
+	cluster = kubeconfig.GetCluster(&kc, "tanzu-cli-mytanzu/current")
+	assert.Equal(t, cluster.Cluster.Server, c.ClusterOpts.Endpoint+"/project/project2-id/foundationgroup/foundationgroup1")
+
+	// Test getting the kubeconfig with incorrect resource combination (request kubeconfig for space and clustergroup)
+	c, err = GetContext("test-tanzu")
+	assert.NoError(t, err)
+	_, err = GetKubeconfigForContext(c.Name, ForProject("project2-id"), ForFoundationGroup("foundationgroup1"), ForClusterGroup("clustergroup1"))
+	assert.Error(t, err)
+	assert.ErrorContains(t, err, "incorrect resource options provided. Only one of space, clustergroup, or foundationgroup can be set. Provided configuration - space: , clustergroup: clustergroup1, foundationgroup: foundationgroup1")
+
 	// Test getting the kubeconfig with incorrect resource combination (request kubeconfig for space and clustergroup)
 	c, err = GetContext("test-tanzu")
 	assert.NoError(t, err)
 	_, err = GetKubeconfigForContext(c.Name, ForProject("project2-id"), ForSpace("space1"), ForClusterGroup("clustergroup1"))
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "incorrect resource options provided. Both space and clustergroup are set but only one can be set")
+	assert.ErrorContains(t, err, "incorrect resource options provided. Only one of space, clustergroup, or foundationgroup can be set. Provided configuration - space: space1, clustergroup: clustergroup1, foundationgroup: ")
 
 	// Test getting the kubeconfig for an arbitrary Tanzu resource for non Tanzu context
 	tmcCtx, err := GetContext("test-tmc")

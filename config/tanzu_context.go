@@ -21,12 +21,13 @@ import (
 
 // keys to Context's AdditionalMetadata map
 const (
-	OrgIDKey            = "tanzuOrgID"
-	OrgNameKey          = "tanzuOrgName"
-	ProjectNameKey      = "tanzuProjectName"
-	ProjectIDKey        = "tanzuProjectID"
-	SpaceNameKey        = "tanzuSpaceName"
-	ClusterGroupNameKey = "tanzuClusterGroupName"
+	OrgIDKey               = "tanzuOrgID"
+	OrgNameKey             = "tanzuOrgName"
+	ProjectNameKey         = "tanzuProjectName"
+	ProjectIDKey           = "tanzuProjectID"
+	SpaceNameKey           = "tanzuSpaceName"
+	ClusterGroupNameKey    = "tanzuClusterGroupName"
+	FoundationGroupNameKey = "tanzuFoundationGroupName"
 
 	TanzuMissionControlEndpointKey = "tanzuMissionControlEndpoint"
 	TanzuHubEndpointKey            = "tanzuHubEndpoint"
@@ -55,6 +56,8 @@ type ResourceInfo struct {
 	SpaceName string
 	// ClusterGroupName name of the ClusterGroup
 	ClusterGroupName string
+	// FoundationGroup name of the FoundationGroup
+	FoundationGroupName string
 }
 
 type IdpType string
@@ -133,6 +136,8 @@ type resourceOptions struct {
 	spaceName string
 	// clusterGroupName name of the ClusterGroup
 	clusterGroupName string
+	// foundationGroupName name of the FoundationGroup
+	foundationGroupName string
 	// customPath use specified path when constructing kubeconfig
 	customPath string
 }
@@ -154,6 +159,11 @@ func ForClusterGroup(clusterGroupName string) ResourceOptions {
 		o.clusterGroupName = strings.TrimSpace(clusterGroupName)
 	}
 }
+func ForFoundationGroup(foundationGroupName string) ResourceOptions {
+	return func(o *resourceOptions) {
+		o.foundationGroupName = strings.TrimSpace(foundationGroupName)
+	}
+}
 func ForCustomPath(customPath string) ResourceOptions {
 	return func(o *resourceOptions) {
 		o.customPath = customPath
@@ -167,35 +177,46 @@ func ForCustomPath(customPath string) ResourceOptions {
 // Notes:
 //
 // Use Case 1: Get the kubeconfig pointing to Tanzu org
-// -> projectID          = ""
-// -> spaceName          = ""
-// -> clusterGroupName   = ""
+// -> projectID           = ""
+// -> spaceName           = ""
+// -> clusterGroupName    = ""
+// -> foundationGroupName = ""
 // ex: kubeconfig's cluster.server URL : https://endpoint/org/orgid
 //
 // Use Case 2: Get the kubeconfig pointing to Tanzu project
-// -> projectID          = "PROJECTNAME"
-// -> spaceName          = ""
-// -> clusterGroupName   = ""
+// -> projectID           = "PROJECTNAME"
+// -> spaceName           = ""
+// -> clusterGroupName    = ""
+// -> foundationGroupName = ""
 // ex: kubeconfig's cluster.server URL : https://endpoint/org/orgid/project/<projectID>
 //
 // Use Case 3: Get the kubeconfig pointing to Tanzu space
-// -> projectID          = "PROJECTID"
-// -> spaceName          = "SPACENAME"
-// -> clusterGroupName   = ""
+// -> projectID           = "PROJECTID"
+// -> spaceName           = "SPACENAME"
+// -> clusterGroupName    = ""
+// -> foundationGroupName = ""
 // ex: kubeconfig's cluster.server URL : https://endpoint/org/orgid/project/<projectID>/space/<spaceName>
 //
 // Use Case 4: Get the kubeconfig pointing to Tanzu clustergroup
 // -> projectID          = "PROJECTID"
 // -> spaceName          = ""
 // -> clusterGroupName   = "CLUSTERGROUPNAME"
+// -> foundationGroupName   = ""
 // ex: kubeconfig's cluster.server URL : https://endpoint/org/orgid/project/<projectID>/clustergroup/<clustergroupName>
 //
-// Note: Specifying `spaceName` and `clusterGroupName` both at the same time is incorrect input.
+// Use Case 5: Get the kubeconfig pointing to Tanzu foundationgroup
+// -> projectID            = "PROJECTID"
+// -> spaceName            = ""
+// -> clusterGroupName     = ""
+// -> foundationGroupName  = "FOUNDATIONGROUPNAME"
+// ex: kubeconfig's cluster.server URL : https://endpoint/org/orgid/project/<projectID>/foundationgroup/<foundationGroupName>
+// Note: Specifying `spaceName` and `clusterGroupName`/`foundationGroupName` at the same time is incorrect input.
 //
 // Use Case 5: Get the kubeconfig pointing to Kubernetes context
-// -> projectID          = ""
-// -> spaceName          = ""
-// -> clusterGroupName   = ""
+// -> projectID            = ""
+// -> spaceName            = ""
+// -> clusterGroupName     = ""
+// -> foundationGroupName  = ""
 func GetKubeconfigForContext(contextName string, opts ...ResourceOptions) ([]byte, error) {
 	ctx, err := GetContext(contextName)
 	if err != nil {
@@ -211,8 +232,9 @@ func GetKubeconfigForContext(contextName string, opts ...ResourceOptions) ([]byt
 		return nil, errors.Errorf("context must be of type: %s or %s", configtypes.ContextTypeTanzu, configtypes.ContextTypeK8s)
 	}
 
-	if ctx.ContextType == configtypes.ContextTypeTanzu && rOptions.spaceName != "" && rOptions.clusterGroupName != "" {
-		return nil, errors.Errorf("incorrect resource options provided. Both space and clustergroup are set but only one can be set")
+	rOptionsErr := validateResourceOptions(rOptions)
+	if ctx.ContextType == configtypes.ContextTypeTanzu && rOptionsErr != nil {
+		return nil, rOptionsErr
 	}
 
 	if ctx.ClusterOpts == nil {
@@ -258,6 +280,9 @@ func prepareClusterServerURL(context *configtypes.Context, rOptions *resourceOpt
 	}
 	if rOptions.clusterGroupName != "" {
 		return serverURL + "/clustergroup/" + rOptions.clusterGroupName
+	}
+	if rOptions.foundationGroupName != "" {
+		return serverURL + "/foundationgroup/" + rOptions.foundationGroupName
 	}
 	return serverURL
 }
@@ -307,7 +332,9 @@ func SetTanzuContextActiveResource(contextName string, resourceInfo ResourceInfo
 	if resourceInfo.ClusterGroupName != "" {
 		args = append(args, "--clustergroup", resourceInfo.ClusterGroupName)
 	}
-
+	if resourceInfo.FoundationGroupName != "" {
+		args = append(args, "--foundationgroup", resourceInfo.FoundationGroupName)
+	}
 	altCommandArgs = append(altCommandArgs, args...)
 
 	// Check if there is an alternate means to set the active Tanzu context active resource
@@ -338,12 +365,13 @@ func GetTanzuContextActiveResource(contextName string) (*ResourceInfo, error) {
 		return nil, errors.New("context is missing the Tanzu metadata")
 	}
 	activeResourceInfo := &ResourceInfo{
-		OrgID:            stringValue(ctx.AdditionalMetadata[OrgIDKey]),
-		OrgName:          stringValue(ctx.AdditionalMetadata[OrgNameKey]),
-		ProjectName:      stringValue(ctx.AdditionalMetadata[ProjectNameKey]),
-		ProjectID:        stringValue(ctx.AdditionalMetadata[ProjectIDKey]),
-		SpaceName:        stringValue(ctx.AdditionalMetadata[SpaceNameKey]),
-		ClusterGroupName: stringValue(ctx.AdditionalMetadata[ClusterGroupNameKey]),
+		OrgID:               stringValue(ctx.AdditionalMetadata[OrgIDKey]),
+		OrgName:             stringValue(ctx.AdditionalMetadata[OrgNameKey]),
+		ProjectName:         stringValue(ctx.AdditionalMetadata[ProjectNameKey]),
+		ProjectID:           stringValue(ctx.AdditionalMetadata[ProjectIDKey]),
+		SpaceName:           stringValue(ctx.AdditionalMetadata[SpaceNameKey]),
+		ClusterGroupName:    stringValue(ctx.AdditionalMetadata[ClusterGroupNameKey]),
+		FoundationGroupName: stringValue(ctx.AdditionalMetadata[FoundationGroupNameKey]),
 	}
 	return activeResourceInfo, nil
 }
@@ -376,4 +404,18 @@ func stringValue(val interface{}) string {
 		return ""
 	}
 	return str
+}
+
+func validateResourceOptions(resourceOptions *resourceOptions) error {
+	nonEmptyCount := 0
+	for _, val := range []string{resourceOptions.spaceName, resourceOptions.clusterGroupName, resourceOptions.foundationGroupName} {
+		if strings.TrimSpace(val) != "" {
+			nonEmptyCount++
+		}
+	}
+	providedResourcesOptions := fmt.Sprintf("space: %s, clustergroup: %s, foundationgroup: %s", resourceOptions.spaceName, resourceOptions.clusterGroupName, resourceOptions.foundationGroupName)
+	if nonEmptyCount > 1 {
+		return fmt.Errorf("incorrect resource options provided. Only one of space, clustergroup, or foundationgroup can be set. Provided configuration - %s", providedResourcesOptions)
+	}
+	return nil
 }

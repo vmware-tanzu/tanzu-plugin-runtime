@@ -45,8 +45,12 @@ func newRootCmd(descriptor *PluginDescriptor) *cobra.Command {
 			cobra.CommandDisplayNameAnnotation: cmdName,
 		},
 	}
+	// Instead of using templates, use go functions.
+	// This allows for dead-code-elimination.
+	// The below call will set the format for both usage and help printouts.
+	cmd.SetUsageFunc(UsageFunc)
+	// Keep this call for backwards-compatibility, in case a plugin uses the templating
 	cobra.AddTemplateFuncs(TemplateFuncs)
-	cmd.SetUsageTemplate(cmdTemplate)
 
 	cmd.AddCommand(
 		newDescribeCmd(descriptor.Description),
